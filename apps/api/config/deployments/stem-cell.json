@@ -10,17 +10,17 @@
       "code": "STEM_CELL_THERAPY",
       "name": "Stem Cell Treatments",
       "theme": {
-        "layout": "academic",
         "primary": "#0f4c5c",
         "accent": "#9a3412",
         "bg": "#ffffff",
-        "surface": "#f8fafc",
-        "text": "#1f2937",
+        "surface": "#f2f7f7",
+        "text": "#0f172a",
         "muted": "#4b5563",
-        "border": "#dbe4f0",
-        "radius": "10px",
+        "border": "#d9e6e6",
+        "radius": "14px",
         "font_heading": "Georgia, Times New Roman, serif",
-        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif"
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+        "layout": "academic"
       },
       "locales": {
         "en": {
@@ -54,97 +54,173 @@
           "en": "Get the weekly brief",
           "es": "Recibir el resumen semanal"
         },
-      "qualify": {
-        "label": {
-          "en": "What are you looking for?",
-          "es": "¿Qué está buscando?"
-        },
-        "required": true,
-        "options": [
-          {
-            "value": "treatment",
-            "label": {
-              "en": "Treatment information",
-              "es": "Información sobre tratamiento"
-            }
+        "qualify": {
+          "label": {
+            "en": "What are you looking for?",
+            "es": "¿Qué está buscando?"
           },
-          {
-            "value": "trial",
-            "label": {
-              "en": "Clinical trials",
-              "es": "Ensayos clínicos"
+          "required": true,
+          "options": [
+            {
+              "value": "treatment",
+              "label": {
+                "en": "Treatment information",
+                "es": "Información sobre tratamiento"
+              }
+            },
+            {
+              "value": "trial",
+              "label": {
+                "en": "Clinical trials",
+                "es": "Ensayos clínicos"
+              }
+            },
+            {
+              "value": "storage",
+              "label": {
+                "en": "Cord blood storage",
+                "es": "Conservación de cordón"
+              }
+            },
+            {
+              "value": "regulatory",
+              "label": {
+                "en": "Regulatory questions",
+                "es": "Consultas regulatorias"
+              }
+            },
+            {
+              "value": "other",
+              "label": {
+                "en": "Something else",
+                "es": "Otra opción"
+              }
             }
-          },
-          {
-            "value": "storage",
-            "label": {
-              "en": "Cord blood storage",
-              "es": "Conservación de cordón"
-            }
-          },
-          {
-            "value": "regulatory",
-            "label": {
-              "en": "Regulatory questions",
-              "es": "Consultas regulatorias"
-            }
-          },
-          {
-            "value": "other",
-            "label": {
-              "en": "Something else",
-              "es": "Otra opción"
-            }
-          }
-        ]
-      }
+          ]
+        }
       },
       "sort_order": 70,
       "retention_days": 30,
       "topics": [
         {
           "slug": "regenerative-medicine",
-          "label": { "en": "Regenerative Medicine", "es": "Medicina Regenerativa" },
+          "label": {
+            "en": "Regenerative Medicine",
+            "es": "Medicina Regenerativa"
+          },
           "weight": 1.4,
           "keywords": {
-            "en": ["stem cell", "regenerative", "tissue repair", "organoid", "regeneration"],
-            "es": ["células madre", "regenerativa", "reparación de tejidos", "organoide"]
+            "en": [
+              "stem cell",
+              "regenerative",
+              "tissue repair",
+              "organoid",
+              "regeneration"
+            ],
+            "es": [
+              "células madre",
+              "regenerativa",
+              "reparación de tejidos",
+              "organoide"
+            ]
           }
         },
         {
           "slug": "clinical-trials",
-          "label": { "en": "Clinical Trials", "es": "Ensayos Clínicos" },
+          "label": {
+            "en": "Clinical Trials",
+            "es": "Ensayos Clínicos"
+          },
           "weight": 1.3,
           "keywords": {
-            "en": ["clinical trial", "phase 1", "phase 2", "efficacy", "patient", "transplant"],
-            "es": ["ensayo clínico", "fase 1", "fase 2", "eficacia", "paciente", "trasplante"]
+            "en": [
+              "clinical trial",
+              "phase 1",
+              "phase 2",
+              "efficacy",
+              "patient",
+              "transplant"
+            ],
+            "es": [
+              "ensayo clínico",
+              "fase 1",
+              "fase 2",
+              "eficacia",
+              "paciente",
+              "trasplante"
+            ]
           }
         },
         {
           "slug": "regulatory",
-          "label": { "en": "Regulation & Approval", "es": "Regulación y Aprobación" },
+          "label": {
+            "en": "Regulation & Approval",
+            "es": "Regulación y Aprobación"
+          },
           "weight": 1.3,
           "keywords": {
-            "en": ["fda", "ema", "approval", "regulatory", "car-t", "market authorization"],
-            "es": ["aprobación", "regulación", "autorización", "agencia"]
+            "en": [
+              "fda",
+              "ema",
+              "approval",
+              "regulatory",
+              "car-t",
+              "market authorization"
+            ],
+            "es": [
+              "aprobación",
+              "regulación",
+              "autorización",
+              "agencia"
+            ]
           }
         },
         {
           "slug": "ethics-safety",
-          "label": { "en": "Ethics & Safety", "es": "Ética y Seguridad" },
+          "label": {
+            "en": "Ethics & Safety",
+            "es": "Ética y Seguridad"
+          },
           "weight": 1.1,
           "keywords": {
-            "en": ["ethics", "safety", "adverse event", "unproven", "clinic", "consent"],
-            "es": ["ética", "seguridad", "evento adverso", "no comprobado", "consentimiento"]
+            "en": [
+              "ethics",
+              "safety",
+              "adverse event",
+              "unproven",
+              "clinic",
+              "consent"
+            ],
+            "es": [
+              "ética",
+              "seguridad",
+              "evento adverso",
+              "no comprobado",
+              "consentimiento"
+            ]
           }
         },
         {
           "slug": "industry",
-          "label": { "en": "Cell Therapy Industry", "es": "Industria de Terapia Celular" },
+          "label": {
+            "en": "Cell Therapy Industry",
+            "es": "Industria de Terapia Celular"
+          },
           "weight": 1.0,
           "keywords": {
-            "en": ["biotech", "manufacturing", "funding", "partnership", "commercial"],
-            "es": ["biotecnología", "fabricación", "financiamiento", "acuerdo"]
+            "en": [
+              "biotech",
+              "manufacturing",
+              "funding",
+              "partnership",
+              "commercial"
+            ],
+            "es": [
+              "biotecnología",
+              "fabricación",
+              "financiamiento",
+              "acuerdo"
+            ]
           }
         }
       ],
@@ -171,13 +247,13 @@
           "name": "STAT News",
           "feed_url": "https://www.statnews.com/feed/",
           "language": "en",
-          "trust": 0.90
+          "trust": 0.9
         },
         {
           "name": "Consalud",
           "feed_url": "https://www.consalud.es/rss/",
           "language": "es",
-          "trust": 0.80
+          "trust": 0.8
         },
         {
           "name": "EFEsalud",

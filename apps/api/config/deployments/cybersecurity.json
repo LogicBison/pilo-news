@@ -10,17 +10,17 @@
       "code": "CYBER_SECURITY",
       "name": "Cybersecurity & Threat Intelligence",
       "theme": {
-        "bg": "#ffffff",
-        "text": "#0f172a",
-        "muted": "#475569",
-        "accent": "#0e7490",
-        "border": "#cbd5e1",
-        "layout": "professional",
-        "radius": "8px",
-        "primary": "#1e293b",
-        "surface": "#f1f5f9",
+        "primary": "#1e3a5f",
+        "accent": "#22d3ee",
+        "bg": "#0b1220",
+        "surface": "#131c2e",
+        "text": "#e5edf7",
+        "muted": "#a3b1c6",
+        "border": "#243046",
+        "radius": "2px",
+        "font_heading": "Arial, Helvetica, sans-serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Arial, Helvetica, sans-serif"
+        "layout": "professional"
       },
       "locales": {
         "en": {

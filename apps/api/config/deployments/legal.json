@@ -10,17 +10,17 @@
       "code": "LEGAL_TECH",
       "name": "Legal Services & Corporate Governance",
       "theme": {
-        "bg": "#ffffff",
-        "text": "#111827",
-        "muted": "#4b5563",
-        "accent": "#8a4b08",
-        "border": "#d8dee6",
-        "layout": "editorial",
-        "radius": "10px",
-        "primary": "#1e3a5f",
-        "surface": "#f6f7f9",
+        "primary": "#5b2333",
+        "accent": "#a16207",
+        "bg": "#faf7f2",
+        "surface": "#f3ede4",
+        "text": "#1c1917",
+        "muted": "#57534e",
+        "border": "#e7ded1",
+        "radius": "6px",
+        "font_heading": "Georgia, Times New Roman, serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Georgia, Times New Roman, serif"
+        "layout": "editorial"
       },
       "locales": {
         "es": {

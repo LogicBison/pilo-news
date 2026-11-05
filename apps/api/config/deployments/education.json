@@ -10,17 +10,17 @@
       "code": "EDTECH_LMS",
       "name": "Education & Higher Academics",
       "theme": {
-        "bg": "#fffdf7",
-        "text": "#1f2937",
-        "muted": "#4b5563",
+        "primary": "#14532d",
         "accent": "#b45309",
-        "border": "#dbe4f0",
-        "layout": "academic",
+        "bg": "#fbf8ef",
+        "surface": "#f4edda",
+        "text": "#1f2a1d",
+        "muted": "#4f5a4a",
+        "border": "#e3dcc6",
         "radius": "10px",
-        "primary": "#1d4ed8",
-        "surface": "#f8fafc",
+        "font_heading": "Georgia, Times New Roman, serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Georgia, Times New Roman, serif"
+        "layout": "academic"
       },
       "locales": {
         "es": {

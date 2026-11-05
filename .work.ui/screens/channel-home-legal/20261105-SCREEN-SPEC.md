@@ -103,7 +103,7 @@ Portico illustration band: six columns, pediment, steps; arches motif behind the
 
 Imagery: a licensed photograph carries the band (source and licence in `apps/web/public/photos/credits.json`); motifs and the masthead emblem stay line-art as the brand layer.
 
-Palette from `industries.theme`: navy primary + bronze accent, off-white base, 6px corners. Reference basis: ellevest (trust-first), nerdwallet (disclosure placement).
+Palette from `industries.theme`: burgundy `#5b2333` primary + ochre `#a16207` accent, ivory `#faf7f2` base, 6px corners. Reference basis: ellevest (trust-first), nerdwallet (disclosure placement).
 
 ## Next action
 

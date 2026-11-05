@@ -103,7 +103,7 @@ Circuit-trace band with a shield and check; hex lattice motif; shield emblem in 
 
 Imagery: a licensed photograph carries the band (source and licence in `apps/web/public/photos/credits.json`); motifs and the masthead emblem stay line-art as the brand layer.
 
-Palette from `industries.theme`: slate primary + cyan accent, grey surface, 0px corners. Reference basis: semrush (data density), userpilot (product-led proof).
+Palette from `industries.theme`: **dark scheme** — midnight `#0b1220` base, light `#e5edf7` text, cyan `#22d3ee` accent, 2px corners. Reference basis: semrush (data density), userpilot (product-led proof).
 
 ## Next action
 

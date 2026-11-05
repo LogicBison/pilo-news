@@ -2,17 +2,15 @@
 
 > **Path:** `<repo-root>/.work.ui/context/HANDOFF_UI.md` · Maintained by **`ui-*` skills**. Session bookends: **`@session-control`** when `.ai/` is present (full repo); `.work.ui`-scoped session verbs (start / status / context / add / commit / close / push) via **`@ui-session`**.
 
-**Status:** **screen-spec-ready: yes** (certified 2026-11-05, all seven channels) · **Needs:** `@ui-design-system init`, then the first channel SPEC.
+**Status:** screen-spec-ready **yes**; 7 channel SPECs drafted, none approved · **Needs:** `@ui-screen-spec review` + `@ui-visual-verify milestone`.
 
 ## Session status
 
-**Open:** 2026-11-05 - goal: per-channel UI skin refresh (foundation first)
+**Closed:** 2026-11-05 - foundation certified screen-spec-ready; seven channel skins, emblems, photography, distinct palettes and layouts shipped
 
 **Updated:** 2026-11-05
 
-**Closed:** -
-
-**UI layer state:** Foundation written - vision/principles, tokens (DTCG + CSS map), pattern inventory, screen map. No screen SPECs, no catalog primitives yet.
+**UI layer state:** Foundation certified. 7 skins live (palette, hero, coverage rhythm, emblem, photo), 7 channel-home SPECs drafted. Catalog primitives still pending (`@ui-design-system init`).
 
 **Recommended pick-up:** `.work.ui/plans/NEXT_UI.md`
 
@@ -195,3 +193,18 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 4. `apps/web/src/middleware.ts` — `photos/` exempted from the locale rewrite (same class of bug as `skins/`)
 **Known gap:** the image cache must be cleared when a photo file is replaced in place (`rm -rf .next/cache/images`); filenames are not content-hashed.
 **Next recommended:** `@ui-visual-verify milestone`, then per-channel SPEC review.
+
+
+---
+
+## Latest build (@x-director) — distinct palettes and layouts
+
+**Date:** 2026-11-05
+**Request:** different colour schemes and layouts per channel
+**Executed:**
+1. Migration `009_distinct_channel_palettes.sql` — 7 palettes (ivory/burgundy, cool-white/navy, blush/plum, parchment/forest, mist/graphite, **dark** midnight/cyan, white/teal); profiles synced
+2. `skins.ts` gains `list` (grid3 / grid2 / stack / magazine) and `bar` (split / centered); layout exposes `data-list` / `data-bar`
+3. `skins.css` — coverage rhythms, centered app bar for three channels, dark-scheme handling for cybersecurity
+4. SPECs updated with each channel's palette
+**Checks:** migration applied and idempotent; `pnpm check` = 7 channels pass contrast; `pnpm lint` / `typecheck` green
+**Note:** the web container lost Playwright's system libraries mid-session; reinstalled `libglib` etc. to keep screenshot verification working (container-only, not a repo change).

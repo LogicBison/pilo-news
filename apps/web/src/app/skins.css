@@ -612,3 +612,85 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* --- coverage rhythms ------------------------------------------------------ */
+
+.sn-columns {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  [data-list="grid3"] .sn-columns,
+  [data-list="grid2"] .sn-columns,
+  [data-list="magazine"] .sn-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-list="grid3"] .sn-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  [data-list="grid2"] .sn-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem;
+  }
+
+  [data-list="magazine"] .sn-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  [data-list="magazine"] .sn-columns > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  [data-list="magazine"] .sn-columns > :first-child .sn-story {
+    padding: 1.75rem;
+  }
+
+  [data-list="stack"] .sn-columns {
+    max-width: 46rem;
+    margin-inline: auto;
+    gap: 1.75rem;
+  }
+}
+
+[data-list="stack"] .sn-columns > div:first-child .sn-story {
+  border-top: 4px solid var(--sn-accent);
+}
+
+/* --- app bar arrangements --------------------------------------------------- */
+
+[data-bar="center"] .sn-appbar nav {
+  flex: 1 1 100%;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  [data-bar="center"] .sn-appbar nav {
+    flex: 1 1 auto;
+    order: 2;
+  }
+}
+
+[data-bar="center"] .sn-appbar nav a {
+  padding-inline: 1rem;
+}
+
+/* --- dark scheme (cybersecurity) -------------------------------------------- */
+
+[data-skin="sentinel"] {
+  color-scheme: dark;
+}
+
+[data-skin="sentinel"] .sn-card {
+  box-shadow: none;
+}
+
+[data-skin="sentinel"] .sn-brandmark {
+  background: var(--sn-surface);
+  color: var(--sn-accent);
+}

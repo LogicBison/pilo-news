@@ -103,7 +103,7 @@ Container-yard band with route arcs; dashed route motif; node emblem in the mast
 
 Imagery: a licensed photograph carries the band (source and licence in `apps/web/public/photos/credits.json`); motifs and the masthead emblem stay line-art as the brand layer.
 
-Palette from `industries.theme`: forest primary + amber accent, pale green surface, 8px corners. Reference basis: basecamp (plain language), calendly (one job per page).
+Palette from `industries.theme`: graphite-green `#1f3d33` primary + burnt orange `#c2410c` accent, mist `#f4f6f5` base, 8px corners. Reference basis: basecamp (plain language), calendly (one job per page).
 
 ## Next action
 

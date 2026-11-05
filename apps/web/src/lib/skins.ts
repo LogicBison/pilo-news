@@ -11,6 +11,8 @@ export type HeroVariant = "split" | "ledger" | "poster" | "ribbon";
 export type RuleStyle = "double" | "hairline" | "dotted" | "dashed" | "none" | "accent";
 export type EyebrowStyle = "serif" | "mono" | "numbered" | "soft";
 export type CtaPanel = "sidebar" | "banner" | "inset" | "corner";
+export type ListLayout = "grid3" | "grid2" | "stack" | "magazine";
+export type BarLayout = "split" | "center";
 
 export interface Skin {
   key: SkinKey;
@@ -33,6 +35,10 @@ export interface Skin {
   cta: CtaPanel;
   /** Favourites strip: static grid or scroll-snap rail. */
   rail: "static" | "scroll";
+  /** Coverage grid rhythm. */
+  list: ListLayout;
+  /** App bar arrangement. */
+  bar: BarLayout;
   /** Operator reference sites this skin draws on. */
   references: string[];
 }
@@ -50,6 +56,8 @@ const CHAMBERS: Skin = {
   eyebrow: "serif",
   cta: "sidebar",
   rail: "static",
+    list: "magazine",
+    bar: "split",
   references: ["ellevest", "nerdwallet"],
 };
 
@@ -67,6 +75,8 @@ const TERMINAL: Skin = {
   eyebrow: "mono",
   cta: "banner",
   rail: "scroll",
+    list: "grid3",
+    bar: "split",
   references: ["databox", "nerdwallet"],
 };
 
@@ -83,6 +93,8 @@ const SANCTUARY: Skin = {
   eyebrow: "soft",
   cta: "inset",
   rail: "static",
+    list: "stack",
+    bar: "center",
   references: ["ellevest", "charitywater"],
 };
 
@@ -99,6 +111,8 @@ const CAMPUS: Skin = {
   eyebrow: "numbered",
   cta: "corner",
   rail: "static",
+    list: "grid2",
+    bar: "center",
   references: ["hubspot", "databox"],
 };
 
@@ -115,6 +129,8 @@ const NETWORK: Skin = {
   eyebrow: "mono",
   cta: "banner",
   rail: "scroll",
+    list: "grid3",
+    bar: "split",
   references: ["basecamp", "calendly"],
 };
 
@@ -132,6 +148,8 @@ const SENTINEL: Skin = {
   eyebrow: "mono",
   cta: "sidebar",
   rail: "static",
+    list: "grid2",
+    bar: "split",
   references: ["semrush", "userpilot"],
 };
 
@@ -149,6 +167,8 @@ const LAB: Skin = {
   eyebrow: "serif",
   cta: "inset",
   rail: "static",
+    list: "magazine",
+    bar: "center",
   references: ["ellevest", "typeform"],
 };
 

@@ -10,17 +10,17 @@
       "code": "FINTECH_CORE",
       "name": "Financial Services & Banking",
       "theme": {
-        "bg": "#ffffff",
-        "text": "#0f172a",
-        "muted": "#475569",
-        "accent": "#0f766e",
-        "border": "#cbd5e1",
-        "layout": "professional",
-        "radius": "6px",
-        "primary": "#0b4f6c",
-        "surface": "#f1f5f9",
+        "primary": "#0f2f4f",
+        "accent": "#0e7490",
+        "bg": "#f7f9fb",
+        "surface": "#eef2f6",
+        "text": "#0b1220",
+        "muted": "#4b5563",
+        "border": "#dbe3ea",
+        "radius": "4px",
+        "font_heading": "Arial, Helvetica, sans-serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Arial, Helvetica, sans-serif"
+        "layout": "professional"
       },
       "locales": {
         "es": {

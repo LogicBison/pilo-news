@@ -103,7 +103,7 @@ Petri-dish band with membrane circles and pipette arc; cell motif; nucleus emble
 
 Imagery: a licensed photograph carries the band (source and licence in `apps/web/public/photos/credits.json`); motifs and the masthead emblem stay line-art as the brand layer.
 
-Palette from `industries.theme`: deep teal primary + rust accent, white base, 14px corners. Reference basis: ellevest (credibility), typeform (low-friction entry).
+Palette from `industries.theme`: deep teal `#0f4c5c` primary + rust `#9a3412` accent, white base, 14px corners. Reference basis: ellevest (credibility), typeform (low-friction entry).
 
 ## Next action
 

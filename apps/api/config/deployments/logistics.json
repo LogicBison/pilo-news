@@ -10,17 +10,17 @@
       "code": "SUPPLY_CHAIN_WMS",
       "name": "Logistics & Supply Chain",
       "theme": {
-        "bg": "#ffffff",
-        "text": "#111827",
-        "muted": "#4b5563",
-        "accent": "#b45309",
-        "border": "#c7e3d0",
-        "layout": "professional",
-        "radius": "6px",
-        "primary": "#14532d",
-        "surface": "#f0fdf4",
+        "primary": "#1f3d33",
+        "accent": "#c2410c",
+        "bg": "#f4f6f5",
+        "surface": "#e9efec",
+        "text": "#0f1a16",
+        "muted": "#4a5a53",
+        "border": "#d7e0da",
+        "radius": "8px",
+        "font_heading": "Arial, Helvetica, sans-serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Arial, Helvetica, sans-serif"
+        "layout": "professional"
       },
       "locales": {
         "es": {

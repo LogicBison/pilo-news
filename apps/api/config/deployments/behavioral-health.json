@@ -10,17 +10,17 @@
       "code": "BEHAVIORAL_HEALTH_EHR",
       "name": "Psychiatry & Clinical Psychology",
       "theme": {
-        "bg": "#ffffff",
-        "text": "#1f2937",
-        "muted": "#4b5563",
-        "accent": "#9a3412",
-        "border": "#ddd6fe",
-        "layout": "editorial",
-        "radius": "12px",
-        "primary": "#4c1d95",
-        "surface": "#faf5ff",
+        "primary": "#7c3f58",
+        "accent": "#b45309",
+        "bg": "#fdf7f5",
+        "surface": "#f9ece7",
+        "text": "#2b1d1b",
+        "muted": "#6b5250",
+        "border": "#eddcd6",
+        "radius": "22px",
+        "font_heading": "Georgia, Times New Roman, serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Georgia, Times New Roman, serif"
+        "layout": "editorial"
       },
       "locales": {
         "es": {

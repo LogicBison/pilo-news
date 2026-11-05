@@ -103,7 +103,7 @@ Soft wave band, open-ring motif, calm spacing; arcs emblem in the masthead.
 
 Imagery: a licensed photograph carries the band (source and licence in `apps/web/public/photos/credits.json`); motifs and the masthead emblem stay line-art as the brand layer.
 
-Palette from `industries.theme`: plum primary + terracotta accent, blush surface, 22px corners. Reference basis: ellevest (trust-first), charitywater (warmth, single ask).
+Palette from `industries.theme`: plum `#7c3f58` primary + amber `#b45309` accent, blush `#fdf7f5` base, 22px corners. Reference basis: ellevest (trust-first), charitywater (warmth, single ask).
 
 ## Next action
 

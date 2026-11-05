@@ -2,7 +2,9 @@
 
 ## Session status
 
-**Open:** 2026-11-05 - goal: per-channel UI skin refresh (UI Design OS foundation first) · **Updated:** 2026-11-05 · **Closed:** -
+**Closed:** 2026-11-05 - seven distinct channel skins, per-channel photography, lead qualification, 108 API tests green; UI foundation certified screen-spec-ready
+
+**Updated:** 2026-11-05
 
 **Repository state:** v1 implemented plus the post-v1 operator scope. Master plan v1.1
 (Approved) executed end to end: schema/migrations (001-007), **seven** live channels
@@ -16,9 +18,11 @@ material-inspired surface system. **Foundation-complete: yes. Plan-master-ready:
 Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.**
 
 **Recommended pick-up file:** `.work/plans/NEXT.md`
-**Next session focus:** per-channel UI skin refresh. run `@ui-design-foundation greenfield`,
-then per-channel specs, using the 14 lead-generation references recorded in
-`.work/plans/20261105-ui-skin-refresh.md`. `.work.ui` is still greenfield.
+**Next session focus:** audit and finish the per-channel skins. `@ui-screen-spec review`
+the seven channel-home SPECs in `.work.ui/screens/`, run `@ui-visual-verify milestone`,
+then `@ui-accessibility-audit` (the dark cybersecurity scheme has not been a11y-audited).
+Skins live in `apps/web/src/lib/skins.ts` + `apps/web/src/app/skins.css`; palettes come
+from `apps/api/migrations/009_distinct_channel_palettes.sql`.
 Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev industry <slug>`
 (quick reference: `docs/guides/switching-channels.md`).
 
@@ -121,6 +125,7 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | Skin system 2026-11-05 | 7 distinct skins live (`data-skin` per channel), 7 motifs + 7 original illustration bands, screenshots desktop+mobile, `pnpm lint/typecheck/check` green |
 | Per-channel art 2026-11-05 | 7 inline masthead emblems, article illustration strips, 7 channel-home SPECs under `.work.ui/screens/` |
 | Realistic imagery 2026-11-05 | 7 licensed photos (credits.json, 2 CC BY-SA with in-page credit), next/image band + article strip, line art kept as motif/emblem/fallback |
+| Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
 
 ---
 
@@ -132,7 +137,7 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | O2 | ~~VPS provider/budget~~ approved | - | owner | ADR 005 |
 | O3 | ~~NFR targets~~ approved | - | owner | doc 04 §5 |
 | O4 | ~~Stack files~~ approved/created | - | owner | operations proposal |
-| O5 | Fill remaining unknowns: U1 brand, U7 roles, U8 email, U9 analytics, U10 traffic, U11 legal review, U12 sponsored | launch | owner | `.work/plans/UNKNOWNS.md` |
+| O5 | Fill remaining unknowns: U1 brand, U7 roles, U9 analytics, U10 traffic, U11 legal review, U12 sponsored (U8 closed: pilo-mail gateway chosen, integration deferred) | launch | owner | `.work/plans/UNKNOWNS.md` |
 | O6 | ~~Master plan~~ approved | - | owner | full plan v1.1 |
 | O7 | prd domain/DNS + provider | prd deploy | owner | launch checklist |
 | O8 | CDN/off-site backup bucket (optional) | RPO | owner | backup doc |
@@ -153,6 +158,9 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | 2026-11-05 | docs | `docs/guides/switching-channels.md` quick reference; UI skin refresh brief |
 | 2026-11-05 | lead magnet | `ProofStrip`, `TrustBlock`, `BriefSignup` components wired to channel home + article (all 7 channels, EN/ES); recommendations in `.work.biz/strategy/20261105-lead-magnet-recommendations.md` |
 | 2026-11-05 | lead qualification | migration 008 (`leads.qualification` + per-channel `cta.qualify`), API field, `LeadForm` select, deployment profiles synced, 1 new contract test |
+| 2026-11-05 | ui foundation | `.work.ui/plans/foundation/01-04`, `tokens.json` (74 DTCG), certified screen-spec-ready; 7 channel-home SPECs |
+| 2026-11-05 | skins | `skins.ts` + `skins.css` + 7 motifs + 7 emblems + 7 photos; four coverage rhythms; dark scheme |
+| 2026-11-05 | session close | commit + push; handoff/next refreshed |
 
 ---
 
@@ -167,6 +175,7 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | ~~U6~~ | Closed: pilot = `legal` | - |
 | U9 | Analytics/consent posture | cookie banner/privacy |
 | U10 | Traffic expectation | sizing |
+| U8 | Closed: email delivery via `pilo-mail` (Brevo gateway); integration deferred | - |
 | U18 | Lead pricing/partner model | CTA routing |
 
 ---
@@ -184,7 +193,9 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
 - Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
-- The UI is a hand-made material pass, not a certified `.work.ui` design system.
+- The UI now has a certified foundation and seven skins, but no screen SPEC is Approved yet and no visual/a11y milestone audit has run.
+- The cybersecurity channel uses a dark scheme; non-text contrast of inputs on dark has not been measured.
+- Photo licences are recorded per file; two channels are CC BY-SA and depend on the in-caption credit staying rendered.
 - AI summaries are fail-open; some items are intentionally left without a
   summary when validation rejects output.
 - CI is written but has not run on GitHub yet.
@@ -198,4 +209,4 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Run the UI skin refresh brief (`.work/plans/20261105-ui-skin-refresh.md`), then answer U9/U8/U10/U1 and run `.work/plans/operations/20261105-launch.md`.
+Run `@ui-visual-verify milestone` and `@ui-accessibility-audit milestone` across the seven skins, then review the channel-home SPECs; answer U9/U10/U1 and run `.work/plans/operations/20261105-launch.md`.

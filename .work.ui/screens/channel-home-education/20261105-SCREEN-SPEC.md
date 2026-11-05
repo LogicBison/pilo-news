@@ -103,7 +103,7 @@ Open-book band with radiating page lines; ruled-paper motif; book emblem in the 
 
 Imagery: a licensed photograph carries the band (source and licence in `apps/web/public/photos/credits.json`); motifs and the masthead emblem stay line-art as the brand layer.
 
-Palette from `industries.theme`: royal primary + amber accent, cream base, 10px corners. Reference basis: hubspot (segmented CTA), databox (proof).
+Palette from `industries.theme`: forest `#14532d` primary + amber `#b45309` accent, parchment `#fbf8ef` base, 10px corners. Reference basis: hubspot (segmented CTA), databox (proof).
 
 ## Next action
 

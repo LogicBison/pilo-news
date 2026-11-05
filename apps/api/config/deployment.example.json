@@ -10,17 +10,17 @@
       "code": "LEGAL_TECH",
       "name": "Legal Services & Corporate Governance",
       "theme": {
-        "bg": "#ffffff",
-        "text": "#111827",
-        "muted": "#4b5563",
-        "accent": "#8a4b08",
-        "border": "#d8dee6",
-        "layout": "editorial",
-        "radius": "10px",
-        "primary": "#1e3a5f",
-        "surface": "#f6f7f9",
+        "primary": "#5b2333",
+        "accent": "#a16207",
+        "bg": "#faf7f2",
+        "surface": "#f3ede4",
+        "text": "#1c1917",
+        "muted": "#57534e",
+        "border": "#e7ded1",
+        "radius": "6px",
+        "font_heading": "Georgia, Times New Roman, serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Georgia, Times New Roman, serif"
+        "layout": "editorial"
       },
       "locales": {
         "es": {
@@ -258,17 +258,17 @@
       "code": "FINTECH_CORE",
       "name": "Financial Services & Banking",
       "theme": {
-        "bg": "#ffffff",
-        "text": "#0f172a",
-        "muted": "#475569",
-        "accent": "#0f766e",
-        "border": "#cbd5e1",
-        "layout": "professional",
-        "radius": "6px",
-        "primary": "#0b4f6c",
-        "surface": "#f1f5f9",
+        "primary": "#0f2f4f",
+        "accent": "#0e7490",
+        "bg": "#f7f9fb",
+        "surface": "#eef2f6",
+        "text": "#0b1220",
+        "muted": "#4b5563",
+        "border": "#dbe3ea",
+        "radius": "4px",
+        "font_heading": "Arial, Helvetica, sans-serif",
         "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
-        "font_heading": "Arial, Helvetica, sans-serif"
+        "layout": "professional"
       },
       "locales": {
         "es": {

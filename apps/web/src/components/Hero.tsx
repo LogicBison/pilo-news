@@ -99,7 +99,7 @@ export function StoryColumns({
         </h2>
         <span aria-hidden="true" className="sn-rule" />
       </div>
-      <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="sn-columns mt-5">
         {populated.map((column, index) => (
           <div key={index} className="flex flex-col gap-5">
             {column.items.map((article) => (

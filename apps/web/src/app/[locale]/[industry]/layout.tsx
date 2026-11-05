@@ -31,6 +31,8 @@ export default async function IndustryLayout({
       data-layout={channel.theme.layout}
       data-skin={skin.key}
       data-hero={skin.hero}
+      data-list={skin.list}
+      data-bar={skin.bar}
       style={{
         ...themeStyle(channel.theme),
         "--sn-radius": skin.radius,

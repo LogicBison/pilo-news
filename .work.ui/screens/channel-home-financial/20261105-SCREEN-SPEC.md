@@ -103,7 +103,7 @@ Skyline band with bar silhouettes and a trend polyline; hex-free hairline grid; 
 
 Imagery: a licensed photograph carries the band (source and licence in `apps/web/public/photos/credits.json`); motifs and the masthead emblem stay line-art as the brand layer.
 
-Palette from `industries.theme`: teal primary + teal accent, white base, 4px corners. Reference basis: databox (dense proof), nerdwallet (comparison clarity).
+Palette from `industries.theme`: navy `#0f2f4f` primary + teal `#0e7490` accent, cool white `#f7f9fb` base, 4px corners. Reference basis: databox (dense proof), nerdwallet (comparison clarity).
 
 ## Next action
 

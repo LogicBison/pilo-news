@@ -34,6 +34,22 @@ Every channel gets a unique tuple. No two channels share a hero, a motif, and a 
 | cybersecurity | **Sentinel** | ledger | hexes | 2px | solid accent | mono ticks | sidebar | semrush data density, userpilot product-led |
 | stem-cell | **Lab** | ribbon | cells | 14px | hairline | serif caps | inset | ellevest credibility, typeform form-first |
 
+## Palettes and coverage rhythm
+
+Each channel owns a colour scheme, not a tint of the same one. Contrast is gated per channel by `pnpm check` (5 pairs × 7 channels).
+
+| Channel | Palette | Base | Primary | Accent | Coverage |
+|---------|---------|------|---------|--------|----------|
+| legal | ivory + burgundy | `#faf7f2` | `#5b2333` | `#a16207` | magazine (wide lead, then 2-up) |
+| financial | cool white + navy | `#f7f9fb` | `#0f2f4f` | `#0e7490` | grid3 |
+| behavioral-health | blush + plum | `#fdf7f5` | `#7c3f58` | `#b45309` | stack (single column, lead card accented) |
+| education | parchment + forest | `#fbf8ef` | `#14532d` | `#b45309` | grid2 |
+| logistics | mist + graphite green | `#f4f6f5` | `#1f3d33` | `#c2410c` | grid3 |
+| cybersecurity | **dark** midnight + cyan | `#0b1220` | `#1e3a5f` | `#22d3ee` | grid2 |
+| stem-cell | white + deep teal | `#ffffff` | `#0f4c5c` | `#9a3412` | magazine |
+
+App bar: `split` for legal, financial, logistics, cybersecurity; `centered` for behavioral-health, education, stem-cell.
+
 Design intent per channel:
 
 - **Chambers** — an institution, not a blog. Serif headline, double rule under the hero, CTA in a margin column. Nothing urgent, nothing loud.

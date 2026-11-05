@@ -36,6 +36,12 @@
 | Stem-cell channel | `config/deployments/stem-cell.json`: 6 verified feeds, 5 topics, 53 articles |
 | Channel quick reference | `docs/guides/switching-channels.md`; linked from README |
 | UI skin refresh brief | `.work/plans/20261105-ui-skin-refresh.md` with 14 reference sites |
+| UI foundation | `.work.ui/plans/foundation/01-04` + `tokens.json`; certified screen-spec-ready |
+| Seven channel skins | `skins.ts` + `skins.css`: 4 hero variants, 4 coverage rhythms, 7 motifs, 7 emblems |
+| Per-channel photography | `apps/web/public/photos/*` + `credits.json`; `next/image` band + article strip |
+| Distinct palettes | migration 009: 7 schemes incl. dark cybersecurity; 7/7 contrast |
+| Lead magnet + qualification | `ProofStrip`, `TrustBlock`, `BriefSignup`; migration 008 qualification select |
+| Channel SPECs | 7 × `.work.ui/screens/channel-home-<slug>/` |
 
 ---
 
@@ -51,16 +57,16 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Per-channel UI skin refresh | `@ui-design-foundation greenfield`, then specs; references in `.work/plans/20261105-ui-skin-refresh.md` |
-| **1** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
-| **2** | U9/U8/U10 decisions | analytics/consent, email delivery, traffic sizing |
-| **3** | Third content language | extension point documented in `docs/customization.md` §3 |
+| **0** | Audit the seven skins | `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`; dark scheme first |
+| **1** | Approve channel SPECs | `@ui-screen-spec review` on the 7 channel-home SPECs, then per-channel copy pass |
+| **2** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
+| **3** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
 
 ---
 
 ## Current iteration
 
-*(Complete - M1-M8 + deployment profile import + source quality + two custom channels + material UI pass + channel quick reference. Next: per-channel UI skin refresh, then pending ops verification.)*
+*(Complete - M1-M8 + deployment profiles + source quality + two profile-only channels + certified UI foundation + seven distinct channel skins + lead qualification. Next: skin audit, SPEC approval, then pending ops verification.)*
 
 ### Concept / NFR registry
 
