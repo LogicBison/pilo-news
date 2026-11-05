@@ -1,32 +1,59 @@
+import Image from "next/image";
+import Link from "next/link";
+
 import type { Industry } from "@/lib/api";
+import { localePath, t, type Locale } from "@/lib/i18n";
 import type { Skin } from "@/lib/skins";
-import { localized } from "@/lib/theme";
-import { t, type Locale } from "@/lib/i18n";
 
 /**
- * Per-channel illustration band. The artwork is original in-repo vector art
- * (no third-party licence), rendered behind the channel tagline so the first
- * screen reads as this industry's page, not a shared template.
+ * Per-channel imagery. Photography is the primary surface (realistic colour,
+ * licence recorded per file in `apps/web/public/photos/credits.json`); the
+ * line-art SVG stays as the fallback and as the motif/emblem layer.
+ * Placements:
+ *  - `band`  channel home: full-height photo, captioned with the tagline.
+ *  - `strip` article page: short crop with a quiet link back to the channel.
+ * The photo is decorative — the caption carries the meaning.
  */
 export function SkinScene({
   skin,
   channel,
   locale,
+  variant = "band",
 }: {
   skin: Skin;
   channel: Industry;
   locale: Locale;
+  variant?: "band" | "strip";
 }) {
-  const tagline = channel.tagline || localized(channel.cta.headline, locale);
+  const home = localePath(locale, `/${channel.slug}`);
+  const compact = variant === "strip";
+
   return (
-    <figure className="sn-scene">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={skin.scene} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    <figure className={compact ? "sn-scene sn-scene-strip" : "sn-scene"}>
+      <Image
+        src={skin.photo}
+        alt=""
+        aria-hidden="true"
+        fill
+        sizes={compact ? "(min-width: 1024px) 768px, 100vw" : "(min-width: 1024px) 1152px, 100vw"}
+        className="sn-scene-img"
+        loading={compact ? "lazy" : "eager"}
+      />
       <figcaption>
         <span className="sn-eyebrow">{channel.name}</span>
-        {tagline ? <span className="sn-scene-line">{tagline}</span> : null}
+        {compact ? (
+          <Link href={home} className="sn-scene-link">
+            {t(locale, "scene.moreCoverage")}
+          </Link>
+        ) : (
+          <span className="sn-scene-line">{channel.tagline}</span>
+        )}
+        {skin.credit ? (
+          <a className="sn-scene-credit" href={skin.credit.href} target="_blank" rel="noreferrer">
+            {skin.credit.label}
+          </a>
+        ) : null}
       </figcaption>
-      <span className="sr-only">{t(locale, "proof.label")}</span>
     </figure>
   );
 }

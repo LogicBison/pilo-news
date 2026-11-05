@@ -8,10 +8,12 @@ import { StickyCta } from "@/components/Cta";
 import { JsonLd } from "@/components/JsonLd";
 import { LeadForm } from "@/components/LeadForm";
 import { EmptyState, FallbackNotice } from "@/components/Notices";
+import { SkinScene } from "@/components/SkinScene";
 import { StoryCard } from "@/components/StoryCard";
 import { TrustBlock } from "@/components/TrustBlock";
 import { getArticle, getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
+import { resolveSkin } from "@/lib/skins";
 import { formatDate, localePath, resolveLocale, t } from "@/lib/i18n";
 import { absoluteUrl, newsArticleJsonLd, pageMetadata } from "@/lib/seo";
 
@@ -141,6 +143,13 @@ export default async function ArticlePage({ params }: Params) {
             </div>
           </section>
         ) : null}
+
+        <SkinScene
+          skin={resolveSkin(channel.slug, channel.theme.layout)}
+          channel={channel}
+          locale={resolved}
+          variant="strip"
+        />
 
         <div className="mt-10 grid gap-5">
           <TrustBlock locale={resolved} />

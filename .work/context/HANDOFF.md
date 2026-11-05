@@ -119,6 +119,8 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | Qualification field 2026-11-05 | migration 008 applied then re-run clean (`applied: 0`); `pytest -q` 108 passed; qualification select renders on 7/7 channels EN+ES; `pnpm check` 247 keys |
 | OpenAPI snapshot 2026-11-05 | regenerated, +`qualification` only (12 lines) |
 | Skin system 2026-11-05 | 7 distinct skins live (`data-skin` per channel), 7 motifs + 7 original illustration bands, screenshots desktop+mobile, `pnpm lint/typecheck/check` green |
+| Per-channel art 2026-11-05 | 7 inline masthead emblems, article illustration strips, 7 channel-home SPECs under `.work.ui/screens/` |
+| Realistic imagery 2026-11-05 | 7 licensed photos (credits.json, 2 CC BY-SA with in-page credit), next/image band + article strip, line art kept as motif/emblem/fallback |
 
 ---
 

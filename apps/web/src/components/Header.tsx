@@ -2,8 +2,10 @@ import Link from "next/link";
 
 import type { Industry } from "@/lib/api";
 import { localePath, t, type Locale } from "@/lib/i18n";
+import { resolveSkin } from "@/lib/skins";
 
 import { LocaleSwitch } from "./LocaleSwitch";
+import { SkinEmblem } from "./SkinEmblem";
 
 interface HeaderProps {
   industry: Industry;
@@ -12,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ industry, locale }: HeaderProps) {
   const home = localePath(locale, `/${industry.slug}`);
+  const skin = resolveSkin(industry.slug, industry.theme.layout);
   const nav = [
     { href: home, label: t(locale, "nav.home") },
     { href: localePath(locale, `/${industry.slug}/about`), label: t(locale, "nav.about") },
@@ -23,7 +26,7 @@ export function Header({ industry, locale }: HeaderProps) {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
         <Link href={home} className="flex items-center gap-3" aria-label={t(locale, "brand.name")}>
           <span className="sn-brandmark" aria-hidden="true">
-            {industry.name.slice(0, 1).toUpperCase()}
+            <SkinEmblem skin={skin} />
           </span>
           <span className="flex flex-col leading-tight">
             <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[var(--sn-muted)]">

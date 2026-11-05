@@ -1,0 +1,72 @@
+[
+  {
+    "channel": "legal",
+    "title": "Beverley Guildhall Courtroom.jpg",
+    "creator": "<a href=\"//commons.wikimedia.org/wiki/User:Mdbeckwith\" class=\"mw-redirect\" title=\"User:Mdbeckwith\">Michael D Beckwith</a>",
+    "creator_url": "",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Beverley_Guildhall_Courtroom.jpg",
+    "file": "apps/web/public/photos/legal/band.jpg"
+  },
+  {
+    "channel": "financial",
+    "title": "New York Stock Exchange August 2017 02.jpg",
+    "creator": "Arild Vågen",
+    "creator_url": "",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:New_York_Stock_Exchange_August_2017_02.jpg",
+    "file": "apps/web/public/photos/financial/band.jpg"
+  },
+  {
+    "channel": "behavioral-health",
+    "title": "Sunset over lake with pier and forest in background",
+    "creator": "Timi Wahalahti",
+    "creator_url": "https://sipp.is",
+    "license": "cc0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "https://wordpress.org/photos/photo/38262d9a05/",
+    "file": "apps/web/public/photos/behavioral-health/band.jpg"
+  },
+  {
+    "channel": "education",
+    "title": "University of Miskolc Library Reading Room 2025 01",
+    "creator": "Szalax",
+    "creator_url": "https://commons.wikimedia.org/wiki/User:Szalax",
+    "license": "cc0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/deed.en/",
+    "source": "https://commons.wikimedia.org/w/index.php?curid=179138529",
+    "file": "apps/web/public/photos/education/band.jpg"
+  },
+  {
+    "channel": "logistics",
+    "title": "Container port",
+    "creator": null,
+    "creator_url": null,
+    "license": "cc0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "https://www.rawpixel.com/image/6486443/photo-image-public-domain-business",
+    "file": "apps/web/public/photos/logistics/band.jpg"
+  },
+  {
+    "channel": "cybersecurity",
+    "title": "BalticServers data center.jpg",
+    "creator": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Fleshas&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Fleshas (page does not exist)\">BalticServers.com</a>",
+    "creator_url": "",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:BalticServers_data_center.jpg",
+    "file": "apps/web/public/photos/cybersecurity/band.jpg"
+  },
+  {
+    "channel": "stem-cell",
+    "title": "Disposable Pipette Tips in Laboratory Tip Boxes.jpg",
+    "creator": "<a href=\"//commons.wikimedia.org/wiki/User:Gannu03\" title=\"User:Gannu03\">Gannu03</a>",
+    "creator_url": "",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Disposable_Pipette_Tips_in_Laboratory_Tip_Boxes.jpg",
+    "file": "apps/web/public/photos/stem-cell/band.jpg"
+  }
+]

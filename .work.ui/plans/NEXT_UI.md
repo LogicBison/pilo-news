@@ -29,7 +29,7 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | `@ui-screen-spec create - channel-home` | skins shipped for 7 channels; now fix copy + hero composition per channel |
+| **0** | `@ui-screen-spec review - channel-home-legal` | 7 channel-home SPECs written; review then build per channel |
 | **1** | `@ui-design-system init` | bind tokens, register P0 primitives from doc 03 |
 | **2** | `@ui-component-build plan - S0` | primitives (craft tier refined) |
 | **3** | `@ui-component-build plan - S1` | channel-home + article + contact |

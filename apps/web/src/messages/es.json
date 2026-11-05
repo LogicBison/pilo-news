@@ -287,5 +287,8 @@
     "termsTitle": "Términos",
     "termsBody": "System News publica titulares, extractos y resúmenes originales con atribución y enlaces al medio original. El contenido sigue siendo propiedad de su medio. Nada en este sitio constituye asesoría legal, financiera, médica o profesional. El uso del sitio es bajo su responsabilidad; el acceso automatizado debe respetar los límites de uso publicados.",
     "lastUpdated": "Última actualización: 5 de noviembre de 2026"
+  },
+  "scene": {
+    "moreCoverage": "Más cobertura →"
   }
 }

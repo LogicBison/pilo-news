@@ -1,14 +1,18 @@
 import Link from "next/link";
 
 import type { Industry } from "@/lib/api";
+import { SkinEmblem } from "./SkinEmblem";
 import { localePath, t, type Locale } from "@/lib/i18n";
+import { resolveSkin } from "@/lib/skins";
 
 export function Footer({ industry, locale }: { industry: Industry; locale: Locale }) {
+  const skin = resolveSkin(industry.slug, industry.theme.layout);
   return (
     <footer className="sn-footer mt-16">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3">
         <div>
-          <p className="sn-eyebrow">
+          <p className="sn-eyebrow flex items-center gap-2">
+            <SkinEmblem skin={skin} className="h-4 w-4" />
             {t(locale, "brand.name")}
           </p>
           <p className="mt-2 max-w-sm text-sm text-[var(--sn-muted)]">

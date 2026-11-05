@@ -287,5 +287,8 @@
     "termsTitle": "Terms",
     "termsBody": "System News publishes headlines, excerpts, and original summaries with attribution and links to the publisher. Content remains the property of its publisher. Nothing on this site is legal, financial, medical, or professional advice. Use of the site is at your own risk; automated access must respect the published rate limits.",
     "lastUpdated": "Last updated 5 November 2026"
+  },
+  "scene": {
+    "moreCoverage": "More coverage →"
   }
 }

@@ -19,8 +19,13 @@ export interface Skin {
   hero: HeroVariant;
   /** Public path to the generated motif SVG. */
   motif: string;
-  /** Public path to the generated illustration band SVG. */
+  /** Public path to the generated illustration band SVG (fallback art). */
   scene: string;
+  /** Photography: 1600px and 800px crops. */
+  photo: string;
+  photoSmall: string;
+  /** Attribution line when the licence requires it (CC BY / BY-SA). */
+  credit?: { label: string; href: string };
   /** Corner language; overrides the channel theme radius. */
   radius: string;
   rule: RuleStyle;
@@ -38,6 +43,8 @@ const CHAMBERS: Skin = {
   hero: "split",
   motif: "/skins/legal/motif.svg",
   scene: "/skins/legal/scene.svg",
+  photo: "/photos/legal/band.jpg",
+  photoSmall: "/photos/legal/band-800.jpg",
   radius: "6px",
   rule: "double",
   eyebrow: "serif",
@@ -52,6 +59,9 @@ const TERMINAL: Skin = {
   hero: "ledger",
   motif: "/skins/financial/motif.svg",
   scene: "/skins/financial/scene.svg",
+  photo: "/photos/financial/band.jpg",
+  photoSmall: "/photos/financial/band-800.jpg",
+  credit: { label: "Photo: Arild Vågen · CC BY-SA 4.0", href: "https://commons.wikimedia.org/wiki/File:New_York_Stock_Exchange_August_2017_02.jpg" },
   radius: "4px",
   rule: "hairline",
   eyebrow: "mono",
@@ -66,6 +76,8 @@ const SANCTUARY: Skin = {
   hero: "split",
   motif: "/skins/behavioral-health/motif.svg",
   scene: "/skins/behavioral-health/scene.svg",
+  photo: "/photos/behavioral-health/band.jpg",
+  photoSmall: "/photos/behavioral-health/band-800.jpg",
   radius: "18px",
   rule: "none",
   eyebrow: "soft",
@@ -80,6 +92,8 @@ const CAMPUS: Skin = {
   hero: "ribbon",
   motif: "/skins/education/motif.svg",
   scene: "/skins/education/scene.svg",
+  photo: "/photos/education/band.jpg",
+  photoSmall: "/photos/education/band-800.jpg",
   radius: "10px",
   rule: "dotted",
   eyebrow: "numbered",
@@ -94,6 +108,8 @@ const NETWORK: Skin = {
   hero: "poster",
   motif: "/skins/logistics/motif.svg",
   scene: "/skins/logistics/scene.svg",
+  photo: "/photos/logistics/band.jpg",
+  photoSmall: "/photos/logistics/band-800.jpg",
   radius: "8px",
   rule: "dashed",
   eyebrow: "mono",
@@ -108,6 +124,9 @@ const SENTINEL: Skin = {
   hero: "ledger",
   motif: "/skins/cybersecurity/motif.svg",
   scene: "/skins/cybersecurity/scene.svg",
+  photo: "/photos/cybersecurity/band.jpg",
+  photoSmall: "/photos/cybersecurity/band-800.jpg",
+  credit: { label: "Photo: BalticServers.com · CC BY-SA 3.0", href: "https://commons.wikimedia.org/wiki/File:BalticServers_data_center.jpg" },
   radius: "2px",
   rule: "accent",
   eyebrow: "mono",
@@ -122,6 +141,9 @@ const LAB: Skin = {
   hero: "ribbon",
   motif: "/skins/stem-cell/motif.svg",
   scene: "/skins/stem-cell/scene.svg",
+  photo: "/photos/stem-cell/band.jpg",
+  photoSmall: "/photos/stem-cell/band-800.jpg",
+  credit: { label: "Photo: Gannu03 · CC BY-SA 4.0", href: "https://commons.wikimedia.org/wiki/File:Disposable_Pipette_Tips_in_Laboratory_Tip_Boxes.jpg" },
   radius: "14px",
   rule: "hairline",
   eyebrow: "serif",

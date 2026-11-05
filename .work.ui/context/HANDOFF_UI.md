@@ -160,9 +160,38 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 1. `.work.ui/design-system/20261105-skin-system.md` - the skin system: 7 named skins, 7 dimensions, reference mapping
 2. `apps/web/src/lib/skins.ts` - typed registry (slug -> skin), layout fallback for channels with no skin entry
 3. `apps/web/public/skins/<slug>/motif.svg` - 7 generated line-art motifs (arches, bars, rings, rules, routes, hexes, cells)
-3b. `apps/web/public/skins/<slug>/scene.svg` - 7 original illustration bands, captioned with the channel tagline (`SkinScene`)
+3b. `apps/web/public/skins/<slug>/scene.svg` - 7 original illustrations in two placements: `band` on channel home (tagline) and `strip` on article pages (quiet back-link), both via `SkinScene`
 4. `apps/web/src/app/skins.css` - `[data-skin]` / `[data-hero]` surface grammar: hero composition, app bar, eyebrow, section rule, story cards, CTA panel, footer, motif placement
 5. Wiring: `[locale]/[industry]/layout.tsx` sets `data-skin` + `data-hero`; hooks in `Hero`, `CtaCard`, `StoryCard`; `skins.css` imported in the root layout; middleware now exempts `skins/`
 **Evidence:** screenshots of all 7 homes (desktop) + 2 mobile; `pnpm lint`, `pnpm typecheck`, `pnpm check` green; 7/7 channels 200 with distinct `data-skin`
 **Deferred:** photography/illustration beyond generated line-art - no image-generation pipeline exists; a channel that needs licensed imagery needs a SPEC + performance budget
 **Next recommended:** `@ui-screen-spec create - channel-home` for per-channel copy and hero composition; then `@ui-visual-verify`
+
+
+---
+
+## Latest build (@ui-screen-spec)
+
+**Date:** 2026-11-05
+**Request:** "implement awesome webdesign an art customized for each channel/industry/subject"
+**Executed:**
+1. Seven channel-home SPECs: `.work.ui/screens/channel-home-<slug>/20261105-SCREEN-SPEC.md` (13 sections each, per-channel art direction, palette, tone, acceptance)
+2. `apps/web/src/components/SkinEmblem.tsx` - seven inline line-art masthead marks (scales, trend bars, open arcs, book, routed nodes, shield, cell), inheriting `currentColor`
+3. `Header` + `Footer` now render the channel emblem instead of a letter tile; brandmark shape/radius stays skin-specific
+**Checks:** `pnpm lint`, `pnpm typecheck`, `pnpm check` green; masthead sheet captured for all 7 channels
+**Next recommended:** `@ui-screen-spec review - channel-home-legal`, then `@ui-visual-verify milestone`
+
+
+---
+
+## Latest build (@x-director) — realistic imagery
+
+**Date:** 2026-11-05
+**Request:** replace line-art with realistic colour imagery; keep line art strategic; professional layout
+**Executed:**
+1. `apps/web/public/photos/<slug>/band.jpg` + 800w crops — one licensed photo per channel, cropped 1600x640, served through `next/image` (fill + sizes)
+2. `apps/web/public/photos/credits.json` — title, creator, licence, source per photo; CC BY-SA channels render an in-caption credit link
+3. `SkinScene` now renders photography for band and article strip; `scene.svg` retained as fallback; motifs + `SkinEmblem` stay line-art as the brand layer
+4. `apps/web/src/middleware.ts` — `photos/` exempted from the locale rewrite (same class of bug as `skins/`)
+**Known gap:** the image cache must be cleared when a photo file is replaced in place (`rm -rf .next/cache/images`); filenames are not content-hashed.
+**Next recommended:** `@ui-visual-verify milestone`, then per-channel SPEC review.

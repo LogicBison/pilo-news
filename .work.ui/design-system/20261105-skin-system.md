@@ -86,7 +86,16 @@ Rules: skins consume `--sn-*` tokens only; a skin may change shape, spacing, bor
 
 ## Illustrations
 
-Each channel ships one `scene.svg` (columns for legal, skyline for financial, waves for health, an open book for education, containers for logistics, a circuit shield for cybersecurity, a petri dish for stem-cell). It renders as a full-width band with the channel tagline over it, so the page reads as that industry's product before any content is scanned.
+Photography is the primary visual surface; line art is retained strategically for motifs, the masthead emblem, and as the no-photo fallback. Photos are cropped to 1600×640 (and 800×320) and served through `next/image`, so the band is one optimised request per breakpoint. Licences: CC0 / public domain where possible, CC BY-SA with an in-page attribution line where not — the record lives in `credits.json` and the credit renders inside the caption.
+
+Each channel ships one `scene.svg` (columns for legal, skyline for financial, waves for health, an open book for education, containers for logistics, a circuit shield for cybersecurity, a petri dish for stem-cell). It renders in two placements:
+
+| Placement | Variant | Size | Copy | Why |
+|-----------|---------|------|------|-----|
+| Channel home | `band` | 210–230px | channel name + tagline | identity moment before the reader scans content |
+| Article page | `strip` | 118px (96px mobile) | channel name + quiet "More coverage →" link | closes the story with an identity beat and a path back, without competing with the headline or the CTA |
+
+Article placement is deliberately **after** the related stories and **before** the CTA stack: illustration never sits above the headline, and never between the summary and the reading link. Contact and search pages get no illustration — those are task pages, and a decorative band there would push the form or results down for no gain.
 
 ## Verification
 
