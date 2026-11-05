@@ -33,7 +33,7 @@ export default async function ContactPage({ params }: Params) {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
       <div>
-        <h1 className="text-3xl font-semibold text-[var(--sn-text)]">
+        <h1 className="text-3xl font-extrabold tracking-tight text-[var(--sn-text)]">
           {t(resolved, "contact.title", { industry: channel.name })}
         </h1>
         <p className="mt-3 max-w-2xl text-base text-[var(--sn-muted)]">
@@ -49,7 +49,7 @@ export default async function ContactPage({ params }: Params) {
           <ContactForm industry={industry} locale={resolved} />
         </div>
       </div>
-      <aside className="rounded-[var(--sn-radius)] border border-[var(--sn-border)] bg-[var(--sn-surface)] p-5">
+      <aside className="sn-card sn-card-surface p-5">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--sn-muted)]">
           {t(resolved, "footer.disclaimer")}
         </h2>

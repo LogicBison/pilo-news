@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 
 import { localePath, resolveLocale } from "@/lib/i18n";
 
+export const dynamic = "force-dynamic";
+
 export default async function LocaleIndex({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const resolved = resolveLocale(locale);

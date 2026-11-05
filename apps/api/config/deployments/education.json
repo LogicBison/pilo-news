@@ -1,0 +1,219 @@
+{
+  "brand": "System News",
+  "site_url": "http://localhost:43991",
+  "default_locale": "en",
+  "refresh_interval_minutes": 720,
+  "default_industry": "education",
+  "industries": [
+    {
+      "slug": "education",
+      "code": "EDTECH_LMS",
+      "name": "Education & Higher Academics",
+      "theme": {
+        "bg": "#fffdf7",
+        "text": "#1f2937",
+        "muted": "#4b5563",
+        "accent": "#b45309",
+        "border": "#dbe4f0",
+        "layout": "academic",
+        "radius": "10px",
+        "primary": "#1d4ed8",
+        "surface": "#f8fafc",
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+        "font_heading": "Georgia, Times New Roman, serif"
+      },
+      "locales": {
+        "es": {
+          "name": "Educación y Academia",
+          "tagline": "Políticas, admisiones, investigación y tecnología educativa."
+        },
+        "en": {
+          "name": "Education & Higher Academics",
+          "tagline": "Policy, admissions, research, and learning technology."
+        }
+      },
+      "disclaimers": {
+        "en": "Program details and outcomes vary; verify with the institution.",
+        "es": "Los detalles y resultados de cada programa varían; confirme con la institución."
+      },
+      "cta": {
+        "body": {
+          "en": "A short weekly brief for counselors, faculty, and administrators. Unsubscribe anytime.",
+          "es": "Un resumen semanal breve para consejeros, docentes y administradores. Cancele cuando quiera."
+        },
+        "kind": "brief",
+        "label": {
+          "en": "Get the weekly brief",
+          "es": "Recibir el resumen semanal"
+        },
+        "headline": {
+          "en": "Bring verified program news to your inbox",
+          "es": "Reciba noticias verificadas de programas"
+        },
+        "secondary_label": {
+          "en": "Request a consultation",
+          "es": "Solicitar una consulta"
+        }
+      },
+      "timezone": "America/El_Salvador",
+      "retention_days": 30,
+      "sort_order": 40,
+      "enabled": true,
+      "topics": [
+        {
+          "slug": "admissions",
+          "label": {
+            "en": "Admissions & Enrollment",
+            "es": "Admisiones y Matrícula"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "admissions",
+              "enrollment",
+              "applicants",
+              "tuition",
+              "financial aid"
+            ],
+            "es": [
+              "admisiones",
+              "matrícula",
+              "solicitantes",
+              "colegiatura",
+              "becas"
+            ]
+          }
+        },
+        {
+          "slug": "edtech",
+          "label": {
+            "en": "Learning Technology",
+            "es": "Tecnología Educativa"
+          },
+          "weight": 1.1,
+          "keywords": {
+            "en": [
+              "edtech",
+              "online learning",
+              "lms",
+              "ai",
+              "classroom"
+            ],
+            "es": [
+              "tecnología educativa",
+              "aprendizaje en línea",
+              "plataforma",
+              "inteligencia artificial"
+            ]
+          }
+        },
+        {
+          "slug": "policy",
+          "label": {
+            "en": "Education Policy",
+            "es": "Política Educativa"
+          },
+          "weight": 1.4,
+          "keywords": {
+            "en": [
+              "policy",
+              "department of education",
+              "funding",
+              "federal",
+              "state"
+            ],
+            "es": [
+              "política",
+              "ministerio",
+              "financiamiento",
+              "federal",
+              "estatal"
+            ]
+          }
+        },
+        {
+          "slug": "research",
+          "label": {
+            "en": "Research & Outcomes",
+            "es": "Investigación y Resultados"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "research",
+              "study",
+              "outcomes",
+              "graduation",
+              "assessment"
+            ],
+            "es": [
+              "investigación",
+              "estudio",
+              "resultados",
+              "graduación",
+              "evaluación"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        {
+          "name": "The Hechinger Report",
+          "feed_url": "https://hechingerreport.org/feed/",
+          "language": "en",
+          "trust": 0.87,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Educación Futura",
+          "feed_url": "https://www.educacionfutura.org/feed/",
+          "language": "es",
+          "trust": 0.78,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Educación 3.0",
+          "feed_url": "https://www.educaciontrespuntocero.com/feed/",
+          "language": "es",
+          "trust": 0.78,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Higher Ed Dive",
+          "feed_url": "https://www.highereddive.com/feeds/news/",
+          "language": "en",
+          "trust": 0.85,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Inside Higher Ed",
+          "feed_url": "https://www.insidehighered.com/rss.xml",
+          "language": "en",
+          "trust": 0.9,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        }
+      ],
+      "partner": {
+        "name": "Launch Education Partner",
+        "contact_email": "education-partner@example.com",
+        "weight": 1.0,
+        "regions": []
+      }
+    }
+  ]
+}

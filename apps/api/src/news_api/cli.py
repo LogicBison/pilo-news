@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 import sys
+from pathlib import Path
 
 from news_api.articles.application.queue import enqueue, wait_for_run
 from news_api.articles.infrastructure.repo import (
@@ -94,6 +95,38 @@ async def _keys(_args: argparse.Namespace) -> int:
     return 0
 
 
+async def _apply_profile(args: argparse.Namespace) -> int:
+    from news_api.provisioning.application.apply import (
+        ProfileError,
+        apply_profile,
+        load_profile,
+    )
+
+    try:
+        profile = load_profile(Path(args.file))
+        report = await apply_profile(
+            profile, dry_run=args.dry_run, only_industry=args.only_industry
+        )
+    except ProfileError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    print(json.dumps(report, indent=2))
+    return 0
+
+
+async def _verify_sources(args: argparse.Namespace) -> int:
+    from news_api.sources.application.verify import verify_sources
+
+    industry = None if args.industry in (None, "all") else args.industry
+    try:
+        report = await verify_sources(industry)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    print(json.dumps(report, indent=2))
+    return 0 if report["summary"]["failed"] == 0 else 1
+
+
 async def _run(args: argparse.Namespace) -> int:
     if args.command == "refresh":
         return await _refresh(args)
@@ -105,6 +138,10 @@ async def _run(args: argparse.Namespace) -> int:
         return await _create_key(args)
     if args.command == "keys":
         return await _keys(args)
+    if args.command == "apply-profile":
+        return await _apply_profile(args)
+    if args.command == "verify-sources":
+        return await _verify_sources(args)
     return 2
 
 
@@ -138,6 +175,24 @@ def build_parser() -> argparse.ArgumentParser:
 
     keys = sub.add_parser("keys", help="list API keys")
     keys.set_defaults(func=_keys)
+
+    profile = sub.add_parser(
+        "apply-profile", help="reconcile a declarative deployment profile into the database"
+    )
+    profile.add_argument("--file", required=True, help="path to the deployment profile JSON")
+    profile.add_argument(
+        "--dry-run", action="store_true", help="report what would change without writing"
+    )
+    profile.add_argument(
+        "--only-industry", default=None, help="apply a single industry slug from the profile"
+    )
+    profile.set_defaults(func=_apply_profile)
+
+    verify = sub.add_parser(
+        "verify-sources", help="fetch enabled sources and grade them against the quality policy"
+    )
+    verify.add_argument("--industry", default="all")
+    verify.set_defaults(func=_verify_sources)
     return parser
 
 

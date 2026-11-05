@@ -4,6 +4,10 @@ System News is a single deployment with channel-as-data. To add a vertical you
 do **not** add routes or components: create the channel, add feed sources, and
 the public site plus `/v1` discover it.
 
+For a reproducible deployment — every channel, source, topic, and partner in one
+file — use the profile importer instead: see `docs/deployment-profile.md`. The
+admin calls below remain the interactive path.
+
 ## 1. Create the channel
 
 Copy `apps/api/config/industry-template.json` as the starting payload; the

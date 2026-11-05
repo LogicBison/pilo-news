@@ -12,11 +12,11 @@ export function DeskBrief({
   return (
     <section
       aria-labelledby="desk-brief-heading"
-      className="rounded-[var(--sn-radius)] border-l-4 border-[var(--sn-accent)] bg-[var(--sn-surface)] p-5"
+      className="sn-card sn-card-surface border-l-4 border-l-[var(--sn-accent)] p-5"
     >
       <h2
         id="desk-brief-heading"
-        className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--sn-muted)]"
+        className="sn-eyebrow"
       >
         {t(locale, "home.deskBrief")}
       </h2>

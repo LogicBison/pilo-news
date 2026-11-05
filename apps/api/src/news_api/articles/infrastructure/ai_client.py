@@ -78,6 +78,26 @@ def validate_brief(text: str) -> tuple[bool, str]:
     return True, "ok"
 
 
+def normalize_brief(text: str) -> str:
+    """Repair a model paragraph into the 3-7 line shape the validator expects."""
+    candidate = _plain(text or "")
+    if not candidate:
+        return ""
+    sentences = [part.strip() for part in SENTENCE_RE.findall(candidate) if part.strip()]
+    if len(sentences) < 3:
+        return candidate[:1150]
+    picked: list[str] = []
+    total = 0
+    for sentence in sentences:
+        if len(picked) >= 5 or total + len(sentence) > 1100:
+            break
+        picked.append(sentence)
+        total += len(sentence)
+    if len(picked) >= 3:
+        return "\n".join(picked)
+    return "\n".join(sentences[:5])
+
+
 def _replace(template: str, **values: str) -> str:
     result = template
     for key, value in values.items():
@@ -214,21 +234,25 @@ class AIClient:
             {"role": "system", "content": str(table["desk"]["system"])},
             {"role": "user", "content": _replace(str(table["desk"]["user"]), headlines=joined)},
         ]
-        try:
-            result = await self._chat(
-                messages,
-                temperature=0.4,
-                timeout=self.settings.ai_desk_timeout_seconds,
-                max_tokens=400,
-            )
-        except AIError as exc:
-            log.warning("desk_brief.failed", error=str(exc))
-            return None
-        valid, reason = validate_brief(result.text)
-        if not valid:
-            log.warning("desk_brief.invalid", reason=reason)
-            return None
-        return result.text.strip()
+        for attempt in range(2):
+            try:
+                result = await self._chat(
+                    messages,
+                    temperature=0.4,
+                    timeout=self.settings.ai_desk_timeout_seconds,
+                    max_tokens=900,
+                )
+            except AIError as exc:
+                log.warning("desk_brief.failed", error=str(exc), attempt=attempt + 1)
+                if isinstance(exc, BudgetExceeded):
+                    return None
+                continue
+            brief = normalize_brief(result.text)
+            valid, reason = validate_brief(brief)
+            if valid:
+                return brief
+            log.warning("desk_brief.invalid", reason=reason, attempt=attempt + 1)
+        return None
 
     async def pick_featured(
         self, *, candidates: list[dict[str, str]], language: str

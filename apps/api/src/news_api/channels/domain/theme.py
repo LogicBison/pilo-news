@@ -20,6 +20,25 @@ REQUIRED_TOKENS = (
 )
 LAYOUT_VARIANTS = ("editorial", "professional", "academic")
 
+RESERVED_SLUGS = frozenset(
+    {
+        "en",
+        "es",
+        "api",
+        "admin",
+        "v1",
+        "health",
+        "static",
+        "sitemap.xml",
+        "robots.txt",
+        "_next",
+    }
+)
+
+
+def is_reserved_slug(slug: str) -> bool:
+    return slug in RESERVED_SLUGS
+
 
 def _channel(value: int) -> float:
     normalized = value / 255

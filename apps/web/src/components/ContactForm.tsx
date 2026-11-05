@@ -51,33 +51,33 @@ export function ContactForm({ industry, locale }: { industry: string; locale: Lo
 
   if (status === "success") {
     return (
-      <div role="status" className="rounded-[var(--sn-radius)] border border-emerald-300 bg-emerald-50 p-6 text-emerald-950">
+      <div role="status" className="rounded-[calc(var(--sn-radius)+6px)] border border-emerald-300 bg-emerald-50 p-6 text-emerald-950 shadow-[var(--sn-elev-1)]">
         <p className="text-sm">{message}</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-[var(--sn-radius)] border border-[var(--sn-border)] p-6">
+    <form onSubmit={onSubmit} className="sn-card p-6">
       <h2 className="text-xl font-semibold text-[var(--sn-text)]">{t(locale, "contact.formTitle")}</h2>
       <p className="mt-2 text-sm text-[var(--sn-muted)]">{t(locale, "contact.formIntro")}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm font-medium">
           {t(locale, "contact.name")}
-          <input name="name" required maxLength={100} autoComplete="name" className="rounded-md border border-[var(--sn-border)] px-3 py-2 text-sm" />
+          <input name="name" required maxLength={100} autoComplete="name" className="sn-input" />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium">
           {t(locale, "contact.email")}
-          <input name="email" type="email" required maxLength={200} autoComplete="email" className="rounded-md border border-[var(--sn-border)] px-3 py-2 text-sm" />
+          <input name="email" type="email" required maxLength={200} autoComplete="email" className="sn-input" />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium sm:col-span-2">
           {t(locale, "contact.phone")} <span className="font-normal text-[var(--sn-muted)]">({t(locale, "common.optional")})</span>
-          <input name="phone" type="tel" maxLength={40} autoComplete="tel" className="rounded-md border border-[var(--sn-border)] px-3 py-2 text-sm" />
+          <input name="phone" type="tel" maxLength={40} autoComplete="tel" className="sn-input" />
         </label>
       </div>
       <label className="mt-4 flex flex-col gap-1 text-sm font-medium">
         {t(locale, "contact.message")}
-        <textarea name="message" required minLength={10} maxLength={2000} rows={5} className="rounded-md border border-[var(--sn-border)] px-3 py-2 text-sm" />
+        <textarea name="message" required minLength={10} maxLength={2000} rows={5} className="sn-input" />
       </label>
       <div aria-hidden="true" className="hidden">
         <label>
@@ -91,7 +91,7 @@ export function ContactForm({ industry, locale }: { industry: string; locale: Lo
       <button
         type="submit"
         disabled={status === "sending"}
-        className="mt-4 rounded-full bg-[var(--sn-primary)] px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
+        className="sn-btn mt-4"
       >
         {status === "sending" ? t(locale, "contact.sending") : t(locale, "contact.submit")}
       </button>

@@ -32,7 +32,7 @@ export function CtaButton({
     <a
       href="#lead-form"
       onClick={() => track("cta_click", { industry, locale, placement, articleId })}
-      className={`inline-flex items-center justify-center rounded-full bg-[var(--sn-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sn-accent)] ${className}`}
+      className={`sn-btn ${className}`}
     >
       {label}
     </a>
@@ -69,13 +69,13 @@ export function StickyCta({
   return (
     <div
       id="sn-sticky-cta"
-      className="fixed inset-x-0 bottom-0 z-40 hidden border-t border-[var(--sn-border)] bg-[var(--sn-bg)] p-3 shadow-lg md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 hidden border-t border-[var(--sn-border)] bg-[var(--sn-bg)]/95 p-3 shadow-[var(--sn-elev-3)] backdrop-blur md:hidden"
     >
       <div className="mx-auto flex max-w-3xl items-center gap-3">
         <a
           href="#lead-form"
           onClick={() => track("cta_click", { industry, locale, placement: "sticky", articleId })}
-          className="flex-1 rounded-full bg-[var(--sn-primary)] px-4 py-2.5 text-center text-sm font-semibold text-white"
+          className="sn-btn flex-1"
         >
           {t(locale, "cta.sticky")}
         </a>
@@ -86,7 +86,7 @@ export function StickyCta({
             sessionStorage.setItem("sn-sticky-dismissed", "1");
             document.getElementById("sn-sticky-cta")?.classList.add("hidden");
           }}
-          className="rounded-full border border-[var(--sn-border)] px-3 py-2 text-sm"
+          className="sn-btn sn-btn-ghost px-3 py-2"
         >
           ✕
         </button>

@@ -51,29 +51,43 @@ async def channel_id_map() -> dict[str, str]:
 async def update_channel(
     slug: str,
     *,
+    name: str | None = None,
     enabled: bool | None = None,
     theme: dict[str, Any] | None = None,
     disclaimers: dict[str, Any] | None = None,
+    cta: dict[str, Any] | None = None,
+    timezone: str | None = None,
     retention_days: int | None = None,
+    sort_order: int | None = None,
 ) -> bool:
+    import json
+
     fields: list[str] = []
     params: dict[str, Any] = {"slug": slug}
+    if name is not None:
+        fields.append("name = :name")
+        params["name"] = name
     if enabled is not None:
         fields.append("enabled = :enabled")
         params["enabled"] = enabled
     if theme is not None:
-        import json
-
         fields.append("theme = CAST(:theme AS jsonb)")
         params["theme"] = json.dumps(theme)
     if disclaimers is not None:
-        import json
-
         fields.append("disclaimers = CAST(:disclaimers AS jsonb)")
         params["disclaimers"] = json.dumps(disclaimers)
+    if cta is not None:
+        fields.append("cta = CAST(:cta AS jsonb)")
+        params["cta"] = json.dumps(cta)
+    if timezone is not None:
+        fields.append("timezone = :timezone")
+        params["timezone"] = timezone
     if retention_days is not None:
         fields.append("retention_days = :retention_days")
         params["retention_days"] = retention_days
+    if sort_order is not None:
+        fields.append("sort_order = :sort_order")
+        params["sort_order"] = sort_order
     if not fields:
         return False
     fields.append("updated_at = now()")
@@ -83,6 +97,60 @@ async def update_channel(
             params,
         )
         return bool(getattr(result, "rowcount", 0))
+
+
+async def list_locales(slug: str) -> dict[str, dict[str, str]]:
+    rows = await fetch_all(
+        """
+        SELECT l.locale, l.name, l.tagline
+        FROM industry_locales l
+        JOIN industries i ON i.id = l.industry_id
+        WHERE i.slug = :slug
+        ORDER BY l.locale
+        """,
+        {"slug": slug},
+    )
+    return {
+        str(row["locale"]): {"name": str(row["name"]), "tagline": str(row["tagline"])}
+        for row in rows
+    }
+
+
+async def upsert_locales(slug: str, locales: dict[str, dict[str, str]]) -> None:
+    if not locales:
+        return
+    async with session_scope() as session:
+        for locale, copy in locales.items():
+            await session.execute(
+                text(
+                    """
+                    INSERT INTO industry_locales (industry_id, locale, name, tagline)
+                    SELECT id, :locale, :name, :tagline FROM industries WHERE slug = :slug
+                    ON CONFLICT (industry_id, locale) DO UPDATE
+                    SET name = EXCLUDED.name, tagline = EXCLUDED.tagline
+                    """
+                ),
+                {
+                    "slug": slug,
+                    "locale": locale,
+                    "name": copy.get("name", ""),
+                    "tagline": copy.get("tagline", ""),
+                },
+            )
+        await session.execute(
+            text(
+                """
+                UPDATE industries SET
+                    locales = (
+                        SELECT array_agg(l.locale ORDER BY l.locale)
+                        FROM industry_locales l WHERE l.industry_id = industries.id
+                    ),
+                    updated_at = now()
+                WHERE slug = :slug
+                """
+            ),
+            {"slug": slug},
+        )
 
 
 async def industry_settings(industry_id: str) -> dict[str, Any]:

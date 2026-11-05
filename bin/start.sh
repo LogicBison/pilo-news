@@ -36,6 +36,7 @@ Commands:
   test      lint + type + tests in the containers
   migrate   run SQL migrations
   refresh   force a news fetch now
+  industry  switch SN_DEFAULT_INDUSTRY (demo switch, no rebuild)
   backup    tar.gz snapshot of stack volumes into backups/
   restore   restore a tar.gz volume snapshot
   init-env  create .env.<env> from .env.example
@@ -227,6 +228,32 @@ cmd_refresh() {
 	compose exec -T api python -m news_api.cli refresh --industry all --force
 }
 
+# Switch the default industry used by the web root redirect. Runtime env only:
+# recreates the web container, never rebuilds it.
+cmd_industry() {
+	require_compose
+	local slug="${SERVICE:-}"
+	if [[ -z "$slug" ]]; then
+		err "usage: ./bin/start.sh --env $ENV industry <slug>"
+		return 2
+	fi
+	local api_port
+	api_port="$(env_value API_PORT 8080)"
+	if ! curl -fsS --max-time 3 "http://localhost:${api_port}/v1/industries/${slug}" >/dev/null 2>&1; then
+		err "unknown industry '$slug' - list with: curl http://localhost:${api_port}/v1/industries"
+		return 2
+	fi
+	if grep -q '^SN_DEFAULT_INDUSTRY=' "$ENV_FILE"; then
+		sed -i.bak "s|^SN_DEFAULT_INDUSTRY=.*|SN_DEFAULT_INDUSTRY=${slug}|" "$ENV_FILE"
+		rm -f "${ENV_FILE}.bak"
+	else
+		printf '\nSN_DEFAULT_INDUSTRY=%s\n' "$slug" >>"$ENV_FILE"
+	fi
+	info "SN_DEFAULT_INDUSTRY=${slug} in $ENV_FILE"
+	compose up -d --force-recreate web >/dev/null
+	ok "web recreated - open http://localhost:$(env_value WEB_PORT 3000)/"
+}
+
 compose_project() {
 	env_value COMPOSE_PROJECT_NAME "system-news-${ENV}"
 }
@@ -415,7 +442,7 @@ while [[ $# -gt 0 ]]; do
 		fi
 		shift
 		;;
-	menu | up | down | restart | status | logs | shell | test | migrate | refresh | backup | restore | init-env | destroy)
+	menu | up | down | restart | status | logs | shell | test | migrate | refresh | industry | backup | restore | init-env | destroy)
 		CMD="$1"
 		shifted=1
 		shift
@@ -445,6 +472,7 @@ shell) cmd_shell ;;
 test) cmd_test ;;
 migrate) cmd_migrate ;;
 refresh) cmd_refresh ;;
+industry) cmd_industry ;;
 backup) cmd_backup ;;
 restore) cmd_restore ;;
 init-env) init_env ;;

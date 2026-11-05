@@ -1,5 +1,6 @@
 from news_api.articles.infrastructure.ai_client import (
     AIError,
+    normalize_brief,
     validate_brief,
     validate_summary,
 )
@@ -67,3 +68,20 @@ def test_legacy_model_is_rejected(monkeypatch) -> None:
             raise AssertionError("legacy model id must be rejected")
     finally:
         monkeypatch.setattr(settings, "ai_model", "deepseek-flash")
+
+
+def test_normalize_brief_turns_a_paragraph_into_lines() -> None:
+    paragraph = (
+        "OpenSSH released a patch for a critical flaw. Attackers can bypass password "
+        "checks on musl-based systems. Administrators should upgrade immediately. "
+        "Exploitation has not been observed yet."
+    )
+    brief = normalize_brief(paragraph)
+    assert len(brief.splitlines()) == 4
+    ok, reason = validate_brief(brief)
+    assert ok, reason
+
+
+def test_normalize_brief_keeps_existing_lines() -> None:
+    brief = normalize_brief("Line one.\nLine two.\nLine three.")
+    assert brief.splitlines() == ["Line one.", "Line two.", "Line three."]

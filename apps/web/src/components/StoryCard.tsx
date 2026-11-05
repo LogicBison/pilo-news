@@ -15,44 +15,43 @@ export function StoryCard({ article, industry, locale, featured = false }: Story
   const body = article.summary ?? article.excerpt;
   return (
     <article
-      className={`group flex h-full flex-col gap-3 rounded-[var(--sn-radius)] border border-[var(--sn-border)] bg-[var(--sn-bg)] p-5 ${
+      className={`sn-card sn-card-interactive group flex h-full flex-col gap-3 p-5 ${
         featured ? "md:p-6" : ""
       }`}
     >
-      <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--sn-muted)]">
-        <span>{article.publisher}</span>
-        <span aria-hidden="true">·</span>
+      <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-[var(--sn-muted)]">
+        <span className="sn-chip">{article.publisher}</span>
         <time dateTime={article.published_at}>
           {formatDate(article.published_at, locale)}
         </time>
         {article.corroboration > 1 ? (
-          <span className="rounded-full bg-[var(--sn-surface)] px-2 py-0.5 font-medium">
+          <span className="sn-chip">
             {article.corroboration} {t(locale, "article.sources")}
           </span>
         ) : null}
       </div>
       <h3
-        className={`font-semibold leading-snug text-[var(--sn-text)] ${
+        className={`font-bold leading-snug tracking-tight text-[var(--sn-text)] ${
           featured ? "text-2xl md:text-3xl" : "text-lg"
         }`}
       >
-        <Link href={href} className="hover:text-[var(--sn-accent)] focus-visible:underline">
+        <Link
+          href={href}
+          className="transition-colors group-hover:text-[var(--sn-primary)] focus-visible:underline"
+        >
           {article.title}
         </Link>
       </h3>
       {body ? <p className="text-sm leading-relaxed text-[var(--sn-muted)]">{body}</p> : null}
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
         {article.topics.slice(0, 3).map((topic) => (
-          <span
-            key={topic.slug}
-            className="rounded-full border border-[var(--sn-border)] px-2.5 py-1 text-xs font-medium text-[var(--sn-muted)]"
-          >
+          <span key={topic.slug} className="sn-chip">
             {topic.label}
           </span>
         ))}
         <Link
           href={href}
-          className="ml-auto text-sm font-semibold text-[var(--sn-primary)] hover:text-[var(--sn-accent)]"
+          className="ml-auto text-sm font-bold text-[var(--sn-primary)] transition-colors hover:text-[var(--sn-accent)]"
           aria-label={`${t(locale, "common.readMore")}: ${article.title}`}
         >
           {t(locale, "common.readMore")} →

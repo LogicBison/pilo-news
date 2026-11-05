@@ -1,0 +1,214 @@
+{
+  "brand": "System News",
+  "site_url": "http://localhost:43991",
+  "default_locale": "en",
+  "refresh_interval_minutes": 720,
+  "default_industry": "cybersecurity",
+  "industries": [
+    {
+      "slug": "cybersecurity",
+      "code": "CYBER_SECURITY",
+      "name": "Cybersecurity & Threat Intelligence",
+      "theme": {
+        "bg": "#ffffff",
+        "text": "#0f172a",
+        "muted": "#475569",
+        "accent": "#0e7490",
+        "border": "#cbd5e1",
+        "layout": "professional",
+        "radius": "8px",
+        "primary": "#1e293b",
+        "surface": "#f1f5f9",
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+        "font_heading": "Arial, Helvetica, sans-serif"
+      },
+      "locales": {
+        "en": {
+          "name": "Cybersecurity & Threat Intelligence",
+          "tagline": "Threats, breaches, and defensive security - in plain language."
+        },
+        "es": {
+          "name": "Ciberseguridad e Inteligencia de Amenazas",
+          "tagline": "Amenazas, brechas y seguridad defensiva, en lenguaje claro."
+        }
+      },
+      "disclaimers": {
+        "en": "News, not security advice. Patch and confirm with your own team.",
+        "es": "Noticias, no asesoría de seguridad. Aplique parches y confirme con su equipo."
+      },
+      "cta": {
+        "body": {
+          "en": "Tell us your stack and exposure. We route qualified requests to an independent partner.",
+          "es": "Cuéntenos su stack y exposición. Canalizamos solicitudes calificadas a un socio independiente."
+        },
+        "kind": "consultation",
+        "label": {
+          "en": "Request a consultation",
+          "es": "Solicitar una consulta"
+        },
+        "headline": {
+          "en": "Talk to a vetted security partner",
+          "es": "Hable con un socio de seguridad verificado"
+        },
+        "secondary_label": {
+          "en": "Get the weekly brief",
+          "es": "Recibir el resumen semanal"
+        }
+      },
+      "timezone": "America/El_Salvador",
+      "retention_days": 30,
+      "sort_order": 60,
+      "enabled": true,
+      "topics": [
+        {
+          "slug": "breaches",
+          "label": {
+            "en": "Breaches & Incidents",
+            "es": "Brechas e Incidentes"
+          },
+          "weight": 1.3,
+          "keywords": {
+            "en": [
+              "breach",
+              "ransomware",
+              "incident",
+              "leak",
+              "intrusion"
+            ],
+            "es": [
+              "brecha",
+              "rescate",
+              "incidente",
+              "filtración"
+            ]
+          }
+        },
+        {
+          "slug": "governance",
+          "label": {
+            "en": "Policy & Compliance",
+            "es": "Política y Cumplimiento"
+          },
+          "weight": 1.1,
+          "keywords": {
+            "en": [
+              "ciso",
+              "regulation",
+              "nist",
+              "compliance",
+              "disclosure"
+            ],
+            "es": [
+              "regulación",
+              "cumplimiento",
+              "divulgación"
+            ]
+          }
+        },
+        {
+          "slug": "threat-intel",
+          "label": {
+            "en": "Threat Intelligence",
+            "es": "Inteligencia de Amenazas"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "malware",
+              "apt",
+              "botnet",
+              "phishing",
+              "campaign"
+            ],
+            "es": [
+              "malware",
+              "phishing",
+              "campaña",
+              "amenaza"
+            ]
+          }
+        },
+        {
+          "slug": "vulnerabilities",
+          "label": {
+            "en": "Vulnerabilities",
+            "es": "Vulnerabilidades"
+          },
+          "weight": 1.4,
+          "keywords": {
+            "en": [
+              "vulnerability",
+              "cve",
+              "patch",
+              "zero-day",
+              "exploit"
+            ],
+            "es": [
+              "vulnerabilidad",
+              "parche",
+              "explotación"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "feed_url": "https://feeds.feedburner.com/TheHackersNews",
+          "language": "en",
+          "trust": 0.84,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Krebs on Security",
+          "feed_url": "https://krebsonsecurity.com/feed/",
+          "language": "en",
+          "trust": 0.92,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Una al Día",
+          "feed_url": "https://unaaldia.hispasec.com/feed/",
+          "language": "es",
+          "trust": 0.8,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "BleepingComputer",
+          "feed_url": "https://www.bleepingcomputer.com/feed/",
+          "language": "en",
+          "trust": 0.86,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Dark Reading",
+          "feed_url": "https://www.darkreading.com/rss.xml",
+          "language": "en",
+          "trust": 0.88,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        }
+      ],
+      "partner": {
+        "name": "Launch Security Partner",
+        "contact_email": "security-partner@example.com",
+        "weight": 1.0,
+        "regions": []
+      }
+    }
+  ]
+}

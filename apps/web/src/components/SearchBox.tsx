@@ -25,12 +25,12 @@ export function SearchBox({
           minLength={3}
           maxLength={64}
           placeholder={t(locale, "search.placeholder")}
-          className="w-full rounded-full border border-[var(--sn-border)] bg-[var(--sn-bg)] px-5 py-3 text-sm text-[var(--sn-text)]"
+          className="sn-input rounded-full px-5 py-3"
         />
       </label>
       <button
         type="submit"
-        className="rounded-full bg-[var(--sn-primary)] px-6 py-3 text-sm font-semibold text-white"
+        className="sn-btn"
       >
         {t(locale, "search.submit")}
       </button>

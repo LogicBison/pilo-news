@@ -25,7 +25,7 @@ from news_api.articles.infrastructure.repo import (
     upsert_article,
 )
 from news_api.channels.infrastructure.repo import get_channel
-from news_api.platform.cache import set_json, single_flight
+from news_api.platform.cache import get_json, set_json, single_flight
 from news_api.platform.clock import hours_ago, now_iso
 from news_api.platform.config import prompt_table, scoring_config, seed_config
 from news_api.platform.errors import Conflict, NotFound
@@ -255,9 +255,18 @@ async def run_ingest(
                     "deduped": len(deduped),
                 }
 
-                if ai_available and deduped:
-                    headlines = [candidate.title for candidate in deduped[:12]]
-                    brief = await ai.desk_brief(headlines=headlines, language=language)
+                if ai_available:
+                    # Generate the desk brief when it is missing, even if this run
+                    # added nothing: a failed first attempt would otherwise leave
+                    # the channel without a brief until the TTL expires.
+                    brief_key = f"bundle:brief:{industry_slug}:{language}"
+                    headlines = [candidate.title for candidate in (deduped or pool)[:12]]
+                    needs_brief = bool(headlines) and await get_json(brief_key) is None
+                    brief = (
+                        await ai.desk_brief(headlines=headlines, language=language)
+                        if needs_brief
+                        else None
+                    )
                     if brief:
                         await set_json(
                             f"bundle:brief:{industry_slug}:{language}",

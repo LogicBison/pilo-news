@@ -8,8 +8,8 @@
 | U2 | Production URL shape: one domain with English unprefixed (`/{industry}`) + `/es/{industry}`, or per-industry domains? | SEO, Caddy config, canonical URLs, ADR 007/008 | owner | Open |
 | U3 | Hosting provider selection (budget approved: ≤ USD 40/month) | Backup destination, deploy runbook | owner | Open - budget approved 2026-11-05; provider chosen at deploy |
 | U4 | AI monthly budget cap value (`AI_MONTHLY_BUDGET_USD`, default 20) | Cost alerts, run sizing | owner | Closed - default 20 approved 2026-11-05 |
-| U5 | Feed portfolio per industry: which publishers, are their terms compatible with aggregation? | Legal risk R1, source seeding, M1 acceptance | owner | Open |
-| U6 | Primary launch industry / pilot channel (recommendation: legal, then financial) | First shipped site, editorial workload | owner | Open |
+| U5 | Feed portfolio per industry: which publishers, are their terms compatible with aggregation? | Legal risk R1, source seeding, M1 acceptance | owner | Closed (technical) - 25 verified feeds across 6 channels, quality policy applied (ADR 014); legal terms review tracked under U11 |
+| U6 | Primary launch industry / pilot channel (recommendation: legal, then financial) | First shipped site, editorial workload | owner | Closed - pilot = `legal` (default channel, widest portfolio, most content); financial second |
 | U7 | Editorial workflow depth: single admin, or roles/review queue at launch? | Editorial console SPEC scope | owner | Open |
 | U8 | Contact-form delivery: transactional email vendor vs SMTP mailbox | Contact flow, secrets, deliverability | owner | Open |
 | U9 | Analytics/consent posture: first-party only, or third-party analytics? | Cookie banner, privacy policy, threat model | owner | Open |
@@ -34,6 +34,7 @@
 |------|----------|--------|
 | 2026-11-05 | plan-foundation | Seeded from doc 01, doc 04 §13 (deferrals), probe ledger |
 | 2026-11-05 | plan-foundation | U4 narrowed to budget; U16/U17 added after ADR 007/010 amendments |
+| 2026-11-05 | operator + agent | U5 closed to technical scope (ADR 014); U6 = legal |
 
 ---
 

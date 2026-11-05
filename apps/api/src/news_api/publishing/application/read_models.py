@@ -43,7 +43,13 @@ async def resolve_language(channel: Channel, locale: str | None) -> tuple[str, s
 
 
 def retention_days(channel: Channel) -> int:
-    return int(scoring_config().get("retention_days", channel.retention_days))
+    """The channel's own window wins; the global scoring value is only a floor.
+
+    Channels are configured by operators (admin or deployment profile); a global
+    key must not silently hide content a channel is configured to keep.
+    """
+    configured = int(scoring_config().get("retention_days", channel.retention_days))
+    return max(channel.retention_days, configured)
 
 
 def card(row: dict[str, Any], topics: list[dict[str, str]]) -> dict[str, Any]:

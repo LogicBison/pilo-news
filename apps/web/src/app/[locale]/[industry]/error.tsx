@@ -22,7 +22,7 @@ export default function IndustryError({
   return (
     <div
       role="alert"
-      className="rounded-[var(--sn-radius)] border border-red-300 bg-red-50 p-6 text-red-950"
+      className="rounded-[calc(var(--sn-radius)+6px)] border border-red-300 bg-red-50 p-6 text-red-950 shadow-[var(--sn-elev-1)]"
     >
       <h1 className="text-2xl font-semibold">{t(locale, "states.errorTitle")}</h1>
       <p className="mt-2 text-sm">{t(locale, "states.errorBody")}</p>

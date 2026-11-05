@@ -34,7 +34,7 @@ export default async function AboutPage({ params }: Params) {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
       <article className="space-y-5">
-        <h1 className="text-3xl font-semibold text-[var(--sn-text)]">
+        <h1 className="text-3xl font-extrabold tracking-tight text-[var(--sn-text)]">
           {t(resolved, "about.title", { industry: name })}
         </h1>
         <p className="text-base leading-relaxed text-[var(--sn-muted)]">
@@ -43,7 +43,7 @@ export default async function AboutPage({ params }: Params) {
         <p className="text-base leading-relaxed text-[var(--sn-muted)]">
           {t(resolved, "about.body2", { industry: name })}
         </p>
-        <section aria-labelledby="how-heading" className="rounded-[var(--sn-radius)] border border-[var(--sn-border)] p-5">
+        <section aria-labelledby="how-heading" className="sn-card p-5">
           <h2 id="how-heading" className="text-xl font-semibold text-[var(--sn-text)]">
             {t(resolved, "about.howTitle")}
           </h2>

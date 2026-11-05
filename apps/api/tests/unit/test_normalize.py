@@ -28,6 +28,10 @@ def test_clean_text_strips_html_and_entities() -> None:
     assert clean_text("<p>Hello &amp;amp; goodbye</p>") == "Hello & goodbye"
 
 
+def test_clean_text_unwraps_escaped_cdata_markers() -> None:
+    assert clean_text("&lt;![CDATA[Our Continued Evolution]]&gt;") == "Our Continued Evolution"
+
+
 def test_repair_mojibake() -> None:
     broken = "RegulaciÃ³n financiera"
     assert repair_mojibake(broken) == "Regulación financiera"
@@ -63,6 +67,16 @@ def test_parse_atom() -> None:
     assert len(items) == 1
     assert items[0].publisher == "Atom Desk"
     assert items[0].link == "https://news.example.org/bank-rules"
+
+
+def test_email_publisher_falls_back_to_outlet_name() -> None:
+    feed = b"""<?xml version="1.0"?><rss version="2.0"><channel>
+    <title>The Hacker News</title>
+    <item><title>Story</title><link>https://example.com/a</link>
+    <source>info@thehackernes.com (The Hacker News)</source></item>
+    </channel></rss>"""
+    items = parse_feed(feed, source_name="THN", language="en")
+    assert items[0].publisher == "The Hacker News"
 
 
 def test_parse_feed_rejects_entities() -> None:

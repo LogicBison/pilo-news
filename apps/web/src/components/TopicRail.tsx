@@ -16,8 +16,8 @@ export function TopicRail({
 }) {
   if (topics.length === 0) return null;
   return (
-    <section aria-labelledby="topics-heading" className="rounded-[var(--sn-radius)] border border-[var(--sn-border)] p-5">
-      <h2 id="topics-heading" className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--sn-muted)]">
+    <section aria-labelledby="topics-heading" className="sn-card p-5">
+      <h2 id="topics-heading" className="sn-eyebrow">
         {title}
       </h2>
       <ul className="mt-3 flex flex-wrap gap-2">
@@ -25,7 +25,7 @@ export function TopicRail({
           <li key={topic.slug}>
             <Link
               href={localePath(locale as "en" | "es", `/${industry}/search?topic=${topic.slug}`)}
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--sn-border)] px-3 py-1.5 text-sm text-[var(--sn-text)] hover:border-[var(--sn-primary)]"
+              className="sn-chip sn-chip-link px-3 py-1.5"
             >
               {topic.label}
               {typeof topic.count === "number" ? (

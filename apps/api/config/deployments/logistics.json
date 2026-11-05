@@ -1,0 +1,208 @@
+{
+  "brand": "System News",
+  "site_url": "http://localhost:43991",
+  "default_locale": "en",
+  "refresh_interval_minutes": 720,
+  "default_industry": "logistics",
+  "industries": [
+    {
+      "slug": "logistics",
+      "code": "SUPPLY_CHAIN_WMS",
+      "name": "Logistics & Supply Chain",
+      "theme": {
+        "bg": "#ffffff",
+        "text": "#111827",
+        "muted": "#4b5563",
+        "accent": "#b45309",
+        "border": "#c7e3d0",
+        "layout": "professional",
+        "radius": "6px",
+        "primary": "#14532d",
+        "surface": "#f0fdf4",
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+        "font_heading": "Arial, Helvetica, sans-serif"
+      },
+      "locales": {
+        "es": {
+          "name": "Logística y Cadena de Suministro",
+          "tagline": "Carga, puertos, aduanas y operaciones de cadena de suministro."
+        },
+        "en": {
+          "name": "Logistics & Supply Chain",
+          "tagline": "Freight, ports, customs, and supply chain operations."
+        }
+      },
+      "disclaimers": {
+        "en": "Rates and timelines vary by lane and season.",
+        "es": "Las tarifas y los plazos varían según la ruta y la temporada."
+      },
+      "cta": {
+        "body": {
+          "en": "Tell us your lanes and volumes. We route qualified requests to an independent logistics partner.",
+          "es": "Cuéntenos sus rutas y volúmenes. Canalizamos solicitudes calificadas a un socio logístico independiente."
+        },
+        "kind": "consultation",
+        "label": {
+          "en": "Request a consultation",
+          "es": "Solicitar una consulta"
+        },
+        "headline": {
+          "en": "Source capacity with a vetted partner",
+          "es": "Encuentre capacidad con un socio verificado"
+        },
+        "secondary_label": {
+          "en": "Get the weekly brief",
+          "es": "Recibir el resumen semanal"
+        }
+      },
+      "timezone": "America/El_Salvador",
+      "retention_days": 30,
+      "sort_order": 50,
+      "enabled": true,
+      "topics": [
+        {
+          "slug": "customs",
+          "label": {
+            "en": "Customs & Trade",
+            "es": "Aduanas y Comercio"
+          },
+          "weight": 1.4,
+          "keywords": {
+            "en": [
+              "customs",
+              "tariff",
+              "trade",
+              "import",
+              "export"
+            ],
+            "es": [
+              "aduana",
+              "arancel",
+              "comercio",
+              "importación",
+              "exportación"
+            ]
+          }
+        },
+        {
+          "slug": "ports",
+          "label": {
+            "en": "Ports & Terminals",
+            "es": "Puertos y Terminales"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "port",
+              "terminal",
+              "dock",
+              "throughput",
+              "congestion"
+            ],
+            "es": [
+              "puerto",
+              "terminal",
+              "muelle",
+              "congestión"
+            ]
+          }
+        },
+        {
+          "slug": "shipping",
+          "label": {
+            "en": "Ocean & Air Freight",
+            "es": "Carga Marítima y Aérea"
+          },
+          "weight": 1.3,
+          "keywords": {
+            "en": [
+              "shipping",
+              "freight",
+              "vessel",
+              "container",
+              "air cargo"
+            ],
+            "es": [
+              "transporte marítimo",
+              "flete",
+              "buque",
+              "contenedor",
+              "carga aérea"
+            ]
+          }
+        },
+        {
+          "slug": "trucking",
+          "label": {
+            "en": "Trucking & Road",
+            "es": "Transporte Terrestre"
+          },
+          "weight": 1.3,
+          "keywords": {
+            "en": [
+              "truck",
+              "trucking",
+              "driver",
+              "carrier",
+              "road"
+            ],
+            "es": [
+              "camión",
+              "transportista",
+              "conductor",
+              "carretera"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        {
+          "name": "Diario del Transporte",
+          "feed_url": "https://www.diariodetransporte.com/feed/",
+          "language": "es",
+          "trust": 0.76,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "FreightWaves",
+          "feed_url": "https://www.freightwaves.com/feed",
+          "language": "en",
+          "trust": 0.88,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Supply Chain Dive",
+          "feed_url": "https://www.supplychaindive.com/feeds/news/",
+          "language": "en",
+          "trust": 0.85,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Trucking Dive",
+          "feed_url": "https://www.truckingdive.com/feeds/news/",
+          "language": "en",
+          "trust": 0.85,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        }
+      ],
+      "partner": {
+        "name": "Launch Logistics Partner",
+        "contact_email": "logistics-partner@example.com",
+        "weight": 1.0,
+        "regions": []
+      }
+    }
+  ]
+}

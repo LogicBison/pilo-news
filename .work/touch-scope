@@ -1,7 +1,7 @@
 {
   "ref": "SYSNEWS",
   "updated": "2026-11-05",
-  "goal": "Implement full v1 (M1-M8), any-industry template, unique host ports/isolation, volume tar.gz backups",
+  "goal": "Deployment profile import (apply-profile CLI + schema + tests + docs); verify pending items",
   "allowed_paths": [
     ".cursorrules",
     "README.md",

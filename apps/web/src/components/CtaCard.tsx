@@ -24,14 +24,14 @@ export function CtaCard({
   return (
     <aside
       aria-label={headline}
-      className={`rounded-[var(--sn-radius)] border border-[var(--sn-border)] bg-[var(--sn-surface)] ${
+      className={`sn-card sn-hero-surface self-start ${
         compact ? "p-4" : "p-6"
       }`}
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--sn-accent)]">
+      <p className="sn-eyebrow">
         {t(locale, "cta.primary")}
       </p>
-      <h2 className={`mt-2 font-semibold text-[var(--sn-text)] ${compact ? "text-lg" : "text-2xl"}`}>
+      <h2 className={`mt-2 font-bold tracking-tight text-[var(--sn-text)] ${compact ? "text-lg" : "text-2xl"}`}>
         {headline}
       </h2>
       {!compact ? <p className="mt-2 text-sm leading-relaxed text-[var(--sn-muted)]">{body}</p> : null}

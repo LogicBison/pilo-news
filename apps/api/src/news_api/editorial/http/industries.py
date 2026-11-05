@@ -5,7 +5,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
-from news_api.channels.domain.theme import DEFAULT_THEMES, validate_theme
+from news_api.channels.domain.theme import DEFAULT_THEMES, is_reserved_slug, validate_theme
 from news_api.channels.infrastructure import repo as channels_repo
 from news_api.dependencies import admin_auth, admin_mutation
 from news_api.editorial.infrastructure.repo import record_audit
@@ -13,20 +13,6 @@ from news_api.platform.errors import Conflict, NotFound, ValidationProblem
 from news_api.platform.i18n import SUPPORTED_LOCALES
 
 router = APIRouter(prefix="/v1/admin/industries", tags=["admin"])
-
-
-RESERVED_SLUGS = {
-    "en",
-    "es",
-    "api",
-    "admin",
-    "v1",
-    "health",
-    "static",
-    "sitemap.xml",
-    "robots.txt",
-    "_next",
-}
 
 
 class LocaleCopy(BaseModel):
@@ -89,7 +75,7 @@ async def list_industries() -> Any:
 
 @router.post("", status_code=201, dependencies=[Depends(admin_mutation)])
 async def create_industry(payload: IndustryCreate, request: Request) -> Any:
-    if payload.slug in RESERVED_SLUGS:
+    if is_reserved_slug(payload.slug):
         raise ValidationProblem("slug is reserved.")
     existing = await channels_repo.get_channel(payload.slug, enabled_only=False)
     if existing:

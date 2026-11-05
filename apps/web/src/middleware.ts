@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const DEFAULT_INDUSTRY = process.env.SN_DEFAULT_INDUSTRY ?? "legal";
 const SUPPORTED = ["en", "es"] as const;
 type Locale = (typeof SUPPORTED)[number];
 
@@ -60,10 +59,9 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   if (pathname === "/") {
-    const locale = negotiate(request);
-    const url = request.nextUrl.clone();
-    url.pathname = locale === "es" ? `/es/${DEFAULT_INDUSTRY}` : `/${DEFAULT_INDUSTRY}`;
-    return withSecurity(NextResponse.redirect(url, 302));
+    // Handled by app/page.tsx (Node runtime) so SN_DEFAULT_INDUSTRY is read at
+    // request time instead of being inlined into the edge bundle at build time.
+    return withSecurity(NextResponse.next());
   }
 
   if (pathname === "/es" || pathname.startsWith("/es/")) {

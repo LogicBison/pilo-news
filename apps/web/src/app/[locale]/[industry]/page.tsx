@@ -72,8 +72,8 @@ export default async function ChannelHome({ params }: Params) {
           </div>
           <StoryColumns bundle={bundle} locale={resolved} industry={industry} />
           {bundle.sources.length > 0 ? (
-            <section aria-labelledby="sources-heading" className="mt-10 rounded-[var(--sn-radius)] border border-[var(--sn-border)] p-5">
-              <h2 id="sources-heading" className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--sn-muted)]">
+            <section aria-labelledby="sources-heading" className="sn-card mt-10 p-5">
+              <h2 id="sources-heading" className="sn-eyebrow">
                 {t(resolved, "home.sources")}
               </h2>
               <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[var(--sn-muted)]">

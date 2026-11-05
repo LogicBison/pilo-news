@@ -22,15 +22,26 @@ export function Hero({
   }
   if (!lead) return null;
   return (
-    <section aria-labelledby="hero-heading" className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
-      <div className="rounded-[var(--sn-radius)] border border-[var(--sn-border)] bg-[var(--sn-surface)] p-6 md:p-8">
-        <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--sn-muted)]">
-          <span>{t(locale, "home.featured")}</span>
-          <span aria-hidden="true">·</span>
-          <time dateTime={lead.published_at}>{formatDate(lead.published_at, locale)}</time>
+    <section
+      aria-labelledby="hero-heading"
+      className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]"
+    >
+      <div className="sn-card sn-hero-surface overflow-hidden p-6 md:p-9">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="sn-eyebrow">{t(locale, "home.featured")}</span>
+          <span className="sn-chip">
+            <time dateTime={lead.published_at}>{formatDate(lead.published_at, locale)}</time>
+          </span>
+          <span className="sn-chip">{lead.publisher}</span>
         </div>
-        <h1 id="hero-heading" className="mt-3 text-3xl font-semibold leading-tight text-[var(--sn-text)] md:text-4xl">
-          <Link href={localePath(locale, `/${industry.slug}/article/${lead.id}`)} className="hover:text-[var(--sn-accent)]">
+        <h1
+          id="hero-heading"
+          className="mt-4 text-3xl font-extrabold leading-[1.1] tracking-tight text-[var(--sn-text)] md:text-[2.7rem]"
+        >
+          <Link
+            href={localePath(locale, `/${industry.slug}/article/${lead.id}`)}
+            className="transition-colors hover:text-[var(--sn-primary)]"
+          >
             {lead.title}
           </Link>
         </h1>
@@ -39,22 +50,26 @@ export function Hero({
             {lead.summary ?? lead.excerpt}
           </p>
         ) : null}
-        <div className="mt-5 flex flex-wrap items-center gap-2">
+        <div className="mt-6 flex flex-wrap items-center gap-2">
           {lead.topics.map((topic) => (
-            <span key={topic.slug} className="rounded-full border border-[var(--sn-border)] px-2.5 py-1 text-xs text-[var(--sn-muted)]">
+            <span key={topic.slug} className="sn-chip">
               {topic.label}
             </span>
           ))}
-          <span className="text-xs text-[var(--sn-muted)]">{lead.publisher}</span>
         </div>
         {favorites.length > 0 ? (
-          <ul className="mt-6 grid gap-3 border-t border-[var(--sn-border)] pt-5 sm:grid-cols-3">
+          <ul className="mt-7 grid gap-2 border-t border-[var(--sn-border)] pt-5 sm:grid-cols-3">
             {favorites.map((item) => (
               <li key={item.id}>
-                <Link href={localePath(locale, `/${industry.slug}/article/${item.id}`)} className="text-sm font-medium hover:text-[var(--sn-accent)]">
-                  {item.title}
+                <Link
+                  href={localePath(locale, `/${industry.slug}/article/${item.id}`)}
+                  className="block rounded-[calc(var(--sn-radius)+2px)] p-3 transition-colors hover:bg-[color-mix(in_srgb,var(--sn-primary)_7%,var(--sn-bg))]"
+                >
+                  <p className="text-sm font-semibold leading-snug text-[var(--sn-text)]">
+                    {item.title}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--sn-muted)]">{item.publisher}</p>
                 </Link>
-                <p className="mt-1 text-xs text-[var(--sn-muted)]">{item.publisher}</p>
               </li>
             ))}
           </ul>
@@ -77,10 +92,16 @@ export function StoryColumns({
   const populated = bundle.columns.filter((column) => column.items.length > 0);
   if (populated.length === 0) return null;
   return (
-    <section aria-labelledby="latest-heading" className="mt-10">
-      <h2 id="latest-heading" className="text-2xl font-semibold text-[var(--sn-text)]">
-        {t(locale, "home.latest")}
-      </h2>
+    <section aria-labelledby="latest-heading" className="mt-12">
+      <div className="flex items-end justify-between gap-4">
+        <h2
+          id="latest-heading"
+          className="text-2xl font-extrabold tracking-tight text-[var(--sn-text)]"
+        >
+          {t(locale, "home.latest")}
+        </h2>
+        <span aria-hidden="true" className="h-1 w-16 rounded-full bg-[var(--sn-accent)]" />
+      </div>
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {populated.map((column, index) => (
           <div key={index} className="flex flex-col gap-5">

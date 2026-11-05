@@ -271,7 +271,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
       <div className="mx-auto max-w-md">
         <h1 className="text-3xl font-semibold">{t(locale, "admin.loginTitle")}</h1>
         <p className="mt-2 text-sm text-[var(--sn-muted)]">{t(locale, "admin.loginIntro")}</p>
-        <form onSubmit={login} className="mt-6 space-y-4 rounded-[var(--sn-radius)] border border-[var(--sn-border)] p-6">
+        <form onSubmit={login} className="sn-card mt-6 space-y-4 p-6">
           <label className="flex flex-col gap-1 text-sm font-medium">
             {t(locale, "admin.email")}
             <input
@@ -279,7 +279,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
-              className="rounded-md border border-[var(--sn-border)] px-3 py-2 text-sm"
+              className="sn-input"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-medium">
@@ -289,11 +289,11 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
-              className="rounded-md border border-[var(--sn-border)] px-3 py-2 text-sm"
+              className="sn-input"
             />
           </label>
           <div aria-live="polite" className="text-sm text-red-700">{message}</div>
-          <button type="submit" className="rounded-full bg-[var(--sn-primary)] px-6 py-3 text-sm font-semibold text-white">
+          <button type="submit" className="sn-btn">
             {t(locale, "admin.signIn")}
           </button>
         </form>
@@ -347,15 +347,15 @@ export function AdminConsole({ locale }: { locale: Locale }) {
 
       {tab === "overview" ? (
         <section className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded border border-[var(--sn-border)] p-4">
+          <div className="sn-card p-4">
             <p className="text-sm text-[var(--sn-muted)]">{t(locale, "admin.sources")}</p>
             <p className="text-3xl font-semibold">{sources.length}</p>
           </div>
-          <div className="rounded border border-[var(--sn-border)] p-4">
+          <div className="sn-card p-4">
             <p className="text-sm text-[var(--sn-muted)]">{t(locale, "admin.tabs.refresh")}</p>
             <p className="text-3xl font-semibold">{runs.length}</p>
           </div>
-          <div className="rounded border border-[var(--sn-border)] p-4">
+          <div className="sn-card p-4">
             <p className="text-sm text-[var(--sn-muted)]">{t(locale, "admin.industry")}</p>
             <p className="text-3xl font-semibold">{industries.length}</p>
           </div>
@@ -368,7 +368,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
       {tab === "channels" ? (
         <section className="mt-6">
           <form
-            className="grid gap-3 rounded border border-[var(--sn-border)] p-4 md:grid-cols-5"
+            className="grid gap-3 sn-card p-4 md:grid-cols-5"
             onSubmit={async (event) => {
               event.preventDefault();
               const form = event.currentTarget;
@@ -386,26 +386,26 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               }
             }}
           >
-            <input name="slug" placeholder={t(locale, "admin.slug")} required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <input name="name" placeholder={t(locale, "admin.name")} required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <input name="code" placeholder={t(locale, "admin.code")} required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <select name="layout" className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm">
+            <input name="slug" placeholder={t(locale, "admin.slug")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="name" placeholder={t(locale, "admin.name")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="code" placeholder={t(locale, "admin.code")} required className="sn-card px-3 py-2 text-sm" />
+            <select name="layout" className="sn-card px-3 py-2 text-sm">
               <option value="editorial">editorial</option>
               <option value="professional">professional</option>
               <option value="academic">academic</option>
             </select>
-            <button type="submit" className="rounded-full bg-[var(--sn-primary)] px-4 py-2 text-sm font-semibold text-white">{t(locale, "admin.createIndustry")}</button>
+            <button type="submit" className="sn-btn px-4 py-2">{t(locale, "admin.createIndustry")}</button>
           </form>
           <ul className="mt-4 space-y-2">
             {industries.map((item) => (
-              <li key={item.slug} className="flex items-center gap-3 rounded border border-[var(--sn-border)] p-3 text-sm">
+              <li key={item.slug} className="flex items-center gap-3 sn-card p-3 text-sm">
                 <span className="font-medium">{item.name}</span>
                 <span className="text-[var(--sn-muted)]">/{item.slug}</span>
                 <span className="ml-auto">{item.enabled ? "on" : "off"}</span>
                 <button
                   type="button"
                   onClick={() => mutate(`/api/proxy/v1/admin/industries/${item.slug}`, "PATCH", { enabled: !item.enabled })}
-                  className="rounded border border-[var(--sn-border)] px-3 py-1"
+                  className="sn-card px-3 py-1"
                 >
                   {item.enabled ? t(locale, "admin.disable") : t(locale, "admin.enable")}
                 </button>
@@ -419,7 +419,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
         <section className="mt-6">
           <IndustryPicker industries={industries} value={industry} onChange={setIndustry} locale={locale} />
           <form
-            className="mt-4 grid gap-3 rounded border border-[var(--sn-border)] p-4 md:grid-cols-5"
+            className="mt-4 grid gap-3 sn-card p-4 md:grid-cols-5"
             onSubmit={async (event) => {
               event.preventDefault();
               const form = event.currentTarget;
@@ -434,13 +434,13 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               if (ok) form.reset();
             }}
           >
-            <input name="name" placeholder={t(locale, "admin.name")} required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <input name="feed_url" placeholder={t(locale, "admin.feedUrl")} required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm md:col-span-2" />
-            <select name="language" className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" defaultValue="en">
+            <input name="name" placeholder={t(locale, "admin.name")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="feed_url" placeholder={t(locale, "admin.feedUrl")} required className="sn-card px-3 py-2 text-sm md:col-span-2" />
+            <select name="language" className="sn-card px-3 py-2 text-sm" defaultValue="en">
               <option value="en">en</option>
               <option value="es">es</option>
             </select>
-            <button type="submit" className="rounded-full bg-[var(--sn-primary)] px-4 py-2 text-sm font-semibold text-white">
+            <button type="submit" className="sn-btn px-4 py-2">
               {t(locale, "admin.create")}
             </button>
           </form>
@@ -455,7 +455,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
                     <td className="p-2">{source.trust}</td>
                     <td className="p-2">{source.status}{source.consecutive_failures ? ` (${source.consecutive_failures})` : ""}</td>
                     <td className="p-2 text-right">
-                      <button type="button" onClick={() => mutate(`/api/proxy/v1/admin/sources/${source.id}`, "PATCH", { enabled: !source.enabled })} className="rounded border border-[var(--sn-border)] px-3 py-1">
+                      <button type="button" onClick={() => mutate(`/api/proxy/v1/admin/sources/${source.id}`, "PATCH", { enabled: !source.enabled })} className="sn-card px-3 py-1">
                         {source.enabled ? t(locale, "admin.hide") : t(locale, "admin.unhide")}
                       </button>
                       <button type="button" onClick={() => mutate(`/api/proxy/v1/admin/sources/${source.id}`, "DELETE")} className="ml-2 rounded border border-red-300 px-3 py-1 text-red-700">
@@ -474,7 +474,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
         <section className="mt-6">
           <IndustryPicker industries={industries} value={industry} onChange={setIndustry} locale={locale} />
           <form
-            className="mt-4 grid gap-3 rounded border border-[var(--sn-border)] p-4 md:grid-cols-5"
+            className="mt-4 grid gap-3 sn-card p-4 md:grid-cols-5"
             onSubmit={async (event) => {
               event.preventDefault();
               const form = event.currentTarget;
@@ -489,15 +489,15 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               if (ok) form.reset();
             }}
           >
-            <input name="slug" placeholder="slug" required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <input name="label_en" placeholder="Label EN" required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <input name="label_es" placeholder="Label ES" required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <input name="weight" type="number" step="0.1" defaultValue="1" className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <button type="submit" className="rounded-full bg-[var(--sn-primary)] px-4 py-2 text-sm font-semibold text-white">{t(locale, "admin.create")}</button>
+            <input name="slug" placeholder="slug" required className="sn-card px-3 py-2 text-sm" />
+            <input name="label_en" placeholder="Label EN" required className="sn-card px-3 py-2 text-sm" />
+            <input name="label_es" placeholder="Label ES" required className="sn-card px-3 py-2 text-sm" />
+            <input name="weight" type="number" step="0.1" defaultValue="1" className="sn-card px-3 py-2 text-sm" />
+            <button type="submit" className="sn-btn px-4 py-2">{t(locale, "admin.create")}</button>
           </form>
           <ul className="mt-4 space-y-2">
             {topics.map((topic) => (
-              <li key={topic.id} className="flex items-center gap-3 rounded border border-[var(--sn-border)] p-3 text-sm">
+              <li key={topic.id} className="flex items-center gap-3 sn-card p-3 text-sm">
                 <span className="font-medium">{topic.slug}</span>
                 <span className="text-[var(--sn-muted)]">{topic.label.en} / {topic.label.es}</span>
                 <span className="ml-auto">{topic.weight}</span>
@@ -522,7 +522,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
                     <td className="p-2">{article.status}</td>
                     <td className="p-2 text-right">
                       {article.status === "hidden" ? (
-                        <button type="button" onClick={() => mutate(`/api/proxy/v1/admin/articles/${article.id}/unhide`, "POST")} className="rounded border border-[var(--sn-border)] px-3 py-1">{t(locale, "admin.unhide")}</button>
+                        <button type="button" onClick={() => mutate(`/api/proxy/v1/admin/articles/${article.id}/unhide`, "POST")} className="sn-card px-3 py-1">{t(locale, "admin.unhide")}</button>
                       ) : (
                         <button type="button" onClick={() => {
                           const reason = window.prompt(t(locale, "admin.reason"));
@@ -532,7 +532,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
                       <button type="button" onClick={() => {
                         const position = Number(window.prompt(t(locale, "admin.position"), "1") ?? 0);
                         if (position >= 1 && position <= 5) void mutate("/api/proxy/v1/admin/pins", "POST", { article_id: article.id, position, weight: 1 });
-                      }} className="ml-2 rounded border border-[var(--sn-border)] px-3 py-1">{t(locale, "admin.pin")}</button>
+                      }} className="ml-2 sn-card px-3 py-1">{t(locale, "admin.pin")}</button>
                     </td>
                   </tr>
                 ))}
@@ -544,7 +544,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               <h3 className="text-sm font-semibold">{t(locale, "admin.pins")}</h3>
               <ul className="mt-2 space-y-1 text-sm">
                 {pins.map((pin) => (
-                  <li key={pin.id} className="flex items-center gap-3 rounded border border-[var(--sn-border)] p-2">
+                  <li key={pin.id} className="flex items-center gap-3 sn-card p-2">
                     <span>#{pin.position} {pin.title}</span>
                     <button type="button" onClick={() => mutate(`/api/proxy/v1/admin/pins/${pin.id}`, "DELETE")} className="ml-auto rounded border border-red-300 px-3 py-1 text-red-700">{t(locale, "admin.unpin")}</button>
                   </li>
@@ -555,12 +555,12 @@ export function AdminConsole({ locale }: { locale: Locale }) {
         </section>
       ) : null}
 
-      {tab === "pins" ? <section className="mt-6"><IndustryPicker industries={industries} value={industry} onChange={setIndustry} locale={locale} /><ul className="mt-4 space-y-2">{pins.map((pin) => (<li key={pin.id} className="flex items-center gap-3 rounded border border-[var(--sn-border)] p-3 text-sm"><span>#{pin.position} {pin.title}</span><button type="button" onClick={() => mutate(`/api/proxy/v1/admin/pins/${pin.id}`, "DELETE")} className="ml-auto rounded border border-red-300 px-3 py-1 text-red-700">{t(locale, "admin.unpin")}</button></li>))}</ul></section> : null}
+      {tab === "pins" ? <section className="mt-6"><IndustryPicker industries={industries} value={industry} onChange={setIndustry} locale={locale} /><ul className="mt-4 space-y-2">{pins.map((pin) => (<li key={pin.id} className="flex items-center gap-3 sn-card p-3 text-sm"><span>#{pin.position} {pin.title}</span><button type="button" onClick={() => mutate(`/api/proxy/v1/admin/pins/${pin.id}`, "DELETE")} className="ml-auto rounded border border-red-300 px-3 py-1 text-red-700">{t(locale, "admin.unpin")}</button></li>))}</ul></section> : null}
 
       {tab === "refresh" ? (
         <section className="mt-6">
           <form
-            className="grid gap-3 rounded border border-[var(--sn-border)] p-4 md:grid-cols-5"
+            className="grid gap-3 sn-card p-4 md:grid-cols-5"
             onSubmit={async (event) => {
               event.preventDefault();
               const data = new FormData(event.currentTarget);
@@ -573,13 +573,13 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               });
             }}
           >
-            <select name="industry" className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm">
+            <select name="industry" className="sn-card px-3 py-2 text-sm">
               <option value="all">all</option>
               {industries.map((item) => <option key={item.slug} value={item.slug}>{item.slug}</option>)}
             </select>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="full_reset" />{t(locale, "admin.fullReset")}</label>
-            <input name="confirmation" placeholder={t(locale, "admin.confirmReset")} className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <button type="submit" className="rounded-full bg-[var(--sn-primary)] px-4 py-2 text-sm font-semibold text-white">{t(locale, "admin.triggerRefresh")}</button>
+            <input name="confirmation" placeholder={t(locale, "admin.confirmReset")} className="sn-card px-3 py-2 text-sm" />
+            <button type="submit" className="sn-btn px-4 py-2">{t(locale, "admin.triggerRefresh")}</button>
           </form>
           <div className="mt-4"><RunTable runs={runs} locale={locale} /></div>
         </section>
@@ -588,7 +588,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
       {tab === "keys" ? (
         <section className="mt-6">
           <form
-            className="flex flex-wrap gap-3 rounded border border-[var(--sn-border)] p-4"
+            className="flex flex-wrap gap-3 sn-card p-4"
             onSubmit={async (event) => {
               event.preventDefault();
               const data = new FormData(event.currentTarget);
@@ -606,14 +606,14 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               }
             }}
           >
-            <input name="label" placeholder={t(locale, "admin.label")} required className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <input name="rate_limit" type="number" defaultValue="600" className="w-32 rounded border border-[var(--sn-border)] px-3 py-2 text-sm" />
-            <button type="submit" className="rounded-full bg-[var(--sn-primary)] px-4 py-2 text-sm font-semibold text-white">{t(locale, "admin.create")}</button>
+            <input name="label" placeholder={t(locale, "admin.label")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="rate_limit" type="number" defaultValue="600" className="w-32 sn-card px-3 py-2 text-sm" />
+            <button type="submit" className="sn-btn px-4 py-2">{t(locale, "admin.create")}</button>
           </form>
           {newKey ? <p className="mt-3 rounded border border-amber-300 bg-amber-50 p-3 text-sm"><strong>{t(locale, "admin.keyShownOnce")}</strong><br /><code className="break-all">{newKey}</code></p> : null}
           <ul className="mt-4 space-y-2">
             {keys.map((key) => (
-              <li key={key.id} className="flex items-center gap-3 rounded border border-[var(--sn-border)] p-3 text-sm">
+              <li key={key.id} className="flex items-center gap-3 sn-card p-3 text-sm">
                 <span className="font-medium">{key.label}</span><span className="text-[var(--sn-muted)]">{key.prefix}…</span><span>{key.enabled ? "on" : "off"}</span>
                 <button type="button" onClick={() => mutate(`/api/proxy/v1/admin/api-keys/${key.id}`, "DELETE")} className="ml-auto rounded border border-red-300 px-3 py-1 text-red-700">{t(locale, "admin.revoke")}</button>
               </li>
@@ -635,7 +635,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
         <section className="mt-6 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead><tr className="border-b border-[var(--sn-border)]"><th className="p-2">{t(locale, "admin.industry")}</th><th className="p-2">{t(locale, "admin.name")}</th><th className="p-2">{t(locale, "admin.email")}</th><th className="p-2">{t(locale, "admin.status")}</th><th className="p-2" /></tr></thead>
-            <tbody>{leads.map((lead) => (<tr key={lead.id} className="border-b border-[var(--sn-border)]"><td className="p-2">{lead.industry}</td><td className="p-2">{lead.name}</td><td className="p-2">{lead.email}</td><td className="p-2"><select value={lead.status} onChange={(event) => mutate(`/api/proxy/v1/admin/leads/${lead.id}`, "PATCH", { status: event.target.value })} className="rounded border border-[var(--sn-border)] px-2 py-1 text-sm">{["new","routed","contacted","qualified","closed","spam"].map((status) => <option key={status} value={status}>{status}</option>)}</select></td><td className="p-2 text-right"><a href={`/api/proxy/v1/admin/leads/${lead.id}/export`} target="_blank" rel="noreferrer" className="rounded border border-[var(--sn-border)] px-3 py-1">{t(locale, "admin.export")}</a><button type="button" onClick={() => mutate(`/api/proxy/v1/admin/leads/${lead.id}`, "DELETE")} className="ml-2 rounded border border-red-300 px-3 py-1 text-red-700">{t(locale, "admin.delete")}</button></td></tr>))}</tbody>
+            <tbody>{leads.map((lead) => (<tr key={lead.id} className="border-b border-[var(--sn-border)]"><td className="p-2">{lead.industry}</td><td className="p-2">{lead.name}</td><td className="p-2">{lead.email}</td><td className="p-2"><select value={lead.status} onChange={(event) => mutate(`/api/proxy/v1/admin/leads/${lead.id}`, "PATCH", { status: event.target.value })} className="sn-card px-2 py-1 text-sm">{["new","routed","contacted","qualified","closed","spam"].map((status) => <option key={status} value={status}>{status}</option>)}</select></td><td className="p-2 text-right"><a href={`/api/proxy/v1/admin/leads/${lead.id}/export`} target="_blank" rel="noreferrer" className="sn-card px-3 py-1">{t(locale, "admin.export")}</a><button type="button" onClick={() => mutate(`/api/proxy/v1/admin/leads/${lead.id}`, "DELETE")} className="ml-2 rounded border border-red-300 px-3 py-1 text-red-700">{t(locale, "admin.delete")}</button></td></tr>))}</tbody>
           </table>
         </section>
       ) : null}
@@ -644,7 +644,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
         <section className="mt-6 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead><tr className="border-b border-[var(--sn-border)]"><th className="p-2">{t(locale, "admin.industry")}</th><th className="p-2">{t(locale, "admin.name")}</th><th className="p-2">{t(locale, "admin.email")}</th><th className="p-2">{t(locale, "admin.status")}</th><th className="p-2" /></tr></thead>
-            <tbody>{partners.map((partner) => (<tr key={partner.id} className="border-b border-[var(--sn-border)]"><td className="p-2">{partner.industry}</td><td className="p-2">{partner.name}</td><td className="p-2">{partner.contact_email}</td><td className="p-2">{partner.status}</td><td className="p-2 text-right"><button type="button" onClick={() => mutate(`/api/proxy/v1/admin/partners/${partner.id}`, "PATCH", { status: partner.status === "active" ? "disabled" : "active" })} className="rounded border border-[var(--sn-border)] px-3 py-1">{t(locale, "admin.save")}</button></td></tr>))}</tbody>
+            <tbody>{partners.map((partner) => (<tr key={partner.id} className="border-b border-[var(--sn-border)]"><td className="p-2">{partner.industry}</td><td className="p-2">{partner.name}</td><td className="p-2">{partner.contact_email}</td><td className="p-2">{partner.status}</td><td className="p-2 text-right"><button type="button" onClick={() => mutate(`/api/proxy/v1/admin/partners/${partner.id}`, "PATCH", { status: partner.status === "active" ? "disabled" : "active" })} className="sn-card px-3 py-1">{t(locale, "admin.save")}</button></td></tr>))}</tbody>
           </table>
         </section>
       ) : null}
@@ -666,7 +666,7 @@ function IndustryPicker({
   return (
     <label className="flex flex-wrap items-center gap-2 text-sm font-medium">
       {t(locale, "admin.industry")}
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="rounded border border-[var(--sn-border)] px-3 py-2 text-sm">
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="sn-card px-3 py-2 text-sm">
         {industries.map((item) => <option key={item.slug} value={item.slug}>{item.slug}</option>)}
       </select>
     </label>

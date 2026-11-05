@@ -14,9 +14,12 @@ from defusedxml import ElementTree as DefusedET  # type: ignore[import-untyped]
 from news_api.articles.domain.models import FeedItem
 from news_api.platform.clock import utcnow
 
+EMAIL_PUBLISHER_RE = re.compile(r"^(?P<email>[^@\s]+@[^@\s]+)\s*(?:\((?P<name>[^)]+)\))?$")
+
 TRACKING_PREFIXES = ("utm_",)
 TRACKING_KEYS = {"fbclid", "gclid", "ref", "mc_cid", "mc_eid", "igshid", "yclid"}
 TAG_RE = re.compile(r"<[^>]+>")
+LITERAL_CDATA_RE = re.compile(r"<!\[CDATA\[(.*?)\]\]>", re.DOTALL)
 WHITESPACE_RE = re.compile(r"\s+")
 MOJIBAKE_MARKERS = ("Ã", "Â", "â€", "Ã©", "Ã³", "Ã±")
 
@@ -67,10 +70,24 @@ def clean_text(value: str) -> str:
     if not value:
         return ""
     text = html.unescape(html.unescape(value))
+    # Some publishers escape CDATA markers as text instead of using them; unwrap
+    # before tag stripping so the title survives.
+    text = LITERAL_CDATA_RE.sub(r"\1", text)
     text = strip_html(text)
     text = repair_mojibake(text)
     text = unicodedata.normalize("NFC", text)
     text = WHITESPACE_RE.sub(" ", text).strip()
+    return text
+
+
+def clean_publisher(value: str, fallback: str) -> str:
+    """Reject author emails as publishers; prefer the parenthesised outlet name."""
+    text = clean_text(value)
+    if not text:
+        return fallback
+    match = EMAIL_PUBLISHER_RE.match(text)
+    if match:
+        return clean_text(match.group("name") or "") or fallback
     return text
 
 
@@ -191,14 +208,17 @@ def parse_feed(content: bytes, *, source_name: str, language: str) -> list[FeedI
             :280
         ]
         published = parse_datetime(_first_text(entry, ("pubdate", "published", "updated", "date")))
-        publisher = clean_text(_first_text(entry, ("author", "creator", "source")))
+        publisher = clean_publisher(
+            _first_text(entry, ("author", "creator", "source")),
+            publisher_default or source_name,
+        )
         items.append(
             FeedItem(
                 title=title,
                 link=canonical,
                 published_at=published,
                 excerpt=excerpt,
-                publisher=publisher or publisher_default or source_name,
+                publisher=publisher,
             )
         )
     return items

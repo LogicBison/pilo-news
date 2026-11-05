@@ -1,0 +1,153 @@
+{
+  "brand": "System News",
+  "site_url": "http://localhost:43991",
+  "default_locale": "en",
+  "default_industry": "stem-cell",
+  "refresh_interval_minutes": 720,
+  "industries": [
+    {
+      "slug": "stem-cell",
+      "code": "STEM_CELL_THERAPY",
+      "name": "Stem Cell Treatments",
+      "theme": {
+        "layout": "academic",
+        "primary": "#0f4c5c",
+        "accent": "#9a3412",
+        "bg": "#ffffff",
+        "surface": "#f8fafc",
+        "text": "#1f2937",
+        "muted": "#4b5563",
+        "border": "#dbe4f0",
+        "radius": "10px",
+        "font_heading": "Georgia, Times New Roman, serif",
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif"
+      },
+      "locales": {
+        "en": {
+          "name": "Stem Cell Treatments",
+          "tagline": "Regenerative medicine, clinical trials, and cell therapy - in plain language."
+        },
+        "es": {
+          "name": "Tratamientos con Células Madre",
+          "tagline": "Medicina regenerativa, ensayos clínicos y terapia celular, en lenguaje claro."
+        }
+      },
+      "disclaimers": {
+        "en": "News, not medical advice. Investigational therapies require a qualified clinician and regulatory approval.",
+        "es": "Noticias, no asesoría médica. Las terapias en investigación requieren un clínico calificado y aprobación regulatoria."
+      },
+      "cta": {
+        "kind": "consultation",
+        "headline": {
+          "en": "Talk to a vetted regenerative-medicine specialist",
+          "es": "Hable con un especialista verificado en medicina regenerativa"
+        },
+        "body": {
+          "en": "Tell us your case and where you are. We route qualified requests to an independent, licensed partner, at no cost and with no obligation.",
+          "es": "Cuéntenos su caso y su ubicación. Canalizamos solicitudes calificadas a un socio independiente y licenciado, sin costo ni compromiso."
+        },
+        "label": {
+          "en": "Request a consultation",
+          "es": "Solicitar una consulta"
+        },
+        "secondary_label": {
+          "en": "Get the weekly brief",
+          "es": "Recibir el resumen semanal"
+        }
+      },
+      "sort_order": 70,
+      "retention_days": 30,
+      "topics": [
+        {
+          "slug": "regenerative-medicine",
+          "label": { "en": "Regenerative Medicine", "es": "Medicina Regenerativa" },
+          "weight": 1.4,
+          "keywords": {
+            "en": ["stem cell", "regenerative", "tissue repair", "organoid", "regeneration"],
+            "es": ["células madre", "regenerativa", "reparación de tejidos", "organoide"]
+          }
+        },
+        {
+          "slug": "clinical-trials",
+          "label": { "en": "Clinical Trials", "es": "Ensayos Clínicos" },
+          "weight": 1.3,
+          "keywords": {
+            "en": ["clinical trial", "phase 1", "phase 2", "efficacy", "patient", "transplant"],
+            "es": ["ensayo clínico", "fase 1", "fase 2", "eficacia", "paciente", "trasplante"]
+          }
+        },
+        {
+          "slug": "regulatory",
+          "label": { "en": "Regulation & Approval", "es": "Regulación y Aprobación" },
+          "weight": 1.3,
+          "keywords": {
+            "en": ["fda", "ema", "approval", "regulatory", "car-t", "market authorization"],
+            "es": ["aprobación", "regulación", "autorización", "agencia"]
+          }
+        },
+        {
+          "slug": "ethics-safety",
+          "label": { "en": "Ethics & Safety", "es": "Ética y Seguridad" },
+          "weight": 1.1,
+          "keywords": {
+            "en": ["ethics", "safety", "adverse event", "unproven", "clinic", "consent"],
+            "es": ["ética", "seguridad", "evento adverso", "no comprobado", "consentimiento"]
+          }
+        },
+        {
+          "slug": "industry",
+          "label": { "en": "Cell Therapy Industry", "es": "Industria de Terapia Celular" },
+          "weight": 1.0,
+          "keywords": {
+            "en": ["biotech", "manufacturing", "funding", "partnership", "commercial"],
+            "es": ["biotecnología", "fabricación", "financiamiento", "acuerdo"]
+          }
+        }
+      ],
+      "sources": [
+        {
+          "name": "ScienceDaily - Stem Cell Research",
+          "feed_url": "https://www.sciencedaily.com/rss/health_medicine/stem_cells.xml",
+          "language": "en",
+          "trust": 0.88
+        },
+        {
+          "name": "RegMedNet",
+          "feed_url": "https://www.regmednet.com/feed/",
+          "language": "en",
+          "trust": 0.86
+        },
+        {
+          "name": "Genetic Engineering & Biotechnology News",
+          "feed_url": "https://www.genengnews.com/feed/",
+          "language": "en",
+          "trust": 0.86
+        },
+        {
+          "name": "STAT News",
+          "feed_url": "https://www.statnews.com/feed/",
+          "language": "en",
+          "trust": 0.90
+        },
+        {
+          "name": "Consalud",
+          "feed_url": "https://www.consalud.es/rss/",
+          "language": "es",
+          "trust": 0.80
+        },
+        {
+          "name": "EFEsalud",
+          "feed_url": "https://www.efesalud.com/feed/",
+          "language": "es",
+          "trust": 0.82
+        }
+      ],
+      "partner": {
+        "name": "Launch Regenerative Medicine Partner",
+        "contact_email": "regen-partner@example.com",
+        "weight": 1.0,
+        "regions": []
+      }
+    }
+  ]
+}

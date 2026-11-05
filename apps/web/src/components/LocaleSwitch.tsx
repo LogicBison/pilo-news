@@ -19,7 +19,7 @@ export function LocaleSwitch({ locale }: { locale: Locale }) {
   };
 
   return (
-    <div className="flex items-center gap-1 rounded-full border border-[var(--sn-border)] p-1 text-xs">
+    <div className="flex items-center gap-1 rounded-full border border-[var(--sn-border)] bg-[color-mix(in_srgb,var(--sn-surface)_70%,var(--sn-bg))] p-1 text-xs">
       <span className="sr-only">{t(locale, "localeSwitch.label")}</span>
       {(["en", "es"] as const).map((option) => (
         <a
@@ -29,7 +29,7 @@ export function LocaleSwitch({ locale }: { locale: Locale }) {
           aria-current={locale === option ? "true" : undefined}
           className={`rounded-full px-3 py-1 font-semibold transition ${
             locale === option
-              ? "bg-[var(--sn-primary)] text-white"
+              ? "bg-[var(--sn-primary)] text-white shadow-[var(--sn-elev-1)]"
               : "text-[var(--sn-muted)] hover:text-[var(--sn-text)]"
           }`}
         >

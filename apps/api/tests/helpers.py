@@ -87,4 +87,5 @@ async def article_state(article_id: str):
 
 
 def expired_at() -> datetime:
-    return days_ago(10)
+    # Outside the channel visibility window (default 30 days, max 90).
+    return days_ago(120)

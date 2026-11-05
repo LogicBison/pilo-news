@@ -76,14 +76,14 @@ export default async function ArticlePage({ params }: Params) {
             </time>
             {article.corroboration > 1 ? <span>· {article.corroboration} sources</span> : null}
           </div>
-          <h1 className="mt-3 text-3xl font-semibold leading-tight text-[var(--sn-text)] md:text-4xl">
+          <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[var(--sn-text)] md:text-4xl">
             {article.title}
           </h1>
           <div className="mt-3 flex flex-wrap gap-2">
             {article.topics.map((topic) => (
               <span
                 key={topic.slug}
-                className="rounded-full border border-[var(--sn-border)] px-2.5 py-1 text-xs text-[var(--sn-muted)]"
+                className="sn-chip"
               >
                 {topic.label}
               </span>
@@ -91,8 +91,8 @@ export default async function ArticlePage({ params }: Params) {
           </div>
         </header>
 
-        <div className="mt-6 rounded-[var(--sn-radius)] border border-[var(--sn-border)] bg-[var(--sn-surface)] p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--sn-accent)]">
+        <div className="sn-card sn-card-surface mt-6 p-6">
+          <p className="sn-eyebrow">
             {article.summary ? t(resolved, "article.aiSummary") : t(resolved, "article.excerptLabel")}
           </p>
           <p className="mt-2 text-base leading-relaxed text-[var(--sn-text)]">
@@ -110,7 +110,7 @@ export default async function ArticlePage({ params }: Params) {
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex rounded-full bg-[var(--sn-primary)] px-5 py-3 text-sm font-semibold text-white"
+            className="sn-btn"
           >
             {t(resolved, "article.readAtPublisher")} ↗
           </a>

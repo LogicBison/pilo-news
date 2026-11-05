@@ -89,7 +89,7 @@ export function LeadForm({
     return (
       <div
         role="status"
-        className="rounded-[var(--sn-radius)] border border-emerald-300 bg-emerald-50 p-6 text-emerald-950"
+        className="rounded-[calc(var(--sn-radius)+6px)] border border-emerald-300 bg-emerald-50 p-6 text-emerald-950 shadow-[var(--sn-elev-1)]"
       >
         <h3 className="text-xl font-semibold">{t(locale, "lead.title")}</h3>
         <p className="mt-2 text-sm">{message}</p>
@@ -102,9 +102,9 @@ export function LeadForm({
       id="lead-form"
       onSubmit={onSubmit}
       onFocus={onStart}
-      className="rounded-[var(--sn-radius)] border border-[var(--sn-border)] bg-[var(--sn-bg)] p-6"
+      className="sn-card p-6"
     >
-      <h2 className="text-2xl font-semibold text-[var(--sn-text)]">{t(locale, "lead.title")}</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-[var(--sn-text)]">{t(locale, "lead.title")}</h2>
       <p className="mt-2 text-sm text-[var(--sn-muted)]">
         {t(locale, "lead.intro")} <span className="font-medium">{industryName}</span>
       </p>
@@ -116,7 +116,7 @@ export function LeadForm({
             required
             maxLength={100}
             autoComplete="name"
-            className="rounded-md border border-[var(--sn-border)] bg-[var(--sn-bg)] px-3 py-2 text-sm"
+            className="sn-input"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium">
@@ -127,7 +127,7 @@ export function LeadForm({
             required
             maxLength={200}
             autoComplete="email"
-            className="rounded-md border border-[var(--sn-border)] bg-[var(--sn-bg)] px-3 py-2 text-sm"
+            className="sn-input"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium">
@@ -138,7 +138,7 @@ export function LeadForm({
             required={logistics}
             maxLength={40}
             autoComplete="tel"
-            className="rounded-md border border-[var(--sn-border)] bg-[var(--sn-bg)] px-3 py-2 text-sm"
+            className="sn-input"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium">
@@ -148,7 +148,7 @@ export function LeadForm({
             required={logistics}
             maxLength={120}
             autoComplete="organization"
-            className="rounded-md border border-[var(--sn-border)] bg-[var(--sn-bg)] px-3 py-2 text-sm"
+            className="sn-input"
           />
         </label>
       </div>
@@ -158,7 +158,7 @@ export function LeadForm({
           name="message"
           rows={4}
           maxLength={2000}
-          className="rounded-md border border-[var(--sn-border)] bg-[var(--sn-bg)] px-3 py-2 text-sm"
+          className="sn-input"
         />
       </label>
       <div aria-hidden="true" className="hidden">
@@ -186,7 +186,7 @@ export function LeadForm({
       <button
         type="submit"
         disabled={status === "sending"}
-        className="mt-4 inline-flex items-center justify-center rounded-full bg-[var(--sn-primary)] px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
+        className="sn-btn mt-4"
       >
         {status === "sending" ? t(locale, "lead.sending") : t(locale, "lead.submit")}
       </button>

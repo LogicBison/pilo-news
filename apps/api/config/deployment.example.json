@@ -1,0 +1,414 @@
+{
+  "brand": "System News",
+  "site_url": "http://localhost:43991",
+  "default_locale": "en",
+  "refresh_interval_minutes": 720,
+  "default_industry": "legal",
+  "industries": [
+    {
+      "slug": "legal",
+      "code": "LEGAL_TECH",
+      "name": "Legal Services & Corporate Governance",
+      "theme": {
+        "bg": "#ffffff",
+        "text": "#111827",
+        "muted": "#4b5563",
+        "accent": "#8a4b08",
+        "border": "#d8dee6",
+        "layout": "editorial",
+        "radius": "10px",
+        "primary": "#1e3a5f",
+        "surface": "#f6f7f9",
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+        "font_heading": "Georgia, Times New Roman, serif"
+      },
+      "locales": {
+        "es": {
+          "name": "Servicios Legales y Gobierno Corporativo",
+          "tagline": "Regulación, tribunales y gobierno corporativo, en lenguaje claro."
+        },
+        "en": {
+          "name": "Legal Services & Corporate Governance",
+          "tagline": "Regulation, courts, and corporate governance - in plain language."
+        }
+      },
+      "disclaimers": {
+        "en": "News, not legal advice. Attorney advertising. No outcome is guaranteed.",
+        "es": "Noticias, no asesoría legal. Publicidad de abogados. No se garantiza resultado alguno."
+      },
+      "cta": {
+        "body": {
+          "en": "Tell us what you need. We route qualified requests to an independent partner, at no cost and with no obligation.",
+          "es": "Cuéntenos qué necesita. Canalizamos solicitudes calificadas a un socio independiente, sin costo ni compromiso."
+        },
+        "kind": "consultation",
+        "label": {
+          "en": "Request a consultation",
+          "es": "Solicitar una consulta"
+        },
+        "headline": {
+          "en": "Speak with a vetted legal professional",
+          "es": "Hable con un profesional legal verificado"
+        },
+        "secondary_label": {
+          "en": "Get the weekly brief",
+          "es": "Recibir el resumen semanal"
+        }
+      },
+      "timezone": "America/El_Salvador",
+      "retention_days": 30,
+      "sort_order": 10,
+      "enabled": true,
+      "topics": [
+        {
+          "slug": "corporate",
+          "label": {
+            "en": "Corporate Governance",
+            "es": "Gobierno Corporativo"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "merger",
+              "acquisition",
+              "governance",
+              "board",
+              "shareholder",
+              "deal"
+            ],
+            "es": [
+              "fusión",
+              "adquisición",
+              "gobierno corporativo",
+              "consejo",
+              "accionista"
+            ]
+          }
+        },
+        {
+          "slug": "legal-tech",
+          "label": {
+            "en": "Legal Technology",
+            "es": "Tecnología Legal"
+          },
+          "weight": 1.1,
+          "keywords": {
+            "en": [
+              "legal tech",
+              "artificial intelligence",
+              "automation",
+              "software",
+              "e-discovery"
+            ],
+            "es": [
+              "tecnología legal",
+              "inteligencia artificial",
+              "automatización",
+              "software"
+            ]
+          }
+        },
+        {
+          "slug": "litigation",
+          "label": {
+            "en": "Litigation",
+            "es": "Litigios"
+          },
+          "weight": 1.3,
+          "keywords": {
+            "en": [
+              "litigation",
+              "lawsuit",
+              "court",
+              "trial",
+              "verdict",
+              "appeal"
+            ],
+            "es": [
+              "litigio",
+              "demanda",
+              "tribunal",
+              "juicio",
+              "sentencia",
+              "apelación"
+            ]
+          }
+        },
+        {
+          "slug": "regulation",
+          "label": {
+            "en": "Regulation & Compliance",
+            "es": "Regulación y Cumplimiento"
+          },
+          "weight": 1.4,
+          "keywords": {
+            "en": [
+              "regulation",
+              "compliance",
+              "gdpr",
+              "sec",
+              "ftc",
+              "rule"
+            ],
+            "es": [
+              "regulación",
+              "cumplimiento",
+              "protección de datos",
+              "norma",
+              "regla"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        {
+          "name": "Above the Law",
+          "feed_url": "https://abovethelaw.com/feed/",
+          "language": "en",
+          "trust": 0.85,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Confilegal",
+          "feed_url": "https://confilegal.com/feed/",
+          "language": "es",
+          "trust": 0.8,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "ABA Journal",
+          "feed_url": "https://www.abajournal.com/rss",
+          "language": "en",
+          "trust": 0.92,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Diario Jurídico",
+          "feed_url": "https://www.diariojuridico.com/feed/",
+          "language": "es",
+          "trust": 0.78,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        }
+      ],
+      "partner": {
+        "name": "Launch Legal Partner",
+        "contact_email": "legal-partner@example.com",
+        "weight": 1.0,
+        "regions": []
+      }
+    },
+    {
+      "slug": "financial",
+      "code": "FINTECH_CORE",
+      "name": "Financial Services & Banking",
+      "theme": {
+        "bg": "#ffffff",
+        "text": "#0f172a",
+        "muted": "#475569",
+        "accent": "#0f766e",
+        "border": "#cbd5e1",
+        "layout": "professional",
+        "radius": "6px",
+        "primary": "#0b4f6c",
+        "surface": "#f1f5f9",
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+        "font_heading": "Arial, Helvetica, sans-serif"
+      },
+      "locales": {
+        "es": {
+          "name": "Servicios Financieros y Banca",
+          "tagline": "Mercados, regulación y tecnología bancaria para profesionales."
+        },
+        "en": {
+          "name": "Financial Services & Banking",
+          "tagline": "Markets, regulation, and banking technology for professionals."
+        }
+      },
+      "disclaimers": {
+        "en": "News, not investment advice. Investing involves risk.",
+        "es": "Noticias, no asesoría de inversión. Invertir implica riesgos."
+      },
+      "cta": {
+        "body": {
+          "en": "Share your situation. We route qualified requests to an independent, regulated partner.",
+          "es": "Cuéntenos su situación. Canalizamos solicitudes calificadas a un socio independiente y regulado."
+        },
+        "kind": "consultation",
+        "label": {
+          "en": "Request a consultation",
+          "es": "Solicitar una consulta"
+        },
+        "headline": {
+          "en": "Talk to a regulated financial advisor",
+          "es": "Hable con un asesor financiero regulado"
+        },
+        "secondary_label": {
+          "en": "Get the weekly brief",
+          "es": "Recibir el resumen semanal"
+        }
+      },
+      "timezone": "America/El_Salvador",
+      "retention_days": 30,
+      "sort_order": 20,
+      "enabled": true,
+      "topics": [
+        {
+          "slug": "banking",
+          "label": {
+            "en": "Banking",
+            "es": "Banca"
+          },
+          "weight": 1.3,
+          "keywords": {
+            "en": [
+              "bank",
+              "banking",
+              "deposits",
+              "lending",
+              "credit"
+            ],
+            "es": [
+              "banco",
+              "banca",
+              "depósitos",
+              "crédito",
+              "préstamos"
+            ]
+          }
+        },
+        {
+          "slug": "fintech",
+          "label": {
+            "en": "Fintech & Payments",
+            "es": "Fintech y Pagos"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "fintech",
+              "payments",
+              "digital wallet",
+              "open banking",
+              "stablecoin"
+            ],
+            "es": [
+              "fintech",
+              "pagos",
+              "billetera digital",
+              "banca abierta"
+            ]
+          }
+        },
+        {
+          "slug": "markets",
+          "label": {
+            "en": "Markets",
+            "es": "Mercados"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "market",
+              "stocks",
+              "bond",
+              "equities",
+              "trading",
+              "yield"
+            ],
+            "es": [
+              "mercado",
+              "bolsa",
+              "bonos",
+              "acciones",
+              "renta fija"
+            ]
+          }
+        },
+        {
+          "slug": "regulation",
+          "label": {
+            "en": "Regulation",
+            "es": "Regulación"
+          },
+          "weight": 1.4,
+          "keywords": {
+            "en": [
+              "sec",
+              "finra",
+              "aml",
+              "kyc",
+              "regulation",
+              "compliance"
+            ],
+            "es": [
+              "regulación",
+              "cumplimiento",
+              "blanqueo",
+              "supervisión"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        {
+          "name": "Expansión",
+          "feed_url": "https://e00-expansion.uecdn.es/rss/portada.xml",
+          "language": "es",
+          "trust": 0.82,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Banking Dive",
+          "feed_url": "https://www.bankingdive.com/feeds/news/",
+          "language": "en",
+          "trust": 0.85,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Finextra",
+          "feed_url": "https://www.finextra.com/rss/headlines.aspx",
+          "language": "en",
+          "trust": 0.9,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Payments Dive",
+          "feed_url": "https://www.paymentsdive.com/feeds/news/",
+          "language": "en",
+          "trust": 0.85,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        }
+      ],
+      "partner": {
+        "name": "Launch Financial Partner",
+        "contact_email": "financial-partner@example.com",
+        "weight": 1.0,
+        "regions": []
+      }
+    }
+  ]
+}

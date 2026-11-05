@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
@@ -41,7 +42,8 @@ async def test_migrations_are_idempotent() -> None:
     applied = await run_migrations()
     assert applied == []
     row = await fetch_one("SELECT COUNT(*) AS total FROM schema_migrations")
-    assert int(row["total"]) == 3
+    expected = len(list((Path(__file__).resolve().parents[2] / "migrations").glob("*.sql")))
+    assert int(row["total"]) == expected
 
 
 @pytest.mark.asyncio
@@ -75,7 +77,14 @@ async def test_ingest_partitions_languages_and_seeds(monkeypatch) -> None:
     run = await get_run(run_id)
     assert run is not None
     assert run["status"] == "ok"
-    assert run["stats"]["feeds_polled"] == 2
+    expected_sources = await fetch_one(
+        """
+        SELECT COUNT(*) AS total FROM sources s
+        JOIN industries i ON i.id = s.industry_id
+        WHERE i.slug = 'legal' AND s.enabled = TRUE
+        """
+    )
+    assert run["stats"]["feeds_polled"] == int(expected_sources["total"])
     assert "per_language" in run["stats"]
 
 

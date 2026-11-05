@@ -1,7 +1,7 @@
 # Template deployment plan - next session
 
-**Status:** proposed · **Needs:** operator choice on profile format (file vs admin import).
-**Next action:** implement `apps/api/config/deployment.example.json` + an idempotent import command, then use it to clone a second channel/deployment.
+**Status:** done · **Needs:** nothing - CLI path chosen over the admin import endpoint.
+**Next action:** clone a customer vertical from `apps/api/config/deployments/<slug>.json`; re-run `verify-sources`.
 
 ## Current capability
 
@@ -65,16 +65,14 @@ Add `apps/api/config/deployment.example.json`:
 Alternative: `POST /v1/admin/deployments/import` with the same payload for
 remote provisioning; keep the CLI as the offline path.
 
-## Next-session tasks
+## Outcome (2026-11-05)
 
-1. Define the profile schema + example; validate with Pydantic.
-2. Implement `apply-profile` service + CLI + tests (idempotency twice).
-3. Add a source-import bulk path that reuses `validate_feed_url`/test-fetch.
-4. Extend `docs/adding-an-industry.md` into a deployment guide (feed choices,
-   trust tuning, prompt/scoring overrides, AI budget, CTA/partner).
-5. Verify a second profile end to end: `up`, `apply-profile`, `refresh`,
-   `/v1/news/bundle` EN/ES, web pages, sitemap.
-6. Run pending verification: k6, prd deploy/rollback, GitHub CI.
+1. Schema + example: `apps/api/config/deployment.example.json`, validated with Pydantic.
+2. `apply-profile` service (`news_api.provisioning`) + CLI (`--dry-run`, `--only-industry`); 18 tests including a no-database run against injected ports.
+3. Sources are imported inside the same profile; each feed is validated with `validate_feed_url`.
+4. Docs: `docs/deployment-profile.md`, `docs/source-quality.md`, `docs/customization.md`.
+5. Verified end to end: `cybersecurity` channel created from a profile only (13 entities), refreshed, serving `/v1/news` and `/cybersecurity`.
+6. Still pending: k6, prd deploy/rollback, GitHub CI (owner/ops).
 
 ## Guardrails
 
