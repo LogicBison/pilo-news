@@ -23,7 +23,8 @@
 | Hosting | Single VPS + Docker Compose + Caddy | compose v2 · caddy 2 | ADR 005 |
 | CI/CD | GitHub Actions | - | ADR 012 |
 | Email | SMTP / transactional API | provider TBD | Contact notifications (U8) |
-| AI summaries | OpenAI-compatible chat API | provider/model TBD | `AI_BASE_URL`, `AI_MODEL` (U4) |
+| Refresh cadence | `REFRESH_INTERVAL_MINUTES` | default 720 | Twice daily; manual force via admin API/CLI (ADR 010) |
+| AI summaries | DeepSeek `deepseek-flash` (V4.1 Flash) | OpenAI-compatible | base `https://api.deepseek.com`; `AI_MODEL` overrides (ADR 010) |
 
 **Deferred (not installed):** object storage/CDN, dedicated search engine, managed cloud, Kubernetes, GraphQL.
 
@@ -37,9 +38,11 @@
 | `apps/api/migrations/` | Idempotent numbered SQL |
 | `apps/api/src/news_api/platform/` | Shared platform package |
 | `apps/web/` | Next.js public UI + admin console |
-| `bin/start.sh` | Dev stack control (`init-env`, `up`, `down`, `logs`, `test`, `migrate`, `backup`) |
+| `bin/start.sh` | Visual stack menu (`up`, `down`, `logs`, `test`, `migrate`, `refresh`, `backup`, `restore`, `destroy`) |
 | `docs/api/` | Public API docs + committed OpenAPI snapshot |
-| `docker-compose.dev.yml` / `docker-compose.prd.yml` | Dev / production stacks (pending approval, O4) |
+| `docker-compose.dev.yml` / `docker-compose.prd.yml` | Dev / production stacks |
+| `.env.example` → `.env.dev` / `.env.prd` | One root template; per-env files generated, ignored |
+| `apps/*/Dockerfile.dev` / `Dockerfile.prd` | Image per environment suffix |
 | `.work/` | Plans, SPECs, ADRs, standards, HANDOFF |
 | `tmp/` | Scratch/reference inputs (git-ignored) |
 
@@ -51,8 +54,8 @@ See `.work/standards/20261105-DIRECTORY_MAP.md` for the binding map.
 
 | Item | Value |
 |------|-------|
-| Dev stack script | `./bin/start.sh` |
-| Compose file | `docker-compose.dev.yml` |
+| Dev stack script | `./bin/start.sh` (menu) · `./bin/start.sh --env prd <cmd>` |
+| Compose file | `docker-compose.<env>.yml` (env = dev \| prd) |
 | Test command | `pytest -q` (in `api`, from `/app`) |
 | Lint | `ruff check . && ruff format --check .` (in `api`) |
 | Type check | `mypy src` (in `api`); `tsc --noEmit` (in `web`) |
@@ -62,7 +65,7 @@ See `.work/standards/20261105-DIRECTORY_MAP.md` for the binding map.
 | Blast radius | `bash /mnt/work/Projects/pilo.ai.logicbison/scripts/blast-radius-check.sh` |
 | Default dev ports | web 3000 · api 8080 · postgres 5433 · redis 6380 · prometheus 9090 · grafana 3001 |
 
-**Rule:** never run app tests/lint/installs on the host while Compose is used - use `docker compose -f docker-compose.dev.yml exec <service> ...` (see `.cursorrules` § Docker / Dev Environment).
+**Rule:** never run app tests/lint/installs on the host while Compose is used - use `./bin/start.sh --env <env> <command>` or `docker compose --env-file .env.<env> -f docker-compose.<env>.yml exec <service> ...` (see `.cursorrules` § Docker / Dev Environment).
 
 ---
 
@@ -84,7 +87,7 @@ See `.work/standards/20261105-DIRECTORY_MAP.md` for the binding map.
 | ID | Topic | Owner | Where |
 |----|-------|-------|-------|
 | U3 | VPS provider + budget | owner | ADR 005 ratification (HANDOFF O2) |
-| U4 | AI provider/model/budget | owner | ADR 010 execution |
+| U4 | AI monthly budget (`AI_MONTHLY_BUDGET_USD`) | owner | cost cap; provider/model decided (`deepseek-flash`) |
 | U5 | Publisher feed portfolio + terms | owner | source seeding, R1 |
 | U8 | Email delivery vendor | owner | contact flow |
 | U10 | Traffic expectation | owner | sizing/scaling trigger |

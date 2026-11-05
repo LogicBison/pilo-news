@@ -64,7 +64,8 @@ Never return stack traces, SQL, or upstream bodies.
 | GET | `/v1/health` | none | Liveness/readiness |
 | GET | `/v1/industries` | none | List channels |
 | GET | `/v1/industries/{slug}` | none | Channel detail + theme summary |
-| GET | `/v1/news` | optional key | List articles (`industry`, `locale`, `topic`, `q`, `limit`, `cursor`) |
+| GET | `/v1/news` | optional key | List articles for one language (`industry`, `locale`, `topic`, `q`, `limit`, `cursor`) |
+| GET | `/v1/news/bundle` | optional key | Reference-compatible single-language bundle (splash, columns, topics, desk brief) |
 | GET | `/v1/news/{id}` | optional key | Article detail |
 | GET | `/v1/news/splash` | optional key | Lead + favorites for the hero |
 | GET | `/v1/topics` | none | Topics for a channel |
@@ -72,13 +73,19 @@ Never return stack traces, SQL, or upstream bodies.
 | GET | `/v1/openapi.json` | none | Machine contract |
 | GET | `/v1/docs` | none | Swagger UI |
 | POST | `/v1/contact` | none (rate-limited) | Contact form |
+| POST | `/v1/leads` | none (rate-limited) | Lead capture (consultation/brief) |
 | POST | `/v1/admin/auth/login` | none | Admin login |
-| POST | `/v1/admin/refresh` | Bearer | Trigger ingestion |
+| POST | `/v1/admin/refresh` | Bearer | Trigger ingestion (`force` bypasses schedule) |
+| GET | `/v1/admin/refresh/{run_id}` | Bearer | Run status/stats |
 | CRUD | `/v1/admin/sources` | Bearer | Source management |
 | CRUD | `/v1/admin/pins` | Bearer | Pins |
 | POST | `/v1/admin/articles/{id}/hide` | Bearer | Hide article |
 | CRUD | `/v1/admin/api-keys` | Bearer | Key management |
 | GET | `/v1/admin/audit` | Bearer | Audit log |
+| GET/PATCH | `/v1/admin/leads` | Bearer | Lead inbox + status |
+| POST | `/v1/admin/leads/{id}/assign` | Bearer | Partner assignment |
+| GET/DELETE | `/v1/admin/leads/{id}/export` · `/v1/admin/leads/{id}` | Bearer | DSAR export/erase |
+| CRUD | `/v1/admin/partners` | Bearer | Partner registry |
 
 - Paths are plural nouns, kebab-case; no verbs except `hide`/`refresh` actions (documented exceptions).
 - Resource ids are UUIDs; slugs are `[a-z0-9-]{2,40}`.
@@ -100,7 +107,7 @@ Never return stack traces, SQL, or upstream bodies.
 | Admin | `Cache-Control: no-store` |
 | 304 | same `ETag`, empty body |
 
-ETag is a weak hash of the serialized body + locale + cursor. Cache keys include `industry`, `locale`, and normalized query.
+ETag is a weak hash of the serialized body + language + cursor. Cache keys include `industry`, `locale`/`language`, and normalized query.
 
 ## 7. Auth
 
@@ -126,7 +133,8 @@ ETag is a weak hash of the serialized body + locale + cursor. Cache keys include
 ## 10. Dates, locales, numbers
 
 - All timestamps are ISO-8601 UTC with `Z`.
-- `locale` is a BCP 47 tag; unsupported → `400`.
+- `locale` is a BCP 47 tag; unsupported → `400 invalid-locale`.
+- `locale` selects the language bundle: items are returned only in that language; a missing bundle falls back to `en` with `meta.fallback: true` (ADR 007 §3).
 - Numbers are JSON numbers; no stringified decimals.
 
 ## 11. Documentation requirements (every change)

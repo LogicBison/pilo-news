@@ -9,7 +9,7 @@
 
 - The brief makes the API mandatory and requires documentation usable by developers **and agentic coding assistants**.
 - Clients read lists, detail, splash/featured, topics, sources, and search; they should not scrape HTML.
-- The data changes constantly (5-10 min), so caching semantics must be part of the contract.
+- The data changes on a schedule (twice daily by default) and on demand, so caching semantics must be part of the contract.
 
 ## Decision
 

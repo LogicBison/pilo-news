@@ -2,10 +2,12 @@
 
 **One platform, many industry news sites, one public API.**
 
-System News aggregates industry news from approved publisher feeds, scores and de-duplicates it, writes short original EN/ES summaries, and serves it two ways:
+System News aggregates industry news from approved publisher feeds, scores and de-duplicates it, writes a short original summary for each story in its own language, and serves it two ways:
 
-1. a **themed landing-page/news site per industry** (`/{locale}/{industry}`), and
-2. a **versioned REST API** (`/v1`) that any client can consume - LogicBison first.
+1. a **themed landing-page/news site per industry** - `/{industry}` in English, `/es/{industry}` in Spanish - and
+2. a **versioned REST API** (`/v1`) that any client can consume - LogicBison first. Updates run **twice a day** by default (configurable) and can be force-triggered on demand.
+
+Every channel carries one professional CTA that routes consented inquiries to a partner professional (ADR 013). Lead generation is a primary goal, not a footer afterthought.
 
 **Status:** foundation complete, plan-master-ready (2026-11-05). No application code yet - implementation starts after `@plan-master greenfield` produces an Approved master plan.
 
@@ -44,18 +46,21 @@ DOCS_TECH_STACK.md
 ## Quickstart (after M1 scaffold exists)
 
 ```bash
-cp .env.example .env.dev          # once created (owner approval O4)
-./bin/start.sh up                 # postgres, redis, api, worker, web
+./bin/start.sh init-env --env dev   # creates .env.dev from .env.example (mode 600)
+./bin/start.sh --env dev up        # postgres, redis, api, worker, web
+./bin/start.sh --env dev refresh   # force a news fetch now (scheduled: every 12 h)
 open http://localhost:3000        # locale-aware site
 curl -s http://localhost:8080/v1/health
 curl -s "http://localhost:8080/v1/news?industry=legal&locale=en&limit=5"
 ```
 
+`./bin/start.sh` with no arguments opens the visual menu. Every artifact is suffixed by the same `dev|prd` value: `docker-compose.<env>.yml`, `apps/*/Dockerfile.<env>`, `.env.<env>`. Only `.env.example` is tracked; `.env.*` lives at the repo root only.
+
 Tests run inside the containers:
 
 ```bash
-docker compose -f docker-compose.dev.yml exec api bash -c "cd /app && pytest -q"
-docker compose -f docker-compose.dev.yml exec web bash -c "cd /app && pnpm test"
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec api bash -c "cd /app && pytest -q"
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "cd /app && pnpm lint && pnpm typecheck"
 ```
 
 Until the scaffold lands, the commands above are **planned**, not verified.
@@ -78,7 +83,7 @@ Source of truth: `.work/docs/integration/industries-v1.1.0/data.json` (mirrored 
 
 ## API in one paragraph
 
-`GET /v1/news?industry={slug}&locale={en|es}` returns a `{data, meta}` envelope with cursor pagination and ETags. Required channel isolation: every response belongs to exactly one industry. Public reads need no key; `X-API-Key` raises rate limits. Errors are RFC 7807. Breaking changes require `/v2`. Full contract: `.work/standards/20261105-api-style-guide.md`.
+`GET /v1/news?industry={slug}&locale={en|es}` returns a `{data, meta}` envelope with cursor pagination and ETags; `GET /v1/news/bundle` returns a reference-compatible single-language bundle (splash, columns, topics, sources, desk brief) for LogicBison-style clients. Every response belongs to exactly one industry and one language. Public reads need no key; `X-API-Key` raises rate limits. Errors are RFC 7807. Breaking changes require `/v2`. Full contract: `.work/standards/20261105-api-style-guide.md`.
 
 ---
 

@@ -29,6 +29,10 @@
 | `api_keys` | label, scopes, rate_limit | Internal | |
 | `api_keys` | key_hash, pepper | Restricted | Never returned |
 | `contact_messages` | name, email, phone, message | Confidential | PII |
+| `leads` | name, email, phone, company, message, ip_hash, ua_hash | Confidential | PII; consent version stored |
+| `leads` | industry_id, partner_id, status, utm, source_page | Confidential | Context |
+| `partners` | name, contact_email | Confidential | Business contact |
+| `cta_events` | event, placement, article_id, locale, session_hash | Internal | No PII; 90-day retention |
 | `contact_messages` | industry_id, locale, status | Confidential | Context |
 | `audit_events` | actor, action, entity | Internal | May contain admin email → treat as Confidential if so |
 | `refresh_runs` | stats | Internal | |
@@ -43,6 +47,10 @@
 | Contact email | Reply | Same | 90 days | Delete row on request |
 | Contact phone | Optional callback | Same | 90 days | Delete row on request |
 | Contact message | Understand request | Same | 90 days | Delete row on request |
+| Lead name | Route to partner | Consent | 24 months | Delete on request (30 days) |
+| Lead email/phone | Contact + routing | Consent | 24 months | Delete on request (30 days) |
+| Lead message | Understand need | Consent | 24 months | Delete on request (30 days) |
+| Lead ip_hash/ua_hash | Abuse review | Legitimate interest | 90 days | Purged with spam retention |
 | Admin email | Login identity | Contract | Life of account | Remove account |
 | Client API key label + hash | Authentication | Contract | Life of key + 30 days | Revoke/delete |
 | Server logs (IP) | Security/rate limiting | Legitimate interest | 14 days | Rotated |
@@ -65,6 +73,9 @@
 | Articles (hot) | 7 days visible | Query filter (`published_at >= now - 7d`) |
 | Articles (rows) | 30 days | Nightly purge job |
 | Contact messages | 90 days | Nightly purge job |
+| Leads | 24 months | Nightly purge job |
+| Spam/rejected leads | 90 days | Nightly purge job |
+| CTA funnel events | 90 days | Nightly purge job |
 | Logs | 14 days | Log rotation |
 | Audit events | 1 year | Append-only; purge job at 12 months |
 | Backups | 30 days | Bucket lifecycle |

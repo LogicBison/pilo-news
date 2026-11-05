@@ -2,7 +2,7 @@
 
 > **Path:** `<repo-root>/.work.ui/context/HANDOFF_UI.md` · Maintained by **`ui-*` skills**. Session bookends: **`@session-control`** when `.ai/` is present (full repo); `.work.ui`-scoped session verbs (start / status / context / add / commit / close / push) via **`@ui-session`**.
 
-**Status:** Draft · **Needs:** REPLACE:<decision, review, or nothing>
+**Status:** Draft - CTA brief written; UI foundation not started · **Needs:** `@ui-design-foundation greenfield` before screen-spec promotion
 
 ## Session status
 
@@ -12,7 +12,7 @@
 
 **Closed:** -
 
-**UI layer state:** Greenfield / foundation / spec / implementation — describe briefly.
+**UI layer state:** Greenfield - CTA/lead-capture brief authored; no design tokens or screen specs yet.
 
 **Recommended pick-up:** `.work.ui/plans/NEXT_UI.md`
 
@@ -51,7 +51,7 @@
 | Screen map | `.work.ui/plans/foundation/*-04-screen-map.md` |
 | Building UI | Approved `.work.ui/screens/<slug>/*-SCREEN-SPEC.md` |
 | API behaviour | `.work/features/<slug>/*-SPEC.md` (link only) |
-| Stack / commands | `REPLACE:UI_TECH_STACK_DOC` or `DOCS_UI_STACK.md` |
+| Stack / commands | `DOCS_UI_STACK.md` |
 | Charts / data viz | Foundation doc 03, `resources/control-platforms.md`, SPEC §14 |
 
 ---
@@ -74,8 +74,8 @@
 
 ## Repository UI state
 
-- **Token file:** REPLACE:UI_TOKENS_FILE
-- **Chart library:** REPLACE:UI_CHART_LIBRARY (if analytical dashboard; recorded in foundation doc 03 + CATALOG.md)
+- **Token file:** `apps/web/src/app/globals.css`
+- **Chart library:** none yet (deferred until an analytical screen exists) (if analytical dashboard; recorded in foundation doc 03 + CATALOG.md)
 - **Catalog:** `.work.ui/design-system/CATALOG.md`
 - **Last visual verify:** -
 - **Last a11y audit:** -
@@ -92,3 +92,16 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 ## Next action
 
 `@ui-session start` — open the next UI session
+
+---
+
+## Latest action (@ui-director)
+
+**Date:** 2026-11-05
+**Request:** "One of the main goals of this system is to get leads ... the call to action (professional and appropriate) must be embedded into the build."
+**Classified bucket:** design-system + copy (cross-cutting)
+**Executed:**
+1. @ui-screen-spec intake -> classified **cross-cutting** (screen-spec-ready: no) -> foundation first
+2. CTA/lead-capture component brief -> `.work.ui/design-system/20261105-CTA-BRIEF.md`
+**Blockers:** `ui-foundation-complete: no`, `screen-spec-ready: no`; brief cannot be promoted to `.work.ui/screens/` yet
+**Next recommended:** `@ui-design-foundation greenfield` (then promote the brief to a screen SPEC)

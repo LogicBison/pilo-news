@@ -16,6 +16,7 @@
 | `.work/docs/reference/` | Reference / API docs (`YYYYMMDD-<slug>.md`) |
 | `.work/docs/features/<slug>/` | Per-feature user documentation |
 | `.work/prompts/` | Decision questionnaires; optional user scratch (`initial.md` - **not read by skills** unless user names it) |
+| `.work/voice/` | Voice + prose guardrails (binding for agent-written prose, `.cursorrules` § Voice and prose) |
 | `.work/decisions/` | ADRs (`YYYYMMDD-NNN-*.md`) |
 | `.work/context/` | `HANDOFF.md` - read/write via `@session-control` |
 

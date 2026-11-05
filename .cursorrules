@@ -4,6 +4,14 @@ You are a senior staff engineer and tech lead on **System News**. You own correc
 
 ---
 
+## Voice and prose
+
+`.work/voice/README.md` is binding for prose the agent writes or drafts on the operator's behalf: lowercase-leaning, terse, answer first, no preamble or closing flourish, no flattery, no hype words, concrete over abstract, one hedge per claim max. It does not apply to code identifiers, commit subject casing, or quoted third-party text.
+
+Precedence: the guardrails in `.work/voice/README.md` §4 outrank style; the operator's meaning outranks the operator's style; generated documents still carry their framework header (Status / Needs / `## Next action`) but use the same voice inside.
+
+---
+
 # AI Agent Rules — System News
 
 > **Bootstrap:** thin-client repo — `.cursorrules` + `.work/` are local; every other `.ai/<path>` resolves from `$AGENT_OS_SOURCE` (§ Source resolution). Do not re-run bootstrap; use `@deploy-basic update` when the framework changes.
@@ -243,17 +251,19 @@ Cache vendor APIs/XSDs/PDFs/OpenAPI under `.work/docs/integration/` (per-project
 | Action | Where |
 |--------|-------|
 | Install deps for a service | Inside that service's compose container |
-| Tests, lint, type-check, builds | `docker compose -f docker-compose.dev.yml exec <service> …` |
+| Tests, lint, type-check, builds | `./bin/start.sh --env dev test` or `docker compose --env-file .env.dev -f docker-compose.dev.yml exec <service> …` |
 | Rare host command | Only if `DOCS_TECH_STACK.md` documents it, or the user approves in-message |
 
 ```bash
 # tests/lint/type (customize service + paths)
-docker compose -f docker-compose.dev.yml exec api bash -c "cd /app && pytest -q"
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec api bash -c "cd /app && pytest -q"
 # one-off script (run from WORKDIR so imports resolve)
-docker compose -f docker-compose.dev.yml exec api bash -c "cd /app && timeout 120 python scripts/my_script.py"
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec api bash -c "cd /app && timeout 120 python scripts/my_script.py"
 ```
 
-Container identity via `.env` (`STACK_SUFFIX`, ports, `COMPOSE_PROJECT_NAME`); prefer `./bin/start.sh` for isolated compose. Skills (`code-implementation`, `code-verify`) must use these commands, not hardcoded names from another project. Place one-off scripts under `apps/api/scripts`. If the project does **not** use Docker, use the local/CI commands from `DOCS_TECH_STACK.md`.
+**Environment convention (binding).** One parameter, `ENV ∈ {dev, prd}`, selects every environment-specific file: `docker-compose.<env>.yml`, `apps/*/Dockerfile.<env>`, `.env.<env>`. There is exactly one `.env.example` (tracked) and one `.env.<env>` per environment, both at the repo root; **no service defines its own `.env` file**. Generate with `./bin/start.sh init-env --env <env>`; control with the `./bin/start.sh` menu or `./bin/start.sh --env <env> <command>`. Always pass `--env-file .env.<env>` when calling Compose directly.
+
+Container identity via `.env.<env>` (`STACK_SUFFIX`, ports, `COMPOSE_PROJECT_NAME`); prefer `./bin/start.sh` for isolated compose. Skills (`code-implementation`, `code-verify`) must use these commands, not hardcoded names from another project. Place one-off scripts under `apps/api/scripts`. If the project does **not** use Docker, use the local/CI commands from `DOCS_TECH_STACK.md`.
 
 ---
 
@@ -339,19 +349,19 @@ This repo was bootstrapped in one of two modes. The agent MUST apply the matchin
 
 AI_UI_SOURCE=/mnt/work/Projects/pilo.ai.ui.logicbison
 
-*(If the line above still shows `REPLACE_BASICUI_SOURCE`, the repo is **fat-client** — see below.)*
+*(If the line above is unset, the repo is **fat-client** — see below.)*
 
 | Mode | Bootstrapped via | Where framework assets live | `AI_UI_SOURCE` |
 |------|------------------|----------------------------|----------------|
-| **Fat-client** (vendored) | `@ui-bootstrap init` or `@ui-deploy-files` | this repo's `.ai.ui/` | unset (token left as `REPLACE_BASICUI_SOURCE`) |
+| **Fat-client** (vendored) | `@ui-bootstrap init` or `@ui-deploy-files` | this repo's `.ai.ui/` | unset |
 | **Thin-client** (remote) | `@ui-deploy-basic` | the **source** UI Design OS; this repo holds only `.cursorrules` + `.work.ui/` | set to an absolute path (e.g. `/path/to/.ai.ui`) |
 
 **Resolution rule (agents MUST apply before reading any `.ai.ui/...` reference):**
 
 1. `.cursorrules` (this file) and `.work.ui/**` — read from the **local** project (this repo), always, in both modes.
 2. **Thin-client** (`AI_UI_SOURCE` is set and readable as a directory): read every other `.ai.ui/<path>` reference from `$AI_UI_SOURCE/<path>` — i.e. `skills/<id>/skill.md`, `skills/README.md`, `standards/**`, `concepts/**`, `docs/**`, `scripts/**`, `templates/**`, `START_HERE.md`, `COHABITATION.md`. **Never** assume a local `.ai.ui/` exists. When you invoke `@<skill>`, read `$AI_UI_SOURCE/skills/<id>/skill.md`; inside it, any `.ai.ui/<x>` reference resolves to `$AI_UI_SOURCE/<x>`.
-3. **Fat-client** (`AI_UI_SOURCE` is unset or still `REPLACE_BASICUI_SOURCE`): read `.ai.ui/<path>` locally in this repo.
-4. `.work.ui/...` references and project app code (REPLACE:UI_APP_ROOT) resolve locally in this repo in both modes.
+3. **Fat-client** (`AI_UI_SOURCE` is unset): read `.ai.ui/<path>` locally in this repo.
+4. `.work.ui/...` references and project app code (`apps/web`) resolve locally in this repo in both modes.
 5. **Thin-client + unreachable source:** if `$AI_UI_SOURCE` is set but the directory does not exist or `skills/README.md` is unreadable, **stop** and report `ui-design-os source unreachable: $AI_UI_SOURCE` — do **not** silently fall back to a local `.ai.ui/` (there isn't one) and do **not** guess a different path.
 
 **First bootstrap in thin-client mode** is a chicken-and-egg escape: before `@ui-deploy-basic` runs, the target has no local skill to invoke. Bootstrap is initiated either (a) from the **source** repo — `@ui-deploy-basic - /abs/path/to/target` — or (b) by invoking the shell directly from the target: `bash /abs/path/to/source/.ai.ui/scripts/ui-deploy-basic.sh .` After that, the source pointer in `.cursorrules` lets the local agent load `@ui-deploy-basic update` and every other UI skill from source.
@@ -396,12 +406,12 @@ Close every UI task response per `.ai.ui/skills/SKILL_DEPENDENCIES.md` § Operat
 | `$AI_UI_SOURCE/START_HERE.md` | UI operator decision tree |
 | `$AI_UI_SOURCE/COHABITATION.md` | Boundary with Agent OS |
 | `DOCS_UI_STACK.md` | Front-end stack |
-| `$AI_UI_SOURCE/standards/REPLACE:UI_CONVENTIONS_FILE` | UI conventions |
-| `$AI_UI_SOURCE/standards/REPLACE:UI_SCREEN_SPEC_STANDARD_FILE` | Screen SPEC |
-| `$AI_UI_SOURCE/standards/REPLACE:UI_COMPONENT_STANDARD_FILE` | Components |
-| `$AI_UI_SOURCE/standards/REPLACE:UI_DESIGN_TOKENS_FILE` | Tokens |
-| `$AI_UI_SOURCE/standards/REPLACE:UI_ACCESSIBILITY_FILE` | WCAG |
-| `$AI_UI_SOURCE/standards/REPLACE:UI_DIRECTORY_MAP_FILE` | UI directories |
+| `$AI_UI_SOURCE/standards/20260523-UI-CONVENTIONS.md` | UI conventions |
+| `$AI_UI_SOURCE/standards/20260523-SCREEN_SPEC_STANDARD.md` | Screen SPEC |
+| `$AI_UI_SOURCE/standards/20260523-COMPONENT_STANDARD.md` | Components |
+| `$AI_UI_SOURCE/standards/20260523-DESIGN_TOKENS_STANDARD.md` | Tokens |
+| `$AI_UI_SOURCE/standards/20260523-ACCESSIBILITY_STANDARD.md` | WCAG |
+| `$AI_UI_SOURCE/standards/20260523-FRONTEND_DIRECTORY_MAP.md` | UI directories |
 | `.work.ui/context/HANDOFF_UI.md` | UI handoff |
 | `.work.ui/plans/NEXT_UI.md` | UI iteration |
 
@@ -415,11 +425,18 @@ Close every UI task response per `.ai.ui/skills/SKILL_DEPENDENCIES.md` § Operat
 | `{SCREEN_SPEC_ROOT}` | `.work.ui/screens/` |
 | `{UI_SKILLS_ROOT}` | `.ai.ui/skills/` |
 | `{UI_CONCEPTS_ROOT}` | `.ai.ui/concepts/` |
-| `REPLACE:UI_APP_ROOT` | e.g. `apps/web/` |
-| `REPLACE:UI_TOKENS_FILE` | e.g. `src/styles/tokens.css` |
-| `REPLACE:UI_TEST` / `REPLACE:UI_LINT` / `REPLACE:UI_TYPECHECK` | Frontend checks |
-| `REPLACE:UI_VISUAL_TEST` / `REPLACE:UI_A11Y_TOOL` | Visual + a11y |
-| `REPLACE:SERVICE_FRONTEND` / `REPLACE:FRONTEND_WORKDIR` | Docker UI service |
+
+### UI project values
+
+| Setting | Value |
+|---------|-------|
+| App root | `apps/web` |
+| Tokens file | `apps/web/src/app/globals.css` |
+| Tests | `pnpm test` (unit) · `pnpm exec playwright test` (e2e/visual) |
+| Lint | `pnpm lint` |
+| Typecheck | `pnpm exec tsc --noEmit` |
+| Accessibility tool | `@axe-core/playwright` |
+| Compose UI service / workdir | `web` · `/app` |
 
 ### UI skills (`@ui-*` only)
 
@@ -448,8 +465,120 @@ Close every UI task response per `.ai.ui/skills/SKILL_DEPENDENCIES.md` § Operat
 
 ### UI protected files (union with existing list; same-message permission only)
 
-- `REPLACE:UI_TOKENS_FILE`
-- `REPLACE:UI_FRAMEWORK_CONFIG_PATHS`
+- `apps/web/src/app/globals.css`
+- `apps/web/next.config.ts`, `apps/web/tsconfig.json`, `apps/web/package.json`, `apps/web/postcss.config.mjs`
 - `.ai.ui/inputs/brand/` (reference — do not auto-edit)
 
 <!-- UI_DESIGN_OS_END -->
+
+<!-- BIZ_DESIGN_OS_BEGIN -->
+<!-- Managed block — written by @biz-deploy-basic. Do not hand-edit inside these
+     markers: `@biz-deploy-basic update` refreshes this region in place.
+     Everything outside the markers belongs to other frameworks and is never
+     touched by Business OS work. -->
+
+## Business OS (`.ai.biz/`) — business strategy and execution
+
+**Cohabitation:** this block coexists with the other OS frameworks registered in this file. Business work writes only under `.work.biz/`. It never edits `.work/`, `.work.ui/`, another framework's section of this file, or application code without saying so and asking first in the same message.
+
+**Business OS source (thin-client — written by `@biz-deploy-basic`):**
+
+AI_BIZ_SOURCE=/mnt/work/Projects/pilo.ai.biz.logicbison
+
+*(If the line above is unset, the block was hand-copied rather than deployed: run `bash /mnt/work/Projects/pilo.ai.biz.logicbison/scripts/biz-deploy-basic.sh . update` to wire it. Legacy installs used `AGENT_OS_SOURCE=`; treat it as this pointer only when it resolves to a Business OS root.)*
+
+### Source resolution and path rules
+
+Apply these before reading any `.ai.biz/<path>` reference in this block:
+
+1. `.cursorrules` (this file) and `.work.biz/**` — always local, in both modes.
+2. **Thin-client** (`$AI_BIZ_SOURCE` set and readable): every other `.ai.biz/<path>` resolves to `$AI_BIZ_SOURCE/<path>` — `skills/<id>/skill.md`, `skills/SKILL_DEPENDENCIES.md`, `standards/**`, `concepts/**`, `docs/**`, `scripts/**`, `templates/**`. Never assume a local `.ai.biz/` exists.
+3. **Fat-client**: read `.ai.biz/<path>` locally in this repo.
+4. **Unreachable source:** stop and report `business-os source unreachable: $AI_BIZ_SOURCE`. Do not fall back to a local `.ai.biz/` and do not guess another path.
+5. Other frameworks' roots are resolved by their own sections. Never resolve a `.ai/` or `.ai.ui/` path from this block.
+
+**Sibling frameworks:** the cross-framework registry lives in `$AI_BIZ_SOURCE/.cursorrules` § Frameworks registry — its path cells are host-specific. A sister that is not installed routes as `[degraded: <framework> not installed]`; never route into the void.
+
+### Business skills
+
+| Skill | Purpose |
+|-------|---------|
+| `biz-session` | Session open/close, HANDOFF/NEXT, scoped git (`start`, `close`, `context`, `commit`, `add`) |
+| `biz-director` | Free-text router: `@biz-director - <what you want>`; never dead-ends |
+| `biz-strategy` | Strategy design and certification: `design` (generate + score candidate plays), `greenfield` (8 elements), `probe`, `career`, `amend`, `reconcile`, `certify`, `status` |
+| `biz-advisory` | Situational counsel: reframe, ranked options, anti-advice, decisive recommendation |
+| `biz-career` | Job search + resume craft: targets, channel plan, CV elaboration on evidenced scope, interview stories, offer evaluation |
+| `biz-market-validate` | Cheap experiments that test load-bearing assumptions before commitment |
+| `biz-pricing` | Value-based, fixed-price, milestone-gated pricing |
+| `biz-brand` | LinkedIn / website / brand presence audit and overhaul |
+| `biz-content` | LinkedIn publishing operations and cadence |
+| `biz-social` | Platform-native social content (Reddit, Instagram, X, Threads, Substack, YouTube, LinkedIn) |
+| `biz-writing` | Long-form craft: articles, case studies, landing pages, emails |
+| `biz-youtube` | YouTube publishing operations |
+| `biz-community` | Community discovery and participation |
+| `biz-referrals` | Systematic referral generation |
+| `biz-discovery` | Sales discovery calls |
+| `biz-proposal` | Proposal writing and scoping |
+| `biz-objections` | Objection handling |
+| `biz-pipeline-diagnosis` | Funnel bottleneck diagnosis |
+| `biz-review` | Weekly / monthly / quarterly review, decision audit, calibration, counterfactual audit of rejected plays |
+| `biz-ideas` | Structured venture idea generation |
+| `biz-products` | Product / service concepts and MVP scoping |
+| `biz-archive` | Archive published content (`ideas/` → `ideas.archive/`) |
+| `biz-sources` | Curate and grade advisory sources |
+| `biz-bootstrap` | Scaffold `.work.biz/` and `.cursorrules` (fat-client setup) |
+| `biz-deploy-basic` | Thin-client deploy / update / status of this block |
+| `biz-deploy-files` | Fat-client vendored deploy of `.ai.biz/` |
+
+**Usage:** when a request matches a skill's purpose, read `$AI_BIZ_SOURCE/skills/<id>/skill.md` and follow its workflow. If no skill obviously fits, run `@biz-director - <describe what you want>`.
+
+### Business context files (read at session start)
+
+| File | Purpose |
+|------|---------|
+| `.work.biz/context/HANDOFF.md` | Session handoff (written at session close) |
+| `.work.biz/plans/NEXT.md` | Tactical next action and active phase |
+| `.work.biz/plans/UNKNOWNS.md` | Open unknowns and blocked decisions |
+| `.work.biz/gates.md` | Readiness ledger — the only authoritative gate state |
+| `.work.biz/decisions/DECISIONS.md` | Decision ledger — what was decided, expected, and what happened |
+| `.work.biz/strategy/one-pager.md` | Certified strategy summary, reality check, strategy bets |
+| `.work.biz/reference/OPERATOR_PROFILE.md` | What the operator can actually deliver and prove |
+
+### Change safety (business work)
+
+| Gate | Command | Fail when |
+|------|---------|-----------|
+| Touch scope | bash /mnt/work/Projects/pilo.ai.biz.logicbison/scripts/touch-scope-verify.sh | File outside `.work.biz/touch-scope` |
+| Blast radius | bash /mnt/work/Projects/pilo.ai.biz.logicbison/scripts/blast-radius-check.sh | Cross-area diff ≥3 areas |
+| Gate check | bash /mnt/work/Projects/pilo.ai.biz.logicbison/scripts/gate-verify.sh | A gate claims PASS without its evidence |
+| Framework verify | bash /mnt/work/Projects/pilo.ai.biz.logicbison/scripts/framework-verify.sh | Non-zero exit |
+
+**Declare scope first:** copy `$AI_BIZ_SOURCE/templates/work/touch-scope.template` → `.work.biz/touch-scope`.
+
+### Business gates
+
+| Gate | Evidence | Promoted by |
+|------|----------|-------------|
+| `strategy-ready` | `.work.biz/strategy/certification.md` | `@biz-strategy certify` |
+| `brand-ready` | `.work.biz/reference/BRAND_STATUS.md` | `@biz-brand overhaul` |
+| `pipeline-ready` | `strategy/pricing.md` + pipeline tracker + outreach cadence | `@biz-review status` |
+| `sales-ready` | Pipeline tracker with a logged discovery call | `@biz-discovery run` |
+| `active-deal` | Pipeline tracker with a live deal | `@biz-discovery run` |
+
+**Reading rule:** a gate is met only when its `**Status:**` line in `.work.biz/gates.md` starts with `PASS`. Never infer a gate from the presence of files.
+
+### Business protected files
+
+Do not modify unless the operator explicitly asks in the same message: `skills/SKILL_DEPENDENCIES.md`, `standards/`, `hooks/`, `templates/`, and the Business OS block in this file. (Application-level protected files listed by other frameworks still apply.)
+
+### Output contracts (binding)
+
+- **Operator handoff** — close every operator-facing report per `$AI_BIZ_SOURCE/skills/SKILL_DEPENDENCIES.md` § Operator handoff contract: terse output; `**Needs your approval:**` numbered with `path:L<n>` cites; `**Needs your answer:**` numbered and never mixed with approvals; exactly one `**Next step:**`; Form A single line when nothing is needed; empty sections omitted.
+- **Document clarity** — every generated document carries a ≤4-line Status/Needs header, separate Decisions / Open questions lists, exactly one `## Next action`, and no leftover scaffolding.
+- **Evidence discipline** — any market claim carries a citation or an explicit `directional` / `Unverified` marker, plus an evidence grade `A`–`D` when the claim carries a decision. Model memory alone may never carry one.
+
+### Business documentation conventions
+
+Strategy documents live under `.work.biz/strategy/`; plans `plan_<topic>.md` under `.work.biz/plans/`; research `research_<topic>.md`; drafts `draft_<topic>.md`. Dated documents use a `YYYYMMDD-` prefix. No "Generated by" lines, no agent signatures, no dates-as-signatures.
+
+<!-- BIZ_DESIGN_OS_END -->

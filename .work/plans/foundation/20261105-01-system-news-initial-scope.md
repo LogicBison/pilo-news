@@ -75,19 +75,20 @@ Full register: `.work/plans/UNKNOWNS.md`.
 
 ### Product statement
 
-System News is a **centralized news aggregation and publishing platform**. It ingests industry-relevant news from approved RSS/Atom sources, normalizes, scores, de-duplicates, and summarizes items (EN/ES), then serves them through (a) a themed, responsive landing-page/news site per industry and (b) a versioned public REST API that any client site can consume - LogicBison first.
+System News is a **centralized news aggregation and publishing platform**. It ingests industry-relevant news from approved RSS/Atom sources, normalizes, scores, de-duplicates, and summarizes items (in each article's language), then serves them through (a) a themed, responsive landing-page/news site per industry and (b) a versioned public REST API that any client site can consume - LogicBison first.
 
 ### In scope (v1)
 
 1. **Channel registry** for the 5 industries in `data.json`, each with theme tokens, display name, compliance disclaimers, and enabled locales.
 2. **Ingestion pipeline**: scheduled feed polling, ETag/Last-Modified, parse/normalize, 7-day retention window, topic scoring, near-duplicate clustering, corroboration markers, manual pins.
-3. **AI summaries**: per-article 2-4 sentence summary and a 5-line channel desk brief, EN and ES, generated only for new/changed items, fail-open.
+3. **AI summaries**: one 2-4 sentence summary per article in its declared language, plus a 5-line desk brief per language bundle, generated only for new/changed items, fail-open. No translation.
 4. **Public read API** `/v1`: industries, news list/detail, splash, topics, sources, search, sitemaps data; envelope + cursor pagination; cache headers; rate limits; OpenAPI at `/v1/openapi.json` and human docs at `/docs/api`.
-5. **Industry sites**: `/{locale}/{industry}` home (splash + columns), article detail, about, contact; server-rendered, ISR-cached; per-industry skin; SEO metadata, JSON-LD, hreflang, sitemap.
-6. **i18n**: English + Spanish UI and summaries; locale derived from browser `Accept-Language` on first visit, switchable in one click, persisted in a cookie; adding a locale is a data/catalog change, not a rewrite.
+5. **Industry sites**: `/{industry}` (English, unprefixed) and `/es/{industry}` home (splash + columns), article detail, about, contact; server-rendered, ISR-cached; per-industry skin; SEO metadata, JSON-LD, hreflang, sitemap.
+6. **i18n**: English (unprefixed) + Spanish (`/es`) UI and language-partitioned bundles; locale derived from browser `Accept-Language` on first visit, switchable in one click, persisted in a cookie; adding a locale is a data/catalog change, not a rewrite.
 7. **Editorial console** (minimal): API-key management, source CRUD + enable/disable, pins, hide article, trigger refresh; audit trail.
 8. **Contact form** per channel: validates, rate-limits, stores with 90-day retention, notifies by email.
 9. **Operations**: Docker Compose dev/prd, `bin/start.sh`, numbered idempotent migrations, health endpoints, backups, restore runbook.
+10. **Lead generation (primary business goal)**: one primary CTA per page, lead form (`POST /v1/leads`) with explicit consent, per-channel partner routing, DSAR export/erase, and funnel instrumentation (ADR 013).
 
 ### Out of scope (v1)
 
@@ -104,15 +105,16 @@ System News is a **centralized news aggregation and publishing platform**. It in
 | # | Criterion | Target | How measured |
 |---|-----------|--------|--------------|
 | S1 | Five channels live with distinct themes | 5/5 | Manual + screenshot review |
-| S2 | EN and ES fully available for UI + summaries | 100% of UI keys; ≥ 95% of visible articles per channel have a summary in the active locale | CI catalog check + API coverage query |
+| S2 | EN and ES UI complete; each language bundle populated | 100% of UI keys; every published article has a summary in its own language; no mixed-language bundle | CI catalog check + contract test I7 |
 | S3 | API contract usable by a third party without reading source | Docs + OpenAPI complete; a sample curl per endpoint | `docs/api` review; contract tests |
-| S4 | Freshness | New item visible ≤ 15 min after feed publication (p95) | `ingest_lag_seconds` metric |
+| S4 | Freshness | Scheduled: new item visible ≤ 12 h (default cadence); manual force: ≤ 60 s after run completes | `ingest_lag_seconds`, `refresh_runs_total{trigger}` |
 | S5 | Public API latency (stated as assumed target) | p95 < 250 ms cached / < 600 ms uncached; p99 < 1.2 s | Load test + prod metric |
 | S6 | Availability | 99.9% monthly | Uptime check |
 | S7 | Accessibility | WCAG 2.2 AA on home + article pages | axe audit, zero criticals |
 | S8 | Core Web Vitals | LCP p75 < 2.0 s, CLS < 0.1, INP < 200 ms | Field data / Lighthouse CI |
 | S9 | Copyright safety | No full article text stored; every item links to the publisher | Schema review + spot audit |
 | S10 | Client integration | LogicBison can switch its news source to this API without UI changes | Integration test app |
+| S11 | Lead generation | Every channel has one primary CTA; lead submits convert ≥ 2% of sessions (assumed); 100% carry explicit consent; routed within 24 h | Funnel dashboard + lead events |
 
 ---
 
@@ -136,11 +138,12 @@ Full detail: `.work/plans/20261105-personas-v1.md`.
 | C1 | Register and theme industry channels | `channels` | industry-sites |
 | C2 | Manage feed sources and topics | `sources` | ingestion-pipeline, editorial-console |
 | C3 | Ingest, normalize, score, dedupe, retain articles | `articles` | ingestion-pipeline |
-| C4 | Generate and cache EN/ES summaries and desk briefs | `articles` | ingestion-pipeline |
+| C4 | Generate and cache one summary per article (its language) + per-language desk briefs | `articles` | ingestion-pipeline |
 | C5 | Serve public read API with caching, pagination, rate limits | `publishing` | news-api |
 | C6 | Render per-industry landing pages, article pages, search | `web` (Next.js) | industry-sites |
 | C7 | Administer sources, pins, hidden items, API keys | `editorial` | editorial-console |
 | C8 | Capture contact messages with retention + notification | `publishing` | industry-sites |
+| C9 | Capture and route leads with consent, CTA placement, and funnel metrics | `publishing` | industry-sites, news-api, editorial-console |
 
 ---
 
@@ -150,11 +153,14 @@ Full detail: `.work/plans/20261105-personas-v1.md`.
 |--------|-----------|-------------|
 | `industries` | slug, name, code, theme JSONB, locales, disclaimers, enabled | Public |
 | `sources` | industry_id, name, feed_url, language, trust, enabled, last_fetched_at | Internal |
-| `articles` | id, industry_id, source_id, canonical_url, title, summary, language, published_at, score, corroboration, status | Public |
+| `articles` | id, industry_id, source_id, canonical_url, title, summary, language, summary_language, published_at, score, corroboration, status | Public |
 | `topics` | industry_id, slug, label JSONB, weight, keywords JSONB | Public |
 | `pins` | article_id, industry_id, position, weight | Internal |
 | `api_keys` | label, key_hash, scopes, rate_limit, last_used_at | Restricted |
 | `contact_messages` | industry_id, name, email, phone, message, locale, status | Confidential (PII) |
+| `leads` | industry_id, partner_id, kind, name, email, phone, company, message, consent_version, consent_at, utm, status | Confidential (PII) |
+| `partners` | industry_id, name, contact_email, status, regions | Confidential (business) |
+| `cta_events` | industry_id, event, placement, article_id, locale | Internal (no PII) |
 | `refresh_runs` | started_at, finished_at, status, stats JSONB | Internal |
 | `audit_events` | actor, action, entity, entity_id, payload JSONB | Internal |
 
@@ -217,15 +223,16 @@ These are directions, not decisions; binding choices live in ADRs and doc 04.
 | Probe ledger | `.work/plans/foundation/PROBE_LEDGER.md` |
 | Personas | `.work/plans/20261105-personas-v1.md` |
 | Feature SPECs | `.work/features/*/20261105-SPEC.md` |
+| Acceptance matrix | `.work/features/news-api/20261105-acceptance-matrix.md` |
 
 ### Success-criteria traceability
 
 | Goal | SPEC rule(s) | ADR | Verification |
 |------|--------------|-----|--------------|
 | S1 five themed channels | industry-sites R4-R6 | 009 | theme/contrast tests + visual review |
-| S2 EN/ES completeness | industry-sites R3, ingestion R11/R15 | 007 | catalog CI + summary coverage query |
+| S2 language completeness | industry-sites R3, ingestion R6/R11/R15 | 007 | catalog CI + contract test I7 |
 | S3 consumable API docs | news-api R15 | 008 | OpenAPI snapshot + docs review |
-| S4 freshness ≤ 15 min | ingestion R1 | 010 | `ingest_lag_seconds` p95 |
+| S4 freshness (12 h scheduled / ≤ 60 s manual) | ingestion R1/R17 | 010 | `ingest_lag_seconds`, `refresh_runs_total{trigger}` |
 | S5 API latency | news-api R9-R10 | 003, 008 | load test + p95 metric |
 | S6 availability 99.9% | (ops) | 005 | uptime check, RTO drill |
 | S7 WCAG 2.2 AA | industry-sites R13 | 004 | axe CI |

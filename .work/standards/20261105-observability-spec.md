@@ -43,14 +43,14 @@
 | `ingest_items_total` | counter | industry, result (`new`/`updated`/`skipped`/`duplicate`) | Throughput |
 | `ingest_lag_seconds` | histogram | industry | NFR-5 freshness |
 | `articles_scored_total` | counter | industry, result (`kept`/`filtered`) | Ranking behavior |
-| `refresh_runs_total` | counter | status | Pipeline reliability |
+| `refresh_runs_total` | counter | trigger, status | Pipeline reliability; `trigger=schedule|manual|reset` |
 | `refresh_duration_seconds` | histogram | industry | Run time |
 
 ### articles / AI summaries
 
 | Metric | Type | Labels | Purpose |
 |--------|------|--------|---------|
-| `summaries_generated_total` | counter | locale, status (`ok`/`skipped`/`failed`/`invalid`) | Quality/coverage |
+| `summaries_generated_total` | counter | language, status (`ok`/`skipped`/`failed`/`invalid`) | Quality/coverage |
 | `summary_latency_seconds` | histogram | locale | Provider latency |
 | `ai_tokens_total` | counter | model, direction (`prompt`/`completion`) | Cost (R3) |
 | `ai_estimated_cost_usd_total` | counter | model | Budget alert |
@@ -59,8 +59,13 @@
 
 | Metric | Type | Labels | Purpose |
 |--------|------|--------|---------|
-| `news_reads_total` | counter | industry, endpoint | Channel usage |
+| `news_reads_total` | counter | industry, endpoint, language | Channel usage |
+| `refresh_manual_total` | counter | industry | On-demand polling usage |
 | `contact_submissions_total` | counter | industry, result | Form health |
+| `leads_total` | counter | industry, status | Lead funnel |
+| `leads_rate_limited_total` | counter | industry | Abuse signal |
+| `lead_route_latency_seconds` | histogram | industry | Partner SLA |
+| `cta_events_total` | counter | industry, event, placement | Funnel top |
 | `contact_rate_limited_total` | counter | industry | Spam signal |
 
 ### editorial
@@ -85,8 +90,8 @@
 |-----|--------|-------|
 | Availability | 99.9% / 30 d | 5xx rate > 1% for 5 min |
 | API latency | p95 < 250 ms cached | p95 > 500 ms for 10 min |
-| Freshness | ≤ 15 min p95 | `ingest_lag_seconds` p95 > 900 s |
-| Stale channel | 0 | no `ingest_fetch_total{status="ok"}` for 2 intervals |
+| Freshness | scheduled ≤ 12 h; manual ≤ 60 s | `ingest_lag_seconds` p95 > 43200 s (scheduled) |
+| Stale channel | 0 | no successful run for 2 scheduled intervals (24 h) |
 | AI health | failure < 10% | `summaries_generated_total{status="failed"}` ratio > 10% for 30 min |
 | Backup | daily | backup age > 26 h |
 | Disk | < 80% | > 80% for 15 min |

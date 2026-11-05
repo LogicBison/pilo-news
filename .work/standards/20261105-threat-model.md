@@ -26,7 +26,7 @@
 2. Feed fetcher (SSRF, parser abuse, retention).
 3. AI summarizer (prompt injection, output trust).
 4. Auth / API-key / admin mutation paths.
-5. Contact-form PII.
+5. Contact-form and lead PII.
 
 ## 3. Data flow
 
@@ -56,6 +56,8 @@ Trust boundaries: **B1** internet→Caddy, **B2** web/API→data stores, **B3** 
 | T10 | **Information disclosure** | Error bodies, logs, source maps | RFC 7807 without internals, no PII in logs, source maps off in prod | observability §4 |
 | T11 | **Supply chain** | Vulnerable dependency | Pinned versions, `pip-audit` + `npm audit` in CI, Dependabot-style updates reviewed | ADR 012 |
 | T12 | **Data loss** | Host failure / accidental delete | Nightly off-site encrypted `pg_dump`, 30-day retention, restore drill, no agent drop/truncate | doc 04 §6 |
+| T13 | **Lead PII abuse / spam** | Fake or injected submissions; partner misuse; PII in logs | Explicit consent + version, honeypot, 5/hour/IP, duplicate suppression, hashed IP/UA, no PII in logs/analytics, partner scoping | ADR 013, news-api R18-R20 |
+| T14 | **Consent / DSAR failure** | Lead kept after withdrawal; export/erase missing | Consent version + timestamp, 24-month retention, export/delete admin API, audit | ADR 013 R15 |
 
 ## 5. Specific controls
 

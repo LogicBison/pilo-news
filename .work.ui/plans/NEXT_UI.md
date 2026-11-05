@@ -2,7 +2,7 @@
 
 > **Path:** `<repo-root>/.work.ui/plans/NEXT_UI.md` · **`@ui-component-build`** owns `## Current UI iteration`.
 
-**Status:** Draft · **Updated:** YYYY-MM-DD · **Needs:** REPLACE:<decision, review, or nothing>
+**Status:** Draft · **Updated:** 2026-11-05 · **Needs:** UI foundation before the CTA brief becomes a screen SPEC
 
 ---
 
@@ -11,6 +11,7 @@
 | Item | Artifact |
 |------|----------|
 | UI bootstrap | `.work.ui/` skeleton |
+| CTA/lead-capture brief | `.work.ui/design-system/20261105-CTA-BRIEF.md` |
 
 ---
 

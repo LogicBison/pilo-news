@@ -1,0 +1,107 @@
+name: ${COMPOSE_PROJECT_NAME:-system-news-prd}
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    env_file: .env.prd
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: .env.prd
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-news}
+      POSTGRES_USER: ${POSTGRES_USER:-news}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-news}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-news} -d ${POSTGRES_DB:-news}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    mem_limit: 2g
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-redis}"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD:-redis} ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    mem_limit: 256m
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.prd
+    restart: unless-stopped
+    env_file: .env.prd
+    expose:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/v1/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    mem_limit: 512m
+    tmpfs:
+      - /tmp
+
+  worker:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.prd
+    restart: unless-stopped
+    env_file: .env.prd
+    command: ["python", "-m", "news_api.worker"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 512m
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.prd
+    restart: unless-stopped
+    env_file: .env.prd
+    expose:
+      - "3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    mem_limit: 512m
+    tmpfs:
+      - /tmp
+
+volumes:
+  pgdata:
+  redisdata:
+  caddy_data:
+  caddy_config:

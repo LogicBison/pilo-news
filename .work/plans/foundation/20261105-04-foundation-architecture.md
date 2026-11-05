@@ -70,15 +70,19 @@ Rules: no context imports another context's `infrastructure/` or `http/`; cross-
 | `industry_locales` | channels | `industry_id`, `locale`, `name`, `tagline` | Optional per-locale copy |
 | `sources` | sources | `id`, `industry_id`, `name`, `feed_url`, `language`, `trust` NUMERIC(3,2), `enabled`, `last_fetched_at`, `etag`, `last_modified`, `status` | `feed_url` UNIQUE per industry |
 | `topics` | articles | `id`, `industry_id`, `slug`, `label` JSONB, `weight`, `keywords` JSONB | Keywords per locale |
-| `articles` | articles | `id` UUID, `industry_id`, `source_id`, `canonical_url` UNIQUE, `title`, `summary`, `language`, `published_at`, `fetched_at`, `score`, `corroboration`, `verification`, `status`, `summary_source`, `summary_version`, `search_vector` | `search_vector` generated tsvector (title + summary) |
+| `articles` | articles | `id` UUID, `industry_id`, `source_id`, `canonical_url` UNIQUE, `title`, `summary`, `language`, `published_at`, `fetched_at`, `score`, `corroboration`, `verification`, `status`, `summary_source`, `summary_language`, `summary_version`, `search_vector` | `summary_language = language`; `search_vector` generated tsvector (title + summary) |
 | `article_topics` | articles | `article_id`, `topic_id` | M:N |
 | `pins` | articles | `article_id`, `industry_id`, `position`, `weight` | Editorial override |
 | `api_keys` | editorial | `id`, `label`, `key_hash`, `scopes` TEXT[], `rate_limit`, `enabled`, `last_used_at` | SHA-256 + pepper |
 | `contact_messages` | publishing | `id`, `industry_id`, `name`, `email`, `phone`, `message`, `locale`, `status`, `created_at` | PII; 90-day retention |
+| `partners` | publishing | `id`, `industry_id`, `name`, `contact_email`, `status`, `weight`, `regions` JSONB | Lead routing (ADR 013) |
+| `leads` | publishing | `id`, `industry_id`, `partner_id`, `kind`, `name`, `email`, `phone`, `company`, `message`, `locale`, `source_page`, `article_id`, `utm` JSONB, `consent_version`, `consent_at`, `ip_hash`, `ua_hash`, `status`, `created_at`, `updated_at` | PII; 24-month retention |
+| `lead_events` | publishing | `id`, `lead_id`, `actor`, `action`, `payload` JSONB, `created_at` | Append-only audit |
+| `cta_events` | publishing | `id`, `industry_id`, `event`, `placement`, `article_id`, `locale`, `created_at`, `session_hash` | No PII; 90-day retention |
 | `refresh_runs` | articles | `id`, `started_at`, `finished_at`, `status`, `stats` JSONB | Pipeline telemetry |
 | `audit_events` | editorial | `id`, `actor`, `action`, `entity`, `entity_id`, `payload` JSONB, `created_at` | Append-only |
 
-**Volumes:** articles **M** (10k-1M, 7-day hot window retained 30 days), sources/topics **K**, contact **K/day**, audit **K/day**. No PHI/FERPA/PCI payloads; see `.work/standards/20261105-data-classification.md`.
+**Volumes:** articles **M** (10k-1M, 7-day hot window retained 30 days), sources/topics **K**, contact/leads **K/day**, CTA events **10K/day**, audit **K/day**. No PHI/FERPA/PCI payloads; see `.work/standards/20261105-data-classification.md`.
 
 ---
 
@@ -90,16 +94,16 @@ Rules: no context imports another context's `infrastructure/` or `http/`; cross-
 | NFR-2 | Page performance | LCP p75 < 2.0 s; CLS < 0.1; INP < 200 ms | Core Web Vitals "good" |
 | NFR-3 | Availability | 99.9% monthly; RPO 24 h; RTO 4 h | single-VPS posture |
 | NFR-4 | Throughput | 1,000 req/min sustained per node; 10k feed items/day/channel ceiling | assumed |
-| NFR-5 | Freshness | new item visible ≤ 15 min p95 after publication | poll interval 5-10 min |
+| NFR-5 | Freshness | scheduled: new item visible ≤ 12 h (default cadence, `REFRESH_INTERVAL_MINUTES=720`); manual force: ≤ 60 s after run completes | ADR 010; configurable cadence |
 | NFR-6 | Security | TLS 1.2+; HSTS; OWASP ASVS L2 intent; no secrets in repo | standard |
 | NFR-7 | Privacy | no PII in logs; contact PII 90 days; export/erase on request | GDPR-style |
 | NFR-8 | i18n | EN + ES complete; locale switch persisted; adding a locale ≤ 1 day | brief |
 | NFR-9 | Accessibility | WCAG 2.2 AA | standard |
-| NFR-10 | Cost | ≤ USD 40/month infra for v1 | assumption (HANDOFF O3) |
+| NFR-10 | Cost | ≤ USD 40/month infra + `AI_MONTHLY_BUDGET_USD` AI cap (default 20) | assumption (HANDOFF O3) |
 | NFR-11 | SEO | Lighthouse SEO ≥ 95; canonical + hreflang + JSON-LD on all public pages | standard |
 | NFR-12 | Operability | one-command dev stack; migrations idempotent; restore drill documented | team size |
 
-**Label policy:** every target above is `assumed` unless the owner ratifies it; owner-adjustments override and are recorded verbatim in this table.
+**Ratification:** all targets above were **owner-ratified on 2026-11-05**; later adjustments are recorded verbatim in this table.
 
 ---
 
@@ -149,7 +153,8 @@ system-news/
 │   │   ├── scripts/              # one-off operational scripts
 │   │   ├── src/news_api/
 │   │   │   ├── main.py           # app factory + lifespan (migrations, clients)
-│   │   │   ├── worker.py         # Redis Streams consumer entrypoint
+│   │   │   ├── worker.py         # Redis Streams consumer + scheduler entrypoint
+│   │   │   ├── cli.py            # admin CLI (refresh --force, status)
 │   │   │   ├── platform/         # settings, db, cache, migrations, i18n, clock, security
 │   │   │   ├── channels/        # domain, application, infrastructure, http, ports
 │   │   │   ├── sources/
@@ -185,6 +190,7 @@ Boundary rule enforced by review + import lint: `apps/api/src/news_api/<context>
 | Search | PostgreSQL full-text (`tsvector`) | built-in | 003 |
 | Frontend | Next.js + React + Tailwind | 15.1.8 · 19.1.0 · 4.1.6 | 004 |
 | i18n | Custom typed catalogs + middleware | in-repo | 007 |
+| AI summaries | DeepSeek `deepseek-flash` (V4.1 Flash) | OpenAI-compatible API | 010 |
 | Auth | API keys (public) + JWT (admin) | in-repo | 011 |
 | Hosting | Single VPS + Docker Compose + Caddy | compose v2 | 005 |
 | CI | GitHub Actions | - | 012 |
@@ -219,12 +225,13 @@ Boundary rule enforced by review + import lint: `apps/api/src/news_api/<context>
 | 004 | Frontend (Next.js 15 + Tailwind 4) | Decided |
 | 005 | Hosting and deployment (VPS + Compose + Caddy) | Decided |
 | 006 | Tenancy and channel model (single deployment, multi-channel) | Decided |
-| 007 | Internationalization (locale routes + JSON catalogs) | Decided |
+| 007 | Internationalization (EN unprefixed, `/es`, language-partitioned content) | Decided |
 | 008 | Public API contract and versioning | Decided |
 | 009 | Industry theming model | Decided |
 | 010 | Ingestion and AI summary pipeline | Decided |
 | 011 | Auth and access control | Decided |
 | 012 | CI/CD and release flow | Decided |
+| 013 | Lead capture and CTA architecture | Decided |
 
 **Rule:** ADR headers win on conflict with this register.
 

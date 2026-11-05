@@ -27,6 +27,8 @@ backups/
 apps/web/.next/
 apps/web/node_modules/
 __pycache__/
+*.egg-info/
+.mypy_cache/
 *.pyc
 .ruff_cache/
 .pytest_cache/
