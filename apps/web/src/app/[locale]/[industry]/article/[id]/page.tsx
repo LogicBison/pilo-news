@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CtaCard } from "@/components/CtaCard";
+import { BriefSignup } from "@/components/BriefSignup";
 import { StickyCta } from "@/components/Cta";
 import { JsonLd } from "@/components/JsonLd";
 import { LeadForm } from "@/components/LeadForm";
 import { EmptyState, FallbackNotice } from "@/components/Notices";
 import { StoryCard } from "@/components/StoryCard";
+import { TrustBlock } from "@/components/TrustBlock";
 import { getArticle, getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { formatDate, localePath, resolveLocale, t } from "@/lib/i18n";
@@ -140,13 +142,22 @@ export default async function ArticlePage({ params }: Params) {
           </section>
         ) : null}
 
-        <div className="mt-10">
+        <div className="mt-10 grid gap-5">
+          <TrustBlock locale={resolved} />
           <LeadForm
             industry={industry}
             industryName={channel.name}
             locale={resolved}
             kind="consultation"
             placement="article-end"
+            articleId={article.id}
+            sourcePage={pagePath}
+            qualify={channel.cta.qualify}
+          />
+          <BriefSignup
+            industry={industry}
+            locale={resolved}
+            placement="brief-article"
             articleId={article.id}
             sourcePage={pagePath}
           />

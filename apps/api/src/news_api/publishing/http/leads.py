@@ -25,6 +25,7 @@ class LeadRequest(BaseModel):
     phone: str | None = Field(default=None, max_length=40)
     company: str | None = Field(default=None, max_length=120)
     message: str | None = Field(default=None, max_length=2000)
+    qualification: str | None = Field(default=None, max_length=60)
     locale: str = Field(default="en", max_length=10)
     consent: bool = False
     source_page: str | None = Field(default=None, max_length=300)
@@ -62,6 +63,7 @@ async def create_lead(payload: LeadRequest, request: Request) -> Any:
             "phone": payload.phone,
             "company": payload.company,
             "message": payload.message,
+            "qualification": payload.qualification,
             "locale": payload.locale,
             "consent": payload.consent,
             "source_page": payload.source_page,

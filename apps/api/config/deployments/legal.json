@@ -53,6 +53,50 @@
         "secondary_label": {
           "en": "Get the weekly brief",
           "es": "Recibir el resumen semanal"
+        },
+        "qualify": {
+          "label": {
+            "en": "Matter type",
+            "es": "Tipo de asunto"
+          },
+          "required": true,
+          "options": [
+            {
+              "value": "corporate",
+              "label": {
+                "en": "Corporate & governance",
+                "es": "Corporativo y gobierno"
+              }
+            },
+            {
+              "value": "litigation",
+              "label": {
+                "en": "Litigation & disputes",
+                "es": "Litigios y disputas"
+              }
+            },
+            {
+              "value": "employment",
+              "label": {
+                "en": "Employment",
+                "es": "Laboral"
+              }
+            },
+            {
+              "value": "immigration",
+              "label": {
+                "en": "Immigration",
+                "es": "Migración"
+              }
+            },
+            {
+              "value": "other",
+              "label": {
+                "en": "Something else",
+                "es": "Otro asunto"
+              }
+            }
+          ]
         }
       },
       "timezone": "America/El_Salvador",

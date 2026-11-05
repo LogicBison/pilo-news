@@ -457,6 +457,18 @@
             ],
             "title": "Phone"
           },
+          "qualification": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualification"
+          },
           "source_page": {
             "anyOf": [
               {

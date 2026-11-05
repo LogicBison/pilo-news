@@ -22,11 +22,8 @@ export function Hero({
   }
   if (!lead) return null;
   return (
-    <section
-      aria-labelledby="hero-heading"
-      className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]"
-    >
-      <div className="sn-card sn-hero-surface overflow-hidden p-6 md:p-9">
+    <section aria-labelledby="hero-heading" className="sn-hero">
+      <div className="sn-card sn-hero-surface sn-hero-card overflow-hidden p-6 md:p-9">
         <div className="flex flex-wrap items-center gap-3">
           <span className="sn-eyebrow">{t(locale, "home.featured")}</span>
           <span className="sn-chip">
@@ -58,7 +55,7 @@ export function Hero({
           ))}
         </div>
         {favorites.length > 0 ? (
-          <ul className="mt-7 grid gap-2 border-t border-[var(--sn-border)] pt-5 sm:grid-cols-3">
+          <ul className="sn-rail mt-7 grid gap-2 border-t border-[var(--sn-border)] pt-5 sm:grid-cols-3">
             {favorites.map((item) => (
               <li key={item.id}>
                 <Link
@@ -100,7 +97,7 @@ export function StoryColumns({
         >
           {t(locale, "home.latest")}
         </h2>
-        <span aria-hidden="true" className="h-1 w-16 rounded-full bg-[var(--sn-accent)]" />
+        <span aria-hidden="true" className="sn-rule" />
       </div>
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {populated.map((column, index) => (

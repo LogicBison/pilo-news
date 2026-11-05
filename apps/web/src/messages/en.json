@@ -119,7 +119,8 @@
     "honeypot": "Leave this field empty",
     "kindConsultation": "Consultation",
     "kindBrief": "Weekly brief",
-    "required": "This field is required."
+    "required": "This field is required.",
+    "chooseOption": "Select an option"
   },
   "cta": {
     "primary": "Request a consultation",
@@ -248,6 +249,37 @@
     "disable": "Disable",
     "newIndustry": "New channel",
     "titleColumn": "Title"
+  },
+  "proof": {
+    "label": "Channel facts",
+    "stories": "Stories live",
+    "languages": "Languages",
+    "languagesValue": "English · Español",
+    "updated": "Updated",
+    "independentLabel": "Independent",
+    "independentValue": "No paywall · No ads"
+  },
+  "trust": {
+    "title": "How this works",
+    "step1Title": "Send the form",
+    "step1Body": "Name, email, and what you need. One request, one channel.",
+    "step2Title": "We route it",
+    "step2Body": "A vetted independent partner for this channel receives it. No one else does.",
+    "step3Title": "You get a reply",
+    "step3Body": "Within one business day, at no cost and with no obligation.",
+    "note": "One partner per channel. Your details are never sold, and no partner sees another partner's requests."
+  },
+  "brief": {
+    "title": "Get the weekly brief",
+    "body": "One email a week with the stories that moved this field, plus what to watch next.",
+    "name": "First name",
+    "email": "Email",
+    "consent": "I agree to receive the weekly brief and have read the privacy policy.",
+    "submit": "Send me the brief",
+    "sending": "Sending...",
+    "success": "You are on the list. The next brief goes out with the Monday refresh.",
+    "error": "That did not send. Check the email address and try again.",
+    "privacyNote": "No spam, one click to leave."
   },
   "legal": {
     "privacyTitle": "Privacy",

@@ -19,7 +19,8 @@ Append only. `D-NNN` ids are never reused.
 
 | ID | Date | Decision | Options considered | Rationale | Expected outcome | Confidence | Reversibility | Kill / review trigger | Review by | Outcome | Lesson |
 |----|------|----------|--------------------|-----------|------------------|------------|---------------|-----------------------|-----------|---------|--------|
-| D-001 | <YYYY-MM-DD> | <one line, imperative> | <the 2+ live alternatives, or "forced"> | <why this one, ≤1 line> | <number + date, or an observable event> | <0-100%> | two-way / one-way | If <observation> by <date> then <stop / change / double down> | <YYYY-MM-DD> | pending | — |
+| D-001 | 2026-11-05 | Ship the lead magnet as three UI surfaces first: proof strip, process block, email-only brief capture | (a) wait for email vendor (U8) and build the full asset ladder; (b) add per-channel qualification fields now; (c) ship proof + process + capture now | R2/R3 need no backend and fix placement/trust, which gate every later number | Brief capture live on all 7 channels; ≥1% of channel-home sessions start the brief by 2027-01-05 | 70% | two-way | If after 30 days no channel clears 0.2% brief starts and CTA click stays under 1%, drop the rung and revisit R5 | 2027-01-05 | pending | — |
+| D-002 | 2026-11-05 | Send all transactional and brief email through the `pilo-mail` gateway (Brevo upstream); do not integrate yet | (a) wire pilo-mail now; (b) pick a SaaS ESP; (c) defer integration and keep capturing leads | The gateway already exists and avoids a second vendor; capture does not need sending | Lead capture stays live with no send path until the gateway is wired; first brief send after integration | 75% | two-way | If a partner needs email notification before the gateway is wired, integrate then; if pilo-mail lacks a needed API by 2027-01-05, re-open the vendor choice | 2027-01-05 | pending | — |
 
 ### Column definitions
 

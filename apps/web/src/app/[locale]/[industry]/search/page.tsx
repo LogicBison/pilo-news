@@ -95,6 +95,7 @@ export default async function SearchPage({ params, searchParams }: Params) {
             kind={channel.cta.kind ?? "consultation"}
             placement="search"
             sourcePage={localePath(resolved, `/${industry}/search`)}
+            qualify={channel.cta.qualify}
           />
         </div>
       </div>

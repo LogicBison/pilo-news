@@ -2,7 +2,7 @@
 
 ## Session status
 
-**Open:** - · **Updated:** 2026-11-05 · **Closed:** 2026-11-05
+**Open:** 2026-11-05 - goal: per-channel UI skin refresh (UI Design OS foundation first) · **Updated:** 2026-11-05 · **Closed:** -
 
 **Repository state:** v1 implemented plus the post-v1 operator scope. Master plan v1.1
 (Approved) executed end to end: schema/migrations (001-007), **seven** live channels
@@ -115,6 +115,10 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | Content check (API) | all 6 channels serve `news` + `bundle` (EN/ES); web pages 200 for all six |
 | Logs/admin check | 11 browser routes 200; `/` 307 to `SN_DEFAULT_INDUSTRY` |
 | Browser smoke 2026-11-05 | `/` 302→`/legal`; `/legal`, `/es/legal`, `/financial`, `/behavioral-health`, article, `/legal/{about,privacy,terms,contact,search}`, `/en/admin` all 200; API `/v1/health` ok |
+| Lead magnet build 2026-11-05 | 7/7 channels 200 with proof strip + trust block + brief capture; `pnpm lint`, `pnpm typecheck`, `pnpm check` green (246 catalog keys, 7 themes) |
+| Qualification field 2026-11-05 | migration 008 applied then re-run clean (`applied: 0`); `pytest -q` 108 passed; qualification select renders on 7/7 channels EN+ES; `pnpm check` 247 keys |
+| OpenAPI snapshot 2026-11-05 | regenerated, +`qualification` only (12 lines) |
+| Skin system 2026-11-05 | 7 distinct skins live (`data-skin` per channel), 7 generated motifs, screenshots desktop+mobile, `pnpm lint/typecheck/check` green |
 
 ---
 
@@ -145,6 +149,8 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | 2026-11-05 | isolation | random host ports, per-project `*-net`/`*-data`, DB/Redis internal-only |
 | 2026-11-05 | custom subjects | `cybersecurity` + `stem-cell` channels from profiles only; 32 verified feeds |
 | 2026-11-05 | docs | `docs/guides/switching-channels.md` quick reference; UI skin refresh brief |
+| 2026-11-05 | lead magnet | `ProofStrip`, `TrustBlock`, `BriefSignup` components wired to channel home + article (all 7 channels, EN/ES); recommendations in `.work.biz/strategy/20261105-lead-magnet-recommendations.md` |
+| 2026-11-05 | lead qualification | migration 008 (`leads.qualification` + per-channel `cta.qualify`), API field, `LeadForm` select, deployment profiles synced, 1 new contract test |
 
 ---
 

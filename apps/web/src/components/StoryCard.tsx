@@ -15,7 +15,7 @@ export function StoryCard({ article, industry, locale, featured = false }: Story
   const body = article.summary ?? article.excerpt;
   return (
     <article
-      className={`sn-card sn-card-interactive group flex h-full flex-col gap-3 p-5 ${
+      className={`sn-card sn-card-interactive sn-story group flex h-full flex-col gap-3 p-5 ${
         featured ? "md:p-6" : ""
       }`}
     >

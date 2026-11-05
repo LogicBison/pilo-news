@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -7,6 +7,7 @@ import { DegradedNotice } from "@/components/Notices";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { isLocale, localePath, t } from "@/lib/i18n";
+import { resolveSkin } from "@/lib/skins";
 import { themeStyle } from "@/lib/theme";
 
 export default async function IndustryLayout({
@@ -22,12 +23,19 @@ export default async function IndustryLayout({
   if (!result.ok && result.status === 404) notFound();
   const channel = result.ok ? result.data : fallbackIndustry(industry);
   const degraded = !result.ok;
+  const skin = resolveSkin(channel.slug, channel.theme.layout);
 
   return (
     <div
       lang={locale}
       data-layout={channel.theme.layout}
-      style={{ ...themeStyle(channel.theme), fontFamily: "var(--sn-font-body)" }}
+      data-skin={skin.key}
+      data-hero={skin.hero}
+      style={{
+        ...themeStyle(channel.theme),
+        "--sn-radius": skin.radius,
+        fontFamily: "var(--sn-font-body)",
+      } as CSSProperties}
       className="min-h-screen bg-[var(--sn-bg)] text-[var(--sn-text)]"
     >
       <a

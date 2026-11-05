@@ -24,7 +24,7 @@ export function CtaCard({
   return (
     <aside
       aria-label={headline}
-      className={`sn-card sn-hero-surface self-start ${
+      className={`sn-card sn-hero-surface sn-cta self-start ${
         compact ? "p-4" : "p-6"
       }`}
     >

@@ -12,6 +12,8 @@
 |------|----------|
 | UI bootstrap | `.work.ui/` skeleton |
 | CTA/lead-capture brief | `.work.ui/design-system/20261105-CTA-BRIEF.md` |
+| UI foundation 01-04 | `.work.ui/plans/foundation/20261105-0{1..4}-*.md` |
+| DTCG token source | `.work.ui/design-system/tokens.json` (74 tokens, schema-valid) |
 
 ---
 
@@ -27,12 +29,11 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | `@ui-design-foundation greenfield` | Foundation 01–04 |
-| **1** | `@ui-design-foundation certify screen-spec-ready` | |
-| **2** | `@ui-design-system init` | After tokens doc 02 |
-| **3** | `@ui-screen-spec create - <slug>` | Approved before build |
-| **4** | `@ui-component-build plan - S0` | Primitives (craft tier ≥ refined) |
-| **5** | `@ui-component-build plan - S1` | Screens |
+| **0** | `@ui-screen-spec create - channel-home` | skins shipped for 7 channels; now fix copy + hero composition per channel |
+| **1** | `@ui-design-system init` | bind tokens, register P0 primitives from doc 03 |
+| **2** | `@ui-component-build plan - S0` | primitives (craft tier refined) |
+| **3** | `@ui-component-build plan - S1` | channel-home + article + contact |
+| **4** | Channel roll-out | financial, behavioral-health, education, logistics, cybersecurity, stem-cell |
 
 ---
 
@@ -59,4 +60,4 @@
 
 ## Next action
 
-`@ui-design-foundation greenfield` — foundation 01–04 (priority 0 in Recommended next)
+`@ui-design-system init` — screen-spec-ready certified; bind tokens and primitives

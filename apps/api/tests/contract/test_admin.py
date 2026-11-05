@@ -189,6 +189,7 @@ async def test_lead_admin_flow(client, admin_client) -> None:
             "email": "lead@example.com",
             "phone": "555-0100",
             "message": "Please contact me about a compliance matter.",
+            "qualification": "corporate",
             "locale": "en",
             "consent": True,
         },

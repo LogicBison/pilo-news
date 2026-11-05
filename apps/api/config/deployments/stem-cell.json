@@ -53,7 +53,51 @@
         "secondary_label": {
           "en": "Get the weekly brief",
           "es": "Recibir el resumen semanal"
-        }
+        },
+      "qualify": {
+        "label": {
+          "en": "What are you looking for?",
+          "es": "¿Qué está buscando?"
+        },
+        "required": true,
+        "options": [
+          {
+            "value": "treatment",
+            "label": {
+              "en": "Treatment information",
+              "es": "Información sobre tratamiento"
+            }
+          },
+          {
+            "value": "trial",
+            "label": {
+              "en": "Clinical trials",
+              "es": "Ensayos clínicos"
+            }
+          },
+          {
+            "value": "storage",
+            "label": {
+              "en": "Cord blood storage",
+              "es": "Conservación de cordón"
+            }
+          },
+          {
+            "value": "regulatory",
+            "label": {
+              "en": "Regulatory questions",
+              "es": "Consultas regulatorias"
+            }
+          },
+          {
+            "value": "other",
+            "label": {
+              "en": "Something else",
+              "es": "Otra opción"
+            }
+          }
+        ]
+      }
       },
       "sort_order": 70,
       "retention_days": 30,

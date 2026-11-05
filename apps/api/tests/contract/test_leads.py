@@ -101,6 +101,7 @@ async def test_lead_created_without_pii_echo(client) -> None:
             "kind": "consultation",
             "name": "Private Person",
             "email": "private@example.com",
+            "qualification": "corporate",
             "phone": "555-0100",
             "company": "Acme",
             "message": "Please contact me about the compliance briefing.",
@@ -125,6 +126,7 @@ async def test_lead_created_without_pii_echo(client) -> None:
             "kind": "consultation",
             "name": "Private Person",
             "email": "private@example.com",
+            "qualification": "corporate",
             "message": "Please contact me about the compliance briefing.",
             "locale": "en",
             "consent": True,
@@ -166,6 +168,7 @@ async def test_lead_rate_limit(client) -> None:
             "message": "Send the weekly brief.",
             "locale": "en",
             "consent": True,
+            "qualification": "certificate",
         }
         first = await client.post("/v1/leads", json={**base, "email": "one@example.com"})
         assert first.status_code == 200
@@ -173,3 +176,53 @@ async def test_lead_rate_limit(client) -> None:
         assert second.status_code == 429
     finally:
         settings.lead_rate_limit_per_hour = original
+
+
+@pytest.mark.asyncio
+async def test_lead_qualification_is_validated_and_accepted(client) -> None:
+    base = {
+        "industry": "legal",
+        "kind": "consultation",
+        "name": "Qualified Person",
+        "email": "qualified@example.com",
+        "message": "Please contact me about a corporate matter.",
+        "locale": "en",
+        "consent": True,
+    }
+    missing = await client.post("/v1/leads", json=base)
+    assert missing.status_code == 422
+
+    invalid = await client.post("/v1/leads", json={**base, "qualification": "not-a-real-option"})
+    assert invalid.status_code == 422
+
+    accepted = await client.post("/v1/leads", json={**base, "qualification": "corporate"})
+    assert accepted.status_code == 200
+    assert accepted.json()["id"]
+
+    brief = await client.post(
+        "/v1/leads",
+        json={
+            "industry": "legal",
+            "kind": "brief",
+            "name": "Brief Person",
+            "email": "brief@example.com",
+            "locale": "en",
+            "consent": True,
+        },
+    )
+    assert brief.status_code == 200
+
+    # the brief rung stays two fields: no qualification required, and a provided one is still validated
+    brief_with_bad_option = await client.post(
+        "/v1/leads",
+        json={
+            "industry": "legal",
+            "kind": "brief",
+            "name": "Brief Two",
+            "email": "brief2@example.com",
+            "locale": "en",
+            "consent": True,
+            "qualification": "not-a-real-option",
+        },
+    )
+    assert brief_with_bad_option.status_code == 422

@@ -6,6 +6,7 @@ import { HydrationMarker } from "@/components/HydrationMarker";
 import { SITE_URL } from "@/lib/seo";
 
 import "./globals.css";
+import "./skins.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

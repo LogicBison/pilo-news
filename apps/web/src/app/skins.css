@@ -1,0 +1,453 @@
+/* Skin layer — per-channel surface grammar.
+   Consumes the --sn-* tokens injected by the channel theme. A skin may change
+   shape, spacing, borders, and which token is used; it never invents a colour. */
+
+/* --- hero composition ------------------------------------------------------ */
+
+.sn-hero {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.sn-hero-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.sn-hero-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.sn-hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+}
+
+@media (min-width: 1024px) {
+  [data-hero="split"] .sn-hero {
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  }
+
+  [data-hero="ledger"] .sn-hero {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+    column-gap: 2.5rem;
+  }
+
+  [data-skin="terminal"][data-hero="ledger"] .sn-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-skin="terminal"][data-hero="ledger"] .sn-cta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  [data-hero="ledger"] .sn-hero-card {
+    padding-right: 2rem;
+    border-right: 1px solid var(--sn-border);
+  }
+
+  [data-hero="poster"] .sn-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-hero="poster"] .sn-hero-card {
+    padding: 3rem 3rem 2.5rem;
+  }
+
+  [data-hero="poster"] .sn-hero-card h1 {
+    max-width: 22ch;
+    font-size: 3.4rem;
+    line-height: 1.02;
+  }
+
+  [data-hero="ribbon"] .sn-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+[data-hero="ribbon"] .sn-hero-card {
+  border-top: 7px solid var(--sn-accent);
+}
+
+[data-hero="poster"] .sn-hero-card {
+  background-color: var(--sn-bg);
+}
+
+/* --- CTAs ------------------------------------------------------------------ */
+
+.sn-cta {
+  align-self: start;
+}
+
+[data-skin="network"] .sn-cta {
+  margin-top: 0.25rem;
+}
+
+[data-skin="terminal"] .sn-hero-card {
+  border-left: 4px solid var(--sn-primary);
+  border-radius: 0;
+}
+
+[data-skin="terminal"] .sn-cta {
+  border-radius: 0;
+  border-left: 4px solid var(--sn-primary);
+}
+
+[data-skin="sanctuary"] .sn-cta {
+  background: var(--sn-surface);
+  box-shadow: none;
+  border-color: transparent;
+}
+
+[data-skin="campus"] .sn-cta {
+  margin-left: auto;
+  max-width: 26rem;
+  border-left: 4px solid var(--sn-accent);
+}
+
+[data-skin="sentinel"] .sn-cta {
+  border: 1px solid var(--sn-border);
+  border-left: 5px solid var(--sn-accent);
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--sn-surface);
+}
+
+[data-skin="sentinel"] .sn-hero-card {
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* --- app bar --------------------------------------------------------------- */
+
+[data-skin="chambers"] .sn-appbar {
+  background: var(--sn-bg);
+  border-bottom: 1px solid var(--sn-border);
+  backdrop-filter: none;
+}
+
+[data-skin="terminal"] .sn-appbar {
+  background: var(--sn-bg);
+  border-bottom: 2px solid var(--sn-primary);
+  backdrop-filter: none;
+}
+
+[data-skin="sanctuary"] .sn-appbar {
+  background: color-mix(in srgb, var(--sn-bg) 92%, var(--sn-surface));
+  border-bottom: 0;
+  box-shadow: var(--sn-elev-1);
+}
+
+[data-skin="campus"] .sn-appbar {
+  background: var(--sn-bg);
+  border-bottom: 4px double var(--sn-accent);
+  backdrop-filter: none;
+}
+
+[data-skin="network"] .sn-appbar {
+  background: var(--sn-bg);
+  border-bottom: 2px dashed var(--sn-primary);
+  backdrop-filter: none;
+}
+
+[data-skin="sentinel"] .sn-appbar {
+  background: var(--sn-bg);
+  border-bottom: 3px solid var(--sn-accent);
+  backdrop-filter: none;
+}
+
+[data-skin="lab"] .sn-appbar {
+  background: color-mix(in srgb, var(--sn-bg) 94%, var(--sn-surface));
+  border-bottom: 1px solid var(--sn-border);
+}
+
+/* --- brandmark ------------------------------------------------------------- */
+
+[data-skin="terminal"] .sn-brandmark,
+[data-skin="sentinel"] .sn-brandmark {
+  border-radius: 2px;
+}
+
+[data-skin="network"] .sn-brandmark {
+  border-radius: 50%;
+}
+
+[data-skin="sanctuary"] .sn-brandmark {
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sn-primary) 88%, var(--sn-bg));
+}
+
+[data-skin="campus"] .sn-brandmark {
+  border-radius: 2px 12px 2px 12px;
+}
+
+/* --- eyebrow labels -------------------------------------------------------- */
+
+[data-skin="chambers"] .sn-eyebrow,
+[data-skin="lab"] .sn-eyebrow {
+  font-family: var(--sn-font-heading);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  font-size: 0.9rem;
+}
+
+[data-skin="terminal"] .sn-eyebrow,
+[data-skin="network"] .sn-eyebrow,
+[data-skin="sentinel"] .sn-eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.08em;
+  color: var(--sn-primary);
+}
+
+[data-skin="campus"] .sn-eyebrow {
+  letter-spacing: 0.2em;
+  font-weight: 800;
+}
+
+[data-skin="sanctuary"] .sn-eyebrow {
+  color: var(--sn-muted);
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+/* --- section rule ---------------------------------------------------------- */
+
+.sn-rule {
+  display: block;
+  height: 3px;
+  width: 4rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sn-accent);
+}
+
+[data-skin="chambers"] .sn-rule {
+  width: 100%;
+  height: 5px;
+  border-radius: 0;
+  background: none;
+  border-top: 1px solid var(--sn-border);
+  border-bottom: 1px solid var(--sn-border);
+}
+
+[data-skin="terminal"] .sn-rule {
+  width: 100%;
+  height: 1px;
+  border-radius: 0;
+  background: var(--sn-border);
+}
+
+[data-skin="sanctuary"] .sn-rule {
+  display: none;
+}
+
+[data-skin="campus"] .sn-rule {
+  width: 100%;
+  height: 2px;
+  border-radius: 0;
+  background: none;
+  border-top: 2px dotted var(--sn-accent);
+}
+
+[data-skin="network"] .sn-rule {
+  width: 100%;
+  height: 2px;
+  border-radius: 0;
+  background: none;
+  border-top: 2px dashed var(--sn-primary);
+}
+
+[data-skin="sentinel"] .sn-rule {
+  width: 5rem;
+  height: 3px;
+  border-radius: 0;
+  background: var(--sn-accent);
+}
+
+[data-skin="lab"] .sn-rule {
+  width: 100%;
+  height: 1px;
+  border-radius: 0;
+  background: var(--sn-border);
+}
+
+/* --- story cards ----------------------------------------------------------- */
+
+[data-skin="chambers"] .sn-story {
+  box-shadow: none;
+  border-radius: 6px;
+}
+
+[data-skin="chambers"] .sn-story:hover {
+  border-color: var(--sn-accent);
+}
+
+[data-skin="terminal"] .sn-story {
+  box-shadow: none;
+  border-radius: 4px;
+  border-color: var(--sn-border);
+}
+
+[data-skin="terminal"] .sn-story:hover {
+  background: var(--sn-surface);
+  box-shadow: none;
+  transform: none;
+}
+
+[data-skin="sanctuary"] .sn-story {
+  border-color: transparent;
+  border-radius: 18px;
+  box-shadow: var(--sn-elev-1);
+}
+
+[data-skin="sanctuary"] .sn-story:hover {
+  box-shadow: var(--sn-elev-2);
+}
+
+[data-skin="campus"] .sn-story {
+  border-left: 4px solid var(--sn-accent);
+  border-radius: 4px 10px 10px 4px;
+}
+
+[data-skin="network"] .sn-story {
+  border-style: dashed;
+  border-radius: 8px;
+}
+
+[data-skin="network"] .sn-story:hover {
+  border-style: solid;
+}
+
+[data-skin="sentinel"] .sn-story {
+  border-radius: 2px;
+  border-left: 3px solid var(--sn-accent);
+  box-shadow: none;
+}
+
+[data-skin="sentinel"] .sn-story:hover {
+  box-shadow: none;
+  border-left-color: var(--sn-primary);
+}
+
+[data-skin="lab"] .sn-story {
+  border-radius: 14px;
+  border-color: color-mix(in srgb, var(--sn-border) 65%, var(--sn-bg));
+}
+
+/* --- favourites rail ------------------------------------------------------- */
+
+[data-skin="terminal"] .sn-rail,
+[data-skin="network"] .sn-rail {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.25rem;
+}
+
+[data-skin="terminal"] .sn-rail > li,
+[data-skin="network"] .sn-rail > li {
+  flex: 0 0 16rem;
+  scroll-snap-align: start;
+}
+
+/* --- footer ---------------------------------------------------------------- */
+
+[data-skin="chambers"] .sn-footer {
+  background: var(--sn-bg);
+  border-top: 3px double var(--sn-border);
+}
+
+[data-skin="terminal"] .sn-footer {
+  background: var(--sn-bg);
+  border-top: 2px solid var(--sn-primary);
+}
+
+[data-skin="campus"] .sn-footer {
+  background: var(--sn-bg);
+  border-top: 2px dotted var(--sn-accent);
+}
+
+[data-skin="network"] .sn-footer {
+  border-top: 2px dashed var(--sn-primary);
+}
+
+[data-skin="sentinel"] .sn-footer {
+  background: var(--sn-bg);
+  border-top: 3px solid var(--sn-accent);
+}
+
+/* --- motifs ---------------------------------------------------------------- */
+
+[data-skin="chambers"] .sn-hero-card::after {
+  background-image: url("/skins/legal/motif.svg");
+  background-position: right -18px bottom -26px;
+  background-size: 360px;
+}
+
+[data-skin="terminal"] .sn-hero-card::after {
+  background-image: url("/skins/financial/motif.svg");
+  background-position: right -30px bottom -40px;
+  background-size: 420px;
+}
+
+[data-skin="sanctuary"] .sn-hero-card {
+  border-color: transparent;
+  border-radius: 22px;
+  box-shadow: var(--sn-elev-1);
+}
+
+[data-skin="sanctuary"] .sn-hero-card::after {
+  background-image: url("/skins/behavioral-health/motif.svg");
+  background-position: center right -80px;
+  background-size: 460px;
+  opacity: 0.6;
+}
+
+[data-skin="campus"] .sn-hero-card::after {
+  background-image: url("/skins/education/motif.svg");
+  background-position: right -40px top -20px;
+  background-size: 380px;
+  opacity: 0.35;
+}
+
+[data-skin="network"] .sn-hero-card::after {
+  background-image: url("/skins/logistics/motif.svg");
+  background-position: center right -60px;
+  background-size: 520px;
+  opacity: 0.4;
+}
+
+[data-skin="sentinel"] .sn-hero-card::after {
+  background-image: url("/skins/cybersecurity/motif.svg");
+  background-position: right -90px bottom -70px;
+  background-size: 420px;
+  opacity: 0.22;
+}
+
+[data-skin="lab"] .sn-hero-card::after {
+  background-image: url("/skins/stem-cell/motif.svg");
+  background-position: right -40px bottom -50px;
+  background-size: 420px;
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sn-story,
+  .sn-rail {
+    transition: none;
+  }
+}

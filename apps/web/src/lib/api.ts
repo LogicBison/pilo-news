@@ -55,12 +55,24 @@ export interface IndustryTheme {
   layout: "editorial" | "professional" | "academic";
 }
 
+export interface CtaQualificationOption {
+  value: string;
+  label: Record<string, string>;
+}
+
+export interface CtaQualification {
+  label?: Record<string, string>;
+  required?: boolean;
+  options?: CtaQualificationOption[];
+}
+
 export interface CtaConfig {
   kind?: "consultation" | "brief";
   headline?: Record<string, string>;
   body?: Record<string, string>;
   label?: Record<string, string>;
   secondary_label?: Record<string, string>;
+  qualify?: CtaQualification;
 }
 
 export interface Industry {

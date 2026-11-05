@@ -3,10 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { DeskBrief } from "@/components/DeskBrief";
+import { BriefSignup } from "@/components/BriefSignup";
 import { Hero, StoryColumns } from "@/components/Hero";
 import { JsonLd } from "@/components/JsonLd";
 import { LeadForm } from "@/components/LeadForm";
 import { EmptyState, FallbackNotice } from "@/components/Notices";
+import { ProofStrip } from "@/components/ProofStrip";
+import { TrustBlock } from "@/components/TrustBlock";
 import { StickyCta } from "@/components/Cta";
 import { TopicRail } from "@/components/TopicRail";
 import { getBundle, getIndustry } from "@/lib/api";
@@ -61,6 +64,7 @@ export default async function ChannelHome({ params }: Params) {
       ) : (
         <>
           <Hero bundle={bundle} locale={resolved} industry={channel} />
+          <ProofStrip bundle={bundle} locale={resolved} />
           <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
             <DeskBrief brief={bundle.ai_summary} locale={resolved} />
             <TopicRail
@@ -89,13 +93,21 @@ export default async function ChannelHome({ params }: Params) {
           ) : null}
         </>
       )}
-      <section className="mt-12">
+      <section className="mt-12 grid gap-5">
+        <TrustBlock locale={resolved} />
         <LeadForm
           industry={industry}
           industryName={channel.name}
           locale={resolved}
           kind={channel.cta.kind ?? "consultation"}
           placement="home"
+          sourcePage={homePath}
+          qualify={channel.cta.qualify}
+        />
+        <BriefSignup
+          industry={industry}
+          locale={resolved}
+          placement="brief-home"
           sourcePage={homePath}
         />
       </section>

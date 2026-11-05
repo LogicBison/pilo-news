@@ -56,6 +56,36 @@ async def duplicate_lead(industry_id: str, email: str, minutes: int = 10) -> dic
     )
 
 
+def qualification_options(channel: Channel) -> dict[str, Any]:
+    """Channel CTA may carry a `qualify` block: label, required, options."""
+    cta = channel.cta if isinstance(channel.cta, dict) else {}
+    config = cta.get("qualify")
+    return config if isinstance(config, dict) else {}
+
+
+def check_qualification(channel: Channel, payload: dict[str, Any]) -> str | None:
+    """Return the validated qualification value, or raise on a missing/invalid one."""
+    config = qualification_options(channel)
+    if not config:
+        return payload.get("qualification")
+    allowed = {
+        str(option.get("value"))
+        for option in config.get("options") or []
+        if isinstance(option, dict) and option.get("value")
+    }
+    value = payload.get("qualification")
+    if value is None or str(value).strip() == "":
+        # The brief rung is deliberately two fields; a missing answer is only a
+        # problem on the consultation form, where the partner needs the context.
+        if config.get("required") and payload.get("kind") != "brief":
+            raise ValidationProblem("Choose the option that fits your request.")
+        return None
+    value = str(value)
+    if allowed and value not in allowed:
+        raise ValidationProblem("Choose an option from the list.")
+    return value
+
+
 async def create_lead(
     channel: Channel,
     payload: dict[str, Any],
@@ -72,6 +102,7 @@ async def create_lead(
             raise ValidationProblem("A phone number is required for logistics inquiries.")
         if not payload.get("company"):
             raise ValidationProblem("A company is required for logistics inquiries.")
+    qualification = check_qualification(channel, payload)
 
     existing = await duplicate_lead(channel.id, str(payload["email"]))
     partner = await partner_for(channel.id)
@@ -105,12 +136,13 @@ async def create_lead(
                 """
                 INSERT INTO leads (
                     industry_id, partner_id, kind, name, email, phone, company, message,
-                    locale, source_page, article_id, utm, consent_version, consent_at,
-                    ip_hash, ua_hash, status
+                    qualification, locale, source_page, article_id, utm, consent_version,
+                    consent_at, ip_hash, ua_hash, status
                 ) VALUES (
                     CAST(:industry_id AS uuid), CAST(:partner_id AS uuid), :kind, :name, :email,
-                    :phone, :company, :message, :locale, :source_page, CAST(:article_id AS uuid),
-                    CAST(:utm AS jsonb), :consent_version, :consent_at, :ip_hash, :ua_hash, :status
+                    :phone, :company, :message, :qualification, :locale, :source_page,
+                    CAST(:article_id AS uuid), CAST(:utm AS jsonb), :consent_version,
+                    :consent_at, :ip_hash, :ua_hash, :status
                 ) RETURNING id
                 """
             ),
@@ -123,6 +155,7 @@ async def create_lead(
                 "phone": payload.get("phone"),
                 "company": payload.get("company"),
                 "message": payload.get("message"),
+                "qualification": qualification,
                 "locale": payload.get("locale") or "en",
                 "source_page": payload.get("source_page"),
                 "article_id": article_id,

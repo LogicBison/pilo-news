@@ -53,6 +53,50 @@
         "secondary_label": {
           "en": "Request a consultation",
           "es": "Solicitar una consulta"
+        },
+        "qualify": {
+          "label": {
+            "en": "Program interest",
+            "es": "Programa de interés"
+          },
+          "required": true,
+          "options": [
+            {
+              "value": "certificate",
+              "label": {
+                "en": "Certificate",
+                "es": "Certificado"
+              }
+            },
+            {
+              "value": "degree",
+              "label": {
+                "en": "Degree",
+                "es": "Título"
+              }
+            },
+            {
+              "value": "licensing",
+              "label": {
+                "en": "Licensing or exam prep",
+                "es": "Licencia o examen"
+              }
+            },
+            {
+              "value": "corporate",
+              "label": {
+                "en": "Corporate training",
+                "es": "Formación corporativa"
+              }
+            },
+            {
+              "value": "other",
+              "label": {
+                "en": "Something else",
+                "es": "Otra opción"
+              }
+            }
+          ]
         }
       },
       "timezone": "America/El_Salvador",

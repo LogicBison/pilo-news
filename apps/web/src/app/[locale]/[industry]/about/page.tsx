@@ -66,6 +66,7 @@ export default async function AboutPage({ params }: Params) {
             kind={channel.cta.kind ?? "consultation"}
             placement="about"
             sourcePage={localePath(resolved, `/${industry}/about`)}
+            qualify={channel.cta.qualify}
           />
         </div>
       </article>

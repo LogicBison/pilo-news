@@ -1,7 +1,7 @@
 {
   "ref": "SYSNEWS",
   "updated": "2026-11-05",
-  "goal": "Deployment profile import (apply-profile CLI + schema + tests + docs); verify pending items",
+  "goal": "UI foundation certify (all 7 channels) + lead-magnet recommendations and implementation (R1-R3)",
   "allowed_paths": [
     ".cursorrules",
     "README.md",
@@ -15,7 +15,9 @@
     "tests/",
     "ops/",
     ".github/",
-    ".work/"
+    ".work/",
+    ".work.ui/",
+    ".work.biz/"
   ],
   "allowed_patterns": [
     "apps/**/*",
@@ -24,6 +26,8 @@
     "ops/**/*",
     ".github/**/*",
     ".work/**/*",
+    ".work.ui/**/*",
+    ".work.biz/**/*",
     "bin/**/*"
   ]
 }

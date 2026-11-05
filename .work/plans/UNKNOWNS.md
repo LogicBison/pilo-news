@@ -11,7 +11,7 @@
 | U5 | Feed portfolio per industry: which publishers, are their terms compatible with aggregation? | Legal risk R1, source seeding, M1 acceptance | owner | Closed (technical) - 25 verified feeds across 6 channels, quality policy applied (ADR 014); legal terms review tracked under U11 |
 | U6 | Primary launch industry / pilot channel (recommendation: legal, then financial) | First shipped site, editorial workload | owner | Closed - pilot = `legal` (default channel, widest portfolio, most content); financial second |
 | U7 | Editorial workflow depth: single admin, or roles/review queue at launch? | Editorial console SPEC scope | owner | Open |
-| U8 | Contact-form delivery: transactional email vendor vs SMTP mailbox | Contact flow, secrets, deliverability | owner | Open |
+| U8 | Contact-form delivery: transactional email vendor vs SMTP mailbox | Contact flow, secrets, deliverability | owner | Closed - `pilo-mail` gateway (Brevo upstream) chosen 2026-11-05; integration deliberately deferred until after v1 lead capture |
 | U9 | Analytics/consent posture: first-party only, or third-party analytics? | Cookie banner, privacy policy, threat model | owner | Open |
 | U10 | Expected traffic at launch (< 10k or > 100k daily sessions) and growth plan | Sizing, cache TTLs, scaling trigger | owner | Open |
 | U11 | Legal review of disclaimers for legal, financial, and health channels | Channel enablement gate | owner + advisor | Open |

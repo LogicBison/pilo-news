@@ -3,7 +3,9 @@
 import { useState } from "react";
 
 import { track } from "@/lib/analytics";
+import type { CtaQualification } from "@/lib/api";
 import { t, type Locale } from "@/lib/i18n";
+import { localized } from "@/lib/theme";
 
 interface LeadFormProps {
   industry: string;
@@ -13,6 +15,7 @@ interface LeadFormProps {
   placement: string;
   articleId?: string;
   sourcePage: string;
+  qualify?: CtaQualification;
 }
 
 type Status = "idle" | "sending" | "success" | "error" | "rate-limited";
@@ -25,11 +28,13 @@ export function LeadForm({
   placement,
   articleId,
   sourcePage,
+  qualify,
 }: LeadFormProps) {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const [started, setStarted] = useState(false);
   const logistics = industry === "logistics";
+  const options = (qualify?.options ?? []).filter((option) => option.value && option.label);
 
   const onStart = () => {
     if (started) return;
@@ -55,6 +60,7 @@ export function LeadForm({
           phone: data.get("phone") || null,
           company: data.get("company") || null,
           message: data.get("message") || null,
+          qualification: data.get("qualification") || null,
           locale,
           consent: data.get("consent") === "on",
           source_page: sourcePage,
@@ -152,6 +158,26 @@ export function LeadForm({
           />
         </label>
       </div>
+      {options.length > 0 ? (
+        <label className="mt-4 flex flex-col gap-1 text-sm font-medium">
+          {localized(qualify?.label, locale) || t(locale, "lead.message")}
+          <select
+            name="qualification"
+            required={qualify?.required !== false}
+            defaultValue=""
+            className="sn-input"
+          >
+            <option value="" disabled>
+              {t(locale, "lead.chooseOption")}
+            </option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {localized(option.label, locale)}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       <label className="mt-4 flex flex-col gap-1 text-sm font-medium">
         {t(locale, "lead.message")}
         <textarea
