@@ -330,3 +330,126 @@ Use Context7 MCP (`@upstash/context7-mcp`) for version-specific library docs whe
 | `.ai/templates/cursorrules.template` | Copy to repo-root `.cursorrules` when bootstrapping |
 
 Canonical map: `.ai/README.md` · Working tree: `.work/README.md`.
+
+## Source resolution — fat-client vs thin-client (UI Design OS)
+
+This repo was bootstrapped in one of two modes. The agent MUST apply the matching resolution rule before reading any `.ai.ui/...` path. Read this section at the start of every conversation.
+
+**UI Design OS source (thin-client only — set by `@ui-deploy-basic`):**
+
+AI_UI_SOURCE=/mnt/work/Projects/pilo.ai.ui.logicbison
+
+*(If the line above still shows `REPLACE_BASICUI_SOURCE`, the repo is **fat-client** — see below.)*
+
+| Mode | Bootstrapped via | Where framework assets live | `AI_UI_SOURCE` |
+|------|------------------|----------------------------|----------------|
+| **Fat-client** (vendored) | `@ui-bootstrap init` or `@ui-deploy-files` | this repo's `.ai.ui/` | unset (token left as `REPLACE_BASICUI_SOURCE`) |
+| **Thin-client** (remote) | `@ui-deploy-basic` | the **source** UI Design OS; this repo holds only `.cursorrules` + `.work.ui/` | set to an absolute path (e.g. `/path/to/.ai.ui`) |
+
+**Resolution rule (agents MUST apply before reading any `.ai.ui/...` reference):**
+
+1. `.cursorrules` (this file) and `.work.ui/**` — read from the **local** project (this repo), always, in both modes.
+2. **Thin-client** (`AI_UI_SOURCE` is set and readable as a directory): read every other `.ai.ui/<path>` reference from `$AI_UI_SOURCE/<path>` — i.e. `skills/<id>/skill.md`, `skills/README.md`, `standards/**`, `concepts/**`, `docs/**`, `scripts/**`, `templates/**`, `START_HERE.md`, `COHABITATION.md`. **Never** assume a local `.ai.ui/` exists. When you invoke `@<skill>`, read `$AI_UI_SOURCE/skills/<id>/skill.md`; inside it, any `.ai.ui/<x>` reference resolves to `$AI_UI_SOURCE/<x>`.
+3. **Fat-client** (`AI_UI_SOURCE` is unset or still `REPLACE_BASICUI_SOURCE`): read `.ai.ui/<path>` locally in this repo.
+4. `.work.ui/...` references and project app code (REPLACE:UI_APP_ROOT) resolve locally in this repo in both modes.
+5. **Thin-client + unreachable source:** if `$AI_UI_SOURCE` is set but the directory does not exist or `skills/README.md` is unreadable, **stop** and report `ui-design-os source unreachable: $AI_UI_SOURCE` — do **not** silently fall back to a local `.ai.ui/` (there isn't one) and do **not** guess a different path.
+
+**First bootstrap in thin-client mode** is a chicken-and-egg escape: before `@ui-deploy-basic` runs, the target has no local skill to invoke. Bootstrap is initiated either (a) from the **source** repo — `@ui-deploy-basic - /abs/path/to/target` — or (b) by invoking the shell directly from the target: `bash /abs/path/to/source/.ai.ui/scripts/ui-deploy-basic.sh .` After that, the source pointer in `.cursorrules` lets the local agent load `@ui-deploy-basic update` and every other UI skill from source.
+
+
+<!-- UI_DESIGN_OS_BEGIN -->
+<!-- Merged by @ui-bootstrap into an existing .cursorrules (typically after Agent OS). Core Principles §1–7 above apply to all UI work. -->
+
+## UI Design OS (`.ai.ui/`)
+
+**Coexistence:** [`$AI_UI_SOURCE/COHABITATION.md`]($AI_UI_SOURCE/COHABITATION.md) — UI skills write to `.work.ui/` only; do not overwrite `.work/plans/NEXT.md` except cross-links.
+
+**Lost on UI?** [`$AI_UI_SOURCE/START_HERE.md`]($AI_UI_SOURCE/START_HERE.md) · **Router:** `@ui-process-router - <question>`
+
+### Change safety (add to existing change-safety section or create one)
+
+| Gate | Command | Fail when |
+|------|---------|-----------|
+| Touch scope | `bash $AI_UI_SOURCE/scripts/touch-scope-verify.sh` | File outside `.work.ui/touch-scope` |
+| Blast radius | `bash $AI_UI_SOURCE/scripts/blast-radius-check.sh` | Cross-area diff ≥3 areas |
+| Tests | `bash $AI_UI_SOURCE/scripts/framework-verify.sh` | Non-zero exit |
+| Gate check | `bash $AI_UI_SOURCE/scripts/gate-verify.sh` | Done task with empty Notes |
+
+### Data loss & destructive operations (union with Agent OS rules)
+
+**Permission rule:** Explicit human approval applies **only to the current request (same message)** — never standing or permanent.
+
+Unless requested in the **same message**, MUST NOT: `git commit` / `git push` / force-push / hard reset / `git clean -fd`; `DROP` / `TRUNCATE` / wipe any database or datastore; delete files or directories; overwrite `.ai/`, `.work/`, or replace `.cursorrules` wholesale (merge or `confirm-overwrite-cursorrules` only when named); modify **UI protected files** below without same-message permission.
+
+### UI completion gate (addition to Core Principle 7)
+
+UI milestone work is not done until: UI lint/type/tests pass; `@ui-visual-verify` + `@ui-accessibility-audit` pass or are waived in `{HANDOFF_UI}`; agent-assisted UI has `@ui-concept-run - UIS-06` unless **`human-only`** in the same message.
+
+### UI operator handoff (communication)
+
+Close every UI task response per `.ai.ui/skills/SKILL_DEPENDENCIES.md` § Operator handoff contract: approvals under `**Needs your approval:**` with `path:L<n>` cites; questions numbered under `**Needs your answer:**` (never mixed); exactly one `**Next step:**`; Form A single line when nothing is needed; empty sections omitted.
+
+### UI context files
+
+| File | Purpose |
+|------|---------|
+| `$AI_UI_SOURCE/START_HERE.md` | UI operator decision tree |
+| `$AI_UI_SOURCE/COHABITATION.md` | Boundary with Agent OS |
+| `DOCS_UI_STACK.md` | Front-end stack |
+| `$AI_UI_SOURCE/standards/REPLACE:UI_CONVENTIONS_FILE` | UI conventions |
+| `$AI_UI_SOURCE/standards/REPLACE:UI_SCREEN_SPEC_STANDARD_FILE` | Screen SPEC |
+| `$AI_UI_SOURCE/standards/REPLACE:UI_COMPONENT_STANDARD_FILE` | Components |
+| `$AI_UI_SOURCE/standards/REPLACE:UI_DESIGN_TOKENS_FILE` | Tokens |
+| `$AI_UI_SOURCE/standards/REPLACE:UI_ACCESSIBILITY_FILE` | WCAG |
+| `$AI_UI_SOURCE/standards/REPLACE:UI_DIRECTORY_MAP_FILE` | UI directories |
+| `.work.ui/context/HANDOFF_UI.md` | UI handoff |
+| `.work.ui/plans/NEXT_UI.md` | UI iteration |
+
+### UI placeholders
+
+| Placeholder | Resolves to |
+|-------------|-------------|
+| `{WORK_UI_ROOT}` | `.work.ui/` |
+| `{HANDOFF_UI}` | `.work.ui/context/HANDOFF_UI.md` |
+| `{UI_ITERATION_CARRIER}` | `.work.ui/plans/NEXT_UI.md` |
+| `{SCREEN_SPEC_ROOT}` | `.work.ui/screens/` |
+| `{UI_SKILLS_ROOT}` | `.ai.ui/skills/` |
+| `{UI_CONCEPTS_ROOT}` | `.ai.ui/concepts/` |
+| `REPLACE:UI_APP_ROOT` | e.g. `apps/web/` |
+| `REPLACE:UI_TOKENS_FILE` | e.g. `src/styles/tokens.css` |
+| `REPLACE:UI_TEST` / `REPLACE:UI_LINT` / `REPLACE:UI_TYPECHECK` | Frontend checks |
+| `REPLACE:UI_VISUAL_TEST` / `REPLACE:UI_A11Y_TOOL` | Visual + a11y |
+| `REPLACE:SERVICE_FRONTEND` / `REPLACE:FRONTEND_WORKDIR` | Docker UI service |
+
+### UI skills (`@ui-*` only)
+
+| Skill | Purpose |
+|-------|---------|
+| ui-bootstrap | `.work.ui/` scaffold; create/merge `.cursorrules` |
+| ui-deploy-basic | Thin-client bootstrap / `update`: re-sync `AI_UI_SOURCE`, merge scaffold |
+| ui-deploy-files | Fat-client: copy `.ai.ui/` into a target project |
+| ui-session | Session carrier: start/status/context/add/commit/close/push (`.work.ui/`-scoped in target repos) |
+| ui-director | Free-text orchestrator → skill chain; new-skill gap detection |
+| ui-project-approach | Archetype + skill chain + pattern pointers |
+| ui-style-stack | Active styling stack (tailwind / css-modules / vanilla-css / styled-components) |
+| ui-design-foundation | Foundation 01–04; screen-spec-ready |
+| ui-screen-spec | `.work.ui/screens/` SPECs |
+| ui-component-build | `NEXT_UI.md` iterations |
+| ui-visual-verify | Visual / token regression |
+| ui-accessibility-audit | WCAG |
+| ui-design-system | Catalog + primitives + Storybook |
+| ui-concept-run | UIS-01…10 |
+| ui-copy | UI copy: microcopy, labels, errors, empty states, confirmations |
+| ui-python-desktop | Python desktop UIs (FLET / PySide6 / PyQt6) |
+| ui-plan-verify | Read-only audit: verifiers, probe coverage, screen→milestone traceability |
+| ui-process-router | UI Q&A (read-only) |
+
+**Sessions:** `@session-control` (`.ai/`, full repo) · `@ui-session` (`.work.ui`-scoped start/status/context/add/commit/close/push) · **Backend:** `@code-implementation` (`.ai/`) · **UIS-06** (agent-assisted) + **UIS-07** (craft ≥ refined) + **UIS-08** (all screens) + **UIS-09** (analytical dashboards) before `ui-component-build complete`.
+
+### UI protected files (union with existing list; same-message permission only)
+
+- `REPLACE:UI_TOKENS_FILE`
+- `REPLACE:UI_FRAMEWORK_CONFIG_PATHS`
+- `.ai.ui/inputs/brand/` (reference — do not auto-edit)
+
+<!-- UI_DESIGN_OS_END -->
