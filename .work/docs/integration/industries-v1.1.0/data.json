@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExtendedIndustryVerticalConfigurations",
+  "version": "1.1.0",
+  "industries": {
+    "psychiatry_psychology": {
+      "industryId": "ind_behavioral_health",
+      "name": "Psychiatry & Clinical Psychology",
+      "code": "BEHAVIORAL_HEALTH_EHR",
+      "complianceFrameworks": ["HIPAA", "42_CFR_PART_2", "GDPR_HEALTH"],
+      "terminology": {
+        "primaryEntity": "Client / Patient",
+        "secondaryEntity": "Clinician / Therapist",
+        "recordUnit": "Therapy Session / Assessment",
+        "actionItem": "Treatment Objective",
+        "statusField": "Care Plan Status"
+      },
+      "customFields": [
+        {
+          "key": "dsm5_icd11_diagnoses",
+          "label": "DSM-5 / ICD-11 Diagnostics",
+          "dataType": "array_string",
+          "required": true
+        },
+        {
+          "key": "phq9_gad7_scores",
+          "label": "Psychometric Assessment Scores (PHQ-9 / GAD-7)",
+          "dataType": "json_object",
+          "required": false
+        },
+        {
+          "key": "controlled_substance_prescription",
+          "label": "Schedule II-V Controlled Medications",
+          "dataType": "boolean",
+          "required": true
+        },
+        {
+          "key": "crisis_safety_plan",
+          "label": "Suicide / Self-Harm Safety Plan Active",
+          "dataType": "boolean",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "intake_assessment", "label": "Initial Evaluation & Intake", "isInitial": true },
+        { "id": "diagnostic_formulation", "label": "Diagnostic & Case Formulation" },
+        { "id": "active_therapy", "label": "Active Treatment / Psychotherapy" },
+        { "id": "med_management", "label": "Psychiatric Medication Management" },
+        { "id": "remission_maintenance", "label": "Maintenance / Step-Down Care" },
+        { "id": "discharged", "label": "Successfully Discharged", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "TELEHEALTH",
+          "protocol": "WEBRTC_SIP",
+          "authMechanism": "OAUTH2_E2EE"
+        },
+        {
+          "systemType": "E_PRESCRIBING",
+          "protocol": "NCPDP_SCRIPT",
+          "authMechanism": "MUTUAL_TLS_CERT"
+        }
+      ]
+    },
+    "education_academics": {
+      "industryId": "ind_education",
+      "name": "Education & Higher Academics",
+      "code": "EDTECH_LMS",
+      "complianceFrameworks": ["FERPA", "COPPA", "GDPR"],
+      "terminology": {
+        "primaryEntity": "Student / Learner",
+        "secondaryEntity": "Instructor / Advisor",
+        "recordUnit": "Course / Academic Term",
+        "actionItem": "Assignment / Exam",
+        "statusField": "Enrollment Status"
+      },
+      "customFields": [
+        {
+          "key": "student_id_number",
+          "label": "Student ID",
+          "dataType": "string",
+          "required": true
+        },
+        {
+          "key": "gpa_cumulative",
+          "label": "Cumulative GPA",
+          "dataType": "number",
+          "required": false
+        },
+        {
+          "key": "degree_program",
+          "label": "Major / Degree Track",
+          "dataType": "string",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "applicant", "label": "Admissions Applicant", "isInitial": true },
+        { "id": "enrolled", "label": "Actively Enrolled" },
+        { "id": "academic_probation", "label": "Academic Review" },
+        { "id": "graduated", "label": "Degree Awarded", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "LMS",
+          "protocol": "LTI_V1_3",
+          "authMechanism": "OAUTH2"
+        },
+        {
+          "systemType": "SIS",
+          "protocol": "REST_JSON",
+          "authMechanism": "BEARER_TOKEN"
+        }
+      ]
+    },
+    "legal_compliance": {
+      "industryId": "ind_legal",
+      "name": "Legal Services & Corporate Governance",
+      "code": "LEGAL_TECH",
+      "complianceFrameworks": ["ABA_ETHICS", "SOC2_TYPE_II", "GDPR"],
+      "terminology": {
+        "primaryEntity": "Client",
+        "secondaryEntity": "Lead Counsel / Attorney",
+        "recordUnit": "Matter / Case",
+        "actionItem": "Legal Motion / Filing",
+        "statusField": "Litigation Phase"
+      },
+      "customFields": [
+        {
+          "key": "docket_number",
+          "label": "Court Docket / Index Number",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "privilege_level",
+          "label": "Attorney-Client Privilege Status",
+          "dataType": "enum",
+          "options": ["Work Product", "Confidential", "Public Filing"],
+          "required": true
+        },
+        {
+          "key": "statute_of_limitations_date",
+          "label": "Statute of Limitations Deadline",
+          "dataType": "date",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "conflict_check", "label": "Conflict of Interest Check", "isInitial": true },
+        { "id": "discovery", "label": "Discovery & Evidence Gathering" },
+        { "id": "pleadings", "label": "Pleadings & Motions" },
+        { "id": "trial_settlement", "label": "Trial / Settlement Negotiation" },
+        { "id": "closed", "label": "Matter Closed", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "E_DISCOVERY",
+          "protocol": "REST_JSON",
+          "authMechanism": "API_KEY"
+        },
+        {
+          "systemType": "COURT_EFILING",
+          "protocol": "SOAP_XML",
+          "authMechanism": "SAML_2_0"
+        }
+      ]
+    },
+    "financial_banking": {
+      "industryId": "ind_finance",
+      "name": "Financial Services & Banking",
+      "code": "FINTECH_CORE",
+      "complianceFrameworks": ["AML_KYC", "FINRA", "SEC", "PCI_DSS_V4"],
+      "terminology": {
+        "primaryEntity": "Account Holder",
+        "secondaryEntity": "Compliance Officer",
+        "recordUnit": "Financial Transaction / Portfolio",
+        "actionItem": "KYC Review / Audit",
+        "statusField": "Account Risk Status"
+      },
+      "customFields": [
+        {
+          "key": "kyc_verification_status",
+          "label": "KYC/AML Clearance Status",
+          "dataType": "enum",
+          "options": ["Pending", "Verified", "Flagged", "Rejected"],
+          "required": true
+        },
+        {
+          "key": "risk_score",
+          "label": "Internal Risk Score (0-100)",
+          "dataType": "number",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "onboarding", "label": "KYC Onboarding", "isInitial": true },
+        { "id": "underwriting", "label": "Credit / Risk Underwriting" },
+        { "id": "active", "label": "Active & Servicing" },
+        { "id": "frozen", "label": "Account Suspended / Frozen" },
+        { "id": "closed", "label": "Account Terminated", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "CORE_BANKING",
+          "protocol": "ISO_20022_XML",
+          "authMechanism": "MUTUAL_TLS_CERT"
+        },
+        {
+          "systemType": "CREDIT_BUREAU",
+          "protocol": "REST_JSON",
+          "authMechanism": "BEARER_TOKEN"
+        }
+      ]
+    },
+    "logistics_supply_chain": {
+      "industryId": "ind_logistics",
+      "name": "Logistics & Supply Chain",
+      "code": "SUPPLY_CHAIN_WMS",
+      "complianceFrameworks": ["DOT", "IATA", "C-TPAT"],
+      "terminology": {
+        "primaryEntity": "Consignment / Waybill",
+        "secondaryEntity": "Freight Handler / Driver",
+        "recordUnit": "Shipment / Order Manifest",
+        "actionItem": "Customs Clearance / Delivery",
+        "statusField": "Transit Status"
+      },
+      "customFields": [
+        {
+          "key": "tracking_number",
+          "label": "Global Tracking Code",
+          "dataType": "string",
+          "required": true
+        },
+        {
+          "key": "hazardous_materials",
+          "label": "HAZMAT Flag",
+          "dataType": "boolean",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "dispatch", "label": "Order Received & Dispatched", "isInitial": true },
+        { "id": "in_transit", "label": "In Transit / Freight" },
+        { "id": "customs_hold", "label": "Customs Inspection" },
+        { "id": "out_for_delivery", "label": "Out for Final Delivery" },
+        { "id": "delivered", "label": "Delivered & Signed (POD)", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "EDI_VAN",
+          "protocol": "EDIFACT_X12",
+          "authMechanism": "AS2_ENCRYPTION"
+        },
+        {
+          "systemType": "TELEMATICS",
+          "protocol": "MQTT",
+          "authMechanism": "API_KEY"
+        }
+      ]
+    }
+  }
+}

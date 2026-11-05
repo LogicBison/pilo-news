@@ -1,0 +1,37 @@
+# Agent OS consumer repo — see .cursorrules § File hygiene and § Data Privacy & Security
+
+# Agent-created exports/scratch (sole exception to the deletion rule; safe to remove after use)
+/tmp/
+
+# Secrets — never staged (protected surfaces + § Secret scrubbing).
+# Real per-environment files (.env.dev / .env.prd, written by `./bin/start.sh init-env`) stay
+# ignored; there is ONE tracked template, .env.example, shared by both environments (ADR 008).
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Stack backups written by `./bin/start.sh backup` — they contain tenant databases
+backups/
+
+# Editor / OS files (local preferences, never shared — same block as the sibling repos)
+.vscode/
+.idea/
+.DS_Store
+
+# Transient commit-ref metadata written by .git/hooks/post-commit
+.work/commit-ref-pending/
+
+# build/test artifacts (implementation start 2026-11-03)
+apps/web/.next/
+apps/web/node_modules/
+__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+apps/api/.venv/
+apps/web/.next-build/
+
+# TypeScript incremental build cache (generated; never commit)
+*.tsbuildinfo

@@ -1,0 +1,17 @@
+# Integration mirror - MANIFEST
+
+Rule: one row per mirrored artifact. Columns: `canonical_url`, `relative_path`, `sha256`, `retrieved`. URLs are recorded even when the artifact was supplied locally.
+
+| canonical_url | relative_path | sha256 | retrieved |
+|---------------|---------------|--------|-----------|
+| local://tmp/references/industries/data.json | `industries-v1.1.0/data.json` | 664c401ead8541f9730f4aa6ad4c6c963f71086e06ac5062483983b716b02f38 | 2026-11-05 |
+| https://www.accidentinjurynews.com/ | `landing-reference/url-sample-reference.md` | 33fb48c2873a91ca26ea55b9b75e6a4c043dbcf21fc9850d2b9ce391b259a62a | 2026-11-05 |
+| local://tmp/references/landing-pages-n-news/url-sample-reference-image.png | `landing-reference/url-sample-reference-image.png` | c708060540925047dea4b91dd44c24a2b2995ae1c760eb94ce5372b99a446322 | 2026-11-05 |
+
+## Notes
+
+- `industries-v1.1.0/data.json` is the authoritative channel configuration for v1 (5 industries). Refresh only when the upstream schema version changes; keep the old folder.
+- `landing-reference/url-sample-reference.md` is the verbatim brief (copied from `tmp/references/landing-pages-n-news/url-sample-reference.md`).
+- `landing-reference/url-sample-reference-image.png` is the reference-site screenshot (local copy; the live URL may change).
+- No publisher feeds are mirrored: feeds are fetched live and are not stored, per copyright policy (doc 02 §5).
+- Never store API keys, tokens, or `.env` files here.

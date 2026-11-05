@@ -1,0 +1,140 @@
+# Docker Compose proposal - System News v1
+
+**What it is:** the proposed local/dev and production Compose topology, ports, volumes, and env contract.
+**Status:** Proposed (2026-11-05) - **approval pending**; `docker-compose*.yml`, `Dockerfile.*`, and `.env.example` are protected files and have NOT been created.
+**Needs:** owner approval to create the files (HANDOFF O4).
+
+**Related:** ADR 005 (hosting), doc 04 §9-10, `.work/standards/20261105-observability-spec.md`.
+
+---
+
+## 1. Services
+
+| Service | Image / build | Purpose | Ports (host:container) |
+|---------|---------------|---------|------------------------|
+| `caddy` | `caddy:2-alpine` | TLS, reverse proxy, security headers (prd only) | 80, 443 |
+| `web` | `apps/web/Dockerfile` | Next.js public UI + admin console | 3000:3000 (dev only) |
+| `api` | `apps/api/Dockerfile` | FastAPI `/v1` | 8080:8080 (dev only) |
+| `worker` | `apps/api/Dockerfile` (same image, different command) | Redis Streams consumer | none |
+| `postgres` | `postgres:16-alpine` | Primary store | 5433:5432 (dev only) |
+| `redis` | `redis:7-alpine` | Cache, locks, rate limits, streams | 6380:6379 (dev only) |
+| `prometheus` | `prom/prometheus:v2.54` | Metrics scrape (dev/optional) | 9090 (dev only) |
+| `grafana` | `grafana/grafana:11` | Dashboards (optional) | 3001 (dev only) |
+
+**Production:** only `caddy` publishes ports; `web`, `api`, `postgres`, `redis` are on the internal network. `worker` has no port.
+
+## 2. Compose files
+
+- `docker-compose.dev.yml` - dev stack with hot reload, exposed ports, seeded DB, Prometheus/Grafana optional profile.
+- `docker-compose.prd.yml` - production stack with pinned image digests, restart policies, resource limits, no source mounts.
+- `COMPOSE_PROJECT_NAME=system-news-${STACK_SUFFIX}` so two stacks can coexist on one host (staging + prod).
+- `bin/start.sh` wraps: `init-env`, `up`, `down`, `logs`, `test`, `migrate`, `backup`, `restore`.
+
+## 3. Volumes
+
+| Volume | Content | Backup |
+|--------|---------|--------|
+| `pgdata` | Postgres data | nightly `pg_dump` |
+| `redisdata` | Redis AOF (queue durability) | not backed up (ephemeral by design) |
+| `caddy_data` | TLS certs/ACME state | not needed (re-issued) |
+| `caddy_config` | Caddy autosave | not needed |
+
+## 4. Environment contract (`.env.example`, names only)
+
+```
+# Stack identity
+COMPOSE_PROJECT_NAME=system-news-dev
+STACK_SUFFIX=dev
+
+# API
+APP_ENV=dev
+APP_BASE_URL=http://localhost:3000
+API_PORT=8080
+DATABASE_URL=postgresql+asyncpg://news:news@postgres:5432/news
+REDIS_URL=redis://redis:6379/0
+SECRET_KEY=change-me-32-bytes
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD_HASH=replace-with-argon2id-hash
+
+# AI (OpenAI-compatible)
+AI_BASE_URL=https://api.example.com/v1
+AI_MODEL=replace-me
+AI_API_KEY=
+AI_MONTHLY_BUDGET_USD=20
+
+# Email (contact notifications)
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASSWORD=
+CONTACT_TO=news@example.com
+
+# Web
+NEXT_PUBLIC_API_BASE=http://localhost:8080
+WEB_PORT=3000
+SN_DEFAULT_LOCALE=en
+SN_DEFAULT_INDUSTRY=legal
+
+# Observability
+METRICS_ENABLED=true
+LOG_LEVEL=info
+```
+
+Real `.env.dev`/`.env.prd` stay git-ignored; only `.env.example` is tracked (after approval).
+
+## 5. Healthchecks
+
+| Service | Check |
+|---------|-------|
+| `postgres` | `pg_isready -U news` |
+| `redis` | `redis-cli ping` |
+| `api` | `curl -fsS http://localhost:8080/v1/health` |
+| `web` | `curl -fsS http://localhost:3000/` |
+| `worker` | heartbeat key updated every 30 s; alert if stale |
+
+`depends_on` uses `condition: service_healthy` for postgres/redis; api waits for migrations before reporting healthy.
+
+## 6. Resource limits (prd)
+
+| Service | CPU | Memory |
+|---------|-----|--------|
+| api | 1.0 | 512 MB |
+| worker | 1.0 | 512 MB |
+| web | 1.0 | 512 MB |
+| postgres | 2.0 | 2 GB |
+| redis | 0.5 | 256 MB |
+
+Host: 4 vCPU / 8 GB / 80 GB SSD (ADR 005). Alert at 80% disk.
+
+## 7. Deploy and rollback
+
+1. CI builds `ghcr.io/<org>/system-news-api:<sha>` and `-web:<sha>`.
+2. `docker compose -f docker-compose.prd.yml pull` then `up -d --remove-orphans`.
+3. API container runs migrations on start; `/v1/health` gates the release.
+4. Rollback: set `API_IMAGE`/`WEB_IMAGE` to the previous SHA and `up -d`.
+5. Migrations are forward-only; a rollback that requires schema reversal is a manual, reviewed operation (`@db-migration` rules).
+
+## 8. Backup and restore
+
+- `pg_dump --format=custom` → `age`-encrypted → off-site bucket (provider per O3), 30-day lifecycle.
+- Restore drill: fresh volume → `pg_restore` → run `/v1/health` + smoke tests; target RTO 4 h.
+- Backup script lives in `bin/start.sh backup`; schedule via host cron at 02:00 UTC.
+
+## 9. Risks
+
+| Risk | Mitigation |
+|------|------------|
+| Postgres port exposed in dev on a public host | Bind to `127.0.0.1` in dev; never in prd |
+| Redis without auth on a shared network | Internal network only; `requirepass` in prd |
+| Migration failure blocks start | Fail fast + keep previous container; logs surface `result: failed` |
+| Disk growth from logs | Docker log rotation 10 MB × 3 |
+
+## 10. Approval requested
+
+Approve creation of `docker-compose.dev.yml`, `docker-compose.prd.yml`, `apps/api/Dockerfile`, `apps/web/Dockerfile`, `.env.example`, and `bin/start.sh` (see HANDOFF O4). Until approved, this remains a proposal.
+
+---
+
+## Next action
+
+Approve file creation per `.work/context/HANDOFF.md` O4.

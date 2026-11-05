@@ -1,0 +1,139 @@
+# Directory Map - System News
+
+**What it is:** binding repository layout and boundary map; align every plan, SPEC, and PR with it.
+**Status:** Approved for implementation (2026-11-05) · **Needs:** nothing.
+
+---
+
+## 1. Repository roots
+
+| Path | Purpose |
+|------|---------|
+| `apps/api/` | Python 3.12 + FastAPI service and worker |
+| `apps/web/` | Next.js 15 public UI |
+| `bin/` | Host control scripts (`start.sh` - dev stack lifecycle) |
+| `docs/` | Public developer docs (`api/`, quickstarts, OpenAPI snapshot) |
+| `docker-compose.dev.yml` | Dev stack (protected; change needs owner approval) |
+| `docker-compose.prd.yml` | Production stack (protected; change needs owner approval) |
+| `.work/` | Project memory: plans, SPECs, ADRs, standards, HANDOFF, integration cache |
+| `tmp/` | Scratch and reference inputs (git-ignored; agent may clean) |
+| `.cursorrules` | Agent + engineering rules |
+| `README.md` | Start-here table and quickstart |
+| `DOCS_TECH_STACK.md` | Pinned versions |
+
+## 2. API layout
+
+```
+apps/api/
+├── pyproject.toml
+├── Dockerfile
+├── config/                      # scoring.json, seeds.json, prompts
+├── migrations/
+│   ├── 001_init.sql
+│   ├── 002_seed_industries.sql
+│   └── ...
+├── scripts/                     # one-off operational scripts
+├── src/news_api/
+│   ├── main.py                  # FastAPI app factory + lifespan
+│   ├── worker.py                # Redis Streams consumer entrypoint
+│   ├── platform/                # shared: settings, db, cache, migrations, i18n, clock, security, logging
+│   ├── channels/
+│   │   ├── domain/              # Industry entity, theme schema
+│   │   ├── application/         # channel queries
+│   │   ├── infrastructure/      # SQLAlchemy repo
+│   │   ├── http/                # /v1/industries routes
+│   │   └── ports/               # ThemePort DTOs
+│   ├── sources/
+│   ├── articles/
+│   │   ├── domain/              # Article, scoring, dedupe, retention rules
+│   │   ├── application/         # ingest, refresh, summarize use cases
+│   │   ├── infrastructure/      # repo, RSS fetcher, AI client, FTS
+│   │   ├── http/                # admin refresh routes (if any)
+│   │   └── ports/               # ArticleQueryPort, ArticleEvents, SearchPort
+│   ├── publishing/
+│   │   ├── domain/              # read models, cursor codec
+│   │   ├── application/
+│   │   ├── infrastructure/
+│   │   ├── http/                # /v1/news, /v1/news/{id}, contact
+│   │   └── ports/               # ExportPort
+│   └── editorial/
+│       ├── domain/              # ApiKey, AuditEvent
+│       ├── application/
+│       ├── infrastructure/
+│       └── http/                # /v1/admin/*
+└── tests/
+    ├── unit/
+    ├── integration/
+    └── contract/
+```
+
+## 3. Web layout
+
+```
+apps/web/
+├── package.json
+├── next.config.ts               # protected
+├── tsconfig.json                # protected
+├── postcss.config.mjs           # protected
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx             # locale negotiation redirect
+│   │   ├── [locale]/
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx         # default industry redirect
+│   │   │   └── [industry]/
+│   │   │       ├── page.tsx     # channel home
+│   │   │       ├── article/[id]/page.tsx
+│   │   │       ├── about/page.tsx
+│   │   │       ├── contact/page.tsx
+│   │   │       └── search/page.tsx
+│   │   ├── sitemap.ts
+│   │   └── robots.ts
+│   ├── components/              # Hero, Splash, StoryCard, TopicRail, Disclaimer, Footer, LocaleSwitch
+│   ├── lib/
+│   │   ├── api.ts               # typed /v1 client (server-side)
+│   │   ├── theme.ts             # theme -> CSS variables
+│   │   ├── i18n.ts              # t(), locale negotiation
+│   │   └── seo.ts               # metadata, JSON-LD
+│   └── messages/{en,es}.json
+└── e2e/                         # Playwright specs
+```
+
+## 4. Dependency rule (binding)
+
+```
+web ──HTTP──▶ publishing ──▶ articles/channels/sources (ports)
+editorial ──HTTP──▶ articles/channels/sources (ports)
+contexts ──▶ platform (only)
+```
+
+- A context may import `news_api.platform` and other contexts' `ports/`.
+- Forbidden: importing another context's `domain`, `infrastructure`, or `http`; sharing ORM models; a `common/` grab-bag.
+- `platform` imports nothing from contexts.
+
+## 5. Documentation map (read order)
+
+| Task | Read first |
+|------|------------|
+| Any code change | `.cursorrules`, `.work/context/HANDOFF.md` |
+| Layout | This file |
+| Stack versions | `DOCS_TECH_STACK.md` |
+| Feature work | `.work/features/<slug>/20261105-SPEC.md` |
+| API design | `.work/standards/20261105-api-style-guide.md` |
+| Security | `.work/standards/20261105-threat-model.md`, `20261105-data-classification.md` |
+| External feeds / AI | `.work/plans/foundation/20261105-02-integration-resources.md` |
+| Ops | `.work/plans/operations/20261105-docker-compose-proposal.md` |
+
+## 6. Change rules
+
+- Adding a top-level directory or a new bounded context requires an ADR (FEATURE_STANDARD §9).
+- Protected paths (`.work/PROTECTED_SURFACES.json`) need owner approval in the same message.
+- Generated artifacts go to `tmp/`; never commit exports.
+- Code-to-registry parity: after material tree changes, run `@plan-verify coverage`.
+
+---
+
+## Next action
+
+None - binding as written; amend with a new dated standard when the stack, threat model, or API contract changes.

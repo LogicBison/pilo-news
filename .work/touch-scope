@@ -1,0 +1,16 @@
+{
+  "ref": "SYSNEWS",
+  "updated": "2026-11-05",
+  "goal": "Plan-foundation greenfield: foundation docs 01-04, ADRs, standards, SPECs, stack pins, ops proposals, registries",
+  "allowed_paths": [
+    ".cursorrules",
+    "README.md",
+    "DOCS_TECH_STACK.md",
+    ".work/"
+  ],
+  "allowed_patterns": [
+    ".work/**/*.md",
+    ".work/**/*.txt",
+    ".work/**/*.json"
+  ]
+}
