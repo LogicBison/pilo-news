@@ -6,8 +6,7 @@ WORKDIR /build
 COPY pyproject.toml ./
 COPY src ./src
 
-RUN pip install --no-cache-dir build \
-    && python -m build --wheel --outdir /wheels .
+RUN pip wheel --no-cache-dir --wheel-dir /wheels .
 
 FROM python:3.12-slim
 
@@ -21,6 +20,11 @@ WORKDIR /app
 COPY --from=builder /wheels /wheels
 RUN pip install --no-cache-dir --no-index --find-links=/wheels news-api \
     && rm -rf /wheels
+COPY --chown=app:app config ./config
+COPY --chown=app:app migrations ./migrations
+COPY --chown=app:app scripts ./scripts
+
+ENV APP_ROOT=/app
 
 USER app
 

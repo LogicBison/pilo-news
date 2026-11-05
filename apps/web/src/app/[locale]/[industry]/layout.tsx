@@ -1,0 +1,51 @@
+import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
+
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { DegradedNotice } from "@/components/Notices";
+import { getIndustry } from "@/lib/api";
+import { fallbackIndustry } from "@/lib/fallback";
+import { isLocale, localePath, t } from "@/lib/i18n";
+import { themeStyle } from "@/lib/theme";
+
+export default async function IndustryLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string; industry: string }>;
+}) {
+  const { locale, industry } = await params;
+  if (!isLocale(locale)) notFound();
+  const result = await getIndustry(industry, locale);
+  if (!result.ok && result.status === 404) notFound();
+  const channel = result.ok ? result.data : fallbackIndustry(industry);
+  const degraded = !result.ok;
+
+  return (
+    <div
+      lang={locale}
+      data-layout={channel.theme.layout}
+      style={{ ...themeStyle(channel.theme), fontFamily: "var(--sn-font-body)" }}
+      className="min-h-screen bg-[var(--sn-bg)] text-[var(--sn-text)]"
+    >
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-[var(--sn-primary)] focus:px-4 focus:py-2 focus:text-white"
+      >
+        {t(locale, "common.skipToContent")}
+      </a>
+      <Header industry={channel} locale={locale} />
+      <main id="main" className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        {degraded ? (
+          <div className="mb-6">
+            <DegradedNotice locale={locale} retryHref={localePath(locale, `/${industry}`)} />
+          </div>
+        ) : null}
+        {children}
+      </main>
+      <Footer industry={channel} locale={locale} />
+    </div>
+  );
+}

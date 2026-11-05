@@ -8,22 +8,22 @@
 
 | Item | Artifact |
 |------|----------|
-| Agent OS bootstrap | `.work/` skeleton, `.cursorrules` from template |
-| `.cursorrules` customization + certification | `.cursorrules` (zero `REPLACE:` tokens) |
-| Foundation P0-P6 | `.work/plans/foundation/` docs 01-04, `PROBE_LEDGER.md` |
-| ADRs | `.work/decisions/` 001-012 + index |
-| Standards | `.work/standards/` 7 files |
-| Feature SPECs | `.work/features/` 4 SPECs + index |
-| Stack pins | `DOCS_TECH_STACK.md` |
-| Ops proposals | `.work/plans/operations/` compose + sandbox |
-| Registries | `ASSUMPTIONS.md`, `RISK_REGISTRY.md`, `UNKNOWNS.md` |
-| Personas | `.work/plans/20261105-personas-v1.md` |
-| Integration mirror | `.work/docs/integration/` + `MANIFEST.txt` |
-| Reference alignment amendments | ADR 007/010 v2; news-api/ingestion/industry-sites SPECs; stack pins (`deepseek-flash`); 12 h cadence + manual force |
-| Owner approval + voice | O1-O3 approved 2026-11-05; `.work/voice/README.md` integrated into `.cursorrules` |
-| Master implementation plan | `.work/plans/full/20261105-full-plan.md` (**Approved v1.1**; 25 sections, 59 tasks, M1-M8; lead generation FR-17; `master-plan-verify` pass) |
-| M1 scaffold + dev stack | `apps/api` (health), `apps/web` (placeholder), `docker-compose.<env>.yml`, `Dockerfile.<env>`, `bin/start.sh` menu; dev stack healthy; tests green |
-| Session close 2026-11-05 | HANDOFF/NEXT current; commit + push done |
+| Foundation P0-P6 | `.work/plans/foundation/` docs 01-04 |
+| Master plan v1.1 | `.work/plans/full/20261105-full-plan.md` |
+| M1 scaffold + dev/prd stack | compose, Dockerfiles, `bin/start.sh` |
+| M2 schema + channels | `apps/api/migrations/001-003`, `/v1/industries` |
+| M3 ingestion | fetcher, normalizer, scoring, dedupe, worker, refresh, sources |
+| M4 AI summaries | DeepSeek client, EN/ES prompts, desk briefs, caps, fail-open |
+| M5 public API | news/list/detail/splash/bundle/topics/sources/contact/leads/CTA, ETags, keys |
+| M6 industry sites | themes, EN/ES routes, SEO, fallback, contact, CTA, lead form |
+| M7 editorial console | auth/CSRF, sources/topics/pins/hide, refresh, keys, audit, leads, partners, channels |
+| M8 hardening | metrics, alerts, dashboards, runbooks, security review, backup/restore drill, launch checklist |
+| Any-industry template | `POST /v1/admin/industries`, admin Channels tab, `docs/adding-an-industry.md`, verification doc |
+| prd images | API + web production images build; API migrations/config verified |
+| Volume backups | `./bin/start.sh backup/restore` - `.tar.gz` volume snapshots, no `pg_dump`; drill pass |
+| Isolation | random host ports, `*-net` + internal `*-data` networks, DB/Redis not published |
+| Verification | 77 API tests, ruff/mypy, web lint/type/build, 9/9 Playwright e2e + axe, OpenAPI snapshot |
+| Session close 2026-11-05 | HANDOFF/NEXT current; commit + push |
 
 ---
 
@@ -31,9 +31,7 @@
 
 | # | Item | Notes |
 |---|------|-------|
-| - | (none - O1-O4 approved) | |
-| O5 | Answer U1-U12 | `.work/plans/UNKNOWNS.md` |
-
+| O5 | Answer U1-U12 | brand/domain, publisher portfolio, pilot, analytics, traffic |
 
 ---
 
@@ -41,13 +39,13 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | `@code-implementation plan - M1` | Plan is implementation-ready; M1 remaining: CI (T6) + milestone verify |
-| **1** | `@ui-design-foundation greenfield` | UI foundation for the CTA brief |
+| **0** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
+| **1** | Deployment profile + import | turn channel/source/theme/prompt setup into one declarative config; see `.work/plans/20261105-template-deployment-plan.md` |
+| **2** | U5/U6/U9 decisions | feeds/terms, pilot channel, analytics/consent |
+| **3** | Cross-model review | recommended for ADR 008/010 before production credentials |
 
 ---
 
 ## Current iteration
 
-*(No active iteration - run `@code-implementation plan - M1`.)*
-
-*(The iteration block is created by `@code-implementation plan - M1`; template in `.work/standards/20261105-FEATURE_STANDARD.md` and `.ai/skills/code-implementation/skill.md`.)*
+*(Complete - M1-M8. Next session: verify pending + implement the deployment-profile import; no new code milestone approved yet.)*

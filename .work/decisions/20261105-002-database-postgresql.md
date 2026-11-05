@@ -24,7 +24,7 @@ Use **PostgreSQL 16** with:
 
 ## Consequences
 
-- **Positive:** transactional ingestion, cross-channel queries, mature backup/restore (`pg_dump`), full-text search without new infra, easy local dev via Docker.
+- **Positive:** transactional ingestion, cross-channel queries, mature backup/restore, full-text search without new infra, easy local dev via Docker.
 - **Negative:** one more service to operate; schema changes need disciplined numbered migrations; JSONB needs validation in the application layer.
 - **Neutral:** read replicas deferred; single primary is fine for NFR-4.
 

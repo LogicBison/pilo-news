@@ -2,9 +2,16 @@
 
 :root {
   --sn-bg: #ffffff;
+  --sn-surface: #f6f7f9;
   --sn-text: #111827;
   --sn-muted: #4b5563;
-  --sn-accent: #0f766e;
+  --sn-primary: #1e3a5f;
+  --sn-accent: #8a4b08;
+  --sn-border: #d8dee6;
+  --sn-radius: 10px;
+  --sn-font-heading: Georgia, Times New Roman, serif;
+  --sn-font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
 }
 
 html,
@@ -13,9 +20,107 @@ body {
   margin: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--sn-bg);
   color: var(--sn-text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--sn-font-body);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--sn-accent);
+  color: #ffffff;
+}
+
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--sn-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+[data-layout="editorial"] h1,
+[data-layout="editorial"] h2,
+[data-layout="editorial"] h3 {
+  font-family: var(--sn-font-heading);
+  letter-spacing: -0.01em;
+}
+
+[data-layout="professional"] h1,
+[data-layout="professional"] h2,
+[data-layout="professional"] h3 {
+  font-family: var(--sn-font-heading);
+  letter-spacing: -0.015em;
+}
+
+[data-layout="academic"] h1,
+[data-layout="academic"] h2,
+[data-layout="academic"] h3 {
+  font-family: var(--sn-font-heading);
+}
+
+[data-layout="academic"] main {
+  max-width: 68rem;
+}
+
+[data-layout="professional"] {
+  --sn-radius: 6px;
+}
+
+input,
+select,
+textarea {
+  color: var(--sn-text);
+  background: var(--sn-bg);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--sn-muted);
+  opacity: 0.8;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

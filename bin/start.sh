@@ -36,8 +36,8 @@ Commands:
   test      lint + type + tests in the containers
   migrate   run SQL migrations
   refresh   force a news fetch now
-  backup    pg_dump into backups/
-  restore   restore a backup
+  backup    tar.gz snapshot of stack volumes into backups/
+  restore   restore a tar.gz volume snapshot
   init-env  create .env.<env> from .env.example
   destroy   stop + delete volumes (typed confirmation)
   menu      interactive menu
@@ -85,6 +85,19 @@ ensure_env() {
 	fi
 }
 
+random_port() {
+	local candidate=""
+	for _ in $(seq 1 60); do
+		candidate="$(shuf -i 20000-60000 -n1 2>/dev/null || (head -c 4 /dev/urandom | od -An -tu4 | awk '{print 20000 + ($1 % 40000)}'))"
+		[[ -n "$candidate" ]] || continue
+		if ! ss -ltn 2>/dev/null | grep -qE "[:.]${candidate}[[:space:]]"; then
+			printf '%s' "$candidate"
+			return 0
+		fi
+	done
+	printf '%s' "$candidate"
+}
+
 init_env() {
 	if [[ -f "$ENV_FILE" ]]; then
 		ok "$ENV_FILE already exists (left untouched)"
@@ -92,16 +105,33 @@ init_env() {
 	fi
 	cp .env.example "$ENV_FILE"
 	chmod 600 "$ENV_FILE"
-	local secret
+	local secret admin_password web api pg redis caddy_http caddy_https
 	secret="$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+	admin_password="$(openssl rand -base64 18 2>/dev/null | tr -d '\n' || head -c 18 /dev/urandom | base64 | tr -d '\n')"
+	web="$(random_port)"; api="$(random_port)"; pg="$(random_port)"
+	redis="$(random_port)"; caddy_http="$(random_port)"; caddy_https="$(random_port)"
+	while [[ "$api" == "$web" || "$pg" == "$web" || "$redis" == "$web" || "$api" == "$pg" || "$api" == "$redis" || "$pg" == "$redis" ]]; do
+		web="$(random_port)"; api="$(random_port)"; pg="$(random_port)"; redis="$(random_port)"
+	done
 	sed -i.bak \
 		-e "s/^COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=system-news-${ENV}/" \
 		-e "s/^STACK_SUFFIX=.*/STACK_SUFFIX=${ENV}/" \
 		-e "s/^APP_ENV=.*/APP_ENV=${ENV}/" \
 		-e "s/^SECRET_KEY=.*/SECRET_KEY=${secret}/" \
+		-e "s/^ADMIN_PASSWORD=.*/ADMIN_PASSWORD=${admin_password}/" \
+		-e "s/^WEB_PORT=.*/WEB_PORT=${web}/" \
+		-e "s/^API_PORT=.*/API_PORT=${api}/" \
+		-e "s/^POSTGRES_PORT=.*/POSTGRES_PORT=${pg}/" \
+		-e "s/^REDIS_PORT=.*/REDIS_PORT=${redis}/" \
+		-e "s/^CADDY_HTTP_PORT=.*/CADDY_HTTP_PORT=${caddy_http}/" \
+		-e "s/^CADDY_HTTPS_PORT=.*/CADDY_HTTPS_PORT=${caddy_https}/" \
+		-e "s#^APP_BASE_URL=.*#APP_BASE_URL=http://localhost:${web}#" \
+		-e "s#^NEXT_PUBLIC_API_BASE=.*#NEXT_PUBLIC_API_BASE=http://localhost:${api}#" \
 		"$ENV_FILE"
 	rm -f "${ENV_FILE}.bak"
 	ok "created $ENV_FILE (mode 600)"
+	info "web: http://localhost:${web}  api: http://localhost:${api}/v1/health"
+	info "admin: $(env_value ADMIN_EMAIL admin@example.com) / ${admin_password}"
 }
 
 require_compose() {
@@ -153,7 +183,8 @@ cmd_status() {
 	local url="http://localhost:$(env_value API_PORT 8080)/v1/health"
 	if curl -fsS --max-time 2 "$url" 2>/dev/null; then
 		echo
-		ok "api healthy"
+		ok "api healthy at http://localhost:$(env_value API_PORT 8080)/v1/health"
+		ok "web at http://localhost:$(env_value WEB_PORT 3000)"
 	else
 		warn "api not responding at $url"
 	fi
@@ -181,8 +212,8 @@ cmd_test() {
 	require_compose
 	info "api: ruff + mypy + pytest"
 	compose exec -T api sh -c "cd /app && ruff check . && ruff format --check . && mypy src && pytest -q"
-	info "web: lint + typecheck"
-	compose exec -T web sh -c "cd /app && pnpm lint && pnpm typecheck"
+	info "web: lint + typecheck + catalogs/themes"
+	compose exec -T web sh -c "cd /app && pnpm lint && pnpm typecheck && pnpm check"
 	ok "all checks passed"
 }
 
@@ -196,25 +227,53 @@ cmd_refresh() {
 	compose exec -T api python -m news_api.cli refresh --industry all --force
 }
 
+compose_project() {
+	env_value COMPOSE_PROJECT_NAME "system-news-${ENV}"
+}
+
+volume_exists() {
+	docker volume inspect "$1" >/dev/null 2>&1
+}
+
+# Backups are tar.gz snapshots of the stack's Docker volumes (no pg_dump).
 cmd_backup() {
 	require_compose
 	mkdir -p backups
-	local stamp db user file
+	local project stamp base file mounts=() found=0 vol name
+	project="$(compose_project)"
 	stamp="$(date -u +%Y%m%d-%H%M%S)"
-	db="$(env_value POSTGRES_DB news)"
-	user="$(env_value POSTGRES_USER news)"
-	file="backups/news-${ENV}-${stamp}.dump"
-	info "dumping $db -> $file"
-	compose exec -T postgres pg_dump -U "$user" -d "$db" -Fc >"$file"
-	ok "backup written: $file"
+	base="news-${ENV}-volumes-${stamp}.tar.gz"
+	file="$ROOT_DIR/backups/$base"
+	info "stopping api/worker/postgres/redis for a consistent volume snapshot"
+	compose stop api worker postgres redis >/dev/null 2>&1 || true
+	for vol in pgdata redisdata caddy_data caddy_config; do
+		name="${project}_${vol}"
+		if volume_exists "$name"; then
+			mounts+=("-v" "${name}:/volumes/${vol}:ro")
+			found=1
+		fi
+	done
+	if [[ $found -eq 0 ]]; then
+		err "no stack volumes found for project $project"
+		compose start postgres redis api worker >/dev/null 2>&1 || true
+		return 1
+	fi
+	docker run --rm "${mounts[@]}" -v "$ROOT_DIR/backups:/backup" alpine:3.20 \
+		tar czf "/backup/$base" -C /volumes .
+	compose start postgres redis >/dev/null 2>&1 || true
+	sleep 2
+	compose start api worker >/dev/null 2>&1 || true
+	wait_health 45 >/dev/null 2>&1 || true
+	ok "volume backup written: $file"
+	info "restore with: ./bin/start.sh --env $ENV restore"
 }
 
 cmd_restore() {
 	require_compose
 	local files=()
-	while IFS= read -r f; do files+=("$f"); done < <(ls -1t backups/news-"${ENV}"-*.dump 2>/dev/null || true)
+	while IFS= read -r f; do files+=("$f"); done < <(ls -1t backups/news-"${ENV}"-volumes-*.tar.gz 2>/dev/null || true)
 	if [[ ${#files[@]} -eq 0 ]]; then
-		err "no backups for $ENV in backups/"
+		err "no volume backups for $ENV in backups/"
 		return 1
 	fi
 	local i=1
@@ -229,13 +288,40 @@ cmd_restore() {
 		return 1
 	}
 	if [[ $ASSUME_YES -ne 1 ]]; then
-		read -r -p "restore $chosen over the $ENV database? [y/N] " answer
-		[[ "$answer" == "y" || "$answer" == "Y" ]] || return 0
+		warn "this replaces the current $ENV Postgres/Redis/Caddy volume contents"
+		read -r -p "type restore-${ENV} to confirm: " answer
+		[[ "$answer" == "restore-${ENV}" ]] || {
+			info "aborted"
+			return 0
+		}
 	fi
-	local db user
-	db="$(env_value POSTGRES_DB news)"
-	user="$(env_value POSTGRES_USER news)"
-	compose exec -T postgres pg_restore -U "$user" -d "$db" --clean --if-exists <"$chosen"
+	local project base members vol mounts=() name
+	project="$(compose_project)"
+	base="$(basename "$chosen")"
+	members="$(docker run --rm -v "$ROOT_DIR/backups:/backup" alpine:3.20 \
+		tar tzf "/backup/$base" | sed 's#^\./##' | cut -d/ -f1 | sort -u | grep -E '^(pgdata|redisdata|caddy_data|caddy_config)$' || true)"
+	if [[ -z "$members" ]]; then
+		err "archive does not contain a recognized stack volume"
+		return 1
+	fi
+	info "stopping api/worker/postgres/redis before restore"
+	compose stop api worker postgres redis >/dev/null 2>&1 || true
+	while IFS= read -r vol; do
+		[[ -n "$vol" ]] || continue
+		name="${project}_${vol}"
+		docker volume create "$name" >/dev/null
+		mounts+=("-v" "${name}:/volumes/${vol}")
+	done <<<"$members"
+	docker run --rm "${mounts[@]}" -v "$ROOT_DIR/backups:/backup" \
+		-e "ARCHIVE=$base" alpine:3.20 sh -c '
+			for dir in /volumes/*; do
+				mkdir -p "$dir"
+				find "$dir" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+			done
+			tar xzf "/backup/$ARCHIVE" -C /volumes
+		'
+	compose up -d >/dev/null 2>&1 || true
+	wait_health 45 >/dev/null 2>&1 || true
 	ok "restored $chosen"
 }
 
@@ -277,8 +363,8 @@ menu() {
  7) test      lint + type + tests
  8) migrate   run SQL migrations
  9) refresh   force a news fetch now
-10) backup    pg_dump into backups/
-11) restore   restore a backup
+10) backup    tar.gz snapshot of stack volumes
+11) restore   restore a volume snapshot
 12) init-env  create .env.<env> from .env.example
 13) destroy   stop + delete volumes (typed confirm)
  0) exit

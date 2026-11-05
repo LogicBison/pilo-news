@@ -9,7 +9,7 @@ System News aggregates industry news from approved publisher feeds, scores and d
 
 Every channel carries one professional CTA that routes consented inquiries to a partner professional (ADR 013). Lead generation is a primary goal, not a footer afterthought.
 
-**Status:** foundation complete, plan-master-ready (2026-11-05). No application code yet - implementation starts after `@plan-master greenfield` produces an Approved master plan.
+**Status:** v1 implemented (2026-11-05): API, ingestion + AI summaries, public sites, editorial console, leads, tests, CI, and volume backups. Template-ready: add an industry as data.
 
 ---
 
@@ -23,7 +23,9 @@ Every channel carries one professional CTA that routes consented inquiries to a 
 | Looking for the architecture | `.work/plans/foundation/20261105-04-foundation-architecture.md` |
 | Making a decision | `.work/decisions/README.md` (ADRs 001-012) |
 | Writing code | `.work/standards/20261105-CONVENTIONS.md`, `20261105-DIRECTORY_MAP.md` |
-| Integrating a client | `docs/api/README.md` (created during M1), `/v1/openapi.json` |
+| Integrating a client | `docs/api/README.md`, `docs/api/openapi.v1.json` |
+| Adding an industry | `docs/adding-an-industry.md` |
+| Backups / restore | `.work/plans/operations/20261105-backup-restore.md` |
 | Operating the stack | `.work/plans/operations/20261105-docker-compose-proposal.md` |
 
 ---
@@ -46,22 +48,29 @@ DOCS_TECH_STACK.md
 ## Quickstart (after M1 scaffold exists)
 
 ```bash
-./bin/start.sh init-env --env dev   # creates .env.dev from .env.example (mode 600)
+./bin/start.sh init-env --env dev   # creates .env.dev with random host ports (mode 600)
 ./bin/start.sh --env dev up        # postgres, redis, api, worker, web
 ./bin/start.sh --env dev refresh   # force a news fetch now (scheduled: every 12 h)
-open http://localhost:3000        # locale-aware site
-curl -s http://localhost:8080/v1/health
-curl -s "http://localhost:8080/v1/news?industry=legal&locale=en&limit=5"
+./bin/start.sh --env dev status    # prints the actual web/API URLs and health
+curl -s "http://localhost:$(grep '^API_PORT=' .env.dev | cut -d= -f2)/v1/health"
+curl -s "http://localhost:$(grep '^API_PORT=' .env.dev | cut -d= -f2)/v1/news?industry=legal&locale=en&limit=5"
 ```
+
+Host ports are random per stack and bound to `127.0.0.1`; Postgres and Redis
+have no host ports and live on an internal compose network. The stack uses two
+per-project networks (`*-net`, `*-data`) so it cannot cross-talk with another
+checkout on the same host.
 
 `./bin/start.sh` with no arguments opens the visual menu. Every artifact is suffixed by the same `dev|prd` value: `docker-compose.<env>.yml`, `apps/*/Dockerfile.<env>`, `.env.<env>`. Only `.env.example` is tracked; `.env.*` lives at the repo root only.
 
 Tests run inside the containers:
 
 ```bash
-docker compose --env-file .env.dev -f docker-compose.dev.yml exec api bash -c "cd /app && pytest -q"
-docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "cd /app && pnpm lint && pnpm typecheck"
+./bin/start.sh --env dev test     # ruff, mypy, pytest, ESLint, tsc, catalogs, themes
 ```
+
+End-to-end and accessibility tests run against a production build; see
+`apps/web/playwright.config.ts` and `e2e/`.
 
 Until the scaffold lands, the commands above are **planned**, not verified.
 
@@ -92,7 +101,7 @@ Source of truth: `.work/docs/integration/industries-v1.1.0/data.json` (mirrored 
 | Area | Path |
 |------|------|
 | Foundation docs 01-04 | `.work/plans/foundation/` |
-| Master plan (to be authored) | `.work/plans/full/` |
+| Master plan | `.work/plans/full/20261105-full-plan.md` |
 | ADRs | `.work/decisions/` |
 | Feature SPECs | `.work/features/` |
 | Binding standards | `.work/standards/` |
@@ -108,13 +117,15 @@ Source of truth: `.work/docs/integration/industries-v1.1.0/data.json` (mirrored 
 |-------|-------|
 | Foundation-complete | yes (P0-P6 gates) |
 | Plan-master-ready | yes (2026-11-05) |
-| Master plan | not yet authored |
-| Implementation-ready | no - requires Approved master plan (`@plan-master status`) |
+| Master plan | Approved v1.1 (2026-11-05) |
+| Implementation-ready | yes - implemented 2026-11-05 |
 
-Owner actions pending: `.work/context/HANDOFF.md` § Open owner actions (O1-O5).
+Owner actions pending: `.work/context/HANDOFF.md` § Open owner actions (O5, O7-O8).
 
 ---
 
 ## Next action
 
-`@plan-master greenfield` - author the master implementation plan.
+Set the owner decisions in `.work/plans/UNKNOWNS.md` (brand, feed portfolio,
+pilot, analytics), then run the launch checklist in
+`.work/plans/operations/20261105-launch.md`.

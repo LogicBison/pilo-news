@@ -1,0 +1,156 @@
+{
+  "version": 1,
+  "note": "Curated pinned seeds (ingestion R18). They bypass fetch, are exempt from the age filter while pinned, and still pass scoring and dedupe. Replace with the owner-approved publisher portfolio when available (U5).",
+  "items": [
+    {
+      "industry": "legal",
+      "language": "en",
+      "title": "EU AI Act guidance sharpens due-diligence duties for law firms",
+      "url": "https://www.abajournal.com/news/article/eu-ai-act-guidance-law-firms",
+      "publisher": "ABA Journal",
+      "published_hours_ago": 9,
+      "excerpt": "Firms deploying generative tools face new documentation duties, client-disclosure questions, and a tighter definition of high-risk use in legal services.",
+      "topics": ["legal-tech", "regulation"]
+    },
+    {
+      "industry": "legal",
+      "language": "en",
+      "title": "Delaware court clarifies board oversight in merger disputes",
+      "url": "https://www.abajournal.com/news/article/delaware-board-oversight-merger",
+      "publisher": "ABA Journal",
+      "published_hours_ago": 20,
+      "excerpt": "The opinion draws a sharper line between good-faith oversight and process failures, giving deal counsel a clearer checklist for board minutes and advisor records.",
+      "topics": ["corporate", "litigation"]
+    },
+    {
+      "industry": "legal",
+      "language": "es",
+      "title": "El reglamento europeo de IA obliga a revisar la diligencia en los despachos",
+      "url": "https://confilegal.com/20261105-reglamento-europeo-ia-diligencia-despachos/",
+      "publisher": "Confilegal",
+      "published_hours_ago": 14,
+      "excerpt": "Los despachos que usan herramientas generativas deberán documentar riesgos, informar al cliente y revisar contratos con proveedores tecnológicos.",
+      "topics": ["legal-tech", "regulation"]
+    },
+    {
+      "industry": "financial",
+      "language": "en",
+      "title": "Basel endgame delays push banks to revisit capital planning",
+      "url": "https://www.finextra.com/newsarticle/basel-endgame-delays-capital-planning",
+      "publisher": "Finextra",
+      "published_hours_ago": 7,
+      "excerpt": "Supervisors signaled a longer transition, but mid-size lenders still need to model higher risk weights and tighter liquidity buffers ahead of the next stress cycle.",
+      "topics": ["regulation", "banking"]
+    },
+    {
+      "industry": "financial",
+      "language": "en",
+      "title": "Real-time payments adoption accelerates across mid-size banks",
+      "url": "https://www.finextra.com/newsarticle/real-time-payments-mid-size-banks",
+      "publisher": "Finextra",
+      "published_hours_ago": 18,
+      "excerpt": "Fraud controls and reconciliation remain the gating items as instant settlement moves from pilot programs into everyday commercial accounts.",
+      "topics": ["fintech", "banking"]
+    },
+    {
+      "industry": "financial",
+      "language": "es",
+      "title": "La banca española acelera sus planes de capital ante el retraso de Basilea",
+      "url": "https://e00-expansion.uecdn.es/rss/portada/20261105-banca-planes-capital-basilea",
+      "publisher": "Expansión",
+      "published_hours_ago": 12,
+      "excerpt": "Las entidades revisan sus modelos de riesgo y prevén recompras condicionadas mientras la autoridad supervisora ajusta el calendario de implantación.",
+      "topics": ["regulation", "banking"]
+    },
+    {
+      "industry": "behavioral-health",
+      "language": "en",
+      "title": "Telehealth prescribing rules tighten for controlled substances",
+      "url": "https://www.psychiatrictimes.com/view/telehealth-prescribing-controlled-substances-rules",
+      "publisher": "Psychiatric Times",
+      "published_hours_ago": 11,
+      "excerpt": "Clinicians face new documentation and in-person referral requirements, with particular attention to continuity of care for patients in rural areas.",
+      "topics": ["policy", "practice"]
+    },
+    {
+      "industry": "behavioral-health",
+      "language": "en",
+      "title": "Large trial links sleep regularity to depression outcomes",
+      "url": "https://www.psychiatrictimes.com/view/sleep-regularity-depression-trial",
+      "publisher": "Psychiatric Times",
+      "published_hours_ago": 26,
+      "excerpt": "Consistency in sleep timing predicted symptom improvement more strongly than total sleep duration, suggesting a practical target for behavioral activation.",
+      "topics": ["research", "clinical"]
+    },
+    {
+      "industry": "behavioral-health",
+      "language": "es",
+      "title": "La telepsiquiatría gana terreno pero exige controles más estrictos",
+      "url": "https://www.psicologiaymente.com/clinica/telepsiquiatria-controles",
+      "publisher": "Psicología y Mente",
+      "published_hours_ago": 15,
+      "excerpt": "Los profesionales piden protocolos claros para recetas controladas, derivaciones presenciales y seguimiento de pacientes con riesgo elevado.",
+      "topics": ["practice", "policy"]
+    },
+    {
+      "industry": "education",
+      "language": "en",
+      "title": "Education Department opens new rules on accreditation and oversight",
+      "url": "https://www.insidehighered.com/news/government/policy/2026/11/05/accreditation-oversight-rules",
+      "publisher": "Inside Higher Ed",
+      "published_hours_ago": 8,
+      "excerpt": "The proposed framework would change how agencies are recognized and how institutions report student outcomes, with a comment window opening this month.",
+      "topics": ["policy"]
+    },
+    {
+      "industry": "education",
+      "language": "en",
+      "title": "Colleges rethink admissions essays as AI use spreads",
+      "url": "https://www.insidehighered.com/news/admissions/2026/11/05/colleges-rethink-admissions-essays-ai",
+      "publisher": "Inside Higher Ed",
+      "published_hours_ago": 22,
+      "excerpt": "Admissions offices are testing shorter prompts and in-person writing samples while trying to preserve access for applicants without private coaching.",
+      "topics": ["admissions", "edtech"]
+    },
+    {
+      "industry": "education",
+      "language": "es",
+      "title": "Las universidades revisan sus procesos de admisión ante el avance de la IA",
+      "url": "https://www.educaciontrespuntocero.com/noticias/universidades-admision-ia/",
+      "publisher": "Educación 3.0",
+      "published_hours_ago": 16,
+      "excerpt": "Varias instituciones combinan ensayos más breves con entrevistas y muestras de escritura presenciales para verificar el trabajo del solicitante.",
+      "topics": ["admissions", "edtech"]
+    },
+    {
+      "industry": "logistics",
+      "language": "en",
+      "title": "Ocean carriers add surcharges as Red Sea rerouting persists",
+      "url": "https://www.freightwaves.com/news/ocean-carriers-surcharges-red-sea-rerouting",
+      "publisher": "FreightWaves",
+      "published_hours_ago": 6,
+      "excerpt": "Longer routings are absorbing capacity and pushing spot rates higher on Asia-Europe lanes, with shippers locking in forward contracts earlier than usual.",
+      "topics": ["shipping"]
+    },
+    {
+      "industry": "logistics",
+      "language": "en",
+      "title": "Customs brokers brace for tariff classification changes",
+      "url": "https://www.freightwaves.com/news/customs-brokers-tariff-classification-changes",
+      "publisher": "FreightWaves",
+      "published_hours_ago": 21,
+      "excerpt": "New guidance on component origin and de minimis treatment is forcing importers to re-audit product data before the next compliance deadline.",
+      "topics": ["customs"]
+    },
+    {
+      "industry": "logistics",
+      "language": "es",
+      "title": "Las navieras amplían recargos mientras se mantienen las rutas alternas",
+      "url": "https://www.diariodetransporte.com/noticias/navieras-recargos-rutas-alternas",
+      "publisher": "Diario del Transporte",
+      "published_hours_ago": 13,
+      "excerpt": "La capacidad absorbida por los desvíos eleva las tarifas al contado y obliga a los cargadores a negociar contratos con mayor antelación.",
+      "topics": ["shipping"]
+    }
+  ]
+}

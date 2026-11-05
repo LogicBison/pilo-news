@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "keyword_weight": 1.0,
+  "trust_weight": 2.0,
+  "title_length_bonus": {
+    "ideal_min": 30,
+    "ideal_max": 120,
+    "ideal": 0.35,
+    "short": 0.1
+  },
+  "recency": {
+    "half_life_hours": 72,
+    "floor": 0.15
+  },
+  "min_score": 0.35,
+  "require_topic_match": true,
+  "pin_bonus": 5.0,
+  "corroboration_bonus": 0.15,
+  "single_source_trust_threshold": 0.8,
+  "single_source_penalty": 0.12,
+  "dedupe_similarity": 0.72,
+  "retention_days": 7,
+  "purge_after_days": 30,
+  "contact_retention_days": 90,
+  "lead_retention_months": 24,
+  "cta_event_retention_days": 90,
+  "max_items_per_bundle": 18,
+  "splash_count": 3,
+  "column_count": 3,
+  "per_column": 4,
+  "ai": {
+    "input_price_per_million": 0.27,
+    "output_price_per_million": 1.1,
+    "pricing_note": "assumption - reconcile with provider billing"
+  }
+}

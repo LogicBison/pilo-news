@@ -113,7 +113,7 @@ Rules: no context imports another context's `infrastructure/` or `http/`; cross-
 - **Controls:** hashed API keys with scopes; Argon2id admin password + 15-min JWT; Redis rate limits; strict input validation (Pydantic); HTML sanitization + escaping; CSP; SSRF-safe fetcher; secrets via env only.
 - **Threats and mitigations:** `.work/standards/20261105-threat-model.md` (T1-T12).
 - **Data classes:** `.work/standards/20261105-data-classification.md`.
-- **Backups:** nightly `pg_dump` to off-site object storage, 30-day retention, monthly restore drill.
+- **Backups:** nightly volume `.tar.gz` snapshots to off-site object storage, 30-day retention, monthly restore drill.
 
 ---
 

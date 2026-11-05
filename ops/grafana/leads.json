@@ -1,0 +1,35 @@
+{
+  "title": "System News - lead funnel",
+  "uid": "system-news-leads",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "CTA events",
+      "targets": [
+        {
+          "expr": "sum(rate(cta_events_total[1h])) by (event,industry)"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Leads by status",
+      "targets": [
+        {
+          "expr": "sum(rate(leads_total[1h])) by (industry,status)"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Lead route p90",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.9, sum(rate(lead_route_latency_seconds_bucket[1h])) by (le,industry))"
+        }
+      ]
+    }
+  ]
+}

@@ -37,3 +37,8 @@ apps/web/.next-build/
 
 # TypeScript incremental build cache (generated; never commit)
 *.tsbuildinfo
+
+# Playwright artifacts
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/blob-report/

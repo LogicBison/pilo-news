@@ -1,0 +1,104 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: news
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d news"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      APP_ENV: test
+      RUN_MIGRATIONS: "true"
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/news
+      REDIS_URL: redis://localhost:6379/0
+      POSTGRES_HOST: localhost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: news
+      TEST_POSTGRES_PORT: "5432"
+      SECRET_KEY: ci-secret-key
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: ci-admin-password
+      AI_ENABLED: "false"
+      METRICS_ENABLED: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: apps/api/pyproject.toml
+      - run: pip install -e ".[dev]"
+      - run: python -m news_api.platform.migrations
+      - run: python -m news_api.platform.migrations
+      - run: ruff check . && ruff format --check . && mypy src
+      - run: pytest -q
+      - run: python scripts/export_openapi.py
+      - name: OpenAPI snapshot is current
+        working-directory: .
+        run: git diff --exit-code -- docs/api/openapi.v1.json
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: node scripts/check-messages.mjs
+      - run: pnpm build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pip-audit
+      - run: pip install -e "apps/api"
+      - run: pip-audit
+      - name: Secret scan (tracked files)
+        run: |
+          if git grep -nE '(sk-[A-Za-z0-9]{20,}|-----BEGIN (RSA|EC|OPENSSH) PRIVATE KEY-----)' -- . ':!docs' ':!*.md'; then
+            echo "potential secret found"; exit 1
+          fi
+      - name: Shell syntax
+        run: bash -n bin/start.sh

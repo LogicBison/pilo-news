@@ -1,0 +1,41 @@
+groups:
+  - name: system-news
+    rules:
+      - alert: ApiDown
+        expr: up{job="system-news-api"} == 0
+        for: 2m
+        labels: { severity: p0 }
+        annotations:
+          summary: "System News API is down"
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status_class="5xx"}[5m])) / sum(rate(http_requests_total[5m])) > 0.01
+        for: 5m
+        labels: { severity: p1 }
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route)) > 0.5
+        for: 10m
+        labels: { severity: p1 }
+      - alert: StaleChannel
+        expr: max by (industry) (time() - (ingest_lag_seconds_sum / ingest_lag_seconds_count)) > 43200
+        for: 15m
+        labels: { severity: p1 }
+      - alert: AiFailureRate
+        expr: sum(rate(summaries_generated_total{status="failed"}[30m])) / sum(rate(summaries_generated_total[30m])) > 0.1
+        for: 30m
+        labels: { severity: p2 }
+      - alert: AiBudgetBurn
+        expr: increase(ai_estimated_cost_usd_total[24h]) > 0.5 * 20
+        for: 1h
+        labels: { severity: p2 }
+      - alert: BackupAge
+        expr: time() - system_news_last_backup_timestamp_seconds > 93600
+        for: 30m
+        labels: { severity: p1 }
+      - alert: DiskHigh
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.2
+        for: 15m
+        labels: { severity: p1 }
+      - alert: LeadRoutingSla
+        expr: histogram_quantile(0.9, sum(rate(lead_route_latency_seconds_bucket[1h])) by (le, industry)) > 86400
+        for: 1h
+        labels: { severity: p2 }

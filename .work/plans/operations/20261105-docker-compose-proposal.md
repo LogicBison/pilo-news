@@ -13,11 +13,11 @@
 | Service | Image / build | Purpose | Ports (host:container) |
 |---------|---------------|---------|------------------------|
 | `caddy` | `caddy:2-alpine` | TLS, reverse proxy, security headers (prd only) | 80, 443 |
-| `web` | `apps/web/Dockerfile` | Next.js public UI + admin console | 3000:3000 (dev only) |
-| `api` | `apps/api/Dockerfile` | FastAPI `/v1` | 8080:8080 (dev only) |
+| `web` | `apps/web/Dockerfile` | Next.js public UI + admin console | random `WEB_PORT` (dev, 127.0.0.1) |
+| `api` | `apps/api/Dockerfile` | FastAPI `/v1` | random `API_PORT` (dev, 127.0.0.1) |
 | `worker` | `apps/api/Dockerfile` (same image, different command) | Redis Streams consumer | none |
-| `postgres` | `postgres:16-alpine` | Primary store | 5433:5432 (dev only) |
-| `redis` | `redis:7-alpine` | Cache, locks, rate limits, streams | 6380:6379 (dev only) |
+| `postgres` | `postgres:16-alpine` | Primary store | internal only (`*-data`) |
+| `redis` | `redis:7-alpine` | Cache, locks, rate limits, streams | internal only (`*-data`) |
 | `prometheus` | `prom/prometheus:v2.54` | Metrics scrape (dev/optional) | 9090 (dev only) |
 | `grafana` | `grafana/grafana:11` | Dashboards (optional) | 3001 (dev only) |
 
@@ -43,7 +43,7 @@ One parameter, `ENV ∈ {dev, prd}`, selects every environment-specific file:
 
 | Volume | Content | Backup |
 |--------|---------|--------|
-| `pgdata` | Postgres data | nightly `pg_dump` |
+| `pgdata` / `redisdata` | Postgres + Redis data | nightly `.tar.gz` volume snapshot |
 | `redisdata` | Redis AOF (queue durability) | not backed up (ephemeral by design) |
 | `caddy_data` | TLS certs/ACME state | not needed (re-issued) |
 | `caddy_config` | Caddy autosave | not needed |
@@ -57,8 +57,8 @@ STACK_SUFFIX=dev
 
 # API
 APP_ENV=dev
-APP_BASE_URL=http://localhost:3000
-API_PORT=8080
+APP_BASE_URL=http://localhost:$WEB_PORT
+API_PORT=<random>
 DATABASE_URL=postgresql+asyncpg://news:news@postgres:5432/news
 REDIS_URL=redis://redis:6379/0
 SECRET_KEY=change-me-32-bytes
@@ -81,8 +81,8 @@ SMTP_PASSWORD=
 CONTACT_TO=news@example.com
 
 # Web
-NEXT_PUBLIC_API_BASE=http://localhost:8080
-WEB_PORT=3000
+NEXT_PUBLIC_API_BASE=http://localhost:$API_PORT
+WEB_PORT=<random>
 SN_DEFAULT_LOCALE=en
 SN_DEFAULT_INDUSTRY=legal
 
@@ -99,8 +99,8 @@ Real `.env.dev`/`.env.prd` stay git-ignored; only `.env.example` is tracked (aft
 |---------|-------|
 | `postgres` | `pg_isready -U news` |
 | `redis` | `redis-cli ping` |
-| `api` | `curl -fsS http://localhost:8080/v1/health` |
-| `web` | `curl -fsS http://localhost:3000/` |
+| `api` | `curl -fsS http://localhost:$API_PORT/v1/health` |
+| `web` | `curl -fsS http://localhost:$WEB_PORT/` |
 | `worker` | heartbeat key updated every 30 s; alert if stale |
 
 `depends_on` uses `condition: service_healthy` for postgres/redis; api waits for migrations before reporting healthy.
@@ -127,7 +127,7 @@ Host: 4 vCPU / 8 GB / 80 GB SSD (ADR 005). Alert at 80% disk.
 
 ## 8. Backup and restore
 
-- `pg_dump --format=custom` → `age`-encrypted → off-site bucket (provider per O3), 30-day lifecycle.
+- volume `.tar.gz` snapshot → `age`-encrypted → off-site bucket (provider per O3), 30-day lifecycle.
 - Restore drill: fresh volume → `pg_restore` → run `/v1/health` + smoke tests; target RTO 4 h.
 - Backup script lives in `bin/start.sh backup`; schedule via host cron at 02:00 UTC.
 

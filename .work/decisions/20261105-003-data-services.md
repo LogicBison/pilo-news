@@ -18,7 +18,7 @@ Evidence driving each service class:
 
 - **Redis 7** for: response cache (TTL 30-60 s, ETag support), distributed locks (refresh single-flight), rate-limit counters, and **Redis Streams** as the job queue (`news:jobs` stream + consumer group `worker`).
 - **PostgreSQL full-text search** (`search_vector` generated column, GIN, `ts_rank_cd` + `websearch_to_tsquery`) behind a `SearchPort` so it can be swapped later.
-- **No object storage** in v1. Backups go directly from `pg_dump` to an off-site bucket (provider decided in O3); that is a backup destination, not an application storage dependency.
+- **No object storage** in v1. Backups are volume `.tar.gz` snapshots uploaded to an off-site bucket (provider decided in O3); that is a backup destination, not an application storage dependency.
 - **No dedicated broker** (RabbitMQ/SQS) in v1.
 
 ## Consequences

@@ -18,7 +18,7 @@
 | Contact messages (name, email, phone, message) | PII | Confidential |
 | AI provider key + monthly budget | Cost and abuse | Restricted |
 | Source feed list and fetch state | Operational integrity | Internal |
-| Backups (`pg_dump`) | Full recovery | Restricted |
+| Volume snapshots (`.tar.gz`) | Full recovery | Restricted |
 
 ## 2. High-risk areas (SPEC review required)
 
@@ -55,7 +55,7 @@ Trust boundaries: **B1** internet→Caddy, **B2** web/API→data stores, **B3** 
 | T9 | **CSRF** on admin | Cross-site form post | SameSite=Strict cookie + `X-CSRF-Token` header check | news-api R12 |
 | T10 | **Information disclosure** | Error bodies, logs, source maps | RFC 7807 without internals, no PII in logs, source maps off in prod | observability §4 |
 | T11 | **Supply chain** | Vulnerable dependency | Pinned versions, `pip-audit` + `npm audit` in CI, Dependabot-style updates reviewed | ADR 012 |
-| T12 | **Data loss** | Host failure / accidental delete | Nightly off-site encrypted `pg_dump`, 30-day retention, restore drill, no agent drop/truncate | doc 04 §6 |
+| T12 | **Data loss** | Host failure / accidental delete | Nightly off-site encrypted volume `.tar.gz` snapshots, 30-day retention, restore drill, no agent drop/truncate | doc 04 §6 |
 | T13 | **Lead PII abuse / spam** | Fake or injected submissions; partner misuse; PII in logs | Explicit consent + version, honeypot, 5/hour/IP, duplicate suppression, hashed IP/UA, no PII in logs/analytics, partner scoping | ADR 013, news-api R18-R20 |
 | T14 | **Consent / DSAR failure** | Lead kept after withdrawal; export/erase missing | Consent version + timestamp, 24-month retention, export/delete admin API, audit | ADR 013 R15 |
 

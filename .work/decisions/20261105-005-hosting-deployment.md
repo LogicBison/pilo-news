@@ -17,7 +17,7 @@
 - **One VPS** (4 vCPU / 8 GB / 80 GB SSD; provider chosen at O2, e.g. Hetzner/Contabo) running **Docker Compose** with services: `caddy`, `web`, `api`, `worker`, `postgres`, `redis`.
 - **Caddy** terminates TLS (automatic Let's Encrypt), sets security headers, reverse-proxies `/api/*` → `api` and everything else → `web`.
 - **Docker volumes** for Postgres and Caddy data; Redis persists AOF for queue durability across restarts.
-- **Backups:** nightly `pg_dump` piped to a compressed, encrypted file uploaded off-site (provider bucket per O3); 30-day retention; monthly restore drill.
+- **Backups:** nightly volume `.tar.gz` snapshots compressed, encrypted, and uploaded off-site (provider bucket per O3); 30-day retention; monthly restore drill.
 - **Scaling trigger:** sustained CPU > 70% or p95 > target for 7 days → move Postgres to managed, add a second app node behind a load balancer (documented path, not built in v1).
 - **Deploy:** image-based (`docker compose -f docker-compose.prd.yml pull && up -d`), health-gated, rollback to previous SHA (ADR 012).
 

@@ -2,38 +2,50 @@
 
 ## Session status
 
-**Open:** 2026-11-05 · **Updated:** 2026-11-05 · **Closed:** 2026-11-05
+**Open:** - · **Updated:** 2026-11-05 · **Closed:** 2026-11-05
 
-**Repository state:** Foundation complete, master plan **Approved (v1.1, 2026-11-05)** with lead generation integrated (FR-17, ADR 013). M1 scaffold exists: `apps/api` (FastAPI health) and `apps/web` (Next placeholder), dev stack verified healthy, lint/type/tests green. **Implementation-ready: yes (2026-11-05 status).** Foundation docs 01-04, ADRs 001-013, four SPECs, eight standards, personas, ops proposals, registries, and integration mirror exist. `.cursorrules` is fully customized (no `REPLACE:` tokens). **Foundation-complete: yes.** **Plan-master-ready: yes (2026-11-05).** Master plan: **Approved v1.1 (2026-11-05)** with lead generation; **implementation-ready: yes (2026-11-05)**.
+**Repository state:** v1 implemented. Master plan v1.1 (Approved) executed end to end:
+schema/migrations, five seeded channels, ingestion + DeepSeek summaries, public
+API, EN/ES industry sites, editorial console, leads, observability artifacts,
+CI, docs, and volume backups. Any-industry template implemented as data
+(`POST /v1/admin/industries`). Dev stack healthy with random host ports and
+isolated project networks; Postgres/Redis have no host ports. **Foundation-complete: yes.**
+**Plan-master-ready: yes. Implementation-ready: yes. v1 implemented: yes.**
 
 **Recommended pick-up file:** `.work/plans/NEXT.md`
+**Next session focus:** verify pending items (k6, prd deploy/rollback, remote CI)
+and turn the data-only channel support into a declarative deployment profile so a
+new industry/customer can be cloned with one config file + import command. See
+`.work/plans/20261105-template-deployment-plan.md`.
 
-**Lost or new?** Read `.ai/START_HERE.md` (thin-client: `$AGENT_OS_SOURCE/START_HERE.md`).
+**Lost or new?** Read `.cursorrules`, then `.work/plans/20261105-industry-template-verification.md`.
 
 ---
 
 ## Fresh start - what the next session should do first
 
-1. Run **`@session-control start`** (or follow `session-control` skill).
-2. Read **`.cursorrules`**.
-3. Read **P0 initial scope**: `.work/plans/foundation/20261105-01-system-news-initial-scope.md`.
-4. Read **this file** through §Fresh start, then §Open owner actions.
-5. Read `.work/plans/NEXT.md`.
-6. Read `.work/plans/ASSUMPTIONS.md`, `RISK_REGISTRY.md`, `UNKNOWNS.md`.
-7. Implementation: run `@code-implementation plan - M1` (plan Approved v1.1; implementation-ready yes).
+1. Run **`@session-control start`**.
+2. Read `.cursorrules` and this file.
+3. Read `.work/plans/NEXT.md`.
+4. Read `.work/plans/20261105-template-deployment-plan.md` (next deliverable) and
+   `.work/plans/20261105-industry-template-verification.md` (current capability).
+5. Verify pending: k6 (`tests/perf/k6-smoke.js`), prd deploy/rollback, remote CI,
+   and the production image smoke checks.
+6. Implement the deployment profile/import, then clone one channel from it.
+7. For launch: answer U5/U6/U9/U1, then run `.work/plans/operations/20261105-launch.md`.
 
 ### Conditional reads
 
 | If the task touches… | Read first |
 |----------------------|------------|
-| Product scope / foundation | `.work/plans/foundation/20261105-0{1,2,3,4}-*.md` |
-| Any code or new feature | `.work/standards/20261105-CONVENTIONS.md`, `.work/standards/20261105-FEATURE_STANDARD.md` |
-| External integration (feeds/AI/email) | `.work/plans/foundation/20261105-02-integration-resources.md`, `.work/docs/integration/MANIFEST.txt` |
-| Security | `.work/standards/20261105-threat-model.md`, `.work/standards/20261105-data-classification.md` |
-| Stack / topology | `DOCS_TECH_STACK.md`, ADR 001-005 |
-| Master plan / milestones | `.work/plans/full/*-full-plan.md` (not yet present) |
-| High-risk feature | `.work/features/{news-api,ingestion-pipeline,industry-sites,editorial-console}/20261105-SPEC.md` |
-| Any prose / chat output | `.work/voice/README.md` (voice + guardrails) |
+| Any code or new feature | `.work/standards/20261105-CONVENTIONS.md`, `20261105-DIRECTORY_MAP.md` |
+| Public API | `.work/standards/20261105-api-style-guide.md`, `docs/api/README.md` |
+| Adding an industry | `docs/adding-an-industry.md` |
+| Ingestion/AI | `.work/features/ingestion-pipeline/20261105-SPEC.md`, `apps/api/config/` |
+| Web/UI | `.work/features/industry-sites/20261105-SPEC.md`, `apps/web/src/` |
+| Backups/restore | `.work/plans/operations/20261105-backup-restore.md` |
+| Security | `.work/standards/20261105-threat-model.md`, `20261105-data-classification.md` |
+| Any prose/chat | `.work/voice/README.md` |
 
 ---
 
@@ -41,32 +53,44 @@
 
 | Phase | Status | Evidence |
 |-------|--------|----------|
-| P0 Capture | done | doc 01, registries, `.cursorrules`, probe ledger |
-| P1 Exploration | done | docs 01-04, integration mirror + MANIFEST, cross-links |
-| P2 ADRs | done | ADRs 001-012 Decided, index current |
-| P3 Specifications | done | 3 standards + 4 SPECs + architecture fitness review (below) |
-| P4 Cross-cutting | done | stack pins, threat model, data classification, observability, API guide, personas |
-| P5 Infrastructure | done | compose dev/prd + Dockerfiles + `.env.example` + `bin/start.sh` created; sandbox runbook |
-| P6 Operations | done | README, this HANDOFF, NEXT, `.gitignore`, registries |
+| P0-P6 foundation | done | docs 01-04, ADRs 001-013, SPECs, standards |
+| M1 scaffold | done | compose dev/prd, Dockerfiles, `bin/start.sh` |
+| M2 schema/channels | done | migrations 001-003 run twice; 5 channels |
+| M3 ingestion | done | fixture tests + live feeds + worker scheduler + refresh runs |
+| M4 AI summaries | done | DeepSeek `deepseek-flash`; 19 legal summaries stored; fail-open tested |
+| M5 public API | done | contract tests, ETag/304, bundle/fallback, rate limits, leads |
+| M6 sites | done | lint/type/build, Playwright public + axe, EN/ES routes |
+| M7 console | done | auth/CSRF contract tests, sources/pins/keys/audit/leads |
+| M8 hardening | done (prd deploy pending) | metrics/alerts/dashboards, runbooks, security review, backup drill |
+| Any-industry template | done | create-channel endpoint + web + docs + tests |
+| Isolation | done | random host ports; `*-net`/`*-data`; DB/Redis internal |
+| Backups | done | `.tar.gz` volume archive + restore drill 2026-11-05 |
+| CI | written, not run on GitHub | `.github/workflows/ci.yml` |
+| k6 / Lighthouse CI | scripts written, not run in prd | `tests/perf/k6-smoke.js` |
+| prd deploy/rollback | images build + smoke; no host DNS deploy yet | owner U7/O7 |
+| deployment profile | proposed for next session | `.work/plans/20261105-template-deployment-plan.md` |
 
-**Integrity (plan-master rules, foundation artifacts):** pass - no waivers. O4 approved and P5 files created; NFR targets ratified (O3); probe coverage 87%.
+**Integrity:** no known waivers. Dev stack running (`system-news-dev`).
 
-**Architecture fitness review (P3-P6):**
+---
 
-| Dimension | Result | Note |
-|-----------|--------|------|
-| Scalability | pass | single-node ceiling documented; scale-out trigger in ADR 005 |
-| Maintainability | pass | bounded contexts + directory map + conventions |
-| Operational complexity | pass | one VPS, compose, one command |
-| Coupling | pass | ports-only cross-context rule in DIRECTORY_MAP §4 |
-| SPOFs | accepted | single VPS/Postgres (R4) with backup + RTO |
-| Extensibility | pass | channel-as-data, additive locales, Phase B lanes |
-| Deployment realism | pass | proposal matches stack pins; files pending approval |
-| Observability | pass | metrics/logs/alerts named per context |
-| Rollback | pass | image SHA rollback; migrations forward-only |
-| Security | pass | threat model T1-T12 + data classes |
+## Verification evidence (this session)
 
-**Plan-master-ready criteria (S4):** 1 pass · 2 pass · 3 pass · 4 pass · 5 pass · 6 pass · 7 pass (traceability tables in SPECs) · 8 pass (fitness above) · 9 pass (personas) · 10 pass with waivers (above). Re-certified after the 2026-11-05 reference-alignment amendments (ADR 007/010 v2, SPECs, registries).
+| Check | Result |
+|-------|--------|
+| `ruff check . && ruff format --check .` (api) | pass |
+| `mypy src` (api) | pass, 86 files |
+| `pytest -q` (api) | 77 passed (unit + integration + contract, includes template tests) |
+| `pnpm lint && pnpm typecheck` (web) | pass |
+| `pnpm check` (catalogs + themes) | 220 keys; 5/5 channels pass contrast |
+| `pnpm build` (web) | pass |
+| Playwright public + axe (production build) | 9/9 pass (public, a11y, admin) |
+| Admin e2e | login, console, refresh trigger pass |
+| AI summaries | 92 articles across channels summarized; failures fail-open |
+| Backup + restore | archive created (14 MB), restore passed, `/v1/health` ok, 19 summaries intact |
+| OpenAPI snapshot | 41 paths, committed |
+| `docker compose config` | valid dev/prd (ports + networks resolved) |
+| prd images | API wheel image built + migrations/config verified; web standalone image built + `/legal` 200 |
 
 ---
 
@@ -74,26 +98,27 @@
 
 | # | Action | Blocks | Owner | Where |
 |---|--------|--------|-------|-------|
-| O1 | ~~Ratify stack ADRs 001-012~~ **approved 2026-11-05** | - | owner | `.work/decisions/README.md` |
-| O2 | ~~VPS provider + budget~~ **approved 2026-11-05**: single VPS, ≤ USD 40/month; provider chosen at deploy | - | owner | `.work/decisions/20261105-005-hosting-deployment.md` |
-| O3 | ~~Confirm NFR targets~~ **approved 2026-11-05** as written (doc 04 §5) | - | owner | `.work/plans/foundation/20261105-04-foundation-architecture.md` §5 |
-| O4 | ~~Create `docker-compose*.yml`, `Dockerfile.*`, `.env.example`, `bin/start.sh`~~ **approved + created 2026-11-05** | - | owner | `.work/plans/operations/20261105-docker-compose-proposal.md` §10 |
-| O5 | Fill U1-U12 (name, domain shape, feed portfolio, pilot industry, roles, email, analytics, traffic, legal review, sponsored) | Content + launch readiness | owner | `.work/plans/UNKNOWNS.md` |
-| O6 | ~~Approve the master plan~~ **approved 2026-11-05** (v1.1 includes lead generation) | - | owner | `.work/plans/full/20261105-full-plan.md` |
+| O1 | ~~Ratify ADRs 001-013~~ approved | - | owner | `.work/decisions/` |
+| O2 | ~~VPS provider/budget~~ approved | - | owner | ADR 005 |
+| O3 | ~~NFR targets~~ approved | - | owner | doc 04 §5 |
+| O4 | ~~Stack files~~ approved/created | - | owner | operations proposal |
+| O5 | Fill U1-U12: brand, domain, feed portfolio, pilot, roles, email, analytics, traffic, legal review | launch | owner | `.work/plans/UNKNOWNS.md` |
+| O6 | ~~Master plan~~ approved | - | owner | full plan v1.1 |
+| O7 | prd domain/DNS + provider | prd deploy | owner | launch checklist |
+| O8 | CDN/off-site backup bucket (optional) | RPO | owner | backup doc |
 
 ---
 
-## What this cycle produced (audit history)
+## What this cycle produced
 
 | Date | Session | Artifacts |
 |------|---------|-----------|
-| 2026-11-05 | plan-foundation greenfield | `.cursorrules` customized; README; DOCS_TECH_STACK; foundation docs 01-04 + PROBE_LEDGER; ADRs 001-012 + index; standards (CONVENTIONS, FEATURE_STANDARD, DIRECTORY_MAP, threat-model, data-classification, observability, api-style-guide); SPECs (news-api, ingestion-pipeline, industry-sites, editorial-console); personas; compose + sandbox proposals; integration mirror + MANIFEST; registries; touch-scope; HANDOFF/NEXT |
-| 2026-11-05 | plan-foundation continue | Reference alignment: ADR 007 v2 (language partition, EN unprefixed), ADR 010 v2 (12 h cadence, manual force, `deepseek-flash`), SPEC amendments (bundle endpoint, fallback semantics, refresh CLI), acceptance matrix (28 reference scenarios), registries updated (R17-R19, U16-U17) |
-| 2026-11-05 | session-control | Owner approved O1-O3 (ADRs, VPS/budget, NFRs); `.work/voice/README.md` integrated into `.cursorrules` |
-| 2026-11-05 | plan-master + x-director | Master plan approved (v1.1); lead generation integrated (ADR 013, FR-17, CTA/lead SPECs, M6-T9/M7-T8/M8-T8) |
-| 2026-11-05 | session-control | O4 approved; dev/prd stack files + `bin/start.sh` menu created; env suffix convention bound in `.cursorrules` and DIRECTORY_MAP |
-| 2026-11-05 | code scaffold | `apps/api` + `apps/web` minimal skeletons; dev stack up (api healthy, web 200); `./bin/start.sh --env dev test` green; only root `.env*` files present |
-| 2026-11-05 | session close | dev stack left running (`system-news-dev`); next session starts with `@code-implementation plan - M1` (T6 CI pending) |
+| 2026-11-05 | implementation | `apps/api` full service: platform, channels, sources, articles, publishing, editorial, worker, CLI; migrations 001-003; config scoring/seeds/prompts |
+| 2026-11-05 | implementation | `apps/web` full Next app: themes, EN/ES, SEO, public pages, admin console, lead/contact forms, proxy, middleware |
+| 2026-11-05 | verification | API 77 tests, web lint/type/build, Playwright public/axe, OpenAPI snapshot, AI smoke, backup/restore drill |
+| 2026-11-05 | template | `POST /v1/admin/industries`, channels admin tab, `docs/adding-an-industry.md`, verification doc |
+| 2026-11-05 | ops | runbooks, launch checklist, security review, restore drill, Prometheus alerts, Grafana dashboards, k6 |
+| 2026-11-05 | isolation | random host ports, per-project `*-net`/`*-data`, DB/Redis internal-only |
 
 ---
 
@@ -101,33 +126,41 @@
 
 | ID | Summary | Blocks |
 |----|---------|--------|
-| U1 | Final brand name | Domain/branding |
+| U1 | Final brand name | domain/branding |
 | U2 | URL shape (one domain vs per-industry) | SEO/canonical |
-| U4 | AI monthly budget cap | Cost control |
-| U5 | Publisher portfolio + terms | Legal/source seeding |
-| U6 | Pilot industry | First launch |
-| U9 | Analytics/consent posture | Cookie banner/privacy |
-| U10 | Traffic expectation | Sizing |
+| U4 | AI monthly budget cap | cost control |
+| U5 | Publisher portfolio + terms | source seeding |
+| U6 | Pilot industry | first launch |
+| U9 | Analytics/consent posture | cookie banner/privacy |
+| U10 | Traffic expectation | sizing |
+| U18 | Lead pricing/partner model | CTA routing |
 
 ---
 
 ## Cross-framework action (@x-director)
 
-**Date:** 2026-11-05
-**Request:** "All approved with one caveat: One of the main goals of this system is to get leads, this is critical component, and the call to action (professional and appropriate) must be embedded into the build."
-**Frameworks involved:** .ai, .ai.ui, .ai.biz
-**Classified bucket(s):** cross-framework (engineering + ui + business)
-**Executed:**
-1. @biz-director - lead offer, CTA ladder, ethics, funnel -> `.work.biz/strategy/lead-generation.md` (prose follows `.work/voice/README.md`)
-2. @ui-director - CTA/lead-capture component brief -> `.work.ui/design-system/20261105-CTA-BRIEF.md`
-3. @ai-director - ADR 013, SPEC rules (industry-sites R16-R19, news-api R18-R20, console R13-R15), data model, standards, plan FR-17 + tasks; plan approved v1.1
-**Blockers:** U18 lead pricing/partner model; UI foundation not yet ready for screen-spec promotion
-**Next recommended:** `@plan-master status` (implementation-ready), then `@ui-design-foundation greenfield`
+Lead generation remains integrated (ADR 013, FR-17): one primary CTA per page,
+consent-first lead form, partner routing, DSAR export/erase, funnel events, and
+lead dashboards/alerts. UI foundation and biz strategy docs remain in
+`.work.ui/` and `.work.biz/`.
 
 ---
 
-## Cross-LLM verification
+## Known residual risks
 
-- **Triggered:** no
-- **Result:** -
-- **Notes:** Recommended before implementation for ADR 008 (public contract) and ADR 010 (prompt pipeline), per plan-foundation § Cross-model verification.
+- Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
+- Feed licensing/terms (U5) and Spanish coverage (R17) remain owner inputs.
+- AI summaries are fail-open; some items are intentionally left without a
+  summary when validation rejects output.
+- CI is written but has not run on GitHub yet.
+- prd images build and smoke; a real host/DNS deploy + rollback drill is still an owner action.
+- `k6` and Lighthouse budgets are scripts only; no prd measurement yet.
+- E2E runs against a production build; run `pnpm build` before `pnpm test`.
+- AI validation intentionally rejects some provider output; those items publish
+  without a summary.
+
+---
+
+## Next action
+
+Answer U5/U6/U9 and run `.work/plans/operations/20261105-launch.md`.

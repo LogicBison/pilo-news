@@ -1,13 +1,17 @@
 {
   "name": "system-news-web",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "node scripts/check-messages.mjs && node scripts/check-themes.mjs",
+    "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test e2e/accessibility.spec.ts"
   },
   "dependencies": {
     "next": "15.1.8",
@@ -15,6 +19,8 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.10.1",
+    "@playwright/test": "1.49.1",
     "@tailwindcss/postcss": "4.1.6",
     "@types/node": "22.15.21",
     "@types/react": "19.1.5",

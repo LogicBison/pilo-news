@@ -74,10 +74,13 @@ Never return stack traces, SQL, or upstream bodies.
 | GET | `/v1/docs` | none | Swagger UI |
 | POST | `/v1/contact` | none (rate-limited) | Contact form |
 | POST | `/v1/leads` | none (rate-limited) | Lead capture (consultation/brief) |
+| POST | `/v1/cta-events` | none (rate-limited) | Funnel event (no PII) |
 | POST | `/v1/admin/auth/login` | none | Admin login |
 | POST | `/v1/admin/refresh` | Bearer | Trigger ingestion (`force` bypasses schedule) |
 | GET | `/v1/admin/refresh/{run_id}` | Bearer | Run status/stats |
 | CRUD | `/v1/admin/sources` | Bearer | Source management |
+| POST | `/v1/admin/industries` | Bearer | Create a data-only industry channel |
+| PATCH | `/v1/admin/industries/{slug}` | Bearer | Enable/disable, theme, disclaimers |
 | CRUD | `/v1/admin/pins` | Bearer | Pins |
 | POST | `/v1/admin/articles/{id}/hide` | Bearer | Hide article |
 | CRUD | `/v1/admin/api-keys` | Bearer | Key management |
