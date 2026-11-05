@@ -19,6 +19,8 @@ export interface Skin {
   hero: HeroVariant;
   /** Public path to the generated motif SVG. */
   motif: string;
+  /** Public path to the generated illustration band SVG. */
+  scene: string;
   /** Corner language; overrides the channel theme radius. */
   radius: string;
   rule: RuleStyle;
@@ -35,6 +37,7 @@ const CHAMBERS: Skin = {
   label: "Chambers",
   hero: "split",
   motif: "/skins/legal/motif.svg",
+  scene: "/skins/legal/scene.svg",
   radius: "6px",
   rule: "double",
   eyebrow: "serif",
@@ -48,6 +51,7 @@ const TERMINAL: Skin = {
   label: "Terminal",
   hero: "ledger",
   motif: "/skins/financial/motif.svg",
+  scene: "/skins/financial/scene.svg",
   radius: "4px",
   rule: "hairline",
   eyebrow: "mono",
@@ -61,6 +65,7 @@ const SANCTUARY: Skin = {
   label: "Sanctuary",
   hero: "split",
   motif: "/skins/behavioral-health/motif.svg",
+  scene: "/skins/behavioral-health/scene.svg",
   radius: "18px",
   rule: "none",
   eyebrow: "soft",
@@ -74,6 +79,7 @@ const CAMPUS: Skin = {
   label: "Campus",
   hero: "ribbon",
   motif: "/skins/education/motif.svg",
+  scene: "/skins/education/scene.svg",
   radius: "10px",
   rule: "dotted",
   eyebrow: "numbered",
@@ -87,6 +93,7 @@ const NETWORK: Skin = {
   label: "Network",
   hero: "poster",
   motif: "/skins/logistics/motif.svg",
+  scene: "/skins/logistics/scene.svg",
   radius: "8px",
   rule: "dashed",
   eyebrow: "mono",
@@ -100,6 +107,7 @@ const SENTINEL: Skin = {
   label: "Sentinel",
   hero: "ledger",
   motif: "/skins/cybersecurity/motif.svg",
+  scene: "/skins/cybersecurity/scene.svg",
   radius: "2px",
   rule: "accent",
   eyebrow: "mono",
@@ -113,6 +121,7 @@ const LAB: Skin = {
   label: "Lab",
   hero: "ribbon",
   motif: "/skins/stem-cell/motif.svg",
+  scene: "/skins/stem-cell/scene.svg",
   radius: "14px",
   rule: "hairline",
   eyebrow: "serif",

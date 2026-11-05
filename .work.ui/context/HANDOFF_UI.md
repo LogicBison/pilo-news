@@ -160,6 +160,7 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 1. `.work.ui/design-system/20261105-skin-system.md` - the skin system: 7 named skins, 7 dimensions, reference mapping
 2. `apps/web/src/lib/skins.ts` - typed registry (slug -> skin), layout fallback for channels with no skin entry
 3. `apps/web/public/skins/<slug>/motif.svg` - 7 generated line-art motifs (arches, bars, rings, rules, routes, hexes, cells)
+3b. `apps/web/public/skins/<slug>/scene.svg` - 7 original illustration bands, captioned with the channel tagline (`SkinScene`)
 4. `apps/web/src/app/skins.css` - `[data-skin]` / `[data-hero]` surface grammar: hero composition, app bar, eyebrow, section rule, story cards, CTA panel, footer, motif placement
 5. Wiring: `[locale]/[industry]/layout.tsx` sets `data-skin` + `data-hero`; hooks in `Hero`, `CtaCard`, `StoryCard`; `skins.css` imported in the root layout; middleware now exempts `skins/`
 **Evidence:** screenshots of all 7 homes (desktop) + 2 mobile; `pnpm lint`, `pnpm typecheck`, `pnpm check` green; 7/7 channels 200 with distinct `data-skin`

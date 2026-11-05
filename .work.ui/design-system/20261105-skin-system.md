@@ -63,14 +63,15 @@ Design intent per channel:
 | mailchimp | tone-led voice | Network mono labels + plain lines |
 | warbyparker | low-friction entry | Terminal two-field brief |
 
-No third-party assets are copied. Motifs are generated SVG line-art owned by the project; photography is deliberately absent (UIS-10 not required for line-art surfaces).
+No third-party assets are copied and nothing is licensed in: motifs and scene illustrations are original vector art generated into this repo, so they are royalty-free by construction (project-owned, no attribution duty). Photography is still absent — there is no image-generation pipeline, and a licensed stock photo per channel would need a budget and a licence record.
 
 ## Implementation
 
 | Layer | File | Role |
 |-------|------|------|
 | Registry | `apps/web/src/lib/skins.ts` | slug → skin tuple, typed, with a fallback for unknown channels |
-| Motifs | `apps/web/public/skins/<slug>/motif.svg` | one generated line-art SVG per channel |
+| Motifs | `apps/web/public/skins/<slug>/motif.svg` | one generated line-art SVG per channel, used behind the hero card |
+| Illustrations | `apps/web/public/skins/<slug>/scene.svg` | one original 1200×460 scene per channel, rendered as a caption band under the proof strip |
 | Surface grammar | `apps/web/src/app/skins.css` | `[data-skin]` / `[data-hero]` rules; consumes channel tokens, never redefines colour |
 | Wiring | `apps/web/src/app/[locale]/[industry]/layout.tsx` | sets `data-skin` + `data-hero` on the channel wrapper |
 | Hooks | `Hero.tsx`, `CtaCard.tsx`, `Header.tsx`, `StoryCard.tsx` | stable class names (`sn-hero`, `sn-cta`, `sn-story`) the skin CSS targets |
@@ -82,6 +83,10 @@ Rules: skins consume `--sn-*` tokens only; a skin may change shape, spacing, bor
 1. Pick a tuple that no existing channel uses (table above).
 2. Draw one motif SVG (≤4 KB, `currentColor`-free, `#0f172a` stroke at 0.10–0.14 opacity + one accent shape).
 3. Register it in `skins.ts` — unknown slugs fall back to the nearest layout variant, so a channel is never unstyled.
+
+## Illustrations
+
+Each channel ships one `scene.svg` (columns for legal, skyline for financial, waves for health, an open book for education, containers for logistics, a circuit shield for cybersecurity, a petri dish for stem-cell). It renders as a full-width band with the channel tagline over it, so the page reads as that industry's product before any content is scanned.
 
 ## Verification
 

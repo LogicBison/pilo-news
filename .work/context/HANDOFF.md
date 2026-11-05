@@ -118,7 +118,7 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | Lead magnet build 2026-11-05 | 7/7 channels 200 with proof strip + trust block + brief capture; `pnpm lint`, `pnpm typecheck`, `pnpm check` green (246 catalog keys, 7 themes) |
 | Qualification field 2026-11-05 | migration 008 applied then re-run clean (`applied: 0`); `pytest -q` 108 passed; qualification select renders on 7/7 channels EN+ES; `pnpm check` 247 keys |
 | OpenAPI snapshot 2026-11-05 | regenerated, +`qualification` only (12 lines) |
-| Skin system 2026-11-05 | 7 distinct skins live (`data-skin` per channel), 7 generated motifs, screenshots desktop+mobile, `pnpm lint/typecheck/check` green |
+| Skin system 2026-11-05 | 7 distinct skins live (`data-skin` per channel), 7 motifs + 7 original illustration bands, screenshots desktop+mobile, `pnpm lint/typecheck/check` green |
 
 ---
 

@@ -9,11 +9,13 @@ import { JsonLd } from "@/components/JsonLd";
 import { LeadForm } from "@/components/LeadForm";
 import { EmptyState, FallbackNotice } from "@/components/Notices";
 import { ProofStrip } from "@/components/ProofStrip";
+import { SkinScene } from "@/components/SkinScene";
 import { TrustBlock } from "@/components/TrustBlock";
 import { StickyCta } from "@/components/Cta";
 import { TopicRail } from "@/components/TopicRail";
 import { getBundle, getIndustry } from "@/lib/api";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { resolveSkin } from "@/lib/skins";
 import { itemListJsonLd, pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string }> };
@@ -65,6 +67,7 @@ export default async function ChannelHome({ params }: Params) {
         <>
           <Hero bundle={bundle} locale={resolved} industry={channel} />
           <ProofStrip bundle={bundle} locale={resolved} />
+          <SkinScene skin={resolveSkin(channel.slug, channel.theme.layout)} channel={channel} locale={resolved} />
           <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
             <DeskBrief brief={bundle.ai_summary} locale={resolved} />
             <TopicRail

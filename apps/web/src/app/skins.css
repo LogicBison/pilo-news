@@ -451,3 +451,86 @@
     transition: none;
   }
 }
+
+/* --- illustration band ----------------------------------------------------- */
+
+.sn-scene {
+  position: relative;
+  margin: 1.75rem 0 0;
+  overflow: hidden;
+  border: 1px solid var(--sn-border);
+  border-radius: calc(var(--sn-radius) + 8px);
+  background: var(--sn-surface);
+}
+
+.sn-scene img {
+  display: block;
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.sn-scene figcaption {
+  position: absolute;
+  left: 1.25rem;
+  bottom: 1rem;
+  right: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: calc(var(--sn-radius) + 2px);
+  background: color-mix(in srgb, var(--sn-bg) 88%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--sn-elev-1);
+}
+
+.sn-scene-line {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sn-text);
+}
+
+[data-skin="chambers"] .sn-scene img,
+[data-skin="lab"] .sn-scene img {
+  height: 230px;
+}
+
+[data-skin="terminal"] .sn-scene,
+[data-skin="sentinel"] .sn-scene {
+  border-radius: 0;
+}
+
+[data-skin="terminal"] .sn-scene img {
+  height: 180px;
+}
+
+[data-skin="terminal"] .sn-scene figcaption,
+[data-skin="network"] .sn-scene figcaption,
+[data-skin="sentinel"] .sn-scene figcaption {
+  border-radius: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+[data-skin="sanctuary"] .sn-scene {
+  border-radius: 26px;
+}
+
+[data-skin="campus"] .sn-scene {
+  border-top: 6px solid var(--sn-accent);
+}
+
+@media (max-width: 640px) {
+  .sn-scene img {
+    height: 160px;
+  }
+
+  .sn-scene figcaption {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.6rem 0.75rem;
+  }
+}
