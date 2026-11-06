@@ -37,11 +37,16 @@
 | Channel quick reference | `docs/guides/switching-channels.md`; linked from README |
 | UI skin refresh brief | `.work/plans/20261105-ui-skin-refresh.md` with 14 reference sites |
 | UI foundation | `.work.ui/plans/foundation/01-04` + `tokens.json`; certified screen-spec-ready |
-| Seven channel skins | `skins.ts` + `skins.css`: 4 hero variants, 4 coverage rhythms, 7 motifs, 7 emblems |
+| Ten channel skins | `skins.ts` + `skins.css`: 4 hero variants, 3 balanced coverage rhythms, 10 motifs, 10 emblems |
 | Per-channel photography | `apps/web/public/photos/*` + `credits.json`; `next/image` band + article strip |
-| Distinct palettes | migration 009: 7 schemes incl. dark cybersecurity; 7/7 contrast |
+| Distinct palettes | migration 009 + 3 profiles: 10 schemes incl. dark cybersecurity; 10/10 contrast |
 | Lead magnet + qualification | `ProofStrip`, `TrustBlock`, `BriefSignup`; migration 008 qualification select |
-| Channel SPECs | 7 × `.work.ui/screens/channel-home-<slug>/` |
+| UI v2 editorial conversion | `.work.ui/inputs/references/` intake (3 lead-gen refs) + `editorial-conversion`; open/full-bleed layout, balanced CSS columns, clear filled forms; `e2e/layout.spec.ts` |
+| UI v2 verification | production build; 57 e2e passed / 1 skipped; 80 pages 200 + zero overflow; layout 40/40; `pnpm lint/typecheck/check` green; token-lint 0 raw |
+| UI direction + bind | `editorial-conversion` Approved 2026-11-05; composition tokens in `tokens.json` (84, schema-valid); 10 SPECs §13/§11 bound; `SCREEN_REFERENCE_MAP.md`; reference audit PASS |
+| Three additional channels | `manufacturing`, `energy`, `retail` profiles applied to dev; Forge/Grid/Market skins; original SVG bands; 45/45 sources pass |
+| Channel inventory | `docs/channel-inventory.md` generated from `/v1/industries`; `apps/web/scripts/channel-inventory.mjs` + `bin/channels.sh`; checked by `./bin/start.sh test` |
+| Channel SPECs | 10 × `.work.ui/screens/channel-home-<slug>/` (all `Review`) |
 
 ---
 
@@ -57,16 +62,17 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Audit the seven skins | `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`; dark scheme first |
-| **1** | Approve channel SPECs | `@ui-screen-spec review` on the 7 channel-home SPECs, then per-channel copy pass |
-| **2** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
-| **3** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
+| **0** | Approve the ten channel SPECs | Visual verify pass with gaps; approval is the operator's gate |
+| **1** | Accessibility audit | `@ui-accessibility-audit milestone`; dark cybersecurity first |
+| **2** | CATALOG + new-channel content coverage | `@ui-design-system init`; manufacturing EN 10, retail ES 1 |
+| **3** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
+| **4** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
 
 ---
 
 ## Current iteration
 
-*(Complete - M1-M8 + deployment profiles + source quality + two profile-only channels + certified UI foundation + seven distinct channel skins + lead qualification. Next: skin audit, SPEC approval, then pending ops verification.)*
+*(Complete - M1-M8 + deployment profiles + source quality + five profile-only channels + certified UI foundation + ten distinct channel skins + lead qualification + editorial-conversion v2 (reference intake, balanced columns, clear forms; direction Approved, 10 SPECs bound + reviewed to `Review`) + three new channels (manufacturing, energy, retail). Visual verify milestone: pass with gaps. Next: approve SPECs, accessibility audit, CATALOG init, content gaps, pending ops.)*
 
 ### Concept / NFR registry
 

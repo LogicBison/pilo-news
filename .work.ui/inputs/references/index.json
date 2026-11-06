@@ -1,0 +1,95 @@
+{
+  "schema": "ui-reference-index/1.0",
+  "updated_at": "2026-11-05T21:34:10+00:00",
+  "references": [
+    {
+      "slug": "ellevest",
+      "requested_url": "https://www.ellevest.com/",
+      "final_url": "https://www.ellevest.com/",
+      "status": "ok",
+      "fetched_at": "2026-11-05T21:34:01+00:00",
+      "title": "Wealth management and financial planning | Ellevest",
+      "http_status": 200,
+      "palette_size": 72,
+      "classification": {
+        "taxonomy_version": "2026-11-05",
+        "primary_type": "forms-surveys",
+        "types": [
+          "forms-surveys",
+          "finance"
+        ],
+        "conversion_goal": "contact-quote",
+        "secondary_goals": [
+          "lead-magnet"
+        ],
+        "funnel_stage": "decision",
+        "confidence": "medium",
+        "reasons": [
+          "content-seo: content language: news, guide, insights",
+          "forms-surveys: forms language: quiz",
+          "finance: finance identity: wealth, financial"
+        ]
+      }
+    },
+    {
+      "slug": "hubspot",
+      "requested_url": "https://www.hubspot.com/",
+      "final_url": "https://www.hubspot.com/",
+      "status": "ok",
+      "fetched_at": "2026-11-05T21:34:10+00:00",
+      "title": "HubSpot | Software & Tools for your Business - Homepage",
+      "http_status": 200,
+      "palette_size": 60,
+      "classification": {
+        "taxonomy_version": "2026-11-05",
+        "primary_type": "saas-product",
+        "types": [
+          "saas-product",
+          "lead-generation"
+        ],
+        "conversion_goal": "free-trial",
+        "secondary_goals": [
+          "demo-booking"
+        ],
+        "funnel_stage": "decision",
+        "confidence": "medium",
+        "reasons": [
+          "lead-generation: sales CTA: get a demo",
+          "lead-generation: form on a sales-CTA page",
+          "saas-product: SaaS CTA/product language: get started free, platform, software",
+          "saas-product: platform + product"
+        ]
+      }
+    },
+    {
+      "slug": "leadpages",
+      "requested_url": "https://leadpages.com/",
+      "final_url": "https://leadpages.com/",
+      "status": "ok",
+      "fetched_at": "2026-11-05T21:34:04+00:00",
+      "title": "The AI Landing Page Builder | Leadpages",
+      "http_status": 200,
+      "palette_size": 26,
+      "classification": {
+        "taxonomy_version": "2026-11-05",
+        "primary_type": "saas-product",
+        "types": [
+          "saas-product"
+        ],
+        "conversion_goal": "free-trial",
+        "secondary_goals": [
+          "demo-booking"
+        ],
+        "funnel_stage": "decision",
+        "confidence": "high",
+        "reasons": [
+          "saas-product: SaaS CTA/product language: platform",
+          "saas-product: JSON-LD SoftwareApplication",
+          "saas-product: platform + product",
+          "content-seo: 5 <article> elements",
+          "comparison-marketplace: many nav groups + article cards"
+        ]
+      }
+    }
+  ]
+}

@@ -25,6 +25,7 @@ Every channel carries one professional CTA that routes consented inquiries to a 
 | Writing code | `.work/standards/20261105-CONVENTIONS.md`, `20261105-DIRECTORY_MAP.md` |
 | Integrating a client | `docs/api/README.md`, `docs/api/openapi.v1.json` |
 | Adding an industry | `docs/adding-an-industry.md` |
+| Channel inventory (EN/ES URLs) | `docs/channel-inventory.md` |
 | Cloning a deployment | `docs/deployment-profile.md` |
 | Source quality policy | `docs/source-quality.md` |
 | Switching channels (quick reference) | `docs/guides/switching-channels.md` |

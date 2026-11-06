@@ -15,8 +15,8 @@ export function StoryCard({ article, industry, locale, featured = false }: Story
   const body = article.summary ?? article.excerpt;
   return (
     <article
-      className={`sn-card sn-card-interactive sn-story group flex h-full flex-col gap-3 p-5 ${
-        featured ? "md:p-6" : ""
+      className={`sn-card-interactive sn-story group flex flex-col gap-3 ${
+        featured ? "sn-story-feature" : ""
       }`}
     >
       <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-[var(--sn-muted)]">
@@ -51,7 +51,7 @@ export function StoryCard({ article, industry, locale, featured = false }: Story
         ))}
         <Link
           href={href}
-          className="ml-auto text-sm font-bold text-[var(--sn-primary)] transition-colors hover:text-[var(--sn-accent)]"
+          className="ml-auto text-sm font-bold text-[var(--sn-accent)] underline-offset-4 transition-colors hover:underline"
           aria-label={`${t(locale, "common.readMore")}: ${article.title}`}
         >
           {t(locale, "common.readMore")} →

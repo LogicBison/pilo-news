@@ -560,7 +560,7 @@
 .sn-scene-link {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--sn-primary);
+  color: var(--sn-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -693,4 +693,1062 @@
 [data-skin="sentinel"] .sn-brandmark {
   background: var(--sn-surface);
   color: var(--sn-accent);
+}
+
+/* --- conversion spine ------------------------------------------------------
+   One shared grammar for the lead-generation surfaces. Every alias derives
+   from the channel's own tokens, so the seven palettes and their contrast
+   gates still own the colour decisions. */
+
+[data-skin] {
+  --sn-action-bg: color-mix(in srgb, var(--sn-primary) 94%, var(--sn-shade));
+  --sn-action-ink: var(--sn-on-primary);
+  --sn-action-muted: color-mix(in srgb, var(--sn-on-primary) 78%, var(--sn-action-bg));
+  --sn-action-line: color-mix(in srgb, var(--sn-accent) 82%, var(--sn-on-primary));
+  --sn-band: color-mix(in srgb, var(--sn-surface) 62%, var(--sn-bg));
+  --sn-lift: 0 8px 0 -4px color-mix(in srgb, var(--sn-primary) 18%, transparent);
+}
+
+[data-skin="sentinel"] {
+  --sn-action-bg: color-mix(in srgb, var(--sn-primary) 78%, var(--sn-accent) 14%);
+  --sn-action-line: var(--sn-accent);
+}
+
+[data-skin="sanctuary"] {
+  --sn-lift: none;
+}
+
+/* Kicker: a short accent bar that gives the eyebrow a point of view. */
+.sn-kicker {
+  display: inline-block;
+  width: 1.75rem;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--sn-accent);
+  vertical-align: middle;
+}
+
+.sn-display {
+  font-size: clamp(2.35rem, 4.6vw, 3.9rem);
+  line-height: 1.03;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+.sn-section-title {
+  font-size: clamp(1.55rem, 2.4vw, 2.05rem);
+  line-height: 1.1;
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+
+/* Action panel: the one saturated block on the page. */
+.sn-action {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--sn-on-primary) 14%, transparent);
+  border-radius: calc(var(--sn-radius) + 10px);
+  background: var(--sn-action-bg);
+  color: var(--sn-action-ink);
+  box-shadow: var(--sn-lift);
+}
+
+.sn-action::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--sn-action-line);
+}
+
+.sn-action .sn-eyebrow {
+  color: var(--sn-action-muted);
+}
+
+.sn-action h2,
+.sn-action h3 {
+  color: var(--sn-action-ink);
+}
+
+.sn-action p {
+  color: var(--sn-action-muted);
+}
+
+.sn-action .sn-btn {
+  background: var(--sn-on-primary);
+  color: var(--sn-action-bg);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--sn-shade) 18%, transparent);
+}
+
+.sn-action .sn-btn:hover {
+  background: color-mix(in srgb, var(--sn-on-primary) 86%, var(--sn-action-line));
+  color: var(--sn-action-bg);
+}
+
+.sn-action .sn-action-link {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--sn-action-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sn-action-promises {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--sn-action-muted);
+}
+
+.sn-action-promises > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sn-action-promises > span + span::before {
+  content: "";
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--sn-action-line);
+}
+
+.sn-action-disclaimer {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--sn-action-muted) !important;
+}
+
+@media (min-width: 768px) {
+  [data-skin="lab"] .sn-hero .sn-action-inner,
+  [data-skin="network"] .sn-hero .sn-action-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.62fr);
+    align-items: center;
+    gap: 1.75rem;
+  }
+}
+
+/* Proof band: credible data, not four identical cards. */
+.sn-proof-band {
+  margin-top: 1.75rem;
+  padding: 1.1rem 1.4rem;
+  border: 1px solid var(--sn-border);
+  border-top: 3px solid var(--sn-accent);
+  border-radius: calc(var(--sn-radius) + 6px);
+  background: var(--sn-band);
+}
+
+.sn-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.sn-proof-item {
+  min-width: 0;
+  padding-left: 0.9rem;
+  border-left: 1px solid color-mix(in srgb, var(--sn-border) 80%, transparent);
+}
+
+.sn-proof-item:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.sn-proof-value {
+  margin-top: 0.2rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--sn-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.015em;
+}
+
+.sn-proof-note {
+  margin-top: 0.65rem;
+  font-size: 0.75rem;
+  color: var(--sn-muted);
+}
+
+@media (min-width: 768px) {
+  .sn-proof-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Photo band: a scrim + overlay lockup instead of a floating white chip. */
+.sn-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--sn-primary) 86%, var(--sn-shade)) 0%,
+    color-mix(in srgb, var(--sn-primary) 38%, transparent) 46%,
+    transparent 78%
+  );
+}
+
+.sn-scene figcaption {
+  z-index: 1;
+  background: color-mix(in srgb, var(--sn-primary) 72%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--sn-on-primary) 16%, transparent);
+  box-shadow: none;
+}
+
+.sn-scene .sn-eyebrow {
+  color: var(--sn-on-primary);
+  opacity: 0.92;
+}
+
+.sn-scene-line {
+  color: var(--sn-on-primary);
+}
+
+.sn-scene-credit {
+  color: color-mix(in srgb, var(--sn-on-primary) 78%, transparent);
+}
+
+/* Conversion module: process + form read as one unit. */
+.sn-convert {
+  margin-top: 3rem;
+  padding: clamp(1.1rem, 2.4vw, 1.85rem);
+  border: 1px solid var(--sn-border);
+  border-radius: calc(var(--sn-radius) + 10px);
+  background: var(--sn-band);
+}
+
+.sn-convert-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.15rem;
+}
+
+@media (min-width: 1024px) {
+  .sn-convert-grid {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    align-items: start;
+    gap: 1.25rem;
+  }
+}
+
+.sn-convert-grid > .sn-card {
+  height: 100%;
+  border-color: color-mix(in srgb, var(--sn-border) 78%, transparent);
+  box-shadow: none;
+  background: var(--sn-bg);
+}
+
+/* Brief band: secondary path, distinct surface, inline capture. */
+.sn-brief {
+  margin-top: 1.25rem;
+  padding: clamp(1.1rem, 2.4vw, 1.65rem);
+  border: 1px dashed color-mix(in srgb, var(--sn-accent) 55%, var(--sn-border));
+  border-radius: calc(var(--sn-radius) + 6px);
+  background: color-mix(in srgb, var(--sn-accent) 6%, var(--sn-bg));
+}
+
+@media (min-width: 768px) {
+  .sn-brief-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+}
+
+.sn-brief-list {
+  margin-top: 0.6rem;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--sn-muted);
+}
+
+.sn-brief-list > li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.sn-brief-list > li::before {
+  content: "";
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--sn-accent);
+}
+
+/* Progressive disclosure inside the lead form. */
+.sn-more {
+  margin-top: 0.9rem;
+  border-top: 1px solid var(--sn-border);
+  padding-top: 0.75rem;
+}
+
+.sn-more > summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--sn-primary);
+  list-style: none;
+}
+
+.sn-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.sn-more > summary::before {
+  content: "+";
+  display: inline-block;
+  width: 1.1rem;
+  font-weight: 800;
+}
+
+.sn-more[open] > summary::before {
+  content: "−";
+}
+
+.sn-more-body {
+  margin-top: 0.85rem;
+}
+
+/* Dark scheme keeps the action panel from glowing. */
+[data-skin="sentinel"] .sn-action {
+  border-color: color-mix(in srgb, var(--sn-accent) 40%, transparent);
+}
+
+[data-skin="sentinel"] .sn-proof-band {
+  background: var(--sn-surface);
+}
+
+[data-skin="sentinel"] .sn-convert {
+  background: var(--sn-surface);
+}
+
+[data-skin="sentinel"] .sn-brief {
+  background: color-mix(in srgb, var(--sn-accent) 8%, var(--sn-bg));
+}
+
+/* Lead story: one card carries the coverage section. */
+.sn-story-feature {
+  background: var(--sn-band);
+  border-top: 4px solid var(--sn-accent);
+}
+
+[data-skin="sentinel"] .sn-story-feature {
+  background: var(--sn-surface);
+}
+
+/* --- editorial conversion v2 ------------------------------------------------
+   Fewer boxes, fewer corners, more full-bleed rhythm. The channel palette and
+   motif stay; the card grammar is replaced by rules, open grids and colour
+   fields. */
+
+body {
+  overflow-x: clip;
+}
+
+/* Marketing surfaces go sharp. Task pages keep their own density. */
+.sn-hero,
+.sn-hero-card,
+.sn-story,
+.sn-story-feature,
+.sn-proof-band,
+.sn-scene,
+.sn-convert,
+.sn-brief,
+.sn-action {
+  border-radius: 0;
+}
+
+.sn-btn,
+.sn-chip,
+.sn-input,
+.sn-nav-link {
+  border-radius: 2px;
+}
+
+.sn-hero {
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.sn-hero-card {
+  border: 0;
+  border-bottom: 1px solid var(--sn-border);
+  background: transparent;
+  box-shadow: none;
+  padding: 0 0 1.5rem;
+}
+
+.sn-hero-card::after {
+  opacity: 0.28;
+}
+
+.sn-action {
+  border: 0;
+  box-shadow: none;
+  background: var(--sn-action-bg);
+}
+
+.sn-action::before {
+  height: 3px;
+}
+
+.sn-action .sn-btn {
+  border-radius: 2px;
+  padding-inline: 1.6rem;
+}
+
+/* Only the two banner skins break the hero action panel out of the content
+   column. Corner/sidebar skins keep their own placement; compact CTA cards on
+   search/about/article pages always stay inside their layout. */
+[data-skin="lab"] .sn-hero .sn-action,
+[data-skin="network"] .sn-hero .sn-action {
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: 1.5rem;
+  padding: 1.6rem max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem));
+}
+
+/* Proof: an open band with rules, not a card. */
+.sn-proof-band {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: 0;
+  padding: 1.15rem max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem));
+  border: 0;
+  border-top: 1px solid var(--sn-border);
+  border-bottom: 1px solid var(--sn-border);
+  background: var(--sn-band);
+}
+
+.sn-proof-grid {
+  gap: 1rem 0;
+}
+
+.sn-proof-item {
+  padding: 0 1.25rem;
+  border-left: 1px solid var(--sn-border);
+}
+
+.sn-proof-item:first-child {
+  padding-left: 0;
+}
+
+.sn-proof-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+/* Photo: full-bleed cinematic band, no frame. */
+.sn-scene {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: 2rem;
+  border: 0;
+  height: 360px;
+}
+
+.sn-scene figcaption {
+  left: max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem));
+  right: max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem));
+  bottom: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.sn-scene .sn-eyebrow {
+  color: var(--sn-on-primary);
+}
+
+.sn-scene-line {
+  font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.sn-scene-credit {
+  color: color-mix(in srgb, var(--sn-on-primary) 72%, transparent);
+}
+
+.sn-scene::after {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--sn-shade) 84%, var(--sn-primary)) 0%,
+    color-mix(in srgb, var(--sn-primary) 46%, transparent) 52%,
+    transparent 86%
+  );
+}
+
+.sn-scene-strip {
+  width: auto;
+  margin-left: 0;
+  margin-right: 0;
+  height: 150px;
+}
+
+.sn-scene-strip figcaption {
+  left: auto;
+  right: 0.75rem;
+  bottom: 0.6rem;
+  padding: 0;
+}
+
+/* Coverage: hairline-separated editorial items, no cards. */
+.sn-columns {
+  gap: 2rem;
+}
+
+.sn-story {
+  border: 0;
+  border-top: 1px solid var(--sn-border);
+  background: transparent;
+  box-shadow: none;
+  padding: 1.25rem 0 0;
+  gap: 0.6rem;
+}
+
+.sn-story:hover {
+  box-shadow: none;
+}
+
+.sn-story-feature {
+  border-top: 3px solid var(--sn-accent);
+  background: transparent;
+  padding-top: 1.5rem;
+}
+
+.sn-story-feature h3 {
+  font-size: clamp(1.6rem, 2.6vw, 2.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.sn-story h3 a {
+  text-underline-offset: 4px;
+}
+
+.sn-story:hover h3 a {
+  text-decoration: underline;
+}
+
+/* Desk brief / topics / sources: open blocks with a rule. */
+.sn-editorial-block {
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--sn-border);
+}
+
+.sn-editorial-block .sn-eyebrow {
+  color: var(--sn-muted);
+}
+
+/* Conversion: a full-bleed band; process and form are open columns. */
+.sn-convert {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: 3.5rem;
+  padding: 2.25rem max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem)) 2.75rem;
+  border: 0;
+  border-top: 1px solid var(--sn-border);
+  border-bottom: 1px solid var(--sn-border);
+  background: var(--sn-band);
+}
+
+.sn-convert-grid {
+  margin-top: 1.5rem;
+  gap: 2rem;
+}
+
+.sn-convert-grid > .sn-card {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+@media (min-width: 1024px) {
+  .sn-convert-grid {
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: 3rem;
+  }
+
+  .sn-convert-grid > :last-child {
+    padding-left: 3rem;
+    border-left: 1px solid var(--sn-border);
+  }
+}
+
+/* Underline fields inside the conversion band: no boxes. */
+.sn-convert .sn-input {
+  border: 0;
+  border-bottom: 1px solid var(--sn-border-strong, var(--sn-border));
+  background: transparent;
+  border-radius: 0;
+  padding: 0.55rem 0;
+}
+
+.sn-convert .sn-input:focus {
+  border-bottom-color: var(--sn-primary);
+  box-shadow: none;
+}
+
+.sn-convert .sn-btn {
+  border-radius: 2px;
+}
+
+/* Brief: an open band, not a dashed box. */
+.sn-brief {
+  margin-top: 2rem;
+  padding: 1.75rem 0 0;
+  border: 0;
+  border-top: 1px solid var(--sn-border);
+  background: transparent;
+}
+
+.sn-brief-grid {
+  gap: 2rem;
+}
+
+.sn-brief .sn-input {
+  border: 0;
+  border-bottom: 1px solid var(--sn-border-strong, var(--sn-border));
+  background: transparent;
+  border-radius: 0;
+  padding: 0.55rem 0;
+}
+
+.sn-brief .sn-input:focus {
+  border-bottom-color: var(--sn-primary);
+  box-shadow: none;
+}
+
+/* Dark scheme: rules remain visible, no boxes return. */
+[data-skin="sentinel"] .sn-hero-card,
+[data-skin="sentinel"] .sn-story,
+[data-skin="sentinel"] .sn-editorial-block {
+  border-color: var(--sn-border);
+}
+
+[data-skin="sentinel"] .sn-proof-band,
+[data-skin="sentinel"] .sn-convert {
+  background: var(--sn-surface);
+}
+
+[data-skin="sentinel"] .sn-brief {
+  background: transparent;
+}
+
+@media (max-width: 767px) {
+  .sn-proof-item {
+    padding: 0 0 0 0.9rem;
+  }
+
+  .sn-scene {
+    height: 240px;
+  }
+
+  .sn-scene-line {
+    font-size: 1.05rem;
+  }
+
+  .sn-convert-grid > :last-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* Coverage: CSS multi-column balances the two/three columns by height, not by
+   item count. One long column and one short column is the failure this fixes. */
+.sn-columns {
+  display: block;
+  column-count: 1;
+  column-gap: 2.75rem;
+  column-fill: balance;
+}
+
+.sn-columns > * {
+  break-inside: avoid;
+  margin: 0 0 2rem;
+}
+
+@media (min-width: 768px) {
+  [data-list="grid3"] .sn-columns,
+  [data-list="grid2"] .sn-columns,
+  [data-list="magazine"] .sn-columns {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-list="grid3"] .sn-columns {
+    column-count: 2;
+  }
+
+  [data-list="grid2"] .sn-columns,
+  [data-list="magazine"] .sn-columns {
+    column-count: 2;
+  }
+
+  [data-list="stack"] .sn-columns {
+    column-count: 1;
+    max-width: 46rem;
+    margin-inline: auto;
+  }
+}
+
+[data-list="stack"] .sn-columns > :first-child .sn-story {
+  border-top: 4px solid var(--sn-accent);
+}
+
+/* Standalone lead block (search / article end): same open grammar as the
+   home conversion band, without the full-bleed colour field. */
+.sn-lead-standalone {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sn-border);
+}
+
+.sn-lead-standalone > .sn-card {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.sn-lead-standalone .sn-input {
+  border: 0;
+  border-bottom: 1px solid var(--sn-border-strong, var(--sn-border));
+  border-radius: 0;
+  background: transparent;
+  padding: 0.55rem 0;
+}
+
+.sn-lead-standalone .sn-input:focus {
+  border-bottom-color: var(--sn-primary);
+  box-shadow: none;
+}
+
+.sn-lead-standalone .sn-btn {
+  border-radius: 2px;
+}
+
+.sn-search-aside > .sn-card {
+  border: 0;
+  border-top: 1px solid var(--sn-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 1.1rem 0 0;
+}
+
+/* Form fields are fields, not rules: a filled surface + a visible boundary,
+   so a field can never be mistaken for a section separator. */
+.sn-convert .sn-input,
+.sn-brief .sn-input,
+.sn-lead-standalone .sn-input {
+  border: 1px solid color-mix(in srgb, var(--sn-border) 55%, var(--sn-text));
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--sn-surface) 58%, var(--sn-bg));
+  padding: 0.7rem 0.8rem;
+  box-shadow: none;
+}
+
+.sn-convert .sn-input:focus,
+.sn-brief .sn-input:focus,
+.sn-lead-standalone .sn-input:focus {
+  border-color: var(--sn-primary);
+  background: var(--sn-bg);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sn-primary) 16%, transparent);
+}
+
+.sn-convert textarea.sn-input,
+.sn-brief textarea.sn-input,
+.sn-lead-standalone textarea.sn-input {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.sn-convert select.sn-input,
+.sn-brief select.sn-input,
+.sn-lead-standalone select.sn-input {
+  min-height: 2.75rem;
+}
+
+.sn-req {
+  color: var(--sn-danger);
+  font-weight: 700;
+}
+
+.sn-required-note {
+  font-size: 0.75rem;
+  color: var(--sn-muted);
+}
+
+.sn-more {
+  margin-top: 1rem;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.sn-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--sn-border);
+  border-radius: 2px;
+  background: var(--sn-surface);
+  color: var(--sn-text);
+  font-weight: 600;
+  transition: border-color 0.16s var(--sn-ease);
+}
+
+.sn-more > summary:hover {
+  border-color: var(--sn-primary);
+}
+
+/* Campus: a corner CTA becomes a balanced two-column hero, not a small card
+   stranded under the lead story. */
+@media (min-width: 1024px) {
+  [data-skin="campus"] .sn-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+    align-items: start;
+    gap: 2.5rem;
+  }
+
+  [data-skin="campus"] .sn-hero .sn-cta {
+    max-width: none;
+    margin-left: 0;
+  }
+}
+
+/* --- forge / grid / market skins (manufacturing, energy, retail) ----------- */
+
+[data-skin="forge"] .sn-hero-card::after {
+  background-image: url("/skins/manufacturing/motif.svg");
+  background-position: right -30px bottom -40px;
+  background-size: 420px;
+  opacity: 0.42;
+}
+
+[data-skin="grid"] .sn-hero-card::after {
+  background-image: url("/skins/energy/motif.svg");
+  background-position: right -40px bottom -40px;
+  background-size: 440px;
+  opacity: 0.38;
+}
+
+[data-skin="market"] .sn-hero-card::after {
+  background-image: url("/skins/retail/motif.svg");
+  background-position: right -20px bottom -30px;
+  background-size: 400px;
+  opacity: 0.4;
+}
+
+[data-skin="forge"] .sn-eyebrow,
+[data-skin="grid"] .sn-eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.08em;
+  color: var(--sn-primary);
+}
+
+[data-skin="market"] .sn-eyebrow {
+  font-family: var(--sn-font-heading);
+  letter-spacing: 0.05em;
+  text-transform: none;
+  font-size: 0.9rem;
+}
+
+[data-skin="forge"] .sn-rule {
+  height: 1px;
+  background: var(--sn-border);
+}
+
+[data-skin="grid"] .sn-rule {
+  height: 2px;
+  background: var(--sn-accent);
+}
+
+[data-skin="market"] .sn-rule {
+  height: 0;
+  border-top: 2px dotted var(--sn-accent);
+  background: transparent;
+}
+
+[data-skin="forge"] .sn-brandmark,
+[data-skin="grid"] .sn-brandmark {
+  border-radius: 2px;
+}
+
+[data-skin="market"] .sn-brandmark {
+  border-radius: 50% 50% 50% 4px;
+}
+
+[data-skin="forge"] .sn-cta {
+  border-left: 4px solid var(--sn-accent);
+  border-radius: 0;
+}
+
+[data-skin="grid"] .sn-cta {
+  border-left: 4px solid var(--sn-accent);
+}
+
+[data-skin="market"] .sn-cta {
+  background: var(--sn-action-bg);
+  box-shadow: none;
+}
+
+[data-skin="forge"] .sn-story {
+  border-top-color: var(--sn-border);
+}
+
+[data-skin="grid"] .sn-story {
+  border-top: 2px solid color-mix(in srgb, var(--sn-accent) 45%, var(--sn-border));
+}
+
+[data-skin="market"] .sn-story {
+  border-top-style: dotted;
+  border-top-color: var(--sn-border);
+}
+
+/* Photo/scene captions always sit on a dark scrim, whatever the skin's eyebrow. */
+[data-skin] .sn-scene .sn-eyebrow {
+  color: var(--sn-on-primary);
+}
+
+/* Sanctuary: the CTA is an open editorial column, not a box. A short accent
+   rule replaces the panel edge so the white-on-pale contrast bug cannot return. */
+[data-skin="sanctuary"] .sn-cta {
+  background: transparent;
+  color: var(--sn-text);
+  border: 0;
+  border-left: 3px solid var(--sn-accent);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-skin="sanctuary"] .sn-cta::before {
+  display: none;
+}
+
+[data-skin="sanctuary"] .sn-cta .sn-eyebrow {
+  color: var(--sn-muted);
+}
+
+[data-skin="sanctuary"] .sn-cta h2 {
+  color: var(--sn-text);
+}
+
+[data-skin="sanctuary"] .sn-cta p {
+  color: var(--sn-muted);
+}
+
+[data-skin="sanctuary"] .sn-cta .sn-btn {
+  background: var(--sn-primary);
+  color: var(--sn-on-primary);
+}
+
+[data-skin="sanctuary"] .sn-cta .sn-action-link {
+  color: var(--sn-primary);
+}
+
+[data-skin="sanctuary"] .sn-cta .sn-action-disclaimer {
+  color: var(--sn-muted) !important;
+}
+
+[data-skin="sanctuary"] .sn-hero .sn-cta {
+  align-self: start;
+}
+
+[data-skin="sanctuary"] .sn-hero .sn-action-inner {
+  display: block;
+  height: auto;
+}
+
+/* Sentinel's primary is too dark for an eyebrow on the midnight canvas. */
+[data-skin="sentinel"] .sn-eyebrow {
+  color: var(--sn-accent);
+}
+
+[data-skin="sanctuary"] .sn-cta .sn-action-promises {
+  color: var(--sn-muted);
+}
+
+[data-skin="sanctuary"] .sn-cta .sn-action-promises > span + span::before {
+  background: var(--sn-accent);
+}
+
+/* Box-removal pass: skin rules used to re-introduce radius/shadow/borders on
+   the hero card and story items even after the v2 grammar removed them. Use a
+   skin-aware selector so no skin can put the box back. */
+[data-skin] .sn-hero-card {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-skin] .sn-story,
+[data-skin] .sn-story-feature {
+  border: 0;
+  border-top: 1px solid var(--sn-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-skin] .sn-story-feature {
+  border-top: 3px solid var(--sn-accent);
+}
+
+.sn-proof-band,
+.sn-convert {
+  border: 0;
+}
+
+/* --- hard invariant: marketing surfaces are square -------------------------
+   Skin rules may change colour, type, spacing and shape language, but they may
+   NOT re-introduce a corner radius on a surface. This guard sits last and uses
+   !important so a new skin cannot silently bring the boxes back. */
+[data-skin] .sn-hero,
+[data-skin] .sn-hero-card,
+[data-skin] .sn-action,
+[data-skin] .sn-cta,
+[data-skin] .sn-proof-band,
+[data-skin] .sn-scene,
+[data-skin] .sn-scene-strip,
+[data-skin] .sn-scene figcaption,
+[data-skin] .sn-story,
+[data-skin] .sn-story-feature,
+[data-skin] .sn-convert,
+[data-skin] .sn-brief,
+[data-skin] .sn-card {
+  border-radius: 0 !important;
+}
+
+/* The per-skin motif overlay behind the hero read as stray line-art and was
+   removed by operator request. Kept as a hard off switch so no skin re-adds it. */
+[data-skin] .sn-hero-card::after {
+  display: none !important;
 }

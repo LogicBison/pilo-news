@@ -8,7 +8,7 @@ Two starting points:
 
 | File | Use |
 |------|-----|
-| `apps/api/config/deployments/<slug>.json` | One complete template per channel — the five launch channels plus two custom channels (`cybersecurity`, `stem-cell`) that are not in the reference industry JSON and exist only as profiles. Each carries skin, locale copy, disclaimers, CTA, topics, verified sources, and partner. Copy one to clone a vertical. |
+| `apps/api/config/deployments/<slug>.json` | One complete template per channel — the five launch channels plus five custom channels (`cybersecurity`, `stem-cell`, `manufacturing`, `energy`, `retail`) that are not in the reference industry JSON and exist only as profiles. Each carries skin, locale copy, disclaimers, CTA, topics, verified sources, and partner. Copy one to clone a vertical. |
 | `apps/api/config/deployment.example.json` | Two-channel example that reproduces the seeded deployment exactly; running it against a fresh stack reports only `skipped` actions. |
 
 Apply one template with `--file config/deployments/<slug>.json`, or every
@@ -150,6 +150,12 @@ they do not rewrite the running environment. The importer warns when
    POST /v1/admin/refresh {"industry":"<slug>","force":true}
    GET  /v1/news/bundle?industry=<slug>&locale=en
    GET  /v1/industries/<slug>?locale=es
+   ```
+
+   Regenerate the canonical channel inventory after applying a profile:
+
+   ```bash
+   ./bin/channels.sh --write
    ```
 6. Open `https://<domain>/<slug>` and `/es/<slug>`; check theme contrast with
    `pnpm check` in `apps/web` (run inside the `web` container).

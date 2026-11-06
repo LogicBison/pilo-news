@@ -72,59 +72,86 @@ export function BriefSignup({ industry, locale, placement, articleId, sourcePage
 
   if (status === "success") {
     return (
-      <section role="status" className="sn-card sn-card-surface p-5">
-        <h2 className="text-lg font-semibold text-[var(--sn-text)]">{t(locale, "brief.title")}</h2>
+      <section id="brief-signup" role="status" className="sn-brief">
+        <span className="sn-chip">{t(locale, "brief.received")}</span>
+        <h2 className="sn-section-title mt-3 font-semibold text-[var(--sn-text)]">
+          {t(locale, "brief.title")}
+        </h2>
         <p className="mt-2 text-sm leading-relaxed text-[var(--sn-text)]">{t(locale, "brief.success")}</p>
       </section>
     );
   }
 
   return (
-    <section aria-labelledby="brief-heading" className="sn-card p-5">
-      <h2 id="brief-heading" className="text-lg font-semibold text-[var(--sn-text)]">
-        {t(locale, "brief.title")}
-      </h2>
-      <p className="mt-1 text-sm leading-relaxed text-[var(--sn-muted)]">{t(locale, "brief.body")}</p>
-      <form onSubmit={onSubmit} onFocus={onStart} className="mt-4 grid gap-3 sm:grid-cols-2">
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          {t(locale, "brief.name")}
-          <input name="name" required maxLength={100} autoComplete="given-name" className="sn-input" />
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          {t(locale, "brief.email")}
-          <input
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            className="sn-input"
-          />
-        </label>
-        <label className="flex items-start gap-2 text-xs leading-relaxed text-[var(--sn-muted)] sm:col-span-2">
-          <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4" />
-          <span>{t(locale, "brief.consent")}</span>
-        </label>
-        <input
-          type="text"
-          name="website"
-          tabIndex={-1}
-          autoComplete="off"
-          aria-hidden="true"
-          className="hidden"
-          placeholder={t(locale, "lead.honeypot")}
-        />
-        <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-          <button type="submit" className="sn-btn" disabled={status === "sending"}>
-            {status === "sending" ? t(locale, "brief.sending") : t(locale, "brief.submit")}
-          </button>
-          <p className="text-xs text-[var(--sn-muted)]">{t(locale, "brief.privacyNote")}</p>
+    <section id="brief-signup" aria-labelledby="brief-heading" className="sn-brief">
+      <div className="sn-brief-grid">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="sn-kicker" aria-hidden="true" />
+            <p className="sn-eyebrow">{t(locale, "brief.eyebrow")}</p>
+          </div>
+          <h2 id="brief-heading" className="sn-section-title mt-2 font-semibold text-[var(--sn-text)]">
+            {t(locale, "brief.title")}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--sn-muted)]">{t(locale, "brief.body")}</p>
+          <ul className="sn-brief-list">
+            <li>{t(locale, "brief.value1")}</li>
+            <li>{t(locale, "brief.value2")}</li>
+          </ul>
+          <p className="sn-required-note mt-2">{t(locale, "common.requiredNote")}</p>
         </div>
-        {status === "error" || status === "rate-limited" ? (
-          <p aria-live="polite" className="text-sm text-[var(--sn-danger,#b91c1c)] sm:col-span-2">
-            {status === "rate-limited" ? t(locale, "lead.rateLimited") : t(locale, "brief.error")}
-          </p>
-        ) : null}
-      </form>
+        <form onSubmit={onSubmit} onFocus={onStart} className="grid gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex flex-col gap-1 text-sm font-semibold">
+              <span>
+                {t(locale, "brief.name")}
+                <span className="sn-req" aria-hidden="true">
+                  {" "}*
+                </span>
+              </span>
+              <input name="name" required maxLength={100} autoComplete="given-name" className="sn-input" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm font-semibold">
+              <span>
+                {t(locale, "brief.email")}
+                <span className="sn-req" aria-hidden="true">
+                  {" "}*
+                </span>
+              </span>
+              <input name="email" type="email" required autoComplete="email" className="sn-input" />
+            </label>
+          </div>
+          <label className="flex items-start gap-2 text-xs leading-relaxed text-[var(--sn-muted)]">
+            <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4" />
+            <span>
+              <span className="sn-req" aria-hidden="true">
+                *
+              </span>{" "}
+              {t(locale, "brief.consent")}
+            </span>
+          </label>
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="hidden"
+            placeholder={t(locale, "lead.honeypot")}
+          />
+          <div className="flex flex-wrap items-center gap-3">
+            <button type="submit" className="sn-btn" disabled={status === "sending"}>
+              {status === "sending" ? t(locale, "brief.sending") : t(locale, "brief.submit")}
+            </button>
+            <p className="text-xs text-[var(--sn-muted)]">{t(locale, "brief.privacyNote")}</p>
+          </div>
+          {status === "error" || status === "rate-limited" ? (
+            <p aria-live="polite" className="text-sm text-[var(--sn-danger)]">
+              {status === "rate-limited" ? t(locale, "lead.rateLimited") : t(locale, "brief.error")}
+            </p>
+          ) : null}
+        </form>
+      </div>
     </section>
   );
 }

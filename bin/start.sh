@@ -215,6 +215,12 @@ cmd_test() {
 	compose exec -T api sh -c "cd /app && ruff check . && ruff format --check . && mypy src && pytest -q"
 	info "web: lint + typecheck + catalogs/themes"
 	compose exec -T web sh -c "cd /app && pnpm lint && pnpm typecheck && pnpm check"
+	if command -v node >/dev/null 2>&1; then
+		info "inventory: channel list"
+		./bin/channels.sh --check
+	else
+		warn "node not found - channel inventory check skipped"
+	fi
 	ok "all checks passed"
 }
 

@@ -2,31 +2,36 @@
 
 ## Session status
 
-**Closed:** 2026-11-05 - seven distinct channel skins, per-channel photography, lead qualification, 108 API tests green; UI foundation certified screen-spec-ready
+**Closed:** 2026-11-05 - editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
 
 **Updated:** 2026-11-05
 
 **Repository state:** v1 implemented plus the post-v1 operator scope. Master plan v1.1
-(Approved) executed end to end: schema/migrations (001-007), **seven** live channels
-(five reference + `cybersecurity` + `stem-cell`, the last two existing only as
-deployment profiles), 32 verified feeds, ingestion + DeepSeek summaries, public API, EN/ES sites,
+(Approved) executed end to end: schema/migrations (001-007), **ten** live channels
+(five reference + `cybersecurity` + `stem-cell` + `manufacturing` + `energy` +
+`retail`; the last five exist only as deployment profiles), 45 verified feeds, ingestion + DeepSeek summaries, public API, EN/ES sites,
 editorial console, leads, observability, CI, docs, volume backups.
 Provisioning is a ports/adapters module (`apply-profile`), source quality is an
 enforced policy (`verify-sources`), the default industry switches at runtime
-(`SN_DEFAULT_INDUSTRY` + `./bin/start.sh industry`), and the UI has a
-material-inspired surface system. **Foundation-complete: yes. Plan-master-ready: yes.
+(`SN_DEFAULT_INDUSTRY` + `./bin/start.sh industry`), and the UI ships the
+**editorial-conversion v2** grammar: open/square marketing surfaces, full-bleed
+proof/photo/conversion bands, balanced two-column coverage, filled forms, and a
+generated channel inventory (`docs/channel-inventory.md`). **Foundation-complete: yes. Plan-master-ready: yes.
 Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.**
 
 **Recommended pick-up file:** `.work/plans/NEXT.md`
-**Next session focus:** audit and finish the per-channel skins. `@ui-screen-spec review`
-the seven channel-home SPECs in `.work.ui/screens/`, run `@ui-visual-verify milestone`,
-then `@ui-accessibility-audit` (the dark cybersecurity scheme has not been a11y-audited).
+**Next session focus:** approve the ten `Review` channel-home SPECs; run
+`@ui-accessibility-audit milestone`; initialize `@ui-design-system init`; close the
+new channels' content gaps (manufacturing EN 10 / ES 41, energy EN 16 / ES 39,
+retail EN 10 / ES 1); then prd deploy/rollback and k6. Visual-verify report:
+`.work.ui/reports/20261105-visual-verify-milestone.md`.
 Skins live in `apps/web/src/lib/skins.ts` + `apps/web/src/app/skins.css`; palettes come
-from `apps/api/migrations/009_distinct_channel_palettes.sql`.
+from migration 009 plus the three new deployment profiles.
 Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev industry <slug>`
 (quick reference: `docs/guides/switching-channels.md`).
 
-**Lost or new?** Read `.cursorrules`, then `.work/plans/20261105-industry-template-verification.md`.
+**Lost or new?** Read `.cursorrules`, then `.work/plans/NEXT.md` and
+`.work.ui/reports/20261105-visual-verify-milestone.md`.
 
 ---
 
@@ -35,14 +40,14 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 1. Run **`@session-control start`**.
 2. Read `.cursorrules` and this file.
 3. Read `.work/plans/NEXT.md`.
-4. Read `.work/plans/20261105-template-deployment-plan.md` (next deliverable) and
-   `.work/plans/20261105-industry-template-verification.md` (current capability).
-5. Clone a vertical by copying `apps/api/config/deployments/<slug>.json` and
-   running `apply-profile` (see `docs/deployment-profile.md`).
+4. Approve the ten `Review` SPECs, then run `@ui-accessibility-audit milestone`;
+   read `.work.ui/reports/20261105-visual-verify-milestone.md`.
+5. Add a vertical by copying `apps/api/config/deployments/<slug>.json`, running
+   `apply-profile` (see `docs/deployment-profile.md`), then `./bin/channels.sh --write`.
 6. Re-run `python -m news_api.cli verify-sources --industry all` after any
-   portfolio change; it must exit 0.
+   portfolio change; it must exit 0 (45/45 today).
 7. Verify pending: k6 (`tests/perf/k6-smoke.js`), prd deploy/rollback, remote CI,
-   and the production image smoke checks.
+   production image smoke, CATALOG init, and the new channels' content gaps.
 8. For launch: answer U9/U8/U10/U1, then run `.work/plans/operations/20261105-launch.md`.
 
 ### Conditional reads
@@ -107,7 +112,7 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | `docker compose config` | valid dev/prd (ports + networks resolved) |
 | prd images | API wheel image built + migrations/config verified; web standalone image built + `/legal` 200 |
 | Deployment profile | `apply-profile --dry-run` + real apply on dev: 0 created, 0 updated, 20 skipped (example matches seeds) |
-| Source verification | `verify-sources --industry all`: 7 industries, 32 sources, 32 pass, 0 fail, 0 coverage warnings |
+| Source verification 2026-11-05 (10 channels) | `verify-sources --industry all`: 10 industries, 45 sources, 45 pass, 0 fail, 0 coverage warnings |
 | Stem-cell verification | `verify-sources --industry stem-cell`: 6/6 grade A; `apply-profile --dry-run`: 0 created, 0 updated, 15 skipped |
 | Channel coverage | enabled sources per channel: 4, 4, 4, 5, 4, 5, 6 (policy floor 4) |
 | Custom channel | `cybersecurity` apply: 13 created; `/v1/news/bundle` EN/ES + web page + sitemap render |
@@ -160,6 +165,10 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | 2026-11-05 | lead qualification | migration 008 (`leads.qualification` + per-channel `cta.qualify`), API field, `LeadForm` select, deployment profiles synced, 1 new contract test |
 | 2026-11-05 | ui foundation | `.work.ui/plans/foundation/01-04`, `tokens.json` (74 DTCG), certified screen-spec-ready; 7 channel-home SPECs |
 | 2026-11-05 | skins | `skins.ts` + `skins.css` + 7 motifs + 7 emblems + 7 photos; four coverage rhythms; dark scheme |
+| 2026-11-05 | ui v2 | lead-gen reference intake (`ellevest`, `hubspot`, `leadpages`) + `editorial-conversion` build; direction **Approved**; 10 SPECs bound; all ten reviewed/amended → `Review`; open/full-bleed layout, balanced CSS columns, clear filled forms; `e2e/layout.spec.ts`; 57 e2e / 1 skipped, 80 pages zero overflow, token-lint 0 raw literals |
+| 2026-11-05 | channel expansion | manufacturing, energy, retail profiles + 5/4/4 sources; Forge/Grid/Market skins + SVG bands + emblems; 10-row reference map; 45/45 sources verified; `pnpm check` 10/10 |
+| 2026-11-05 | channel inventory | `docs/channel-inventory.md` generated from `/v1/industries` (10 channels, EN/ES URLs, layout, default); `apps/web/scripts/channel-inventory.mjs` + `bin/channels.sh`; `./bin/start.sh test` fails when stale |
+| 2026-11-05 | visual verify | `@ui-visual-verify milestone`: **pass with gaps** on 10 channels; UIS-07/10 done; 57 e2e / 1 skipped; axe 11/11; report in `.work.ui/reports/20261105-visual-verify-milestone.md` |
 | 2026-11-05 | session close | commit + push; handoff/next refreshed |
 
 ---
@@ -187,14 +196,34 @@ consent-first lead form, partner routing, DSAR export/erase, funnel events, and
 lead dashboards/alerts. UI foundation and biz strategy docs remain in
 `.work.ui/` and `.work.biz/`.
 
+### 2026-11-05 — UI v2 via lead-generation reference intake
+
+**Request:** "use x-director to improve the UI with the recently updated UI Agent OS Framework, using the lead-generation references/skills now available in 'ui' os" → "too many boxes, too many rounded corners... forms confusing... unbalanced columns".
+**Frameworks involved:** `.ai`, `.ai.ui`
+**Classified bucket(s):** cross-framework (ui primary; engineering for build/verify)
+**Executed:**
+1. `@ui-reference-intake scan/dna/synthesize` — `ellevest`, `hubspot`, `leadpages` → DNA docs + direction `editorial-conversion` (Approved 2026-11-05).
+2. `@ui-component-build` (applied under operator's continue instruction) — open editorial layout, full-bleed bands, sharp corners, balanced CSS columns, per-channel CTA placement, filled forms.
+3. Verification — production build; Playwright 57 passed / 1 skipped; `e2e/layout.spec.ts` 30 checks; 80 pages 200 + zero overflow; `pnpm lint/typecheck/check` green; token-lint 0 raw.
+4. Operator approved the direction + bind package; composition tokens added to `tokens.json` (84, schema-valid); ten SPECs §13/§11 bound with `exampleIds: N/A` waiver; `SCREEN_REFERENCE_MAP.md` created; reference audit PASS.
+5. `@ui-screen-spec review` run across all ten channels; 7 SPEC-vs-build mismatches amended in each §3/§4/§5/§8/§11/§12/§13; re-check PASS 10/10; all statuses `Review` (approval still operator’s).
+6. Added `manufacturing`, `energy`, `retail`: profiles applied to dev, 45/45 sources verified, Forge/Grid/Market skins, three bound/reviewed SPECs; 57 e2e / 1 skipped; 80 pages 200 + no overflow.
+7. Channel inventory is generated from the API (`docs/channel-inventory.md`, `bin/channels.sh`); `./bin/start.sh test` runs `--check` and fails on a stale list.
+8. Visual fix after review: Sanctuary CTA opened (transparent, accent rule), skin-level hero/story radius+shadow removed, proof/conversion borders removed, health coverage moved to 2 balanced columns, Sentinel dark-scheme link/eyebrow contrast fixed; axe 11/11.
+9. Visual verify milestone: pass with gaps; UIS-07 (ship_with_notes) + UIS-10 (ship) done; 40 layout checks, 11 axe pages; square-surface + no-motif regressions enforced.
+**Coordination notes:** UI + channel data; no API/schema code changes. `.work.ui/` artifacts + `apps/web` code + `apps/api/config/deployments/*.json`; no protected files edited.
+**Blockers:** none for the build; all ten SPECs are in `Review` pending operator approval.
+**Next recommended:** approve the ten `Review` SPECs; close the new channels' content gaps; then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`.
+
 ---
 
 ## Known residual risks
 
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
 - Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
-- The UI now has a certified foundation and seven skins, but no screen SPEC is Approved yet and no visual/a11y milestone audit has run.
-- The cybersecurity channel uses a dark scheme; non-text contrast of inputs on dark has not been measured.
+- The UI now has ten channels/skins, a verified editorial-conversion v2 build and an **Approved** direction with all ten SPECs bound and reviewed (`Review`); the formal visual/a11y milestone audit has not run.
+- New channel coverage is uneven: manufacturing EN 10 vs ES 41, energy EN 16 vs ES 39, retail EN 10 vs ES 1; the three new channels use original SVG bands, not licensed photos. Profiles are applied to dev, not prd; legal/terms review (U11) still applies.
+- The cybersecurity channel uses a dark scheme; fill/border contrast of the new conversion fields was checked visually, but the matrix is not yet in `check-themes.mjs`.
 - Photo licences are recorded per file; two channels are CC BY-SA and depend on the in-caption credit staying rendered.
 - AI summaries are fail-open; some items are intentionally left without a
   summary when validation rejects output.
@@ -209,4 +238,4 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Run `@ui-visual-verify milestone` and `@ui-accessibility-audit milestone` across the seven skins, then review the channel-home SPECs; answer U9/U10/U1 and run `.work/plans/operations/20261105-launch.md`.
+Approve the ten `Review` SPECs; run `@ui-accessibility-audit milestone`; initialize the CATALOG; close the new channels' content gaps; answer U9/U10/U1 and run `.work/plans/operations/20261105-launch.md`.

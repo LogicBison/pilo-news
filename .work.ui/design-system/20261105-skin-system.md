@@ -22,43 +22,58 @@ A skin changes **structure and surface grammar**, not just colour:
 
 Every channel gets a unique tuple. No two channels share a hero, a motif, and a radius at once. Adding a channel means choosing a tuple and drawing one motif — no page code changes.
 
-## The seven skins
+## The ten skins
 
 | Channel | Skin | Hero | Motif | Radius | Rule | Eyebrow | CTA panel | Reference basis |
 |---------|------|------|-------|--------|------|---------|-----------|-----------------|
 | legal | **Chambers** | split | arches | 6px | double | serif caps | sidebar | ellevest trust-first, nerdwallet disclosure |
 | financial | **Terminal** | ledger | bars | 4px | hairline | mono ticks | banner | databox density, nerdwallet comparison |
-| behavioral-health | **Sanctuary** | split | rings | 18px | none | soft caps | inset | ellevest calm, charitywater warmth |
+| behavioral-health | **Sanctuary** | split | rings | 18px | none | soft caps | open column | ellevest calm, charitywater warmth |
 | education | **Campus** | ribbon | rules | 10px | dotted | numbered | corner | hubspot segmentation, databox proof |
 | logistics | **Network** | poster | routes | 8px | dashed | mono ticks | banner | basecamp plainness, calendly single job |
 | cybersecurity | **Sentinel** | ledger | hexes | 2px | solid accent | mono ticks | sidebar | semrush data density, userpilot product-led |
 | stem-cell | **Lab** | ribbon | cells | 14px | hairline | serif caps | inset | ellevest credibility, typeform form-first |
+| manufacturing | **Forge** | poster | gears | 3px | hairline | mono ticks | banner | leadpages conversion rhythm, hubspot proof |
+| energy | **Grid** | ledger | grid | 5px | solid accent | mono ticks | sidebar | databox density, semrush data proof |
+| retail | **Market** | split | tags | 12px | dotted | serif caps | inset | hubspot proof, ellevest low-friction capture |
 
 ## Palettes and coverage rhythm
 
-Each channel owns a colour scheme, not a tint of the same one. Contrast is gated per channel by `pnpm check` (5 pairs × 7 channels).
+Each channel owns a colour scheme, not a tint of the same one. Contrast is gated per channel by `pnpm check` (5 pairs × 10 channels).
 
 | Channel | Palette | Base | Primary | Accent | Coverage |
 |---------|---------|------|---------|--------|----------|
 | legal | ivory + burgundy | `#faf7f2` | `#5b2333` | `#a16207` | magazine (wide lead, then 2-up) |
-| financial | cool white + navy | `#f7f9fb` | `#0f2f4f` | `#0e7490` | grid3 |
-| behavioral-health | blush + plum | `#fdf7f5` | `#7c3f58` | `#b45309` | stack (single column, lead card accented) |
+| financial | cool white + navy | `#f7f9fb` | `#0f2f4f` | `#0e7490` | grid2 (balanced) |
+| behavioral-health | blush + plum | `#fdf7f5` | `#7c3f58` | `#b45309` | magazine |
 | education | parchment + forest | `#fbf8ef` | `#14532d` | `#b45309` | grid2 |
-| logistics | mist + graphite green | `#f4f6f5` | `#1f3d33` | `#c2410c` | grid3 |
+| logistics | mist + graphite green | `#f4f6f5` | `#1f3d33` | `#c2410c` | grid2 (balanced) |
 | cybersecurity | **dark** midnight + cyan | `#0b1220` | `#1e3a5f` | `#22d3ee` | grid2 |
 | stem-cell | white + deep teal | `#ffffff` | `#0f4c5c` | `#9a3412` | magazine |
+| manufacturing | mist + graphite teal | `#f5f7f6` | `#1f3a3d` | `#b45309` | grid2 (balanced) |
+| energy | cool mist + deep green | `#f7faf8` | `#123f3a` | `#0e7490` | grid2 (balanced) |
+| retail | warm white + oxblood | `#fffaf5` | `#7c2d12` | `#a16207` | magazine |
 
-App bar: `split` for legal, financial, logistics, cybersecurity; `centered` for behavioral-health, education, stem-cell.
+App bar: `split` for legal, financial, logistics, cybersecurity, manufacturing, energy; `centered` for behavioral-health, education, stem-cell, retail.
+
+**Motif overlay (2026-11-05):** the per-skin motif SVG still lives in the repo, but the hero overlay (`.sn-hero-card::after`) is **off by operator request** — the faint line-art read as stray drawing. The visible brand layer is the photo/illustration band + masthead emblem. `e2e/layout.spec.ts` asserts the overlay is `display:none` on every channel.
+
+**Square surfaces (2026-11-05):** marketing surfaces use `border-radius: 0 !important` under `[data-skin]` (hero, action panel, proof, scene, story, conversion, brief, cards). Skin rules cannot re-introduce a radius; `e2e/layout.spec.ts` checks computed `0px` on every channel.
+
+**Coverage balance (2026-11-05):** story grids are rendered as CSS multi-columns (`column-fill: balance`), not fixed grid tracks. The earlier per-column DOM made one column 300–400 px longer than the other. `grid3` remains in the type/CSS for future feeds, but no current channel uses three columns: with nine uneven stories the third column ended 288–408 px short. Two balanced columns are the default for `grid2`, `grid3` and `magazine`; `stack` remains available for future feeds but no current channel uses it (behavioral-health moved to `magazine`). The regression check is `apps/web/e2e/layout.spec.ts`.
 
 Design intent per channel:
 
 - **Chambers** — an institution, not a blog. Serif headline, double rule under the hero, CTA in a margin column. Nothing urgent, nothing loud.
 - **Terminal** — numbers first. Hairline grid, tabular figures, accent only as a marker on the active row. The CTA reads as a data request, not a sales pitch.
-- **Sanctuary** — softness as a signal of safety: no hard rules, wide radius, rings that never close. CTA as an inset panel, low pressure.
+- **Sanctuary** — softness as a signal of safety: no hard rules, wide radius, rings that never close. CTA as an open accent-rule column, low pressure.
 - **Campus** — a course catalogue: ribbon header, numbered sections, dotted separators. CTA anchored in the corner of the hero block.
 - **Network** — a dispatch board: poster hero, dashed route lines, mono labels, metric chips. CTA as a banner across the fold.
 - **Sentinel** — an operations console: ledger layout, hex lattice, square corners, accent rail. CTA as a sidebar.
 - **Lab** — a research brief: ribbon hero, cellular motifs, hairline rules, ethics note beside the CTA.
+- **Forge** — a plant floor: poster hero, gear lattice, hairline rules, banner CTA and tabular production labels.
+- **Grid** — a control room: ledger hero, grid motif, accent rules, sidebar CTA and data-first proof.
+- **Market** — a storefront: split hero, tag motif, dotted rules, inset CTA and warm editorial voice.
 
 ## Reference mapping (operator list)
 
@@ -74,7 +89,7 @@ Design intent per channel:
 | nerdwallet | comparison clarity + disclosure placement | Terminal rules, legal disclaimer slot |
 | monday | benefit-led cards | Campus card headers |
 | leadpages | CTA repetition | Terminal banner, Network banner |
-| charitywater | emotional proof + single CTA | Sanctuary inset |
+| charitywater | emotional proof + single CTA | Sanctuary open column |
 | semrush | data-rich proof | Sentinel metric rail |
 | mailchimp | tone-led voice | Network mono labels + plain lines |
 | warbyparker | low-friction entry | Terminal two-field brief |
@@ -117,11 +132,8 @@ Article placement is deliberately **after** the related stories and **before** t
 
 `pnpm lint`, `pnpm typecheck`, `pnpm check`, then screenshot each channel home and compare: hero, rule, radius, motif, CTA panel must differ on at least three dimensions between any two channels.
 
-## Open questions
-
-1. Once copy is rewritten per channel (per-channel screen SPECs), do titles need a per-skin type scale bump, or is one scale enough?
-2. Photography: still absent by choice. If a channel later gets licensed imagery, it needs a SPEC and a performance budget.
+Run `bash $AI_UI_SOURCE/scripts/token-lint.sh --tokens apps/web/src/app/globals.css --tokens apps/web/src/lib/theme.ts apps/web/src` for the raw-hex gate. `apps/web/e2e/layout.spec.ts` adds the balance/stability gate: for every channel it asserts no horizontal overflow, no oversized CTA on task pages, the hero action panel stays inside the viewport, and the coverage columns' last-item bottom spread is ≤ 260 px. Run it against a production build (`pnpm build` → `pnpm start`) — dev-mode hydration timing is not a reliable signal for this check.
 
 ## Next action
 
-`@ui-screen-spec create - channel-home` — per-channel copy and hero composition on top of the skins.
+Bind the approved direction to the seven channel-home SPECs and run the visual/a11y milestone audit; the skin system itself is implemented and balanced.

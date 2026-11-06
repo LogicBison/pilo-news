@@ -79,7 +79,7 @@ export default async function ChannelHome({ params }: Params) {
           </div>
           <StoryColumns bundle={bundle} locale={resolved} industry={industry} />
           {bundle.sources.length > 0 ? (
-            <section aria-labelledby="sources-heading" className="sn-card mt-10 p-5">
+            <section aria-labelledby="sources-heading" className="sn-editorial-block mt-10">
               <h2 id="sources-heading" className="sn-eyebrow">
                 {t(resolved, "home.sources")}
               </h2>
@@ -96,17 +96,31 @@ export default async function ChannelHome({ params }: Params) {
           ) : null}
         </>
       )}
-      <section className="mt-12 grid gap-5">
-        <TrustBlock locale={resolved} />
-        <LeadForm
-          industry={industry}
-          industryName={channel.name}
-          locale={resolved}
-          kind={channel.cta.kind ?? "consultation"}
-          placement="home"
-          sourcePage={homePath}
-          qualify={channel.cta.qualify}
-        />
+      <section className="sn-convert" aria-labelledby="convert-heading">
+        <div className="max-w-2xl">
+          <div className="flex items-center gap-2">
+            <span className="sn-kicker" aria-hidden="true" />
+            <p className="sn-eyebrow">{t(resolved, "convert.eyebrow")}</p>
+          </div>
+          <h2 id="convert-heading" className="sn-section-title mt-2 text-[var(--sn-text)]">
+            {t(resolved, "convert.title")}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--sn-muted)]">
+            {t(resolved, "convert.body")}
+          </p>
+        </div>
+        <div className="sn-convert-grid">
+          <TrustBlock locale={resolved} />
+          <LeadForm
+            industry={industry}
+            industryName={channel.name}
+            locale={resolved}
+            kind={channel.cta.kind ?? "consultation"}
+            placement="home"
+            sourcePage={homePath}
+            qualify={channel.cta.qualify}
+          />
+        </div>
         <BriefSignup
           industry={industry}
           locale={resolved}

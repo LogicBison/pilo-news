@@ -1,5 +1,5 @@
 import type { BundleData } from "@/lib/api";
-import { formatDate, t, type Locale } from "@/lib/i18n";
+import { formatDay, t, type Locale } from "@/lib/i18n";
 
 /**
  * Verifiable proof strip. Every value comes from the bundle the page already
@@ -18,30 +18,27 @@ export function ProofStrip({ bundle, locale }: { bundle: BundleData; locale: Loc
     },
     {
       label: t(locale, "proof.updated"),
-      value: formatDate(bundle.generated_at, locale),
+      value: formatDay(bundle.generated_at, locale),
+    },
+    {
+      label: t(locale, "proof.independentLabel"),
+      value: t(locale, "proof.independentValue"),
     },
   ];
 
   return (
-    <section aria-label={t(locale, "proof.label")} className="mt-6">
-      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <section aria-label={t(locale, "proof.label")} className="sn-proof-band">
+      <dl className="sn-proof-grid">
         {facts.map((fact) => (
-          <div key={fact.label} className="sn-card sn-card-surface px-4 py-3">
-            <dt className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[var(--sn-muted)]">
+          <div key={fact.label} className="sn-proof-item">
+            <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--sn-muted)]">
               {fact.label}
             </dt>
-            <dd className="mt-1 text-sm font-semibold text-[var(--sn-text)]">{fact.value}</dd>
+            <dd className="sn-proof-value">{fact.value}</dd>
           </div>
         ))}
-        <div className="sn-card sn-card-surface px-4 py-3">
-          <dt className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[var(--sn-muted)]">
-            {t(locale, "proof.independentLabel")}
-          </dt>
-          <dd className="mt-1 text-sm font-semibold text-[var(--sn-text)]">
-            {t(locale, "proof.independentValue")}
-          </dd>
-        </div>
       </dl>
+      <p className="sn-proof-note">{t(locale, "proof.sourceNote")}</p>
     </section>
   );
 }

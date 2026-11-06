@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { CtaCard } from "@/components/CtaCard";
+import { BriefSignup } from "@/components/BriefSignup";
 import { LeadForm } from "@/components/LeadForm";
+import { TrustBlock } from "@/components/TrustBlock";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
@@ -43,7 +44,7 @@ export default async function AboutPage({ params }: Params) {
         <p className="text-base leading-relaxed text-[var(--sn-muted)]">
           {t(resolved, "about.body2", { industry: name })}
         </p>
-        <section aria-labelledby="how-heading" className="sn-card p-5">
+        <section aria-labelledby="how-heading" className="sn-editorial-block">
           <h2 id="how-heading" className="text-xl font-semibold text-[var(--sn-text)]">
             {t(resolved, "about.howTitle")}
           </h2>
@@ -58,7 +59,7 @@ export default async function AboutPage({ params }: Params) {
             {t(resolved, "about.contact")}
           </a>
         </p>
-        <div className="pt-4">
+        <div className="sn-lead-standalone pt-4">
           <LeadForm
             industry={industry}
             industryName={name}
@@ -69,8 +70,16 @@ export default async function AboutPage({ params }: Params) {
             qualify={channel.cta.qualify}
           />
         </div>
+        <BriefSignup
+          industry={industry}
+          locale={resolved}
+          placement="brief-about"
+          sourcePage={localePath(resolved, `/${industry}/about`)}
+        />
       </article>
-      <CtaCard industry={channel} locale={resolved} placement="about" />
+      <aside className="sn-search-aside h-fit lg:sticky lg:top-24">
+        <TrustBlock locale={resolved} />
+      </aside>
     </div>
   );
 }

@@ -11,7 +11,7 @@
 | **Design source (DTCG)** | `.work.ui/design-system/tokens.json` | canonical token definitions, `$type`/`$value`, OKLCH, aliases — validated (`token-schema-verify.sh`) |
 | **Channel values (data)** | `industries.theme` JSONB (`apps/api/migrations/002_seed_industries.sql:8-40`, `apps/config/deployments/*.json`) | per-channel overrides, injected at request time by `apps/web/src/lib/theme.ts:37-51` |
 
-**Boundary rule:** `tokens.json` holds the fallback palette (the `editorial` default) and the full UI scale. Per-channel colours are **data**, never copied into `tokens.json` — one source of truth per layer, no drift. `tokens.json` is validated by `token-schema-verify.sh` (74 tokens, ok, measured 2026-11-05).
+**Boundary rule:** `tokens.json` holds the fallback palette (the `editorial` default) and the full UI scale. Per-channel colours are **data**, never copied into `tokens.json` — one source of truth per layer, no drift. `tokens.json` is validated by `token-schema-verify.sh` (84 tokens, ok, measured 2026-11-05).
 
 **Projection rule:** the CSS layer still receives hex from `industries.theme` because the backend contract requires 6-digit hex (`apps/api/src/news_api/channels/domain/theme.py:70-74`). Each colour token therefore carries its hex projection under `$extensions.sn.hex`; the OKLCH value is the design source, the hex is the wire format. Moving the wire format to OKLCH is a backend change — out of scope, recorded in UU2.
 
@@ -28,7 +28,7 @@ Light is the only shipped scheme (`apps/web/src/app/globals.css:14`); dark is de
 | `color.text.primary` | `--sn-text` | `oklch(21.0% 0.0318 264.7)` · `#111827` | body, headings |
 | `color.text.secondary` | new `--sn-text-secondary` | `oklch(37.3% 0.0306 259.7)` · `#374151` | support copy |
 | `color.text.muted` | `--sn-muted` | `oklch(44.6% 0.0263 256.8)` · `#4b5563` | timestamps, captions |
-| `color.text.on-primary` | hardcoded `#ffffff` (retire) | `oklch(100% 0 0)` · `#ffffff` | text on primary fill |
+| `color.text.on-primary` | `--sn-on-primary` | `oklch(100% 0 0)` · `#ffffff` | text on primary fill |
 | `color.border.subtle` | new `--sn-border-subtle` | `oklch(93.3% 0.0092 258.3)` · `#e5e9ef` | region separators |
 | `color.border.default` | `--sn-border` | `oklch(89.8% 0.0127 255.5)` · `#d8dee6` | decorative borders only |
 | `color.border.strong` | new `--sn-border-strong` | `oklch(59.8% 0.0252 260.7)` · `#77808f` | control boundaries (1.4.11) |
@@ -37,10 +37,13 @@ Light is the only shipped scheme (`apps/web/src/app/globals.css:14`); dark is de
 | `color.focus.ring` | `--sn-accent` | alias → `color.brand.accent` | focus-visible outline |
 | `color.state.success` | new `--sn-success` | `#15803d` | confirmations |
 | `color.state.warning` | new `--sn-warning` | `#b45309` | degraded/retry notice |
-| `color.state.danger` | new `--sn-danger` | `#b91c1c` | field errors |
+| `color.shade` | `--sn-shade` | `oklch(0% 0 0)` · `#000000` | mix base for action surface |
+| `color.state.danger` | `--sn-danger` (contrast-aware) | `#b91c1c` light / `#fca5a5` dark | field errors |
 | `color.state.info` | new `--sn-info` | `#0b4f6c` | language-fallback notice |
 
 Non-colour tokens: `space.0-16` (4px base), `radius.sm|md|lg|xl|pill`, `elevation.1|2|3|inset`, `font.*`, `motion.*`, `z.base|sticky|overlay|toast`, `breakpoint.sm|md|lg|xl` — full values in `tokens.json`.
+
+**Conversion composition tokens (2026-11-05).** `component.action.*`, `component.band`, `component.lift` and `component.field.*` (fill / border / radius) are runtime aliases over `color.brand.primary`, `color.text.on-primary`, `color.surface.inset` and `color.border.strong`; the exact CSS derivation is in `$extensions.sn.css`. `--sn-on-primary`, `--sn-shade` and the contrast-aware `--sn-danger` are injected by `apps/web/src/lib/theme.ts`. `token-schema-verify.sh` = **84 tokens**.
 
 ## Surface & control tokens (craft tier: refined)
 
@@ -87,7 +90,7 @@ Reading: every channel clears 4.5:1 on the five gated pairs, and the accent clea
 | Contrast ratios in the table | measured (WCAG 2.1 relative luminance) |
 | Input boundary 1.26–1.48:1 vs 3:1 floor | measured |
 | `border.strong` `#77808f` = 3.99:1 on white, 3.59:1 on inset | measured |
-| `tokens.json` valid DTCG, 74 tokens | measured (`token-schema-verify.sh`) |
+| `tokens.json` valid DTCG, 84 tokens | measured (`token-schema-verify.sh`) |
 | OKLCH values are the design source, hex the wire format | assumption — depends on a future backend change (UU2) |
 | Base `#fbfbfd` vs elevated `#ffffff` reads as a stack at 1.03:1 | assumption — verify visually in `@ui-visual-verify` |
 

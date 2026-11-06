@@ -42,3 +42,6 @@ apps/web/.next-build/
 apps/web/test-results/
 apps/web/playwright-report/
 apps/web/blob-report/
+
+# UI reference-intake raw captures (derived evidence lives in .work.ui/inputs/)
+.work.ui/tmp/

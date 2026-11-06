@@ -1,0 +1,283 @@
+{
+ "brand": "System News",
+ "site_url": "http://localhost:43991",
+ "default_locale": "en",
+ "refresh_interval_minutes": 720,
+ "default_industry": "manufacturing",
+ "industries": [
+  {
+   "slug": "manufacturing",
+   "code": "MFG_OPERATIONS",
+   "name": "Manufacturing & Industrial Operations",
+   "theme": {
+    "primary": "#1f3a3d",
+    "accent": "#b45309",
+    "bg": "#f5f7f6",
+    "surface": "#e9efed",
+    "text": "#111827",
+    "muted": "#4b5563",
+    "border": "#cbd5d1",
+    "radius": "6px",
+    "font_heading": "Arial, Helvetica, sans-serif",
+    "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+    "layout": "professional"
+   },
+   "locales": {
+    "en": {
+     "name": "Manufacturing & Industrial Operations",
+     "tagline": "Plants, quality, automation, and industrial policy - in plain language."
+    },
+    "es": {
+     "name": "Manufactura y Operaciones Industriales",
+     "tagline": "Plantas, calidad, automatización y política industrial, en lenguaje claro."
+    }
+   },
+   "disclaimers": {
+    "en": "News, not operational, safety, or engineering advice. Verify standards and controls with a qualified engineer.",
+    "es": "Noticias, no asesoría operativa, de seguridad ni de ingeniería. Verifique normas y controles con un ingeniero calificado."
+   },
+   "cta": {
+    "kind": "consultation",
+    "headline": {
+     "en": "Talk to an industrial operations partner",
+     "es": "Hable con un socio de operaciones industriales"
+    },
+    "body": {
+     "en": "Tell us what you are trying to fix on the floor. We route qualified requests to an independent partner.",
+     "es": "Cuéntenos qué intenta resolver en planta. Canalizamos solicitudes calificadas a un socio independiente."
+    },
+    "label": {
+     "en": "Request a consultation",
+     "es": "Solicitar una consulta"
+    },
+    "secondary_label": {
+     "en": "Get the weekly brief",
+     "es": "Recibir el resumen semanal"
+    },
+    "qualify": {
+     "label": {
+      "en": "Operational need",
+      "es": "Necesidad operativa"
+     },
+     "required": true,
+     "options": [
+      {
+       "value": "automation",
+       "label": {
+        "en": "Automation & robotics",
+        "es": "Automatización y robótica"
+       }
+      },
+      {
+       "value": "quality",
+       "label": {
+        "en": "Quality & inspection",
+        "es": "Calidad e inspección"
+       }
+      },
+      {
+       "value": "supply-chain",
+       "label": {
+        "en": "Supply chain & sourcing",
+        "es": "Cadena de suministro y abastecimiento"
+       }
+      },
+      {
+       "value": "compliance",
+       "label": {
+        "en": "Safety & compliance",
+        "es": "Seguridad y cumplimiento"
+       }
+      },
+      {
+       "value": "other",
+       "label": {
+        "en": "Something else",
+        "es": "Otra necesidad"
+       }
+      }
+     ]
+    }
+   },
+   "timezone": "America/El_Salvador",
+   "retention_days": 30,
+   "sort_order": 80,
+   "enabled": true,
+   "topics": [
+    {
+     "slug": "automation",
+     "label": {
+      "en": "Automation",
+      "es": "Automatización"
+     },
+     "weight": 1.3,
+     "keywords": {
+      "en": [
+       "automation",
+       "robotics",
+       "cobot",
+       "plc",
+       "digital twin"
+      ],
+      "es": [
+       "automatización",
+       "robótica",
+       "cobot",
+       "plc"
+      ]
+     }
+    },
+    {
+     "slug": "quality",
+     "label": {
+      "en": "Quality",
+      "es": "Calidad"
+     },
+     "weight": 1.2,
+     "keywords": {
+      "en": [
+       "quality",
+       "defect",
+       "inspection",
+       "iso",
+       "metrology"
+      ],
+      "es": [
+       "calidad",
+       "defecto",
+       "inspección",
+       "metrología"
+      ]
+     }
+    },
+    {
+     "slug": "supply-chain",
+     "label": {
+      "en": "Supply Chain",
+      "es": "Cadena de Suministro"
+     },
+     "weight": 1.3,
+     "keywords": {
+      "en": [
+       "supply chain",
+       "sourcing",
+       "reshoring",
+       "tariff",
+       "procurement"
+      ],
+      "es": [
+       "cadena de suministro",
+       "abastecimiento",
+       "arancel",
+       "compras"
+      ]
+     }
+    },
+    {
+     "slug": "workforce",
+     "label": {
+      "en": "Workforce",
+      "es": "Fuerza Laboral"
+     },
+     "weight": 1.1,
+     "keywords": {
+      "en": [
+       "workforce",
+       "skills",
+       "training",
+       "labor",
+       "apprentice"
+      ],
+      "es": [
+       "fuerza laboral",
+       "habilidades",
+       "formación",
+       "mano de obra"
+      ]
+     }
+    },
+    {
+     "slug": "safety",
+     "label": {
+      "en": "Safety",
+      "es": "Seguridad"
+     },
+     "weight": 1.2,
+     "keywords": {
+      "en": [
+       "safety",
+       "osha",
+       "incident",
+       "compliance",
+       "lockout"
+      ],
+      "es": [
+       "seguridad",
+       "incidente",
+       "cumplimiento",
+       "bloqueo"
+      ]
+     }
+    }
+   ],
+   "sources": [
+    {
+     "name": "Assembly Magazine",
+     "feed_url": "https://www.assemblymag.com/rss/topic/2628-news",
+     "language": "en",
+     "trust": 0.85,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    },
+    {
+     "name": "Plant Engineering",
+     "feed_url": "https://www.plantengineering.com/feed/",
+     "language": "en",
+     "trust": 0.82,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    },
+    {
+     "name": "Design World",
+     "feed_url": "https://www.designworldonline.com/feed/",
+     "language": "en",
+     "trust": 0.82,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    },
+    {
+     "name": "Interempresas",
+     "feed_url": "https://www.interempresas.net/rss/",
+     "language": "es",
+     "trust": 0.82,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    },
+    {
+     "name": "Metalmecánica",
+     "feed_url": "https://www.metalmecanica.com/rss",
+     "language": "es",
+     "trust": 0.8,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    }
+   ],
+   "partner": {
+    "name": "Launch Manufacturing Partner",
+    "contact_email": "manufacturing-partner@example.com",
+    "weight": 1.0,
+    "regions": []
+   }
+  }
+ ]
+}

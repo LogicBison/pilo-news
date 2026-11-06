@@ -27,6 +27,7 @@ export function SkinScene({
 }) {
   const home = localePath(locale, `/${channel.slug}`);
   const compact = variant === "strip";
+  const illustration = skin.photo.endsWith(".svg");
 
   return (
     <figure className={compact ? "sn-scene sn-scene-strip" : "sn-scene"}>
@@ -38,6 +39,7 @@ export function SkinScene({
         sizes={compact ? "(min-width: 1024px) 768px, 100vw" : "(min-width: 1024px) 1152px, 100vw"}
         className="sn-scene-img"
         loading={compact ? "lazy" : "eager"}
+        unoptimized={illustration}
       />
       <figcaption>
         <span className="sn-eyebrow">{channel.name}</span>

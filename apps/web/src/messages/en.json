@@ -28,6 +28,7 @@
     "dismiss": "Dismiss",
     "optional": "optional",
     "required": "required",
+    "requiredNote": "Fields marked * are required.",
     "error": "Something went wrong.",
     "skipToContent": "Skip to content"
   },
@@ -101,12 +102,18 @@
   },
   "lead": {
     "title": "Talk to a vetted professional",
+    "eyebrow": "Request a consultation",
+    "received": "Request received",
+    "optionalDetails": "Add details (optional)",
+    "responseTime": "Reply within one business day",
+    "successNext": "Want the weekly brief while you wait?",
     "intro": "Tell us what you need. We route qualified requests to an independent partner for this channel.",
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
     "company": "Company",
     "message": "What do you need?",
+    "details": "Additional details",
     "consent": "I agree to be contacted about this request and have read the privacy policy.",
     "consentLink": "Privacy policy",
     "submit": "Send request",
@@ -125,6 +132,10 @@
   "cta": {
     "primary": "Request a consultation",
     "secondary": "Get the weekly brief",
+    "briefLink": "Or get the weekly brief",
+    "promise1": "No obligation",
+    "promise2": "One partner per channel",
+    "promise3": "Reply in one business day",
     "sticky": "Talk to a partner",
     "dismiss": "Dismiss the partner bar",
     "placementHero": "hero",
@@ -257,10 +268,12 @@
     "languagesValue": "English · Español",
     "updated": "Updated",
     "independentLabel": "Independent",
-    "independentValue": "No paywall · No ads"
+    "independentValue": "No paywall · No ads",
+    "sourceNote": "Facts from this channel's live bundle."
   },
   "trust": {
     "title": "How this works",
+    "eyebrow": "The process",
     "step1Title": "Send the form",
     "step1Body": "Name, email, and what you need. One request, one channel.",
     "step2Title": "We route it",
@@ -271,6 +284,10 @@
   },
   "brief": {
     "title": "Get the weekly brief",
+    "eyebrow": "The weekly brief",
+    "received": "You are on the list",
+    "value1": "One email a week, with the Monday refresh.",
+    "value2": "Stories only — no ads, no partner pitches.",
     "body": "One email a week with the stories that moved this field, plus what to watch next.",
     "name": "First name",
     "email": "Email",
@@ -280,6 +297,11 @@
     "success": "You are on the list. The next brief goes out with the Monday refresh.",
     "error": "That did not send. Check the email address and try again.",
     "privacyNote": "No spam, one click to leave."
+  },
+  "convert": {
+    "eyebrow": "Let's talk",
+    "title": "Tell us what you need",
+    "body": "One form, one vetted partner for this channel, and a reply within one business day."
   },
   "legal": {
     "privacyTitle": "Privacy",

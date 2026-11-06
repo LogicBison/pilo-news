@@ -75,6 +75,31 @@ export function SkinEmblem({ skin, className }: { skin: Skin; className?: string
           <path d="M9 12.2l2.1 2.1 4-4.3" />
         </svg>
       );
+    case "forge":
+      // gear: production, repeatable process
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8" />
+        </svg>
+      );
+    case "grid":
+      // pylon and current
+      return (
+        <svg {...common}>
+          <path d="M12 3 6.5 21M12 3l5.5 18M8 9h8M9.5 15h5" />
+          <path d="M3 7c3 2 6 2 9 0s6-2 9 0M3 17c3 2 6 2 9 0s6-2 9 0" strokeDasharray="2 2.5" />
+        </svg>
+      );
+    case "market":
+      // price tag with a punched hole
+      return (
+        <svg {...common}>
+          <path d="M4 4h8l8 8-8 8-8-8V4Z" />
+          <circle cx="8" cy="8" r="1.4" />
+          <path d="M11 11l4 4" />
+        </svg>
+      );
     case "lab":
       // cell with nucleus
       return (

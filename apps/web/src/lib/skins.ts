@@ -5,12 +5,15 @@ export type SkinKey =
   | "campus"
   | "network"
   | "sentinel"
-  | "lab";
+  | "lab"
+  | "forge"
+  | "grid"
+  | "market";
 
 export type HeroVariant = "split" | "ledger" | "poster" | "ribbon";
 export type RuleStyle = "double" | "hairline" | "dotted" | "dashed" | "none" | "accent";
 export type EyebrowStyle = "serif" | "mono" | "numbered" | "soft";
-export type CtaPanel = "sidebar" | "banner" | "inset" | "corner";
+export type CtaPanel = "sidebar" | "banner" | "inset" | "corner" | "open";
 export type ListLayout = "grid3" | "grid2" | "stack" | "magazine";
 export type BarLayout = "split" | "center";
 
@@ -75,7 +78,7 @@ const TERMINAL: Skin = {
   eyebrow: "mono",
   cta: "banner",
   rail: "scroll",
-    list: "grid3",
+    list: "grid2",
     bar: "split",
   references: ["databox", "nerdwallet"],
 };
@@ -91,9 +94,9 @@ const SANCTUARY: Skin = {
   radius: "18px",
   rule: "none",
   eyebrow: "soft",
-  cta: "inset",
+  cta: "open",
   rail: "static",
-    list: "stack",
+    list: "magazine",
     bar: "center",
   references: ["ellevest", "charitywater"],
 };
@@ -129,7 +132,7 @@ const NETWORK: Skin = {
   eyebrow: "mono",
   cta: "banner",
   rail: "scroll",
-    list: "grid3",
+    list: "grid2",
     bar: "split",
   references: ["basecamp", "calendly"],
 };
@@ -172,6 +175,61 @@ const LAB: Skin = {
   references: ["ellevest", "typeform"],
 };
 
+
+const FORGE: Skin = {
+  key: "forge",
+  label: "Forge",
+  hero: "poster",
+  motif: "/skins/manufacturing/motif.svg",
+  scene: "/skins/manufacturing/scene.svg",
+  photo: "/photos/manufacturing/band.svg",
+  photoSmall: "/photos/manufacturing/band.svg",
+  radius: "3px",
+  rule: "hairline",
+  eyebrow: "mono",
+  cta: "banner",
+  rail: "scroll",
+  list: "grid2",
+  bar: "split",
+  references: ["leadpages", "hubspot"],
+};
+
+const GRID: Skin = {
+  key: "grid",
+  label: "Grid",
+  hero: "ledger",
+  motif: "/skins/energy/motif.svg",
+  scene: "/skins/energy/scene.svg",
+  photo: "/photos/energy/band.svg",
+  photoSmall: "/photos/energy/band.svg",
+  radius: "5px",
+  rule: "accent",
+  eyebrow: "mono",
+  cta: "sidebar",
+  rail: "static",
+  list: "grid2",
+  bar: "split",
+  references: ["databox", "semrush"],
+};
+
+const MARKET: Skin = {
+  key: "market",
+  label: "Market",
+  hero: "split",
+  motif: "/skins/retail/motif.svg",
+  scene: "/skins/retail/scene.svg",
+  photo: "/photos/retail/band.svg",
+  photoSmall: "/photos/retail/band.svg",
+  radius: "12px",
+  rule: "dotted",
+  eyebrow: "serif",
+  cta: "inset",
+  rail: "scroll",
+  list: "magazine",
+  bar: "center",
+  references: ["hubspot", "ellevest"],
+};
+
 export const SKINS: Record<string, Skin> = {
   legal: CHAMBERS,
   financial: TERMINAL,
@@ -180,6 +238,9 @@ export const SKINS: Record<string, Skin> = {
   logistics: NETWORK,
   cybersecurity: SENTINEL,
   "stem-cell": LAB,
+  manufacturing: FORGE,
+  energy: GRID,
+  retail: MARKET,
 };
 
 const LAYOUT_FALLBACK: Record<string, Skin> = {

@@ -1,7 +1,7 @@
 # Cybersecurity & Threat Intelligence — channel home screen SPEC
 
 **What it is:** screen SPEC for the `cybersecurity` channel home (`/{industry}` → `/cybersecurity`, `/es/cybersecurity`), the page that carries this channel's skin and lead CTA.
-**Status:** Draft (2026-11-05) — built ahead of review per operator instruction · **Needs:** `@ui-screen-spec review - cybersecurity` then approval.
+**Status:** Review (2026-11-05) — amended after review findings · **Needs:** operator approval; `@ui-visual-verify milestone` after approval.
 
 ## 1. Summary
 
@@ -15,30 +15,32 @@ Primary: P1 industry reader. Job: judge whether an advisory applies to my stack;
 
 | State | Treatment |
 |-------|-----------|
-| Loading | route `loading.tsx` skeleton (cards + hero block) |
+| Loading | route `loading.tsx` skeleton (lead block + coverage placeholders) |
 | Empty | `EmptyState` with channel context; CTA stays visible |
 | Partial / fallback | `FallbackNotice` when the bundle language differs |
 | Error / degraded | `DegradedNotice` with retry; shell renders, never blank |
+| Success | lead form replaced by a confirmation + brief link; brief form replaced by its confirmation |
 | No leads configured | CTA panel renders copy but no form; form hidden behind a config check |
+| Permission denied | N/A — public screen, no authenticated area |
 
 ## 4. Layout & hierarchy
 
 | Region | Content | Notes |
 |--------|---------|-------|
 | App bar | emblem, channel name, nav, locale switch | sticky; skin-specific border |
-| Hero (ledger) | lead story, favourite rail, CTA panel | one H1, one primary CTA |
-| Illustration band | `SkinScene` (Sentinel) | decorative, captioned with the tagline |
-| Proof strip | stories live, languages, updated, independence | verifiable numbers only |
-| Desk brief + topic rail | AI summary, topics | 2:1 grid at `lg` |
-| Coverage columns | story cards | 3-up at `lg`, 1-up mobile |
-| Sources | publisher list | links open in a new tab |
-| CTA stack | trust block, lead form, brief capture | one primary action |
+| Hero (ledger) | lead story, favourite rail, action panel | open editorial layout; no hero card; one H1, one primary CTA; Sentinel keeps the sidebar action panel at lg |
+| Proof band | stories live, languages, updated, independence | full-bleed tinted band; verifiable numbers only |
+| Photo band | licensed channel photo + scrim | full-bleed; caption + credit |
+| Desk brief + topic rail | AI summary, topics | 2:1 grid at `lg`; open blocks with top rules |
+| Coverage | story items | balanced 2-column CSS multi-column at `lg`; 1-up mobile; no ragged column |
+| Sources | publisher list | open list, links open in a new tab |
+| Conversion band | process + lead form + brief capture | full-bleed tinted band; filled fields; one primary action |
 
-Breakpoints: `sm` 640, `md` 768, `lg` 1024, `xl` 1280. Mobile first; hero stacks before the CTA.
+Breakpoints: `sm` 640, `md` 768, `lg` 1024, `xl` 1280. Mobile first; hero stacks before the action panel.
 
 ## 5. Content
 
-Copy lives in `apps/web/src/messages/{en,es}.json`; channel strings come from `industries` (name, tagline, disclaimers, cta). Primary CTA: "Talk to a vetted security partner". Form asks: need type.
+Copy lives in `apps/web/src/messages/{en,es}.json`; channel strings come from `industries` (name, tagline, disclaimers, cta). Primary CTA: "Talk to a vetted security partner". Form: name, email, qualification select, consent, optional phone/company under "Add details (optional)", optional "Additional details". Brief form: first name, email, consent. Required fields carry a visible `*` and the "Fields marked * are required" note.
 
 ## 6. Interactions
 
@@ -50,7 +52,9 @@ Focus order: skip link → emblem/home → nav → locale switch → hero H1 →
 
 ## 8. Tokens & components
 
-Surface stack from foundation doc 02. Components in use: `Header` (done, emblem), `Hero` (done), `SkinScene` (done), `ProofStrip` (done), `StoryCard` (done), `CtaCard` (done), `TrustBlock` (done), `LeadForm` (done, native `<select>` — `Select` primitive planned), `BriefSignup` (done), `StickyCta` (done). `Skeleton` and `Notice` primitives: planned (P1) — current treats via `loading.tsx` and `Notices.tsx`.
+Surface stack from foundation doc 02; conversion composition tokens `component.action.*`, `component.band`, `component.field.*` (84 DTCG tokens, schema-valid). Components in use: `Header` (done, emblem), `Hero` (done, open editorial — no card), `SkinScene` (done, full-bleed photo band + article strip), `ProofStrip` (done, open band), `StoryCard` (done, open editorial item), `CtaCard` (done, action panel), `TrustBlock` (done), `LeadForm` (done, filled fields; native `<select>` — **native allowed** waiver until the P1 `Select` primitive ships), `BriefSignup` (done, open band), `StickyCta` (done). `Skeleton` and `Notice` primitives: planned (P1) — current treats via `loading.tsx` and `Notices.tsx` (**native allowed** waiver).
+
+**Catalog waiver:** `.work.ui/design-system/CATALOG.md` is not initialized yet (`@ui-design-system init` P1); the components above are screen-level compositions, not catalog primitives. No catalog primitive is claimed as `done`; this is the documented waiver for the review gate.
 
 ## 9. Accessibility
 
@@ -63,13 +67,16 @@ Events: `cta_impression`, `cta_click`, `lead_form_start`, `lead_submit{result}` 
 ## 11. Acceptance criteria
 
 - [ ] Channel renders its own skin attributes (`data-skin="Sentinel"`, `data-hero="ledger"`) — no two channels share the tuple
-- [ ] Hero contains exactly one H1 and one primary CTA
-- [ ] Circuit-trace band with a shield and check; hex lattice motif; shield emblem in the masthead.
-- [ ] Proof strip shows only values derivable from the bundle response
+- [ ] Hero is open (no card) and contains exactly one H1 and one primary CTA; Sentinel keeps the sidebar action panel at lg
+- [ ] Proof band and full-bleed photo band render live bundle facts only; photo has a scrim, caption and licence credit
+- [ ] Coverage renders as two balanced columns at `lg` (CSS multi-column, no ragged column >260 px) and one column on mobile
+- [ ] Conversion band contains process + lead form + brief; fields are filled/bordered, required fields carry `*`, and no field is underline-only
+- [ ] No duplicate compact CTA or oversized hero banner on search/about; `#brief-signup` exists wherever a brief link is rendered
+- [ ] No horizontal overflow at 1280 and 390 px; `apps/web/e2e/layout.spec.ts` passes for this channel
 - [ ] Locale switch preserves the current path; ES page never mixes EN copy
 - [ ] Contrast stays green for this channel (`pnpm check`)
 - [ ] Tone: credible, specific, no fear-mongering. Mono labels, square corners.
-- [ ] extractedRules — W2 split hero / single CTA; W3 tiered CTA in a card grid; W6 content grid with filter chips; W9 ≤65ch reading measure on articles
+- [ ] Reference DNA bound: `editorial-conversion` (Approved 2026-11-05) — one action panel, proof before the ask, full-bleed photo scrim, balanced coverage columns, filled fields, per-channel CTA placement; originality + a11y recorded in §13
 
 ## 12. Concept / UIS registry
 
@@ -81,21 +88,37 @@ Events: `cta_impression`, `cta_click`, `lead_form_start`, `lead_submit{result}` 
 | UIS-04 | yes | channel contrast pairs gated | done |
 | UIS-05 | yes | keyboard order through nav, hero, form | done |
 | UIS-06 | yes | agent-authored UI: no slop, no stock gradients | done |
-| UIS-07 | yes | craft tier refined | pending at milestone close |
+| UIS-07 | yes | craft tier refined | done — ship_with_notes |
 | UIS-08 | yes | empty/error/degraded states | done |
 | UIS-09 | no | no analytical charts on this screen | N/A |
-| UIS-10 | no | no photography; original line-art only | N/A |
+| UIS-10 | yes | channel home is the marketing/landing surface — hero, action panel and photo band carry the creative direction | done — ship (distinct hero/photo/action per channel) |
+
+> UIS-07 note: CATALOG init and the native-select/Skeleton waivers are non-blocking; see `.work.ui/reports/20261105-uis-07-10.md`.
 
 ## 13. Visual references
 
 | Field | Value |
 |-------|-------|
-| **exampleIds** | W2, W6, W9 |
-| **manifestPaths** | `.ai.ui/examples/websites/manifest.md` |
+| **exampleIds** | N/A — live-site references; waiver recorded in HANDOFF_UI |
+| **manifestPaths** | `.work.ui/inputs/references/directions/editorial-conversion.md` (Approved 2026-11-05) |
+| **referenceIds** | `ellevest`, `hubspot`, `leadpages` |
+| **direction** | `.work.ui/inputs/references/directions/editorial-conversion.md` (Approved 2026-11-05) |
+| **doNotCopy** | logo/wordmark; brand palette as identity; source copy/testimonials; proprietary illustrations/photos/fonts |
+| **originalityCheck** | own composition + own palette + own imagery + own copy; recognition test passed |
+| **accessibility** | WCAG 2.2 AA; reference contrast failures not inherited; token-lint 0 raw literals |
 | **craftTier** | refined |
 | **beforeScreenshot** | n/a — greenfield skin, no before state kept |
-| **extractedRules** | hero single CTA; tiered CTAs; content grid with chips; ≤65ch measure |
-| **regionMap** | hero → W2 · coverage → W6 · CTA panel → W3 · article body → W9 |
+| **extractedRules** | one action panel; proof before ask; full-bleed photo scrim; balanced 2-column coverage; filled fields; per-channel CTA placement |
+| **regionMap** | hero → lead story · coverage → balanced columns · CTA panel → action panel · article body → ≤65ch measure |
+
+### extractedRules (binding)
+
+- One saturated action panel per screen; 0–2 px corners; promise row + one primary verb.
+- Proof before the ask: live bundle facts only, no invented logos or testimonials.
+- Full-bleed photo band with a channel-tinted scrim and caption credit.
+- Balanced coverage columns (`column-fill: balance`); no ragged 3-column layout.
+- Filled, bordered form fields with a required note and a distinct optional-details control.
+- Per-channel CTA placement: Legal sidebar; Financial banner; Sanctuary open column; Campus corner in a 2-column hero; Network full-bleed banner; Sentinel sidebar; Lab full-bleed banner; Forge banner; Grid sidebar; Market inset.
 
 ### Channel art direction
 
@@ -105,6 +128,17 @@ Imagery: a licensed photograph carries the band (source and licence in `apps/web
 
 Palette from `industries.theme`: **dark scheme** — midnight `#0b1220` base, light `#e5edf7` text, cyan `#22d3ee` accent, 2px corners. Reference basis: semrush (data density), userpilot (product-led proof).
 
+### Reference DNA (binding)
+
+- **referenceIds:** `ellevest`, `hubspot`, `leadpages`
+- **referenceManifest:** `inputs/references/directions/editorial-conversion.md` (Approved; the direction is the manifest)
+- **direction:** `inputs/references/directions/editorial-conversion.md` (Approved 2026-11-05)
+- **extractedRules:** see the `### extractedRules (binding)` block above (6 rules).
+- **doNotCopy:** logo/wordmark; reference palettes as identity (orange, violet/lime, cream/teal); proprietary illustrations/photos/fonts; source copy/testimonials; distinctive composition.
+- **originalityCheck:** own composition, own channel palette, own imagery treatment, own copy; side-by-side recognition test passed.
+- **accessibility:** WCAG 2.2 AA; reference contrast failures not inherited; token-lint 0 raw literals; axe green on the production build.
+- **exampleIds waiver:** live-site references (not an `examples/` manifest); `exampleIds: N/A` recorded in HANDOFF_UI.
+
 ## Next action
 
-`@ui-screen-spec review - channel-home-cybersecurity`, then `@ui-visual-verify milestone` for this channel.
+Operator approval of this Review SPEC, then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone` for this channel.

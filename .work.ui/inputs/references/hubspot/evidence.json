@@ -1,0 +1,2029 @@
+{
+  "schema": "ui-reference-evidence/1.0",
+  "slug": "hubspot",
+  "generated_at": "2026-11-05T21:34:10+00:00",
+  "scan": {
+    "status": "ok",
+    "method": "static-http",
+    "browser": false,
+    "javascript": false,
+    "tool": "scripts/reference-scan.py"
+  },
+  "source": {
+    "requested_url": "https://www.hubspot.com/",
+    "final_url": "https://www.hubspot.com/",
+    "http_status": 200,
+    "content_type": "text/html",
+    "bytes": 104783,
+    "sha256_html": "46c8c1d4527a82bfa72c99bf17b28164d501e1794afbcde007a7379d8de070a1",
+    "fetched_at": "2026-11-05T21:34:10+00:00",
+    "redirects": [],
+    "robots": {
+      "checked": true,
+      "allowed": true,
+      "url": "https://www.hubspot.com/robots.txt",
+      "reason": "no matching robots rule (allow)",
+      "http_status": 200,
+      "crawl_delay": null
+    },
+    "robots_bypass": false,
+    "robots_approval_note": "",
+    "raw_copy": ".work.ui/tmp/reference-scan/hubspot/page.html"
+  },
+  "page": {
+    "title": "HubSpot | Software & Tools for your Business - Homepage",
+    "description": "HubSpot's customer platform includes all the marketing, sales, customer service, and CRM software you need to grow your business.",
+    "og_title": "HubSpot | Software & Tools for your Business - Homepage",
+    "og_description": "HubSpot's customer platform includes all the marketing, sales, customer service, and CRM software you need to grow your business.",
+    "og_type": "",
+    "jsonld_types": [
+      "Organization",
+      "ImageObject",
+      "PostalAddress",
+      "WebSite",
+      "WebPage",
+      "Product",
+      "Brand",
+      "PropertyValue",
+      "AggregateRating"
+    ],
+    "lang": "en",
+    "theme_color": "#FF7A59",
+    "generator": "HubSpot",
+    "framework_hints": [],
+    "landmarks": {
+      "header": 1,
+      "nav": 3,
+      "form": 2,
+      "section": 22,
+      "main": 1,
+      "footer": 1
+    },
+    "tags": {
+      "html": 1,
+      "head": 1,
+      "script": 50,
+      "meta": 27,
+      "title": 2,
+      "link": 52,
+      "style": 9,
+      "body": 1,
+      "svg": 222,
+      "symbol": 140,
+      "path": 361,
+      "circle": 25,
+      "g": 35,
+      "defs": 16,
+      "clippath": 11,
+      "use": 195,
+      "ellipse": 1,
+      "div": 440,
+      "mask": 10,
+      "rect": 13,
+      "polygon": 6,
+      "header": 1,
+      "a": 229,
+      "nav": 3,
+      "ul": 74,
+      "li": 312,
+      "span": 154,
+      "button": 46,
+      "form": 2,
+      "label": 2,
+      "input": 2,
+      "img": 95,
+      "section": 22,
+      "h2": 46,
+      "p": 83,
+      "h3": 64,
+      "main": 1,
+      "h1": 1,
+      "video": 9,
+      "hr": 20,
+      "footer": 1
+    },
+    "headings": [
+      {
+        "tag": "h2",
+        "text": "The HubSpot Customer Platform"
+      },
+      {
+        "tag": "h3",
+        "text": "Marketing Hub"
+      },
+      {
+        "tag": "h3",
+        "text": "Sales Hub"
+      },
+      {
+        "tag": "h3",
+        "text": "Service Hub"
+      },
+      {
+        "tag": "h3",
+        "text": "Content Hub"
+      },
+      {
+        "tag": "h3",
+        "text": "Data Hub"
+      },
+      {
+        "tag": "h3",
+        "text": "Revenue Hub"
+      },
+      {
+        "tag": "h3",
+        "text": "Smart CRM"
+      },
+      {
+        "tag": "h3",
+        "text": "Agent Hub"
+      },
+      {
+        "tag": "h3",
+        "text": "Small Business Bundle"
+      },
+      {
+        "tag": "h3",
+        "text": "AEO (Beta)"
+      },
+      {
+        "tag": "h3",
+        "text": "HubSpot Marketplace"
+      },
+      {
+        "tag": "h2",
+        "text": "Marketing"
+      },
+      {
+        "tag": "h3",
+        "text": "Generate leads"
+      },
+      {
+        "tag": "h3",
+        "text": "Automate marketing"
+      },
+      {
+        "tag": "h2",
+        "text": "Sales"
+      },
+      {
+        "tag": "h3",
+        "text": "Build pipeline"
+      },
+      {
+        "tag": "h3",
+        "text": "Close deals"
+      },
+      {
+        "tag": "h2",
+        "text": "Customer Service"
+      },
+      {
+        "tag": "h3",
+        "text": "Scale support"
+      },
+      {
+        "tag": "h3",
+        "text": "Drive retention"
+      },
+      {
+        "tag": "h2",
+        "text": "Content"
+      },
+      {
+        "tag": "h3",
+        "text": "Create content"
+      },
+      {
+        "tag": "h3",
+        "text": "Manage content"
+      },
+      {
+        "tag": "h2",
+        "text": "Startups & Small Businesses"
+      },
+      {
+        "tag": "h3",
+        "text": "Find and reach customers"
+      },
+      {
+        "tag": "h3",
+        "text": "Grow sales and get paid"
+      },
+      {
+        "tag": "h3",
+        "text": "Organize customer data"
+      },
+      {
+        "tag": "h2",
+        "text": "Artificial Intelligence"
+      },
+      {
+        "tag": "h3",
+        "text": "Resolve customer queries 24/7"
+      },
+      {
+        "tag": "h3",
+        "text": "Automate sales prospecting"
+      },
+      {
+        "tag": "h3",
+        "text": "Research customers faster"
+      },
+      {
+        "tag": "h2",
+        "text": "By Team Size"
+      },
+      {
+        "tag": "h3",
+        "text": "For Small Businesses & Startups"
+      },
+      {
+        "tag": "h3",
+        "text": "For Enterprises"
+      },
+      {
+        "tag": "h2",
+        "text": "Why HubSpot?"
+      },
+      {
+        "tag": "h3",
+        "text": "Why Choose HubSpot?"
+      },
+      {
+        "tag": "h3",
+        "text": "Case Studies"
+      },
+      {
+        "tag": "h3",
+        "text": "Spotlight: Product Updates"
+      },
+      {
+        "tag": "h2",
+        "text": "Featured Links"
+      }
+    ],
+    "nav_labels": [
+      "\u65e5\u672c\u8a9e",
+      "Deutsch",
+      "English",
+      "Espa\u00f1ol",
+      "Portugu\u00eas",
+      "Fran\u00e7ais",
+      "Customer Support",
+      "Contact Sales",
+      "Log in",
+      "About Us",
+      "Careers",
+      "Contact Us",
+      "Investor Relations",
+      "Management Team",
+      "Get a demo of HubSpot's premium software",
+      "Get started free with HubSpot's free tools",
+      "Free HubSpot CRM",
+      "Overview of all products",
+      "Free and premium plans",
+      "Learn more",
+      "See all integrations",
+      "Generate leads",
+      "Automate marketing",
+      "Build pipeline",
+      "Close deals",
+      "Scale support",
+      "Drive retention",
+      "Create content",
+      "Manage content",
+      "Find and reach customers",
+      "Grow sales and get paid",
+      "Organize customer data"
+    ],
+    "cta_labels": [
+      "Skip to content",
+      "Select a language",
+      "High Contrast",
+      "Close Search",
+      "About",
+      "Back",
+      "Get a demo of HubSpot's premium software",
+      "Get started free with HubSpot's free tools",
+      "Menu",
+      "Products",
+      "Free HubSpot CRM",
+      "Overview of all products",
+      "Free and premium plans",
+      "Learn more",
+      "See all integrations",
+      "Solutions",
+      "By Use Case",
+      "By Team Size",
+      "Why HubSpot?",
+      "Learn more about HubSpot\u2019s Starter Customer Platform",
+      "Learn more about HubSpot\u2019s Enterprise Customer Platform",
+      "Learn more about why how HubSpot\u2019s solution is different",
+      "See all case studies",
+      "Explore product updates",
+      "Resources"
+    ],
+    "buttons": [
+      "Select a language",
+      "High Contrast",
+      "Close Search",
+      "About",
+      "Back",
+      "Menu",
+      "Products",
+      "Solutions",
+      "By Use Case",
+      "By Team Size",
+      "Why HubSpot?",
+      "Resources",
+      "Play video",
+      "Previous",
+      "Next",
+      "Previous slide",
+      "Next slide",
+      "Pause Carousel",
+      "Enterprise",
+      "Mid-Sized Business",
+      "Small Business",
+      "Close",
+      "Popular Features",
+      "Free Tools",
+      "Company",
+      "Customers",
+      "Partners"
+    ],
+    "images": {
+      "total": 95,
+      "missing_alt": 26,
+      "lazy": 74,
+      "srcset": 46,
+      "svg": 222
+    },
+    "forms": {
+      "forms": 2,
+      "inputs": 2,
+      "labels": 2,
+      "required": 0
+    },
+    "word_count": 2173,
+    "inline_style_count": 93,
+    "stylesheet_count": 29
+  },
+  "styles": {
+    "sources": [
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/190645192841/1788968224369/module_Breeze_Agents_-_Tabbed_Testimonials.min.css",
+        "http_status": 200,
+        "bytes": 277,
+        "sha256": "13ebabc24e23f4d87c06bef59126529bcafc3548a48b305c7aa39cdb11edad6d"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/190737726287/1789404129819/module_Breeze_Agents_-_Multi-Column_Content.min.css",
+        "http_status": 200,
+        "bytes": 899,
+        "sha256": "bfceb893000f833ea84bc528a030b7171719e1d6e2e998c82a5c512fbc6a8e4e"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/193936998720/1754456454021/module_WTM_-_WF_-_Badges.min.css",
+        "http_status": 200,
+        "bytes": 314,
+        "sha256": "7118dcbacf359223714ae7fbabb69f3ff08e96bc4d7b5e7e5f5b1f18c718d654"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/193936998727/1760630155025/module_WTM_-_WF_-_Product_Platform.min.css",
+        "http_status": 200,
+        "bytes": 1250,
+        "sha256": "372e413dad8b258747ce7039a40a68443c1b5b47b725df37a4d8bdb88250bf26"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/193936998729/1754456457083/module_WTM_-_WF_-_Rotating_SVG.min.css",
+        "http_status": 200,
+        "bytes": 309,
+        "sha256": "bf8d6d698c6caaa0f723b14e3e1bc6261c812681c6002e586342d70615631458"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/193942273292/1784127972358/module_WTM_-_WF_-_Animated_Card_Carousel.min.css",
+        "http_status": 200,
+        "bytes": 1056,
+        "sha256": "d71719e5ce982af516cd137699e4d23fe584c415722fc372c19fd373047cb698"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/194108955804/1754602918209/module_WTM_-_WF_-_Elevated_CTA_Content_Block.min.css",
+        "http_status": 200,
+        "bytes": 181,
+        "sha256": "eb41e6bb3b677e52139ab285e64b43f5ad6e2df3937e001c5788b86146214d4f"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/220382832731/1792505923633/module_WTM_-_Expandable_Video_Feature_Carousel.min.css",
+        "http_status": 200,
+        "bytes": 2806,
+        "sha256": "4d181df1334f46a27b3bac1c41e8d85c6a1c49544fb94bac74472efbaea6e030"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/module_assets/1/80992206983/1793192614430/module_logoCarousel.min.css",
+        "http_status": 200,
+        "bytes": 585,
+        "sha256": "6100338b0949bd4426ace9169bbd6267e7ba931952dbb4bb0fc0a1f9c1184ced"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/193941920320/1779824330028/template_wfFlexibleTagline.min.css",
+        "http_status": 200,
+        "bytes": 456,
+        "sha256": "347e5f8a53fb2e85268af426947b8e45e916136bfaf4ef18dad5c682ee38fd17"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/193941920321/1793911203331/template_wfFlexibleSectionHeader.min.css",
+        "http_status": 200,
+        "bytes": 782,
+        "sha256": "1a6b2e59761a40c3e99132fd12b07971409d6dd36b0fe55ea7ab874e1cf63b98"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/193941920518/1779824542016/template_statistics-variation.min.css",
+        "http_status": 200,
+        "bytes": 1154,
+        "sha256": "d6d41a0e17cd9d0d98ddbb7b47b5d44f9b5c8762dbed3b0669f307898996691c"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071283/1784123277484/template_carousel.min.css",
+        "http_status": 200,
+        "bytes": 2724,
+        "sha256": "d4157c85e07d9227f9ec02576f4b42534182d70c2544de2aaee202d3b5af00db"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071286/1793192626457/template_button.min.css",
+        "http_status": 200,
+        "bytes": 984,
+        "sha256": "fc5ea964353fc886a28ff517c73dcb49b58c5823c2b45785fed23baad8fdd969"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071292/1784123274384/template_lightbox.min.css",
+        "http_status": 200,
+        "bytes": 3564,
+        "sha256": "f1e84c71db7784bfe14e9b81fb6a7925e93124886f05960d40973c5d031ad0d3"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071293/1768385561117/template_loading.min.css",
+        "http_status": 200,
+        "bytes": 364,
+        "sha256": "59d2040077730739f2b60a6e748b99179defd125d5642b76893e71860f80b32d"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071295/1792064505328/template_badge.min.css",
+        "http_status": 200,
+        "bytes": 595,
+        "sha256": "678009ce49709ed6dfffd96a55d1b1987d0f7103544477c66a4f3e7a443249b5"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071316/1784123276521/template_a11y.min.css",
+        "http_status": 200,
+        "bytes": 102,
+        "sha256": "aeccbd9603525373df38d7d4412055081ad74906cb5bcbfc79ea95a9ef8f9968"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071318/1768385548642/template_roundButton.min.css",
+        "http_status": 200,
+        "bytes": 409,
+        "sha256": "46970931437830b45511bca5f50a63b0843aa9c8e80e2a85569be894b44033c7"
+      },
+      {
+        "url": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194395071322/1788350162170/template_card.min.css",
+        "http_status": 200,
+        "bytes": 1541,
+        "sha256": "0a4495f93c2eace02cea3eefde2d5891e3e7211498c000806ed4201e3307cdb6"
+      }
+    ],
+    "skipped": [
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194396003586/1768385543609/template_tagline.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194396003587/1768385542577/template_textLink.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194396003589/1792064504679/template_tabs.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/194475978141/1791880779619/template_logo-carousel.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/201641145442/1764770669082/template_csol-image.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/207924262801/1793726122664/template_footer-core-critical.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/207928094053/1793726124017/template_footer-core-non-critical.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/220201250349/1793726131615/template_homepage-2026.min.css",
+        "reason": "stylesheet cap reached"
+      },
+      {
+        "href": "https://www.hubspot.com/hubfs/hub_generated/template_assets/1/80992946022/1792662553874/template_section.min.css",
+        "reason": "stylesheet cap reached"
+      }
+    ],
+    "inline_blocks": 9,
+    "inline_attributes": 93,
+    "custom_properties": {
+      "--a11y-contrast-toggle-background-color": "#0000c5",
+      "--a11y-contrast-toggle-border-color": "#2e475d",
+      "--a11y-contrast-toggle-border-width": "calc(var(--a11y-contrast-toggle-px-border-width) * 1px)",
+      "--a11y-contrast-toggle-circle-diameter": "calc(var(--a11y-contrast-toggle-px-circle-diameter) * 1px)",
+      "--a11y-contrast-toggle-cover-scale": "calc( var(--a11y-contrast-toggle-px-cover-diameter) / var(--a11y-contrast-toggle-px-circle-diameter) )",
+      "--a11y-contrast-toggle-enabled-color": "var(--cl-color-container-01)",
+      "--a11y-contrast-toggle-enabled-overlay": "none",
+      "--a11y-contrast-toggle-icon-color": "var(--cl-color-icon-01)",
+      "--a11y-contrast-toggle-outline-width": "calc((var(--a11y-contrast-toggle-px-visible-padding) / 2) * 1px)",
+      "--a11y-contrast-toggle-padding": "calc(var(--a11y-contrast-toggle-px-padding) * 1px)",
+      "--a11y-contrast-toggle-px-border-width": "2",
+      "--a11y-contrast-toggle-px-circle-diameter": "calc( var(--a11y-contrast-toggle-px-height) - 2 * var(--a11y-contrast-toggle-px-padding) )",
+      "--a11y-contrast-toggle-px-cover-diameter": "calc( var(--a11y-contrast-toggle-px-width) * 2 - var(--a11y-contrast-toggle-px-height) )",
+      "--a11y-contrast-toggle-px-height": "24",
+      "--a11y-contrast-toggle-px-inner-width": "calc( var(--a11y-contrast-toggle-px-width) - 2 * var(--a11y-contrast-toggle-px-padding) )",
+      "--a11y-contrast-toggle-px-padding": "calc( var(--a11y-contrast-toggle-px-border-width) + var(--a11y-contrast-toggle-px-visible-padding) )",
+      "--a11y-contrast-toggle-px-visible-padding": "var(--a11y-contrast-toggle-px-border-width)",
+      "--a11y-contrast-toggle-px-width": "40",
+      "--a11y-contrast-toggle-text-color": "var(--cl-color-text-01)",
+      "--a11y-contrast-toggle-text-gap": "12px",
+      "--a11y-contrast-toggle-transition-duration": "0.5s",
+      "--a11y-contrast-toggle-translate-distance": "calc( (var(--a11y-contrast-toggle-px-inner-width) - var(--a11y-contrast-toggle-px-circle-diameter)) * 1px )",
+      "--breeze-agents-multi-column-content-gap-desktop": "7.25rem",
+      "--breeze-agents-multi-column-content-gap-mobile": "3rem",
+      "--breeze-agents-multi-column-content-image-gap": "2.5rem",
+      "--breeze-agents-multi-column-content-image-size-l": "7.5rem",
+      "--breeze-agents-multi-column-content-image-size-m": "5rem",
+      "--breeze-agents-multi-column-content-image-size-s": "3rem",
+      "--breeze-agents-multi-column-content-image-size-xl": "9rem",
+      "--breeze-agents-multi-column-content-image-size-xs": "1.25rem",
+      "--breeze-agents-multi-column-content-inner-content-gap": "1rem",
+      "--breeze-agents-multi-column-content-item-gap": "3rem",
+      "--carousel-duration": "19.125s",
+      "--cl-anchor-color": "var(--cl-color-link-01)",
+      "--cl-anchor-color-dark": "var(--dark-theme-link-01)",
+      "--cl-anchor-font-weight": "var(--cl-font-weight-p-link)",
+      "--cl-anchor-hover-color": "var(--cl-color-hover-link-01)",
+      "--cl-anchor-hover-color-dark": "var(--dark-theme-hover-link-01)",
+      "--cl-anchor-pressed-color": "var(--cl-color-pressed-link-01)",
+      "--cl-anchor-text-decoration": "underline",
+      "--cl-background": "var(--cl-color-background-01)",
+      "--cl-badge-background-color": "var(--cl-badge-background-color-default)",
+      "--cl-badge-background-color-default": "var(--cl-color-neutral-background-01)",
+      "--cl-badge-border-color": "var(--cl-color-neutral-01)",
+      "--cl-border-radius-container": "16px",
+      "--cl-border-radius-container-medium": "16px",
+      "--cl-border-radius-container-small": "8px",
+      "--cl-border-radius-input": "4px",
+      "--cl-border-radius-medium": "8px",
+      "--cl-border-radius-round": "9999px",
+      "--cl-border-radius-small": "4px",
+      "--cl-border-width-heavy": "2px",
+      "--cl-border-width-medium": "1px",
+      "--cl-button-background": "var(--cl-color-button-primary-fill-idle)",
+      "--cl-button-border": "var(--cl-button-border-width) solid var(--cl-button-border-color)",
+      "--cl-button-border-color": "transparent",
+      "--cl-button-border-width": "var(--cl-border-width-heavy)",
+      "--cl-button-color": "var(--cl-color-text-on-color-01)",
+      "--cl-button-disabled-background": "var(--cl-color-disabled-02)",
+      "--cl-button-disabled-color": "var(--cl-color-disabled-01)",
+      "--cl-button-font-size": "var(--cl-font-size-small)",
+      "--cl-button-hover-background": "var(--cl-color-button-primary-fill-hover)",
+      "--cl-button-hover-color": "var(--cl-button-color)",
+      "--cl-button-line-height": "var(--cl-line-height-small)",
+      "--cl-button-padding": "var(--cl-button-padding-small)",
+      "--cl-button-padding-large": "1rem 2.5rem",
+      "--cl-button-padding-medium": "0.75rem 1.5rem",
+      "--cl-button-padding-small": "0.5rem 1rem",
+      "--cl-button-pressed-background": "var(--cl-color-button-primary-fill-pressed)",
+      "--cl-button-pressed-color": "var(--cl-button-hover-color)",
+      "--cl-card-background-color": "var(--cl-color-container-01)",
+      "--cl-card-border-color": "transparent",
+      "--cl-card-border-width": "0px",
+      "--cl-card-caret-bottom": "auto",
+      "--cl-card-caret-left": "auto",
+      "--cl-card-caret-right": "auto",
+      "--cl-card-caret-rotate": "0",
+      "--cl-card-caret-top": "auto",
+      "--cl-card-caret-translate-x": "0px",
+      "--cl-card-caret-translate-y": "0px",
+      "--cl-card-edge-color": "var(--cl-color-accent-decoration-01)",
+      "--cl-card-hover-background-color": "var(--cl-color-hover-01)",
+      "--cl-card-interactive-padding": "1.5rem",
+      "--cl-card-text-color": "var(--cl-color-text-01)",
+      "--cl-carousel-animation-duration": "300ms",
+      "--cl-carousel-autoplay-enabled": "0",
+      "--cl-carousel-autoplay-toggle-size": "32px",
+      "--cl-carousel-clone-count": "calc(var(--cl-carousel-slide-count)*2*var(--cl-carousel-is-infinite, 0))",
+      "--cl-carousel-controls-button-size": "48px",
+      "--cl-carousel-controls-height": "calc(var(--cl-carousel-is-active)*(var(--cl-carousel-controls-button-size) + var(--cl-carousel-controls-padding-block)*2))",
+      "--cl-carousel-controls-padding": "1.5rem 0 0 0",
+      "--cl-carousel-controls-padding-block": "16px",
+      "--cl-carousel-controls-padding-inline": "16px",
+      "--cl-carousel-controls-top": "100%",
+      "--cl-carousel-controls-transform": "none",
+      "--cl-carousel-controls-visibility": "hidden",
+      "--cl-carousel-controls-z-index": "1",
+      "--cl-carousel-dot-gap": "8px",
+      "--cl-carousel-dot-size": "16px",
+      "--cl-carousel-dots-active": "calc(var(--cl-carousel-show-dots)*var(--cl-carousel-is-active))",
+      "--cl-carousel-dots-height": "calc(var(--cl-carousel-dot-size) + var(--cl-carousel-dots-padding-block)*2)",
+      "--cl-carousel-dots-padding-block": "32px",
+      "--cl-carousel-easing": "ease",
+      "--cl-carousel-footer-elements-height": "calc(var(--cl-carousel-dots-active)*var(--cl-carousel-dots-height) + var(--cl-carousel-autoplay-enabled)*var(--cl-carousel-autoplay-toggle-size))",
+      "--cl-carousel-footer-height": "max(var(--cl-carousel-controls-height),var(--cl-carousel-footer-elements-height))",
+      "--cl-carousel-is-active": "calc(max(var(--cl-carousel-slide-surplus), 0)/max(var(--cl-carousel-slide-surplus), 1))",
+      "--cl-carousel-is-infinite": "0",
+      "--cl-carousel-margin-bottom": "var(--cl-carousel-footer-height)",
+      "--cl-carousel-padding-inline": "0",
+      "--cl-carousel-peek": "var(--cl-carousel-peek-default)",
+      "--cl-carousel-peek-after": "var(--cl-carousel-peek)",
+      "--cl-carousel-peek-before": "var(--cl-carousel-peek)",
+      "--cl-carousel-peek-default": "48px",
+      "--cl-carousel-peek-phone": "40px",
+      "--cl-carousel-peek-tablet": "200px",
+      "--cl-carousel-show-dots": "var(--cl-carousel-show-dots-default)",
+      "--cl-carousel-show-dots-default": "1",
+      "--cl-carousel-show-dots-desktop": "1",
+      "--cl-carousel-show-dots-phone": "1",
+      "--cl-carousel-show-dots-tablet": "1",
+      "--cl-carousel-slide-capacity": "calc(100cqi - var(--cl-carousel-total-gap-to-show))",
+      "--cl-carousel-slide-count": "3",
+      "--cl-carousel-slide-gap": "var(--cl-carousel-slide-gap-default)",
+      "--cl-carousel-slide-gap-count": "calc(var(--cl-carousel-total-count) - 1)",
+      "--cl-carousel-slide-gap-default": "24px",
+      "--cl-carousel-slide-gap-phone": "8px",
+      "--cl-carousel-slide-gap-tablet": "8px",
+      "--cl-carousel-slide-gaps-to-show": "calc(var(--cl-carousel-slides-to-show) - 1)",
+      "--cl-carousel-slide-surplus": "calc(var(--cl-carousel-slide-count) - var(--cl-carousel-slides-per-view))",
+      "--cl-carousel-slide-width": "calc(var(--cl-carousel-slide-capacity)/var(--cl-carousel-slides-to-show))",
+      "--cl-carousel-slides-per-view": "var(--cl-carousel-slides-per-view-default)",
+      "--cl-carousel-slides-per-view-default": "3",
+      "--cl-carousel-slides-per-view-phone": "1",
+      "--cl-carousel-slides-per-view-tablet": "1",
+      "--cl-carousel-slides-to-scroll": "var(--cl-carousel-slides-to-scroll-default)",
+      "--cl-carousel-slides-to-scroll-default": "1",
+      "--cl-carousel-slides-to-scroll-phone": "1",
+      "--cl-carousel-slides-to-scroll-tablet": "1",
+      "--cl-carousel-slides-to-show": "min(var(--cl-carousel-slide-count),var(--cl-carousel-slides-per-view))",
+      "--cl-carousel-total-count": "calc(var(--cl-carousel-slide-count) + var(--cl-carousel-clone-count))",
+      "--cl-carousel-total-gap-to-show": "calc(var(--cl-carousel-slide-gaps-to-show)) * var(--cl-carousel-slide-gap)",
+      "--cl-carousel-train-translate": "calc((var(--cl-carousel-active-slide-index, 0) + (var(--cl-carousel-clone-count)/2))*-1*(var(--cl-carousel-slide-width) + var(--cl-carousel-slide-gap)))",
+      "--cl-carousel-train-width": "calc(var(--cl-carousel-slide-width)*var(--cl-carousel-total-count) + var(--cl-carousel-slide-gap)*var(--cl-carousel-slide-gap-count))",
+      "--cl-color-accent-decoration-01": "var(--light-theme-accent-decoration-01)",
+      "--cl-color-accent-decoration-02": "var(--light-theme-accent-decoration-02)",
+      "--cl-color-accent-decoration-03": "var(--light-theme-accent-decoration-03)",
+      "--cl-color-accent-decoration-04": "var(--light-theme-accent-decoration-04)",
+      "--cl-color-accent-decoration-05": "var(--light-theme-accent-decoration-05)",
+      "--cl-color-accent-decoration-06": "var(--light-theme-accent-decoration-06)",
+      "--cl-color-accent-decoration-07": "var(--light-theme-accent-decoration-07)",
+      "--cl-color-accent-decoration-08": "var(--light-theme-accent-decoration-08)",
+      "--cl-color-accent-fill-01": "var(--light-theme-accent-fill-01)",
+      "--cl-color-accent-fill-02": "var(--light-theme-accent-fill-02)",
+      "--cl-color-accent-fill-03": "var(--light-theme-accent-fill-03)",
+      "--cl-color-accent-fill-04": "var(--light-theme-accent-fill-04)",
+      "--cl-color-accent-fill-05": "var(--light-theme-accent-fill-05)",
+      "--cl-color-accent-fill-06": "var(--light-theme-accent-fill-06)",
+      "--cl-color-accent-fill-07": "var(--light-theme-accent-fill-07)",
+      "--cl-color-accent-fill-08": "var(--light-theme-accent-fill-08)",
+      "--cl-color-background-01": "var(--light-theme-background-01)"
+    },
+    "color_tokens": {
+      "--a11y-contrast-toggle-background-color": "#0000c5",
+      "--a11y-contrast-toggle-border-color": "#2e475d",
+      "--a11y-contrast-toggle-enabled-color": "#ffffff",
+      "--a11y-contrast-toggle-icon-color": "#1f1f1f",
+      "--a11y-contrast-toggle-text-color": "#1f1f1f",
+      "--cl-anchor-color": "#1f1f1f",
+      "--cl-anchor-color-dark": "#f8f5ee",
+      "--cl-anchor-hover-color": "#1f1f1f",
+      "--cl-anchor-hover-color-dark": "#f8f5ee",
+      "--cl-anchor-pressed-color": "#1f1f1f",
+      "--cl-background": "#fcfcfa",
+      "--cl-badge-background-color": "#cfcccb",
+      "--cl-badge-background-color-default": "#cfcccb",
+      "--cl-badge-border-color": "#9b9897",
+      "--cl-button-background": "#ff4800",
+      "--cl-button-color": "#ffffff",
+      "--cl-button-disabled-color": "#000000",
+      "--cl-button-hover-background": "#c93700",
+      "--cl-button-hover-color": "#ffffff",
+      "--cl-button-pressed-background": "#9f2800",
+      "--cl-button-pressed-color": "#ffffff",
+      "--cl-card-background-color": "#ffffff",
+      "--cl-card-edge-color": "#9b9897",
+      "--cl-card-hover-background-color": "#000000",
+      "--cl-card-text-color": "#1f1f1f",
+      "--cl-color-accent-decoration-01": "#9b9897",
+      "--cl-color-accent-decoration-02": "#ffa581",
+      "--cl-color-accent-decoration-03": "#ffa499",
+      "--cl-color-accent-decoration-04": "#9cbaa4",
+      "--cl-color-accent-decoration-05": "#ccc0a3",
+      "--cl-color-accent-decoration-06": "#c4b4f7",
+      "--cl-color-accent-decoration-07": "#97dadc",
+      "--cl-color-accent-decoration-08": "#fcc3dc",
+      "--cl-color-accent-fill-01": "#cfcccb",
+      "--cl-color-accent-fill-02": "#fcc6b1",
+      "--cl-color-accent-fill-03": "#fcc5be",
+      "--cl-color-accent-fill-04": "#b9cdbe",
+      "--cl-color-accent-fill-05": "#ece6d9",
+      "--cl-color-accent-fill-06": "#d7cdfc",
+      "--cl-color-accent-fill-07": "#b2e9eb",
+      "--cl-color-accent-fill-08": "#fbdbe9",
+      "--cl-color-background-01": "#fcfcfa",
+      "--cl-color-background-02": "#f8f5ee",
+      "--cl-color-background-03": "#f8f5ee",
+      "--cl-color-background-accent-01": "#b9cdbe",
+      "--cl-color-background-accent-02": "#d6c2d9",
+      "--cl-color-background-accent-03": "#fcc3dc",
+      "--cl-color-background-footer-01": "#1f1f1f",
+      "--cl-color-badge-brand-fill-01": "#fcc6b1",
+      "--cl-color-beta-01": "#7d53e9",
+      "--cl-color-beta-background-01": "#e5e1fa",
+      "--cl-color-border-01": "#1f1f1f",
+      "--cl-color-border-02": "#000000",
+      "--cl-color-border-03": "#000000",
+      "--cl-color-border-brand-01": "#ff4800",
+      "--cl-color-border-highlight-01": "#2f7579",
+      "--cl-color-button-primary-fill-hover": "#c93700",
+      "--cl-color-button-primary-fill-idle": "#ff4800",
+      "--cl-color-button-primary-fill-pressed": "#9f2800",
+      "--cl-color-button-primary-text-color": "#ffffff",
+      "--cl-color-button-primary-text-color-hover": "#ffffff",
+      "--cl-color-button-secondary-border": "#ff4800",
+      "--cl-color-button-secondary-border-hover": "#c93700",
+      "--cl-color-button-secondary-fill-hover": "#fcece6",
+      "--cl-color-button-secondary-fill-idle": "#ffffff",
+      "--cl-color-button-secondary-fill-pressed": "#fcc6b1",
+      "--cl-color-button-secondary-text-color-hover": "#c93700",
+      "--cl-color-button-secondary-text-color-pressed": "#9f2800",
+      "--cl-color-button-tertiary-fill-hover": "#000000",
+      "--cl-color-button-tertiary-fill-idle": "#1f1f1f",
+      "--cl-color-button-tertiary-fill-pressed": "#000000",
+      "--cl-color-button-tertiary-text-color": "#ffffff",
+      "--cl-color-button-tertiary-text-color-hover": "#ffffff",
+      "--cl-color-checkmark-list-icon-brand-fill": "#ff4800",
+      "--cl-color-container-01": "#ffffff",
+      "--cl-color-container-02": "#ffffff",
+      "--cl-color-container-03": "#ffffff",
+      "--cl-color-container-inverse-01": "#1f1f1f",
+      "--cl-color-disabled-01": "#000000",
+      "--cl-color-disabled-03": "#000000",
+      "--cl-color-divider-01": "#000000",
+      "--cl-color-error-01": "#d9002b",
+      "--cl-color-error-background-01": "#fcc5be",
+      "--cl-color-focus-01": "#459195",
+      "--cl-color-free-01": "#2f7579",
+      "--cl-color-free-background-01": "#ccf4f5",
+      "--cl-color-hover-01": "#000000",
+      "--cl-color-hover-02": "#000000",
+      "--cl-color-hover-03": "#cfcccb",
+      "--cl-color-hover-brand-01": "#c93700",
+      "--cl-color-hover-inverse-01": "#000000",
+      "--cl-color-hover-link-01": "#1f1f1f",
+      "--cl-color-hover-link-02": "#000000",
+      "--cl-color-hubspot-brand-01": "#ff4800",
+      "--cl-color-icon-01": "#1f1f1f",
+      "--cl-color-icon-02": "#292929",
+      "--cl-color-icon-on-color-01": "#ffffff",
+      "--cl-color-link-01": "#1f1f1f",
+      "--cl-color-link-02": "#124548",
+      "--cl-color-loading-primary-fill-active": "#ff4800",
+      "--cl-color-loading-primary-fill-inactive": "#fcc6b1",
+      "--cl-color-loading-secondary-fill-active": "#000000",
+      "--cl-color-loading-secondary-fill-inactive": "#000000",
+      "--cl-color-neutral-01": "#9b9897",
+      "--cl-color-neutral-background-01": "#cfcccb",
+      "--cl-color-number-fill-active": "#ff4800",
+      "--cl-color-number-fill-inactive": "#ffdbc1",
+      "--cl-color-number-fill-statistic": "#ff4800",
+      "--cl-color-overlay-01": "#000000",
+      "--cl-color-play-button-fill-hover": "#c93700",
+      "--cl-color-play-button-fill-idle": "#ff4800",
+      "--cl-color-play-button-fill-pressed": "#ffa766",
+      "--cl-color-pressed-01": "#000000",
+      "--cl-color-pressed-02": "#000000",
+      "--cl-color-pressed-03": "#9b9897",
+      "--cl-color-pressed-brand-01": "#9f2800",
+      "--cl-color-pressed-inverse-01": "#000000",
+      "--cl-color-pressed-link-01": "#1f1f1f",
+      "--cl-color-pressed-link-02": "#000000",
+      "--cl-color-social-button-fill-hover": "#000000"
+    },
+    "palette": {
+      "entries": [
+        {
+          "hex": "#000000",
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "oklch": "oklch(0.0% 0.000 0.0)",
+          "luminance": 0.0,
+          "chroma": 0.0,
+          "hue": 0.0,
+          "alpha": 0.62,
+          "role": "dark / text",
+          "count": 78,
+          "source_value": "rgba(0, 0, 0, 0.6196078431)"
+        },
+        {
+          "hex": "#ffffff",
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "oklch": "oklch(100.0% 0.000 89.9)",
+          "luminance": 1.0,
+          "chroma": 0.0,
+          "hue": 89.9,
+          "alpha": 1.0,
+          "role": "light surface",
+          "count": 69,
+          "source_value": "#ffffff"
+        },
+        {
+          "hex": "#1f1f1f",
+          "rgb": [
+            31,
+            31,
+            31
+          ],
+          "oklch": "oklch(23.9% 0.000 89.9)",
+          "luminance": 0.0137,
+          "chroma": 0.0,
+          "hue": 89.9,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 63,
+          "source_value": "#1f1f1f"
+        },
+        {
+          "hex": "#ff4800",
+          "rgb": [
+            255,
+            72,
+            0
+          ],
+          "oklch": "oklch(66.3% 0.227 36.0)",
+          "luminance": 0.2589,
+          "chroma": 0.2272,
+          "hue": 36.0,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 41,
+          "source_value": "#ff4800"
+        },
+        {
+          "hex": "#f8f5ee",
+          "rgb": [
+            248,
+            245,
+            238
+          ],
+          "oklch": "oklch(97.1% 0.010 87.5)",
+          "luminance": 0.9143,
+          "chroma": 0.0098,
+          "hue": 87.5,
+          "alpha": 1.0,
+          "role": "light surface",
+          "count": 25,
+          "source_value": "#f8f5ee"
+        },
+        {
+          "hex": "#c93700",
+          "rgb": [
+            201,
+            55,
+            0
+          ],
+          "oklch": "oklch(55.4% 0.190 36.0)",
+          "luminance": 0.1515,
+          "chroma": 0.1897,
+          "hue": 36.0,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 18,
+          "source_value": "#c93700"
+        },
+        {
+          "hex": "#fcfcfa",
+          "rgb": [
+            252,
+            252,
+            250
+          ],
+          "oklch": "oklch(99.1% 0.003 106.4)",
+          "luminance": 0.9722,
+          "chroma": 0.0026,
+          "hue": 106.4,
+          "alpha": 1.0,
+          "role": "light surface",
+          "count": 13,
+          "source_value": "#fcfcfa"
+        },
+        {
+          "hex": "#9f2800",
+          "rgb": [
+            159,
+            40,
+            0
+          ],
+          "oklch": "oklch(46.4% 0.161 35.6)",
+          "luminance": 0.0889,
+          "chroma": 0.1606,
+          "hue": 35.6,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 12,
+          "source_value": "#9f2800"
+        },
+        {
+          "hex": "#9b9897",
+          "rgb": [
+            155,
+            152,
+            151
+          ],
+          "oklch": "oklch(68.2% 0.004 39.5)",
+          "luminance": 0.3166,
+          "chroma": 0.0038,
+          "hue": 39.5,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 11,
+          "source_value": "#9b9897"
+        },
+        {
+          "hex": "#fcc6b1",
+          "rgb": [
+            252,
+            198,
+            177
+          ],
+          "oklch": "oklch(86.9% 0.068 42.3)",
+          "luminance": 0.6426,
+          "chroma": 0.0684,
+          "hue": 42.3,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 11,
+          "source_value": "#fcc6b1"
+        },
+        {
+          "hex": "#cfcccb",
+          "rgb": [
+            207,
+            204,
+            203
+          ],
+          "oklch": "oklch(84.7% 0.004 39.5)",
+          "luminance": 0.6076,
+          "chroma": 0.0036,
+          "hue": 39.5,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 10,
+          "source_value": "#cfcccb"
+        },
+        {
+          "hex": "#d9002b",
+          "rgb": [
+            217,
+            0,
+            43
+          ],
+          "oklch": "oklch(55.8% 0.226 23.3)",
+          "luminance": 0.1493,
+          "chroma": 0.2256,
+          "hue": 23.3,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 8,
+          "source_value": "#d9002b"
+        },
+        {
+          "hex": "#2f7579",
+          "rgb": [
+            47,
+            117,
+            121
+          ],
+          "oklch": "oklch(52.0% 0.070 200.4)",
+          "luminance": 0.1471,
+          "chroma": 0.0695,
+          "hue": 200.4,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 7,
+          "source_value": "#2f7579"
+        },
+        {
+          "hex": "#b9cdbe",
+          "rgb": [
+            185,
+            205,
+            190
+          ],
+          "oklch": "oklch(82.9% 0.030 153.2)",
+          "luminance": 0.5769,
+          "chroma": 0.0299,
+          "hue": 153.2,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 7,
+          "source_value": "#b9cdbe"
+        },
+        {
+          "hex": "#fcc3dc",
+          "rgb": [
+            252,
+            195,
+            220
+          ],
+          "oklch": "oklch(87.5% 0.072 350.6)",
+          "luminance": 0.6489,
+          "chroma": 0.0722,
+          "hue": 350.6,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 6,
+          "source_value": "#fcc3dc"
+        },
+        {
+          "hex": "#292929",
+          "rgb": [
+            41,
+            41,
+            41
+          ],
+          "oklch": "oklch(28.1% 0.000 89.9)",
+          "luminance": 0.0222,
+          "chroma": 0.0,
+          "hue": 89.9,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 5,
+          "source_value": "#292929"
+        },
+        {
+          "hex": "#00823a",
+          "rgb": [
+            0,
+            130,
+            58
+          ],
+          "oklch": "oklch(53.0% 0.146 150.0)",
+          "luminance": 0.1627,
+          "chroma": 0.1459,
+          "hue": 150.0,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 5,
+          "source_value": "#00823a"
+        },
+        {
+          "hex": "#fcc5be",
+          "rgb": [
+            252,
+            197,
+            190
+          ],
+          "oklch": "oklch(87.0% 0.064 26.8)",
+          "luminance": 0.6435,
+          "chroma": 0.064,
+          "hue": 26.8,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 5,
+          "source_value": "#fcc5be"
+        },
+        {
+          "hex": "#042729",
+          "rgb": [
+            4,
+            39,
+            41
+          ],
+          "oklch": "oklch(25.0% 0.039 200.5)",
+          "luminance": 0.0164,
+          "chroma": 0.0389,
+          "hue": 200.5,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 4,
+          "source_value": "#042729"
+        },
+        {
+          "hex": "#213343",
+          "rgb": [
+            33,
+            51,
+            67
+          ],
+          "oklch": "oklch(31.3% 0.037 246.2)",
+          "luminance": 0.031,
+          "chroma": 0.0373,
+          "hue": 246.2,
+          "alpha": 0.12,
+          "role": "dark / text",
+          "count": 4,
+          "source_value": "rgba(33,51,67,.12)"
+        },
+        {
+          "hex": "#124548",
+          "rgb": [
+            18,
+            69,
+            72
+          ],
+          "oklch": "oklch(35.9% 0.053 200.7)",
+          "luminance": 0.0485,
+          "chroma": 0.0525,
+          "hue": 200.7,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 4,
+          "source_value": "#124548"
+        },
+        {
+          "hex": "#459195",
+          "rgb": [
+            69,
+            145,
+            149
+          ],
+          "oklch": "oklch(61.0% 0.075 200.0)",
+          "luminance": 0.2369,
+          "chroma": 0.0752,
+          "hue": 200.0,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 4,
+          "source_value": "#459195"
+        },
+        {
+          "hex": "#ffa581",
+          "rgb": [
+            255,
+            165,
+            129
+          ],
+          "oklch": "oklch(80.3% 0.118 42.5)",
+          "luminance": 0.4976,
+          "chroma": 0.1179,
+          "hue": 42.5,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 4,
+          "source_value": "#ffa581"
+        },
+        {
+          "hex": "#d6c2d9",
+          "rgb": [
+            214,
+            194,
+            217
+          ],
+          "oklch": "oklch(83.8% 0.038 321.8)",
+          "luminance": 0.5789,
+          "chroma": 0.0383,
+          "hue": 321.8,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 4,
+          "source_value": "#d6c2d9"
+        },
+        {
+          "hex": "#1f1049",
+          "rgb": [
+            31,
+            16,
+            73
+          ],
+          "oklch": "oklch(23.6% 0.099 288.4)",
+          "luminance": 0.0114,
+          "chroma": 0.0993,
+          "hue": 288.4,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 3,
+          "source_value": "#1f1049"
+        },
+        {
+          "hex": "#093436",
+          "rgb": [
+            9,
+            52,
+            54
+          ],
+          "oklch": "oklch(29.8% 0.045 199.6)",
+          "luminance": 0.0278,
+          "chroma": 0.0451,
+          "hue": 199.6,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 3,
+          "source_value": "#093436"
+        },
+        {
+          "hex": "#6431da",
+          "rgb": [
+            100,
+            49,
+            218
+          ],
+          "oklch": "oklch(49.1% 0.235 288.1)",
+          "luminance": 0.0997,
+          "chroma": 0.2349,
+          "hue": 288.1,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 3,
+          "source_value": "#6431da"
+        },
+        {
+          "hex": "#7d53e9",
+          "rgb": [
+            125,
+            83,
+            233
+          ],
+          "oklch": "oklch(57.0% 0.215 290.9)",
+          "luminance": 0.1643,
+          "chroma": 0.2147,
+          "hue": 290.9,
+          "alpha": 1.0,
+          "role": "dark / text",
+          "count": 3,
+          "source_value": "#7d53e9"
+        },
+        {
+          "hex": "#b6b1af",
+          "rgb": [
+            182,
+            177,
+            175
+          ],
+          "oklch": "oklch(76.4% 0.006 43.3)",
+          "luminance": 0.4448,
+          "chroma": 0.0064,
+          "hue": 43.3,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 3,
+          "source_value": "#b6b1af"
+        },
+        {
+          "hex": "#9cbaa4",
+          "rgb": [
+            156,
+            186,
+            164
+          ],
+          "oklch": "oklch(76.0% 0.045 153.4)",
+          "luminance": 0.4487,
+          "chroma": 0.0452,
+          "hue": 153.4,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 3,
+          "source_value": "#9cbaa4"
+        },
+        {
+          "hex": "#eeb117",
+          "rgb": [
+            238,
+            177,
+            23
+          ],
+          "oklch": "oklch(79.6% 0.160 82.8)",
+          "luminance": 0.4968,
+          "chroma": 0.1598,
+          "hue": 82.8,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 3,
+          "source_value": "#eeb117"
+        },
+        {
+          "hex": "#ffa766",
+          "rgb": [
+            255,
+            167,
+            102
+          ],
+          "oklch": "oklch(80.3% 0.132 56.0)",
+          "luminance": 0.4986,
+          "chroma": 0.1319,
+          "hue": 56.0,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 3,
+          "source_value": "#ffa766"
+        },
+        {
+          "hex": "#ffa499",
+          "rgb": [
+            255,
+            164,
+            153
+          ],
+          "oklch": "oklch(80.7% 0.110 27.2)",
+          "luminance": 0.5011,
+          "chroma": 0.11,
+          "hue": 27.2,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 3,
+          "source_value": "#ffa499"
+        },
+        {
+          "hex": "#c4b4f7",
+          "rgb": [
+            196,
+            180,
+            247
+          ],
+          "oklch": "oklch(80.7% 0.095 295.2)",
+          "luminance": 0.5109,
+          "chroma": 0.0947,
+          "hue": 295.2,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 3,
+          "source_value": "#c4b4f7"
+        },
+        {
+          "hex": "#ccc0a3",
+          "rgb": [
+            204,
+            192,
+            163
+          ],
+          "oklch": "oklch(81.0% 0.042 88.2)",
+          "luminance": 0.5318,
+          "chroma": 0.0416,
+          "hue": 88.2,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 3,
+          "source_value": "#ccc0a3"
+        },
+        {
+          "hex": "#97dadc",
+          "rgb": [
+            151,
+            218,
+            220
+          ],
+          "oklch": "oklch(84.4% 0.067 198.3)",
+          "luminance": 0.6189,
+          "chroma": 0.0674,
+          "hue": 198.3,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 3,
+          "source_value": "#97dadc"
+        },
+        {
+          "hex": "#d7cdfc",
+          "rgb": [
+            215,
+            205,
+            252
+          ],
+          "oklch": "oklch(87.2% 0.065 294.8)",
+          "luminance": 0.6514,
+          "chroma": 0.0651,
+          "hue": 294.8,
+          "alpha": 1.0,
+          "role": "accent",
+          "count": 3,
+          "source_value": "#d7cdfc"
+        },
+        {
+          "hex": "#bde7cb",
+          "rgb": [
+            189,
+            231,
+            203
+          ],
+          "oklch": "oklch(89.1% 0.058 155.9)",
+          "luminance": 0.7228,
+          "chroma": 0.0581,
+          "hue": 155.9,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 3,
+          "source_value": "#bde7cb"
+        },
+        {
+          "hex": "#b2e9eb",
+          "rgb": [
+            178,
+            233,
+            235
+          ],
+          "oklch": "oklch(89.7% 0.056 199.0)",
+          "luminance": 0.7374,
+          "chroma": 0.056,
+          "hue": 199.0,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 3,
+          "source_value": "#b2e9eb"
+        },
+        {
+          "hex": "#ffdbc1",
+          "rgb": [
+            255,
+            219,
+            193
+          ],
+          "oklch": "oklch(91.5% 0.053 57.8)",
+          "luminance": 0.7577,
+          "chroma": 0.053,
+          "hue": 57.8,
+          "alpha": 1.0,
+          "role": "neutral",
+          "count": 3,
+          "source_value": "#ffdbc1"
+        }
+      ],
+      "unique_colors": 60,
+      "method": "CSS declaration frequency; not computed style"
+    },
+    "fonts": {
+      "families": {
+        "HubSpot Sans": 3,
+        "HubSpot Serif": 3,
+        "Zen Kaku Gothic New": 2,
+        "HubSpot Serif Page Header Human": 1
+      },
+      "declarations": {
+        "monospace": 2,
+        "inherit": 2,
+        "\"HubSpot Sans\"": 2,
+        "\"HubSpot Serif\"": 2,
+        "\"Zen Kaku Gothic New\"": 3,
+        "var(--cl-font-family, \"HubSpot Sans\", sans-serif)": 1,
+        "\"Zen Kaku Gothic New\",sans-serif !important": 1,
+        "var(--cl-font-family-display, \"HubSpot Serif\", serif)": 3,
+        "var(--cl-font-family-heading, inherit)": 3,
+        "var(--cl-font-family, inherit)": 14,
+        "var(--cl-font-family)": 1,
+        "\"HubSpot Serif Page Header Human\"": 2,
+        "var(--cl-font-family,inherit)": 3,
+        "var(--cl-font-family-heading)": 1,
+        "var(--cl-font-family-display)": 1
+      },
+      "sizes": {
+        "2em": 1,
+        "1em": 2,
+        "80%": 1,
+        "75%": 1,
+        "100%": 1,
+        "var(--cl-text-font-size)": 8,
+        "var(--cl-font-size-display-01)": 2,
+        "var(--cl-font-size-display-02)": 2,
+        "var(--cl-font-size-display-03)": 1,
+        "var(--cl-font-size-h1)": 2,
+        "var(--cl-font-size-h1-small)": 1,
+        "var(--cl-font-size-h2)": 1,
+        "var(--cl-font-size-h3)": 1,
+        "var(--cl-font-size-h4)": 3,
+        "var(--cl-font-size-h5)": 7,
+        "var(--cl-font-size-h6)": 7,
+        "var(--cl-font-size-microheading)": 6,
+        "var(--cl-font-size-microcopy)": 7,
+        "var(--cl-font-size-blockquote)": 1,
+        "var(--cl-font-size-input-label)": 5,
+        "var(--cl-font-size-small)": 1,
+        ".875rem": 3,
+        "var(--cl-button-font-size)": 3,
+        "inherit": 1,
+        "var(--wf-page-header-heading-custom-font-size)": 3,
+        "var(--cl-font-size-p-small)": 2,
+        "28px": 1,
+        "1rem": 1
+      },
+      "weights": {
+        "bolder": 1,
+        "300 400": 2,
+        "500 600": 1,
+        "400 600": 2,
+        "300": 4,
+        "500": 2,
+        "700": 1,
+        "var(--cl-text-font-weight)": 8,
+        "var(--cl-font-weight-display-01)": 1,
+        "var(--cl-font-weight-display-02)": 1,
+        "var(--cl-font-weight-display-03)": 1,
+        "var(--cl-font-weight-h1)": 1,
+        "var(--cl-font-weight-h1-small)": 1,
+        "var(--cl-font-weight-h2)": 1,
+        "var(--cl-font-weight-h3)": 1,
+        "var(--cl-font-weight-h4)": 2,
+        "var(--cl-font-weight-h5)": 7,
+        "var(--cl-font-weight-h6)": 7,
+        "var(--cl-font-weight-microheading)": 6,
+        "var(--cl-font-weight-microcopy)": 7,
+        "var(--cl-font-weight-medium)": 4,
+        "var(--cl-anchor-font-weight, var(--cl-font-weight-medium))": 8,
+        "var(--cl-font-weight-blockquote)": 1,
+        "var(--cl-font-weight-input-label)": 5,
+        "var(--cl-font-weight-light)": 3,
+        "var(--cl-font-weight-demi-bold)": 1
+      },
+      "line_heights": {
+        "1.15": 2,
+        "0": 1,
+        "var(--cl-text-line-height)": 8,
+        "var(--cl-line-height-display-01)": 2,
+        "var(--cl-line-height-display-02)": 2,
+        "var(--cl-line-height-display-03)": 1,
+        "var(--cl-line-height-h1)": 2,
+        "var(--cl-line-height-h1-small)": 1,
+        "var(--cl-line-height-h2)": 1,
+        "var(--cl-line-height-h3)": 1,
+        "var(--cl-line-height-h4)": 2,
+        "var(--cl-line-height-h5)": 7,
+        "var(--cl-line-height-h6)": 7,
+        "var(--cl-line-height-microheading)": 6,
+        "var(--cl-line-height-microcopy)": 7,
+        "var(--cl-line-height-blockquote)": 1,
+        "var(--cl-line-height-input-label)": 5,
+        "var(--cl-line-height-small)": 1,
+        "1.57142857": 2,
+        "var(--cl-button-line-height)": 3,
+        "var(--wf-page-header-heading-custom-line-height)": 3,
+        "var(--cl-line-height-p-small)": 1
+      },
+      "letter_spacings": {
+        "var(--cl-text-letter-spacing, normal)": 8,
+        "var(--cl-letter-spacing-display-01, normal)": 1,
+        "var(--cl-letter-spacing-display-02, normal)": 1,
+        "var(--cl-letter-spacing-display-03, normal)": 1,
+        "var(--cl-letter-spacing-h1, normal)": 1,
+        "var(--cl-letter-spacing-h1-small, normal)": 1,
+        "var(--cl-letter-spacing-h2, normal)": 1,
+        "var(--cl-letter-spacing-h3, normal)": 1,
+        "var(--cl-letter-spacing-h4, normal)": 1,
+        "var(--cl-letter-spacing-h5, normal)": 6,
+        "var(--cl-letter-spacing-h6, normal)": 6,
+        "var(--cl-letter-spacing-microheading, normal)": 6,
+        "var(--cl-letter-spacing-microcopy, normal)": 6,
+        "var(--cl-letter-spacing-display-01)": 1,
+        "var(--cl-letter-spacing-display-02)": 1,
+        "var(--cl-letter-spacing-h6,normal)": 1,
+        "var(--cl-letter-spacing-h5,normal)": 1,
+        "var(--cl-letter-spacing-microcopy,normal)": 1,
+        "var(--cl-letter-spacing-h4,normal)": 1
+      },
+      "transforms": {
+        "none": 2,
+        "uppercase": 2
+      }
+    },
+    "space": {
+      "margin": {
+        "0px 0px 0px 0px": 1,
+        "0 0 20px 20px": 1,
+        "0": 42,
+        ".67em 0": 1,
+        "0 auto": 1,
+        "1rem": 1,
+        "auto": 4,
+        ".5rem": 2,
+        "1rem 0": 2,
+        ".125rem": 1,
+        "3px": 1,
+        "auto 0 .5rem": 1,
+        "auto 0 .5rem 1rem": 1,
+        ".75rem": 1
+      },
+      "padding": {
+        "0px 0px 0px 0px": 1,
+        "10px 0px 10px 10px": 1,
+        "0": 30,
+        "var(--cl-nav-link-padding)": 1,
+        ".5rem 1rem": 2,
+        "0 .5rem": 1,
+        ".5rem": 5,
+        ".75rem": 2,
+        ".4rem": 1,
+        "0 0 1rem .5rem": 1,
+        "var(--cl-button-padding)": 3,
+        "0 16px": 2,
+        "2px 2px 0": 1,
+        "8px 16px 4px": 1,
+        "24px 16px": 1,
+        "0 0 0 16px": 1,
+        "8px 32px 4px 16px": 1,
+        "0px 24px": 1,
+        "1.5rem": 4,
+        "1rem .5rem": 1,
+        "0 .75rem": 1,
+        "1rem": 3,
+        "var(--a11y-contrast-toggle-padding)": 1,
+        "16px 0": 1,
+        ".5rem 2.5rem .5rem 1rem": 1,
+        ".2rem .5rem": 1,
+        "calc(.5rem - var(--cl-card-border-width)) 0": 1,
+        ".5rem calc(1rem - var(--cl-card-border-width))": 1,
+        "2rem": 3,
+        "2rem 0": 2,
+        "2rem 2rem 1.5rem": 1,
+        "0 2rem 2rem": 1,
+        "3.5rem 0 3.5rem 5rem": 1,
+        "1.5rem 1.5rem 2rem": 1,
+        "10px": 1,
+        "1.25rem 1rem": 1,
+        "0 1rem": 1,
+        "calc(var(--wf-flexible-tagline-padding)/2) var(--wf-flexible-tagline-padding)": 1,
+        "var(--wf-flexible-tagline-padding)": 1,
+        "1.5rem 1rem": 1,
+        "0 0 1.5rem": 1,
+        "0 1.5rem 0 0": 1,
+        "3rem": 1,
+        "3rem 0 0": 1,
+        "var(--cl-carousel-controls-padding-block) var(--cl-carousel-controls-padding-inline)": 2,
+        "12px 16px": 2,
+        "0 24px": 2,
+        "0 4px": 1,
+        "var(--cl-card-interactive-padding)": 1
+      },
+      "gap": {
+        "var(--cl-nav-link-gap)": 1,
+        ".5rem": 12,
+        ".75rem": 4,
+        "1rem": 12,
+        "28px": 1,
+        ".25rem": 5,
+        "2.5rem": 3,
+        "var(--a11y-contrast-toggle-text-gap)": 1,
+        "var(--global-nav-search-close-icon-size, 24px)": 1,
+        "var(--breeze-agents-multi-column-content-gap-mobile)": 1,
+        "var(--breeze-agents-multi-column-content-gap-desktop)": 1,
+        "var(--breeze-agents-multi-column-content-inner-content-gap)": 2,
+        "var(--breeze-agents-multi-column-content-item-gap)": 1,
+        "var(--breeze-agents-multi-column-content-image-gap)": 1,
+        "1.25rem": 1,
+        "1.5rem": 10,
+        "var(--wf-badges-grid-item-gap)": 1,
+        ".75rem 1rem": 2,
+        "1rem 1.5rem": 2,
+        ".375rem": 1,
+        "8px": 1,
+        "var(--wf-flexible-tagline-spacing-small)": 1,
+        "4px": 1,
+        "var(--cl-carousel-slide-gap)": 2,
+        "12px": 4,
+        "var(--cl-carousel-dot-gap)": 2,
+        "6px": 1
+      },
+      "max_width": {
+        "50%": 1,
+        "100%": 8,
+        "min(100% - var(--cl-section-gutter)*2,var(--cl-section-content-max-width))": 1,
+        "none": 1,
+        "var(--cl-content-max-width)": 1,
+        "240px": 1,
+        "200px": 1,
+        "242px": 2,
+        "max-content": 1,
+        "0": 1,
+        "var(--global-nav-content-max-width, 1080px)": 1,
+        "unset": 3,
+        "370px": 1,
+        "712px": 1,
+        "368px": 1,
+        "var(--cl-content-max-width-enhanced)": 1,
+        "var(--csol-logo-carousel-image-max-width)": 1,
+        "80%": 2,
+        "210px": 1,
+        "520px": 1,
+        "11rem": 1,
+        "calc(var(--cl-carousel-dot-size)*7 + var(--cl-carousel-dot-gap)*6)": 2,
+        "calc(var(--cl-carousel-dot-size)*5 + var(--cl-carousel-dot-gap)*4)": 2,
+        "90%": 1,
+        "1030px": 2
+      },
+      "container_widths": {
+        "100%": 54,
+        "1px": 3,
+        "2rem": 2,
+        "var(--cl-nav-link-toggle-icon-size, 18px)": 1,
+        "auto": 5,
+        "2.5rem": 1,
+        "80%": 1,
+        "var(--cl-text-link-icon-size)": 2,
+        "var(--global-nav-header-sublinks-icon, 26px)": 1,
+        "var(--global-nav-card-icon-small, 26px)": 1,
+        "var(--global-nav-card-icon-medium, 48px)": 1,
+        "var(--global-nav-card-icon-large-width, 100%)": 1,
+        "var(--global-nav-header-cta-icon-small, 24px)": 2,
+        "40px": 2,
+        "0": 3,
+        "calc(100% - 1.25rem)": 1,
+        "1400px": 1,
+        "var(--cl-nav-link-toggle-icon-size, 1.125rem)": 1,
+        "var(--global-nav-mobile-list-item-icon-width, 18px)": 1,
+        "var(--global-nav-mobile-list-item-left-icon-width, 26px)": 1,
+        "calc(var(--a11y-contrast-toggle-px-width)*1px)": 2,
+        "var(--a11y-contrast-toggle-circle-diameter)": 2,
+        "1rem": 2,
+        "var(--global-nav-search-close-icon-size, 24px)": 1,
+        "calc(1080px - var(--global-nav-search-total-close-button-and-gap-space, 45px))": 1,
+        "20px": 2,
+        ".875rem": 1,
+        "100px": 1,
+        "fit-content": 8,
+        "30px": 1,
+        "var(--breeze-agents-multi-column-content-image-size-xs)": 1,
+        "var(--breeze-agents-multi-column-content-image-size-s)": 1,
+        "var(--breeze-agents-multi-column-content-image-size-m)": 1,
+        "var(--breeze-agents-multi-column-content-image-size-l)": 1,
+        "var(--breeze-agents-multi-column-content-image-size-xl)": 1,
+        "var(--wf-badges-grid-item-size-large)": 1,
+        "24px": 5,
+        "1.125rem": 1,
+        "min-content": 1,
+        "8rem": 1,
+        "6rem": 1,
+        "4rem": 1,
+        "400px": 1,
+        "var(--wtm-evfc-play-btn-size)": 1,
+        "48%": 1,
+        "34%": 1,
+        "28%": 2,
+        "32%": 1,
+        "var(--wf-flexible-tagline-icon-size)": 1,
+        "48px": 4,
+        "50%": 4,
+        "32px": 4,
+        "var(--cl-carousel-train-width)": 2,
+        "var(--cl-carousel-slide-width)": 2,
+        "var(--cl-carousel-controls-button-size)": 2,
+        "var(--cl-carousel-autoplay-toggle-size)": 2,
+        "var(--cl-carousel-dot-size)": 2,
+        "1.5rem": 1,
+        "28px": 1,
+        "52px": 1,
+        "64px": 1,
+        "8px": 2,
+        "12px": 2
+      }
+    },
+    "shape": {
+      "radius": {
+        "1rem": 1,
+        "var(--cl-border-radius-container)": 5,
+        "var(--cl-border-radius-medium)": 7,
+        "8px": 1,
+        "0 0 .1875rem .1875rem": 1,
+        "calc(var(--a11y-contrast-toggle-px-height)*1px/2)": 1,
+        "50%": 12,
+        "inherit": 2,
+        "0 50% 50% 0": 1,
+        "var(--cl-border-radius-small)": 3,
+        "var(--cl-border-radius-container-small)": 2,
+        "0": 1,
+        "var(--wf-flexible-tagline-border-radius)": 1,
+        "4px": 1,
+        "48px": 2
+      },
+      "border": {
+        "0": 10,
+        "var(--cl-card-border-width, 0px) solid var(--cl-card-border-color, transparent)": 3,
+        "none": 14,
+        "2px solid": 1,
+        "rgba(0,0,0,0)": 1,
+        "1px solid var(--cl-color-border-03)": 1,
+        "var(--a11y-contrast-toggle-border-width) solid var(--a11y-contrast-toggle-border-color)": 1,
+        "var(--a11y-contrast-toggle-border-width) solid currentColor": 1,
+        "1px solid var(--cl-color-border-02)": 1,
+        "1px solid var(--cl-color-error-01)": 1,
+        "var(--cl-card-border-width) solid": 1,
+        "var(--cl-button-border)": 6,
+        "var(--cl-border-width-medium) solid var(--cl-color-border-03)": 1,
+        "1px solid var(--light-theme-border-03)": 2,
+        "var(--cl-border-width-heavy) solid var(--cl-badge-border-color)": 1,
+        "var(--cl-card-border-width,0) solid var(--cl-card-border-color,transparent)": 1,
+        "2px solid var(--cl-color-border-01)": 2
+      },
+      "shadow": {
+        "0 2px 4px rgba(33,51,67,.12)": 1,
+        "var(--global-nav-box-shadow, 0 2px 4px rgba(33, 51, 67, 0.12))": 2,
+        "none": 8,
+        "0 0 0 1px var(--cl-card-border-color)": 6,
+        "0 1px 24px rgba(33,51,67,.12)": 1,
+        "0 0 0 1px var(--cl-color-border-02)": 2,
+        "0 0 0 1px var(--cl-color-error-01)": 1,
+        "0 1px 4px 1px var(--cl-color-container-03) inset,0 8px 8px 0 var(--cl-color-border-03)": 1,
+        "0 0 0 2px var(--cl-color-border-01)": 1
+      },
+      "backdrop_filter": {
+        "blur(4px)": 1
+      }
+    },
+    "motion": {
+      "transition": {
+        "top 1s ease-out": 1,
+        "top .1s ease-in": 1,
+        "transform .3s ease-out": 1,
+        ".3s ease-in-out": 2,
+        "opacity .2s ease-out,visibility .3s": 2,
+        "opacity .2s ease-in,visibility 0s": 2,
+        "var(--global-nav-dropdown-toggle-transition, transform 0.3s ease)": 2,
+        "text-underline-offset .3s ease-in-out": 2,
+        ".15s background-color linear,.15s color linear": 2,
+        "left .3s ease,visibility .3s ease,width .3s ease": 2,
+        "left .3s ease": 2,
+        "transform var(--a11y-contrast-toggle-transition-duration) ease-in-out": 2,
+        "border-color var(--a11y-contrast-toggle-transition-duration) ease-in-out": 1,
+        "transform var(--a11y-contrast-toggle-transition-duration) ease-in-out,opacity var(--a11y-contrast-toggle-transition-duration) ease-in-out": 1,
+        "left var(--a11y-contrast-toggle-transition-duration) ease-in-out": 1,
+        "all .3s ease-out": 1,
+        "all .3s ease-in": 1,
+        "height 300ms ease-out": 1,
+        "opacity var(--wf-page-header-image-loaded-speed) var(--wf-page-header-image-loaded-easing-function)": 1,
+        "font-size .3s linear,font-weight .3s linear,line-height .3s linear": 1,
+        "none": 1,
+        "transform .2s ease-in-out": 1,
+        "transform .3s ease-in-out,opacity .3s ease-in-out": 1,
+        "opacity .3s ease-in-out": 2,
+        "opacity var(--cl-motion-duration-medium,.35s) var(--cl-motion-easing-standard,ease)": 2,
+        "flex var(--cl-motion-duration-medium,.35s) var(--cl-motion-easing-standard,ease)": 1,
+        "translate var(--cl-carousel-animation-duration) var(--cl-carousel-easing)": 2,
+        "translate .01s .01s": 2,
+        "opacity .01s": 2,
+        "translate var(--cl-carousel-animation-duration)": 2,
+        "scale var(--cl-carousel-animation-duration)": 2,
+        "background-color .15s linear,color .15s linear": 1,
+        "scale .4s cubic-bezier(.65,0,.35,1)": 1,
+        "visibility 0s .4s": 1,
+        "translate .4s cubic-bezier(.65,0,.35,1),scale 0s .4s": 1,
+        "opacity .4s ease-in": 1
+      },
+      "animation": {
+        "global-nav-slide-right 1s": 1,
+        "global-nav-slide-left 1s": 1,
+        "cl-typing-dot-opacity 2s linear infinite": 1,
+        "dash 2s ease-in-out infinite,spin 2s linear infinite": 1,
+        "dash 10s linear infinite": 1
+      },
+      "duration": {
+        "1ms !important": 1
+      },
+      "timing": {
+        "ease-out": 1
+      },
+      "transform": {
+        "translateY(0)": 2,
+        "rotate(0deg)": 1,
+        "translateY(-0.5rem)": 1,
+        "translateY(0.5rem)": 1,
+        "rotate(90deg)": 1,
+        "rotate(-135deg)": 1,
+        "rotate(-45deg)": 1,
+        "rotate(180deg)": 1,
+        "translateX(-50%)": 1,
+        "scale(var(--a11y-contrast-toggle-cover-scale))": 1,
+        "translateX(var(--a11y-contrast-toggle-translate-distance)) scale(1)": 1,
+        "translateX(var(--a11y-contrast-toggle-translate-distance)) rotate(180deg)": 1,
+        "translateX(100%)": 2,
+        "translateY(-50%)": 5,
+        "translateX(-100%)": 1,
+        "translateX(0%)": 2,
+        "translateX(5px)": 1,
+        "rotate(15deg) translate(-50%,-5%)": 1,
+        "scale(.9)": 1,
+        "scale(1)": 1,
+        "translate(-50%,-50%)": 1,
+        "var(--cl-carousel-controls-transform)": 2,
+        "rotate(1turn)": 1,
+        "none": 3,
+        "rotate(45deg) translateY(-50%)": 1,
+        "rotate(45deg)": 1
+      },
+      "keyframes": [
+        "global-nav-slide-right",
+        "global-nav-slide-left",
+        "cl-typing-dot-opacity",
+        "spin",
+        "dash"
+      ]
+    },
+    "layout": {
+      "display": {
+        "block": 42,
+        "table": 1,
+        "list-item": 1,
+        "none": 36,
+        "none !important": 35,
+        "grid": 18,
+        "flex": 114,
+        "inline-flex": 9,
+        "inline-block": 10,
+        "inline": 3
+      },
+      "grid_template_columns": {
+        "repeat(var(--cl-grid-column-count-phone, 4), minmax(0, 1fr))": 1,
+        "repeat(var(--cl-grid-column-count-tablet, 8), minmax(0, 1fr))": 1,
+        "repeat(var(--cl-grid-column-count-desktop, 12), minmax(0, 1fr))": 1,
+        "subgrid": 1,
+        "repeat(2, minmax(0, max-content))": 1,
+        "none": 2,
+        "repeat(var(--grid-column, 1), 1fr)": 1,
+        "repeat(3, 1fr)": 2,
+        "repeat(4, 1fr)": 2,
+        "auto auto 1fr": 1,
+        "32% 1fr": 1,
+        "40% 1fr": 1,
+        "60% 1fr": 1,
+        "repeat(2,1fr)": 1,
+        "1fr": 1,
+        "1fr 2fr": 1,
+        "minmax(0,1fr)": 1,
+        "repeat(2,minmax(0,1fr))": 1,
+        "repeat(3,1fr)": 1,
+        "600px 1fr": 1,
+        "2fr 1fr": 1
+      },
+      "media_queries": {
+        "(width >= 600px)": 42,
+        "(width >= 1080px)": 38,
+        "(width >= 900px)": 23,
+        "(width < 600px)": 13,
+        "(hover:hover)": 3,
+        "(prefers-reduced-motion: no-preference)": 2,
+        "(width <= 275px)": 2,
+        "(max-width: 568px)": 1,
+        "(prefers-reduced-motion: reduce)": 1,
+        "(width >= 768px)": 1,
+        "(width <= 1220px)": 1,
+        "(max-width: 1080px)": 1,
+        "(width < 900px)": 1,
+        "(prefers-reduced-motion:reduce)": 1
+      },
+      "breakpoints": [
+        "max-width 568px",
+        "max-width 1080px"
+      ]
+    },
+    "gradients": {
+      "linear-gradient(var(--cl-tab-control-overflow-direction), var(--cl-tab-control-background) 10%, transparent 100%)": 2,
+      "linear-gradient(var(--cl-color-hover-01), var(--cl-color-hover-01))": 1,
+      "linear-gradient(var(--cl-color-container-02), var(--cl-color-container-02))": 1,
+      "linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4))": 1,
+      "linear-gradient(257deg,hsla(18,84%,90%,.3) -32.4%,rgba(255,165,129,.3) -3.42%,rgba(255,73,0,.3) 23.87%,rgba(251,223,233,.3) 50.46%,rgba(253,191,219,.3) 79.15%,rgba(249,57,166,.3) \u2026": 1,
+      "linear-gradient(180deg,hsla(0,0%,100%,0),#fff)": 1,
+      "linear-gradient(188deg,#3a3d3b00 28.2%,#1f1f1f 94.49%)": 1,
+      "linear-gradient(var(--cl-color-container-02),var(--cl-color-container-02))": 1,
+      "linear-gradient(var(--cl-card-hover-background-color),var(--cl-card-hover-background-color))": 1
+    },
+    "imports": [],
+    "media_query_count": 130
+  },
+  "classification": {
+    "taxonomy_version": "2026-11-05",
+    "primary_type": "saas-product",
+    "types": [
+      "saas-product",
+      "lead-generation"
+    ],
+    "conversion_goal": "free-trial",
+    "secondary_goals": [
+      "demo-booking"
+    ],
+    "funnel_stage": "decision",
+    "confidence": "medium",
+    "reasons": [
+      "lead-generation: sales CTA: get a demo",
+      "lead-generation: form on a sales-CTA page",
+      "saas-product: SaaS CTA/product language: get started free, platform, software",
+      "saas-product: platform + product"
+    ]
+  },
+  "limits": [
+    "Static HTML/CSS only: JavaScript-rendered DOM, computed style, hover/focus states, and animations are not observed.",
+    "CSS declaration frequency is not visual usage: unused framework/reset rules can dominate the palette.",
+    "CSS cascade/layers are not resolved; `<style>` blocks and linked stylesheets are analyzed independently.",
+    "Cross-origin iframes, shadow DOM, canvas/WebGL, video, and image contents are skipped.",
+    "Robots.txt is respected for the page fetch; no crawl, no forms, no auth, no paywall bypass.",
+    "No screenshot was taken and no browser was launched. Browser/vision tiers need explicit operator authorization.",
+    "No logos, images, fonts, icons, or page copy should be reused; this evidence supports principles, not assets."
+  ]
+}

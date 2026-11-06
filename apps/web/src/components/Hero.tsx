@@ -23,8 +23,9 @@ export function Hero({
   if (!lead) return null;
   return (
     <section aria-labelledby="hero-heading" className="sn-hero">
-      <div className="sn-card sn-hero-surface sn-hero-card overflow-hidden p-6 md:p-9">
+      <div className="sn-hero-card overflow-hidden">
         <div className="flex flex-wrap items-center gap-3">
+          <span className="sn-kicker" aria-hidden="true" />
           <span className="sn-eyebrow">{t(locale, "home.featured")}</span>
           <span className="sn-chip">
             <time dateTime={lead.published_at}>{formatDate(lead.published_at, locale)}</time>
@@ -33,7 +34,7 @@ export function Hero({
         </div>
         <h1
           id="hero-heading"
-          className="mt-4 text-3xl font-extrabold leading-[1.1] tracking-tight text-[var(--sn-text)] md:text-[2.7rem]"
+          className="sn-display mt-4 font-extrabold text-[var(--sn-text)]"
         >
           <Link
             href={localePath(locale, `/${industry.slug}/article/${lead.id}`)}
@@ -86,26 +87,30 @@ export function StoryColumns({
   locale: Locale;
   industry: string;
 }) {
-  const populated = bundle.columns.filter((column) => column.items.length > 0);
-  if (populated.length === 0) return null;
+  const items = Array.from(
+    new Map(bundle.columns.flatMap((column) => column.items).map((article) => [article.id, article])).values(),
+  );
+  if (items.length === 0) return null;
   return (
     <section aria-labelledby="latest-heading" className="mt-12">
       <div className="flex items-end justify-between gap-4">
         <h2
           id="latest-heading"
-          className="text-2xl font-extrabold tracking-tight text-[var(--sn-text)]"
+          className="sn-section-title shrink-0 font-extrabold text-[var(--sn-text)]"
         >
           {t(locale, "home.latest")}
         </h2>
         <span aria-hidden="true" className="sn-rule" />
       </div>
       <div className="sn-columns mt-5">
-        {populated.map((column, index) => (
-          <div key={index} className="flex flex-col gap-5">
-            {column.items.map((article) => (
-              <StoryCard key={article.id} article={article} industry={industry} locale={locale} />
-            ))}
-          </div>
+        {items.map((article, index) => (
+          <StoryCard
+            key={article.id}
+            article={article}
+            industry={industry}
+            locale={locale}
+            featured={index === 0}
+          />
         ))}
       </div>
     </section>

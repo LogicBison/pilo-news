@@ -12,7 +12,7 @@ export function DeskBrief({
   return (
     <section
       aria-labelledby="desk-brief-heading"
-      className="sn-card sn-card-surface border-l-4 border-l-[var(--sn-accent)] p-5"
+      className="sn-editorial-block"
     >
       <h2
         id="desk-brief-heading"

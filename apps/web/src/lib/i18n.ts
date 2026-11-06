@@ -47,6 +47,18 @@ export function formatDate(value: string, locale: Locale, timeZone = "America/El
   }
 }
 
+export function formatDay(value: string, locale: Locale, timeZone = "America/El_Salvador"): string {
+  const intlLocale = locale === "es" ? "es-ES" : "en-US";
+  try {
+    return new Intl.DateTimeFormat(intlLocale, {
+      dateStyle: "medium",
+      timeZone,
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
 export function localePath(locale: Locale, path: string): string {
   const clean = path.startsWith("/") ? path : `/${path}`;
   return locale === "es" ? `/es${clean === "/" ? "" : clean}` : clean;

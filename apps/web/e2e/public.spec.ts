@@ -40,7 +40,7 @@ test("lead form requires consent and never echoes PII in the URL", async ({ page
   const form = page.locator("#lead-form");
   await form.getByLabel("Name").fill("Test Reader");
   await form.getByLabel("Email").fill("reader@example.com");
-  await form.getByLabel("What do you need?").fill("A compliance question.");
+  await form.getByLabel(/additional details/i).fill("A compliance question.");
   await form.getByRole("button", { name: /send request/i }).click();
   await expect(page).toHaveURL(/\/legal$/);
   expect(page.url()).not.toContain("reader@example.com");

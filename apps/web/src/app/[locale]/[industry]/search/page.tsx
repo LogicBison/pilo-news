@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { CtaCard } from "@/components/CtaCard";
 import { LeadForm } from "@/components/LeadForm";
 import { EmptyState } from "@/components/Notices";
 import { SearchBox } from "@/components/SearchBox";
 import { StoryCard } from "@/components/StoryCard";
+import { TrustBlock } from "@/components/TrustBlock";
+import { BriefSignup } from "@/components/BriefSignup";
 import { getIndustry, getNews } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
@@ -87,7 +88,7 @@ export default async function SearchPage({ params, searchParams }: Params) {
           </div>
         ) : null}
 
-        <div className="mt-10">
+        <div className="sn-lead-standalone mt-10">
           <LeadForm
             industry={industry}
             industryName={channel.name}
@@ -98,8 +99,16 @@ export default async function SearchPage({ params, searchParams }: Params) {
             qualify={channel.cta.qualify}
           />
         </div>
+        <BriefSignup
+          industry={industry}
+          locale={resolved}
+          placement="brief-search"
+          sourcePage={localePath(resolved, `/${industry}/search`)}
+        />
       </div>
-      <CtaCard industry={channel} locale={resolved} placement="search" compact />
+      <aside className="sn-search-aside h-fit lg:sticky lg:top-24">
+        <TrustBlock locale={resolved} />
+      </aside>
     </div>
   );
 }

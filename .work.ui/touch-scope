@@ -1,0 +1,15 @@
+{
+  "ref": "SYSNEWS",
+  "updated": "2026-11-05",
+  "goal": "Editorial conversion UI: lead-generation reference intake, balanced coverage columns, open layout, clear forms",
+  "allowed_paths": [
+    ".work.ui/",
+    ".work/",
+    "apps/web/"
+  ],
+  "allowed_patterns": [
+    "apps/web/**/*",
+    ".work.ui/**/*",
+    ".work/**/*"
+  ]
+}

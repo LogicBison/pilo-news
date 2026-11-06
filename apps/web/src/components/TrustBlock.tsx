@@ -13,19 +13,27 @@ export function TrustBlock({ locale }: { locale: Locale }) {
 
   return (
     <section aria-labelledby="trust-heading" className="sn-card p-6">
-      <h2 id="trust-heading" className="text-xl font-semibold tracking-tight text-[var(--sn-text)]">
+      <div className="flex items-center gap-2">
+        <span className="sn-kicker" aria-hidden="true" />
+        <p className="sn-eyebrow">{t(locale, "trust.eyebrow")}</p>
+      </div>
+      <h2 id="trust-heading" className="sn-section-title mt-2 font-semibold text-[var(--sn-text)]">
         {t(locale, "trust.title")}
       </h2>
-      <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+      <ol className="mt-5 grid gap-4">
         {steps.map((step, index) => (
-          <li key={step.title}>
-            <p className="sn-chip">{index + 1}</p>
-            <h3 className="mt-2 text-sm font-semibold text-[var(--sn-text)]">{step.title}</h3>
-            <p className="mt-1 text-sm leading-relaxed text-[var(--sn-muted)]">{step.body}</p>
+          <li key={step.title} className="flex gap-3">
+            <span className="sn-chip h-fit">{index + 1}</span>
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--sn-text)]">{step.title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-[var(--sn-muted)]">{step.body}</p>
+            </div>
           </li>
         ))}
       </ol>
-      <p className="mt-4 text-xs leading-relaxed text-[var(--sn-muted)]">{t(locale, "trust.note")}</p>
+      <p className="mt-5 border-t border-[var(--sn-border)] pt-4 text-xs leading-relaxed text-[var(--sn-muted)]">
+        {t(locale, "trust.note")}
+      </p>
     </section>
   );
 }

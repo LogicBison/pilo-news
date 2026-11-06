@@ -1,0 +1,274 @@
+{
+ "brand": "System News",
+ "site_url": "http://localhost:43991",
+ "default_locale": "en",
+ "refresh_interval_minutes": 720,
+ "default_industry": "energy",
+ "industries": [
+  {
+   "slug": "energy",
+   "code": "ENERGY_UTILITIES",
+   "name": "Energy & Utilities",
+   "theme": {
+    "primary": "#123f3a",
+    "accent": "#0e7490",
+    "bg": "#f7faf8",
+    "surface": "#eaf4f2",
+    "text": "#0f172a",
+    "muted": "#475569",
+    "border": "#cbd5e1",
+    "radius": "5px",
+    "font_heading": "Arial, Helvetica, sans-serif",
+    "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+    "layout": "professional"
+   },
+   "locales": {
+    "en": {
+     "name": "Energy & Utilities",
+     "tagline": "Grid, markets, renewables, and regulation - in plain language."
+    },
+    "es": {
+     "name": "Energía y Servicios Públicos",
+     "tagline": "Red, mercados, renovables y regulación, en lenguaje claro."
+    }
+   },
+   "disclaimers": {
+    "en": "News, not investment, regulatory, or safety advice. Verify decisions with a licensed professional.",
+    "es": "Noticias, no asesoría de inversión, regulatoria ni de seguridad. Verifique decisiones con un profesional con licencia."
+   },
+   "cta": {
+    "kind": "consultation",
+    "headline": {
+     "en": "Talk to an energy specialist",
+     "es": "Hable con un especialista en energía"
+    },
+    "body": {
+     "en": "Tell us what you are planning. We route qualified requests to an independent partner.",
+     "es": "Cuéntenos qué está planificando. Canalizamos solicitudes calificadas a un socio independiente."
+    },
+    "label": {
+     "en": "Request a consultation",
+     "es": "Solicitar una consulta"
+    },
+    "secondary_label": {
+     "en": "Get the weekly brief",
+     "es": "Recibir el resumen semanal"
+    },
+    "qualify": {
+     "label": {
+      "en": "Energy need",
+      "es": "Necesidad energética"
+     },
+     "required": true,
+     "options": [
+      {
+       "value": "procurement",
+       "label": {
+        "en": "Energy procurement",
+        "es": "Compra de energía"
+       }
+      },
+      {
+       "value": "interconnection",
+       "label": {
+        "en": "Grid interconnection",
+        "es": "Interconexión a la red"
+       }
+      },
+      {
+       "value": "renewables",
+       "label": {
+        "en": "Renewables & storage",
+        "es": "Renovables y almacenamiento"
+       }
+      },
+      {
+       "value": "regulatory",
+       "label": {
+        "en": "Regulatory strategy",
+        "es": "Estrategia regulatoria"
+       }
+      },
+      {
+       "value": "other",
+       "label": {
+        "en": "Something else",
+        "es": "Otra necesidad"
+       }
+      }
+     ]
+    }
+   },
+   "timezone": "America/El_Salvador",
+   "retention_days": 30,
+   "sort_order": 90,
+   "enabled": true,
+   "topics": [
+    {
+     "slug": "grid",
+     "label": {
+      "en": "Grid",
+      "es": "Red Eléctrica"
+     },
+     "weight": 1.4,
+     "keywords": {
+      "en": [
+       "grid",
+       "transmission",
+       "interconnection",
+       "reliability",
+       "capacity"
+      ],
+      "es": [
+       "red",
+       "transmisión",
+       "interconexión",
+       "confiabilidad",
+       "capacidad"
+      ]
+     }
+    },
+    {
+     "slug": "renewables",
+     "label": {
+      "en": "Renewables",
+      "es": "Renovables"
+     },
+     "weight": 1.3,
+     "keywords": {
+      "en": [
+       "solar",
+       "wind",
+       "storage",
+       "battery",
+       "renewable"
+      ],
+      "es": [
+       "solar",
+       "eólica",
+       "almacenamiento",
+       "batería",
+       "renovable"
+      ]
+     }
+    },
+    {
+     "slug": "regulation",
+     "label": {
+      "en": "Regulation",
+      "es": "Regulación"
+     },
+     "weight": 1.3,
+     "keywords": {
+      "en": [
+       "ferc",
+       "regulation",
+       "policy",
+       "rate",
+       "utility commission"
+      ],
+      "es": [
+       "regulación",
+       "política",
+       "tarifa",
+       "comisión"
+      ]
+     }
+    },
+    {
+     "slug": "markets",
+     "label": {
+      "en": "Markets",
+      "es": "Mercados"
+     },
+     "weight": 1.2,
+     "keywords": {
+      "en": [
+       "price",
+       "demand",
+       "capacity",
+       "market",
+       "ppa"
+      ],
+      "es": [
+       "precio",
+       "demanda",
+       "capacidad",
+       "mercado",
+       "ppa"
+      ]
+     }
+    },
+    {
+     "slug": "nuclear",
+     "label": {
+      "en": "Nuclear",
+      "es": "Nuclear"
+     },
+     "weight": 1.1,
+     "keywords": {
+      "en": [
+       "nuclear",
+       "smr",
+       "reactor",
+       "uranium"
+      ],
+      "es": [
+       "nuclear",
+       "reactor",
+       "uranio"
+      ]
+     }
+    }
+   ],
+   "sources": [
+    {
+     "name": "Utility Dive",
+     "feed_url": "https://www.utilitydive.com/feeds/news/",
+     "language": "en",
+     "trust": 0.9,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    },
+    {
+     "name": "POWER Magazine",
+     "feed_url": "https://www.powermag.com/feed/",
+     "language": "en",
+     "trust": 0.85,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    },
+    {
+     "name": "El Periódico de la Energía",
+     "feed_url": "https://elperiodicodelaenergia.com/feed/",
+     "language": "es",
+     "trust": 0.82,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    },
+    {
+     "name": "Energy News",
+     "feed_url": "https://www.energynews.es/feed/",
+     "language": "es",
+     "trust": 0.8,
+     "enabled": true,
+     "allow_http": false,
+     "poll_interval_min": 720,
+     "terms_url": null
+    }
+   ],
+   "partner": {
+    "name": "Launch Energy Partner",
+    "contact_email": "energy-partner@example.com",
+    "weight": 1.0,
+    "regions": []
+   }
+  }
+ ]
+}

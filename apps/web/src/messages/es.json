@@ -28,6 +28,7 @@
     "dismiss": "Descartar",
     "optional": "opcional",
     "required": "obligatorio",
+    "requiredNote": "Los campos con * son obligatorios.",
     "error": "Algo salió mal.",
     "skipToContent": "Saltar al contenido"
   },
@@ -101,12 +102,18 @@
   },
   "lead": {
     "title": "Hable con un profesional verificado",
+    "eyebrow": "Solicite una consulta",
+    "received": "Solicitud recibida",
+    "optionalDetails": "Añadir detalles (opcional)",
+    "responseTime": "Respuesta en un día hábil",
+    "successNext": "¿Quiere el resumen semanal mientras espera?",
     "intro": "Cuéntenos qué necesita. Canalizamos solicitudes calificadas a un socio independiente de este canal.",
     "name": "Nombre",
     "email": "Correo electrónico",
     "phone": "Teléfono",
     "company": "Empresa",
     "message": "¿Qué necesita?",
+    "details": "Detalles adicionales",
     "consent": "Acepto que me contacten sobre esta solicitud y he leído la política de privacidad.",
     "consentLink": "Política de privacidad",
     "submit": "Enviar solicitud",
@@ -125,6 +132,10 @@
   "cta": {
     "primary": "Solicitar una consulta",
     "secondary": "Recibir el resumen semanal",
+    "briefLink": "O reciba el resumen semanal",
+    "promise1": "Sin compromiso",
+    "promise2": "Un socio por canal",
+    "promise3": "Respuesta en un día hábil",
     "sticky": "Hablar con un socio",
     "dismiss": "Descartar la barra del socio",
     "placementHero": "portada",
@@ -257,10 +268,12 @@
     "languagesValue": "English · Español",
     "updated": "Actualizado",
     "independentLabel": "Independiente",
-    "independentValue": "Sin muro de pago · Sin anuncios"
+    "independentValue": "Sin muro de pago · Sin anuncios",
+    "sourceNote": "Datos del paquete en vivo de este canal."
   },
   "trust": {
     "title": "Cómo funciona",
+    "eyebrow": "El proceso",
     "step1Title": "Envíe el formulario",
     "step1Body": "Nombre, correo y lo que necesita. Una solicitud, un canal.",
     "step2Title": "Lo canalizamos",
@@ -271,6 +284,10 @@
   },
   "brief": {
     "title": "Reciba el resumen semanal",
+    "eyebrow": "El resumen semanal",
+    "received": "Ya está en la lista",
+    "value1": "Un correo a la semana, con la actualización del lunes.",
+    "value2": "Solo noticias: sin anuncios ni ofertas de socios.",
     "body": "Un correo a la semana con las noticias que movieron el sector y lo que viene.",
     "name": "Nombre",
     "email": "Correo electrónico",
@@ -280,6 +297,11 @@
     "success": "Ya está en la lista. El próximo resumen sale con la actualización del lunes.",
     "error": "No se pudo enviar. Revise el correo e inténtelo de nuevo.",
     "privacyNote": "Sin spam, baja con un clic."
+  },
+  "convert": {
+    "eyebrow": "Hablemos",
+    "title": "Cuéntenos qué necesita",
+    "body": "Un formulario, un socio verificado para este canal y una respuesta en un día hábil."
   },
   "legal": {
     "privacyTitle": "Privacidad",

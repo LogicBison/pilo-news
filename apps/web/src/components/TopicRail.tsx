@@ -16,7 +16,7 @@ export function TopicRail({
 }) {
   if (topics.length === 0) return null;
   return (
-    <section aria-labelledby="topics-heading" className="sn-card p-5">
+    <section aria-labelledby="topics-heading" className="sn-editorial-block">
       <h2 id="topics-heading" className="sn-eyebrow">
         {title}
       </h2>

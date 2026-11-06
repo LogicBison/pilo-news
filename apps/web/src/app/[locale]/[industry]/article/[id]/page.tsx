@@ -151,7 +151,7 @@ export default async function ArticlePage({ params }: Params) {
           variant="strip"
         />
 
-        <div className="mt-10 grid gap-5">
+        <div className="sn-lead-standalone mt-10 grid gap-8">
           <TrustBlock locale={resolved} />
           <LeadForm
             industry={industry}

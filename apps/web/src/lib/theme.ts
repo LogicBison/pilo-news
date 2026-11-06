@@ -36,6 +36,7 @@ export function resolveTheme(theme: Partial<IndustryTheme> | undefined): Industr
 
 export function themeStyle(theme: Partial<IndustryTheme> | undefined): CSSProperties {
   const resolved = resolveTheme(theme);
+  const danger = contrastRatio("#b91c1c", resolved.bg) >= 4.5 ? "#b91c1c" : "#fca5a5";
   return {
     "--sn-bg": resolved.bg,
     "--sn-surface": resolved.surface,
@@ -47,6 +48,9 @@ export function themeStyle(theme: Partial<IndustryTheme> | undefined): CSSProper
     "--sn-radius": resolved.radius,
     "--sn-font-heading": resolved.font_heading,
     "--sn-font-body": resolved.font_body,
+    "--sn-on-primary": "#ffffff",
+    "--sn-shade": "#000000",
+    "--sn-danger": danger,
   } as CSSProperties;
 }
 

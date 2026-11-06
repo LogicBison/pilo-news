@@ -93,6 +93,20 @@ GET  /v1/industries/manufacturing
 Curated pinned seeds (`apps/api/config/seeds.json`) are optional; they bypass
 fetch and survive the retention window while pinned.
 
+## 3b. Keep the channel inventory current
+
+The canonical list of live channels, slugs, EN/ES URLs, layout and the default
+channel is generated from the API:
+
+```bash
+./bin/channels.sh --write    # regenerate docs/channel-inventory.md
+./bin/channels.sh --check    # fail when the file is stale
+```
+
+`./bin/start.sh test` runs the check after the web checks, so a channel change
+without a regenerated inventory fails the local gate. Commit the regenerated
+file with the channel change.
+
 ## 4. Theme contract
 
 Every channel theme must provide `primary`, `accent`, `bg`, `surface`, `text`,

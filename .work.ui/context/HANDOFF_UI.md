@@ -2,15 +2,15 @@
 
 > **Path:** `<repo-root>/.work.ui/context/HANDOFF_UI.md` · Maintained by **`ui-*` skills**. Session bookends: **`@session-control`** when `.ai/` is present (full repo); `.work.ui`-scoped session verbs (start / status / context / add / commit / close / push) via **`@ui-session`**.
 
-**Status:** screen-spec-ready **yes**; 7 channel SPECs drafted, none approved · **Needs:** `@ui-screen-spec review` + `@ui-visual-verify milestone`.
+**Status:** UI v2 implemented and verified; direction **Approved**; **10 channels / 10/10 SPEC Review**; **visual verify: pass with gaps** · 57 passed / 1 skipped e2e, 40/40 layout, 80 pages zero overflow, 45/45 sources verified · **Needs:** approve the ten Review SPECs + `@ui-accessibility-audit milestone`.
 
 ## Session status
 
-**Closed:** 2026-11-05 - foundation certified screen-spec-ready; seven channel skins, emblems, photography, distinct palettes and layouts shipped
+**Open:** 2026-11-05 - goal: x-director UI improvement via lead-generation reference intake; editorial conversion v2 built and verified
 
 **Updated:** 2026-11-05
 
-**UI layer state:** Foundation certified. 7 skins live (palette, hero, coverage rhythm, emblem, photo), 7 channel-home SPECs drafted. Catalog primitives still pending (`@ui-design-system init`).
+**UI layer state:** Foundation certified. Ten skins live (seven photo bands + three original illustration bands); the conversion spine is open/editorial (full-bleed proof, photo, conversion bands; balanced 2-column coverage; filled fields). Ten channel-home SPECs are in `Review`. Catalog primitives still pending (`@ui-design-system init`).
 
 **Recommended pick-up:** `.work.ui/plans/NEXT_UI.md`
 
@@ -23,8 +23,11 @@
 | State | Value | Date |
 |-------|-------|------|
 | ui-foundation-complete | **yes** | 2026-11-05 |
-| screen-spec-ready | **yes** - certified, coverage = 7 channels (incl. `stem-cell`) | 2026-11-05 |
-| ui-implementation-ready | no - needs component build + verify | |
+| screen-spec-ready | **yes** - certified, coverage = 10 channels | 2026-11-05 |
+| ui-implementation-ready | **yes (v2 conversion spine)** - build + e2e verified | 2026-11-05 |
+| direction-bound | **yes** - `editorial-conversion` Approved; 10/10 SPECs §13/§11 + reference map | 2026-11-05 |
+| spec-review | **10/10 Review** - all channel SPECs amended + re-checked | 2026-11-05 |
+| visual-verify | **pass with gaps** - 10 channels, 0 visual regressions; gaps: CATALOG, Storybook, vision tier | 2026-11-05 |
 
 ## Active UI milestone
 
@@ -38,7 +41,7 @@
 | Field | Value |
 |-------|-------|
 | Archetype | hybrid - public news/marketing sites + editorial console |
-| Complexity | L (7 channels x 2 locales x 7 page types + console) |
+| Complexity | L (10 channels x 2 locales x 7 page types + console) |
 | Style stack | tailwind 4.1.6 + CSS custom properties |
 | Craft tier | **refined** (console = utilitarian, mixed-tier exception recorded) |
 | Example ids | W2 (split hero), W3 (tiered CTA cards), W6 (content grid), W9 (long-form reading) |
@@ -208,3 +211,125 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 4. SPECs updated with each channel's palette
 **Checks:** migration applied and idempotent; `pnpm check` = 7 channels pass contrast; `pnpm lint` / `typecheck` green
 **Note:** the web container lost Playwright's system libraries mid-session; reinstalled `libglib` etc. to keep screenshot verification working (container-only, not a repo change).
+
+---
+
+## Latest build (@x-director) — editorial conversion v2
+
+**Date:** 2026-11-05
+**Request:** "the current web UI design is pretty lame and dull... too many boxes, too many rounded corners... the forms are confusing... the left column is double the height from the column on the right"
+**Executed:**
+1. **Reference intake:** scanned `ellevest`, `hubspot`, `leadpages`; DNA docs + references registry + Draft direction `.work.ui/inputs/references/directions/editorial-conversion.md`. Audit PASS.
+2. **Open editorial layout:** removed the hero card and page-section cards; full-bleed proof, photo and conversion bands; 0–2 px corners on marketing surfaces; display H1; action panel with promise row; photo scrim + credit lockup.
+3. **Balanced coverage:** replaced per-column DOM with CSS multi-column `column-fill: balance`; `grid2`/`magazine` 2 columns, `stack` 1; `grid3` retired for the current seven (3 columns left a 288–408 px ragged bottom). Added `apps/web/e2e/layout.spec.ts` (21 checks: overflow, CTA containment, column spread ≤ 260 px).
+4. **Per-channel placement:** Lab/Network full-bleed banner; Legal/Financial/Sentinel sidebar/banner; Sanctuary inset; Campus 2-column hero so the corner CTA is balanced. Search page uses a process sidebar instead of a duplicate compact CTA.
+5. **Form clarity:** filled, bordered fields (not underline-only), 600-weight labels, `*` + "Fields marked * are required", optional block as a bordered control, message visible and marked optional, 3 px focus ring, filled textarea/select.
+**Checks:** production build green; Playwright 29 passed / 1 skipped (public, accessibility, admin, layout); 56 channel pages × desktop/mobile = 200 + zero horizontal overflow; `pnpm lint`, `typecheck`, `check` green (268 keys, 7 themes); token-lint 48 files / 0 raw literals.
+**Follow-up:** direction Approved; aliases applied; all seven SPECs bound. Remaining: SPEC review + milestone visual/a11y audit.
+**Next recommended:** `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`; then `@ui-screen-spec review` the seven bound SPECs.
+
+---
+
+## Bind (@ui-reference-intake) — editorial-conversion
+
+**Date:** 2026-11-05
+**Request:** operator approved "1." ratify the direction and "2." bind the seven SPECs + apply the composition aliases.
+**Executed:**
+1. Direction `editorial-conversion` marked **Approved (2026-11-05)**.
+2. Applied composition tokens to `.work.ui/design-system/tokens.json`: `component.action.*`, `component.band`, `component.lift`, `component.field.*`, `color.shade`; schema-valid **84 tokens**.
+3. Bound all seven channel-home SPECs — §13 `exampleIds: N/A` waiver, `referenceIds`/`direction`/`doNotCopy`/`originalityCheck`/`accessibility` rows, `### Reference DNA (binding)` block, §11 acceptance bullet, de-exampled `regionMap`.
+4. Created `.work.ui/inputs/references/SCREEN_REFERENCE_MAP.md` with seven Approved rows.
+**Checks:** `reference-scan.py audit` PASS (0 problems); `token-schema-verify.sh` 84 tokens valid; `token-lint` 0 raw literals; build/e2e unchanged (29 passed / 1 skipped; layout 21/21).
+**N/A waiver:** the screens are driven by live-site references, not an `examples/` manifest; `exampleIds: N/A` in all seven SPECs is deliberate and recorded here.
+**Impact read:** `.work.ui/reports/20261105-editorial-conversion-impact.md` — what the change means for readers, the business, the codebase and what remains unproven.
+**Next recommended:** `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`, then `@ui-screen-spec review` the seven bound SPECs.
+
+---
+
+## Amendment (@ui-screen-spec) — channel-home-legal
+
+**Date:** 2026-11-05
+**Request:** amend after the review failed on SPEC-vs-build mismatches.
+**Fixed:**
+1. §3 — added success + permission-denied (N/A) states; loading copy now matches the open layout.
+2. §4 — coverage is balanced 2-column, not 3-up; proof/photo/conversion are full-bleed; open blocks and skin placement documented.
+3. §5 — form fields updated (name/email/matter type/consent, Add details, Additional details; brief fields).
+4. §8 — component statuses match the v2 build; explicit `native allowed` waivers for native select and the P1 Skeleton/Notice; CATALOG-init waiver recorded.
+5. §11 — replaced the stale Portico/hero-card bullet with v2 acceptance (open hero, proof/photo bands, balanced columns, filled fields, no duplicate task-page CTA, layout gate).
+6. §12 — UIS-10 corrected to **yes / pending** (marketing shell with photography), not “no photography”.
+7. §13 — added the standard `### extractedRules (binding)` heading; Reference DNA block retained.
+**Review:** re-checked — required sections 1–13, §12 registry, §13 shape, §11 extractedRules, N/A waiver, catalog waiver, one Next action: **PASS**.
+**Status:** `Draft` → `Review`; approval is still the operator’s.
+**Next recommended:** approve `channel-home-legal`, then `@ui-screen-spec review` the other six bound SPECs; run the milestone visual/a11y audit.
+
+---
+
+## Review all channels (@ui-screen-spec)
+
+**Date:** 2026-11-05
+**Request:** run `@ui-screen-spec review` for all channels.
+**Result:** **7/7 PASS**; all statuses `Review`.
+**Amended in the six remaining SPECs (same seven classes as legal):**
+1. §3 — success + permission-denied (N/A) states; loading copy matches the open layout.
+2. §4 — balanced 2-column coverage, full-bleed proof/photo/conversion, open blocks; per-channel CTA placement.
+3. §5 — form fields (name/email/qualification/consent, Add details, Additional details; brief fields).
+4. §8 — v2 component statuses; `native allowed` waivers for select + P1 skeleton/notice; CATALOG-init waiver.
+5. §11 — v2 acceptance: open hero, proof/photo bands, balanced columns, filled fields, no duplicate task-page CTA, layout gate.
+6. §12 — UIS-10 corrected to **yes / pending**; UIS-07 remains pending at milestone.
+7. §13 — `### extractedRules (binding)` heading; Reference DNA block retained.
+**Checks:** required sections 1–13, §12 registry, §13 shape, §11 extractedRules, N/A + catalog waivers, one Next action — pass on all seven. No code changed.
+**Next recommended:** approve the seven `Review` SPECs; then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`.
+
+---
+
+## Channel expansion (@x-director) — manufacturing, energy, retail
+
+**Date:** 2026-11-05
+**Request:** add three additional channels (operator selected full live: manufacturing, energy & utilities, retail & e-commerce).
+**Executed:**
+1. Profiles `apps/api/config/deployments/manufacturing.json`, `energy.json`, `retail.json` — theme, EN/ES copy, disclaimers, CTA + qualification, 5 topics, 4–5 sources, partner.
+2. Applied to the running dev stack (idempotent; re-run reports 0 created/updated). **45/45 sources pass** `verify-sources --industry all`; 10 industries, 0 failures, 0 coverage warnings.
+3. New skins **Forge** (poster, gear), **Grid** (ledger, pylon), **Market** (split, tag) — `skins.ts`, motifs + original SVG scene bands, `SkinScene` unoptimized SVG support, emblems, CSS skin grammar.
+4. Three channel-home SPECs copied from the bound direction, reviewed to `Review`; `SCREEN_REFERENCE_MAP` now 10 rows.
+5. Verification: production build; Playwright **57 passed / 1 skipped** (layout 40/40, axe 11/11, public/admin); 80 channel pages desktop+mobile 200 + zero overflow; `pnpm check` 10/10 contrast; token-lint 0 raw.
+**Known content gap:** manufacturing EN 10 / ES 41, energy EN 16 / ES 39, retail EN 10 / ES 1. The English thinness is a source/scoring issue; add EN feeds or broaden topics before launch. New channels use original SVG bands, not licensed photos.
+**Next recommended:** approve the ten `Review` SPECs; run the milestone visual/a11y audit; apply the three profiles to prd when the deploy lane opens.
+
+---
+
+## Visual fix — Sanctuary CTA, box removal, dark-scheme links
+
+**Date:** 2026-11-05
+**Request:** "behavioral-health: fix the spacing issues and the color scheme making the text almost unreadable… remove the box borders and the corner-rounding."
+**Changed:**
+1. Sanctuary CTA is an **open column** (accent left rule, transparent background) — no pale-on-white contrast bug, no box, no empty stretched panel. `CtaPanel` gains `open`.
+2. Removed the skin-level box overrides that re-added **22 px hero radius + shadow** and **18 px story radius + shadow**; `[data-skin]` selectors now enforce 0 radius / no shadow / no side borders.
+3. Proof and conversion bands are borderless full-width tints; hero/story/proof/conversion no longer read as cards.
+4. Behavioral-health coverage changed `stack` → `magazine` (two balanced columns instead of a narrow single column with a large empty side).
+5. Dark-scheme contrast: story "Read more" and scene links use the accent; Sentinel eyebrows use the accent. Axe now passes on all ten channels.
+**Checks:** production build; **57 e2e passed / 1 skipped** (layout 40/40, axe 11/11); 80 pages desktop+mobile 200 + zero overflow; `pnpm check` 10/10; token-lint 0; inventory check pass.
+**Docs:** skin system (Sanctuary open column, magazine coverage), behavioural-health SPEC + canonical CTA list, direction wording.
+
+---
+
+## Visual invariant — square surfaces, no hero motif
+
+**Date:** 2026-11-05
+**Request:** "get rid of the round-corners… this drawing is weird, just remove it."
+**Changed:**
+1. Photo band, hero card, story items, proof band, conversion band, brief band, action panel and cards are forced to `border-radius: 0 !important` under `[data-skin]`; a skin rule can no longer re-introduce a radius.
+2. The per-skin hero motif overlay (`.sn-hero-card::after`) is disabled globally; the photo/illustration band and masthead emblem remain.
+3. Added regression checks in `apps/web/e2e/layout.spec.ts`: every channel's surfaces compute `0px` radius and the hero `::after` computes `display:none`.
+**Checks:** production build/e2e pass after this change; 57 e2e / 1 skipped; axe 11/11; 80 pages zero overflow; inventory check pass.
+
+---
+
+## Visual verify — milestone (@ui-visual-verify)
+
+**Date:** 2026-11-05
+**Verdict:** **pass with gaps** (`10` channel homes).
+**Report:** `.work.ui/reports/20261105-visual-verify-milestone.md`
+**Concept run:** `.work.ui/reports/20261105-uis-07-10.md` — UIS-07 done / ship_with_notes; UIS-10 done / ship.
+**Checks:** production build; Playwright 57 passed / 1 skipped; token-lint 0 raw; 84 DTCG tokens; no `Applies=yes` + `pending`; §13 exampleIds N/A waiver; extractedRules reflected; native-select/Skeleton waivers; reference fidelity pass; effects N/A.
+**Gaps/waivers:** CATALOG init (P1), native select/Skeleton/Notice waivers, Storybook not configured (N/A), vision tier not run (opt-in), ten SPECs still `Review`.
+**Next recommended:** approve the ten `Review` SPECs; `@ui-accessibility-audit milestone`; then CATALOG init.

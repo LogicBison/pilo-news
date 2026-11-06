@@ -93,40 +93,51 @@ export function LeadForm({
 
   if (status === "success") {
     return (
-      <div
-        role="status"
-        className="rounded-[calc(var(--sn-radius)+6px)] border border-emerald-300 bg-emerald-50 p-6 text-emerald-950 shadow-[var(--sn-elev-1)]"
-      >
-        <h3 className="text-xl font-semibold">{t(locale, "lead.title")}</h3>
-        <p className="mt-2 text-sm">{message}</p>
+      <div role="status" className="sn-card p-6">
+        <span className="sn-chip">{t(locale, "lead.received")}</span>
+        <h3 className="sn-section-title mt-3 font-semibold text-[var(--sn-text)]">
+          {t(locale, "lead.title")}
+        </h3>
+        <p className="mt-2 text-sm text-[var(--sn-muted)]">{message}</p>
+        <p className="mt-4 border-t border-[var(--sn-border)] pt-4 text-sm text-[var(--sn-text)]">
+          {t(locale, "lead.successNext")}
+        </p>
+        <a href="#brief-signup" className="sn-btn sn-btn-ghost mt-4">
+          {t(locale, "brief.submit")}
+        </a>
       </div>
     );
   }
 
   return (
-    <form
-      id="lead-form"
-      onSubmit={onSubmit}
-      onFocus={onStart}
-      className="sn-card p-6"
-    >
-      <h2 className="text-2xl font-bold tracking-tight text-[var(--sn-text)]">{t(locale, "lead.title")}</h2>
+    <form id="lead-form" onSubmit={onSubmit} onFocus={onStart} className="sn-card p-6">
+      <div className="flex items-center gap-2">
+        <span className="sn-kicker" aria-hidden="true" />
+        <p className="sn-eyebrow">{t(locale, "lead.eyebrow")}</p>
+      </div>
+      <h2 className="sn-section-title mt-2 font-bold text-[var(--sn-text)]">{t(locale, "lead.title")}</h2>
       <p className="mt-2 text-sm text-[var(--sn-muted)]">
         {t(locale, "lead.intro")} <span className="font-medium">{industryName}</span>
       </p>
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          {t(locale, "lead.name")}
-          <input
-            name="name"
-            required
-            maxLength={100}
-            autoComplete="name"
-            className="sn-input"
-          />
+      <p className="sn-required-note mt-2">{t(locale, "common.requiredNote")}</p>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <label className="flex flex-col gap-1 text-sm font-semibold">
+          <span>
+            {t(locale, "lead.name")}
+            <span className="sn-req" aria-hidden="true">
+              {" "}*
+            </span>
+          </span>
+          <input name="name" required maxLength={100} autoComplete="name" className="sn-input" />
         </label>
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          {t(locale, "lead.email")}
+        <label className="flex flex-col gap-1 text-sm font-semibold">
+          <span>
+            {t(locale, "lead.email")}
+            <span className="sn-req" aria-hidden="true">
+              {" "}*
+            </span>
+          </span>
           <input
             name="email"
             type="email"
@@ -136,31 +147,18 @@ export function LeadForm({
             className="sn-input"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          {t(locale, "lead.phone")} {logistics ? null : <span className="font-normal text-[var(--sn-muted)]">({t(locale, "common.optional")})</span>}
-          <input
-            name="phone"
-            type="tel"
-            required={logistics}
-            maxLength={40}
-            autoComplete="tel"
-            className="sn-input"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          {t(locale, "lead.company")} {logistics ? null : <span className="font-normal text-[var(--sn-muted)]">({t(locale, "common.optional")})</span>}
-          <input
-            name="company"
-            required={logistics}
-            maxLength={120}
-            autoComplete="organization"
-            className="sn-input"
-          />
-        </label>
       </div>
+
       {options.length > 0 ? (
-        <label className="mt-4 flex flex-col gap-1 text-sm font-medium">
-          {localized(qualify?.label, locale) || t(locale, "lead.message")}
+        <label className="mt-3 flex flex-col gap-1 text-sm font-semibold">
+          <span>
+            {localized(qualify?.label, locale) || t(locale, "lead.message")}
+            {qualify?.required !== false ? (
+              <span className="sn-req" aria-hidden="true">
+                {" "}*
+              </span>
+            ) : null}
+          </span>
           <select
             name="qualification"
             required={qualify?.required !== false}
@@ -178,24 +176,101 @@ export function LeadForm({
           </select>
         </label>
       ) : null}
-      <label className="mt-4 flex flex-col gap-1 text-sm font-medium">
-        {t(locale, "lead.message")}
-        <textarea
-          name="message"
-          rows={4}
-          maxLength={2000}
-          className="sn-input"
-        />
+
+      {logistics ? (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="flex flex-col gap-1 text-sm font-semibold">
+            <span>
+              {t(locale, "lead.phone")}
+              <span className="sn-req" aria-hidden="true">
+                {" "}*
+              </span>
+            </span>
+            <input
+              name="phone"
+              type="tel"
+              required
+              maxLength={40}
+              autoComplete="tel"
+              className="sn-input"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm font-semibold">
+            <span>
+              {t(locale, "lead.company")}
+              <span className="sn-req" aria-hidden="true">
+                {" "}*
+              </span>
+            </span>
+            <input
+              name="company"
+              required
+              maxLength={120}
+              autoComplete="organization"
+              className="sn-input"
+            />
+          </label>
+        </div>
+      ) : (
+        <details className="sn-more">
+          <summary>{t(locale, "lead.optionalDetails")}</summary>
+          <div className="sn-more-body grid gap-3 sm:grid-cols-2">
+            <label className="flex flex-col gap-1 text-sm font-medium">
+              <span>
+                {t(locale, "lead.phone")}{" "}
+                <span className="font-normal text-[var(--sn-muted)]">
+                  ({t(locale, "common.optional")})
+                </span>
+              </span>
+              <input
+                name="phone"
+                type="tel"
+                maxLength={40}
+                autoComplete="tel"
+                className="sn-input"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm font-medium">
+              <span>
+                {t(locale, "lead.company")}{" "}
+                <span className="font-normal text-[var(--sn-muted)]">
+                  ({t(locale, "common.optional")})
+                </span>
+              </span>
+              <input
+                name="company"
+                maxLength={120}
+                autoComplete="organization"
+                className="sn-input"
+              />
+            </label>
+          </div>
+        </details>
+      )}
+
+      <label className="mt-3 flex flex-col gap-1 text-sm font-semibold">
+        <span>
+          {t(locale, "lead.details")}{" "}
+          <span className="font-normal text-[var(--sn-muted)]">
+            ({t(locale, "common.optional")})
+          </span>
+        </span>
+        <textarea name="message" rows={3} maxLength={2000} className="sn-input" />
       </label>
+
       <div aria-hidden="true" className="hidden">
         <label>
           {t(locale, "lead.honeypot")}
           <input name="website" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
+
       <label className="mt-4 flex items-start gap-3 text-sm">
         <input type="checkbox" name="consent" required className="mt-1 h-4 w-4" />
         <span>
+          <span className="sn-req" aria-hidden="true">
+            *
+          </span>{" "}
           {t(locale, "lead.consent")}{" "}
           <a
             href={`/${locale === "es" ? "es/" : ""}${industry}/privacy`}
@@ -205,17 +280,17 @@ export function LeadForm({
           </a>
         </span>
       </label>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <button type="submit" disabled={status === "sending"} className="sn-btn">
+          {status === "sending" ? t(locale, "lead.sending") : t(locale, "lead.submit")}
+        </button>
+        <span className="sn-chip">{t(locale, "lead.responseTime")}</span>
+      </div>
       <p className="mt-3 text-xs text-[var(--sn-muted)]">{t(locale, "lead.privacyNote")}</p>
-      <div aria-live="polite" className="mt-3 text-sm text-red-700">
+      <div aria-live="polite" className="mt-3 text-sm text-[var(--sn-danger)]">
         {message}
       </div>
-      <button
-        type="submit"
-        disabled={status === "sending"}
-        className="sn-btn mt-4"
-      >
-        {status === "sending" ? t(locale, "lead.sending") : t(locale, "lead.submit")}
-      </button>
     </form>
   );
 }
