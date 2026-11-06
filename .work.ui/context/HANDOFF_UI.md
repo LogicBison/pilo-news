@@ -2,7 +2,7 @@
 
 > **Path:** `<repo-root>/.work.ui/context/HANDOFF_UI.md` · Maintained by **`ui-*` skills**. Session bookends: **`@session-control`** when `.ai/` is present (full repo); `.work.ui`-scoped session verbs (start / status / context / add / commit / close / push) via **`@ui-session`**.
 
-**Status:** UI v2 implemented and verified; direction **Approved**; **10 channels / 10/10 SPEC Review**; **visual verify: pass with gaps** · 57 passed / 1 skipped e2e, 40/40 layout, 80 pages zero overflow, 45/45 sources verified · **Needs:** approve the ten Review SPECs + `@ui-accessibility-audit milestone`.
+**Status:** UI v2 implemented and verified; direction **Approved**; **10/10 SPEC Approved**; **visual verify: pass with gaps**; **a11y milestone: pass**; **a11y F1/F2 fixed**; **S0 primitives shipped**; **10/10 photo bands** · 45/45 sources verified · **Needs:** content coverage, then `@ui-component-build plan - S1`.
 
 ## Session status
 
@@ -10,7 +10,7 @@
 
 **Updated:** 2026-11-05
 
-**UI layer state:** Foundation certified. Ten skins live (seven photo bands + three original illustration bands); the conversion spine is open/editorial (full-bleed proof, photo, conversion bands; balanced 2-column coverage; filled fields). Ten channel-home SPECs are in `Review`. Catalog primitives still pending (`@ui-design-system init`).
+**UI layer state:** Foundation certified. Ten skins live (seven photo bands + three original illustration bands); the conversion spine is open/editorial (full-bleed proof, photo, conversion bands; balanced 2-column coverage; filled fields). Ten channel-home SPECs are `Approved` (2026-11-05). Catalog primitives still pending (`@ui-design-system init`).
 
 **Recommended pick-up:** `.work.ui/plans/NEXT_UI.md`
 
@@ -26,8 +26,11 @@
 | screen-spec-ready | **yes** - certified, coverage = 10 channels | 2026-11-05 |
 | ui-implementation-ready | **yes (v2 conversion spine)** - build + e2e verified | 2026-11-05 |
 | direction-bound | **yes** - `editorial-conversion` Approved; 10/10 SPECs §13/§11 + reference map | 2026-11-05 |
-| spec-review | **10/10 Review** - all channel SPECs amended + re-checked | 2026-11-05 |
+| spec-review | **10/10 Approved** - all channel SPECs amended, re-checked, operator-approved | 2026-11-05 |
 | visual-verify | **pass with gaps** - 10 channels, 0 visual regressions; gaps: CATALOG, Storybook, vision tier | 2026-11-05 |
+| accessibility-audit | **pass** - 30 URLs, 0 critical/serious; F1/F2 fixed 2026-11-05, re-scan 0 violations | 2026-11-05 |
+| catalog | **S0 shipped** - 10 primitives built under `components/ui/`, 21 catalog rows, forms refactored onto them | 2026-11-05 |
+| imagery | **pass** - 10/10 photographic bands; retail/energy/manufacturing replaced SVG line-art; credits recorded | 2026-11-05 |
 
 ## Active UI milestone
 
@@ -333,3 +336,47 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Checks:** production build; Playwright 57 passed / 1 skipped; token-lint 0 raw; 84 DTCG tokens; no `Applies=yes` + `pending`; §13 exampleIds N/A waiver; extractedRules reflected; native-select/Skeleton waivers; reference fidelity pass; effects N/A.
 **Gaps/waivers:** CATALOG init (P1), native select/Skeleton/Notice waivers, Storybook not configured (N/A), vision tier not run (opt-in), ten SPECs still `Review`.
 **Next recommended:** approve the ten `Review` SPECs; `@ui-accessibility-audit milestone`; then CATALOG init.
+
+---
+
+## SPEC approval - 2026-11-05 (@ui-screen-spec)
+
+**Action:** operator approved all ten channel-home SPECs in one message.
+**Paths:** `.work.ui/screens/channel-home-<slug>/20261105-SCREEN-SPEC.md` - behavioral-health, cybersecurity, education, energy, financial, legal, logistics, manufacturing, retail, stem-cell.
+**Header change:** `Status: Review` -> `Approved (2026-11-05)`; `Needs` -> `@ui-accessibility-audit milestone`; `## Next action` rewritten to the same command.
+**Unchanged:** sections 1-13 (layout, content, acceptance criteria, UIS registry, references) - approval changed status only.
+**Next recommended:** `@ui-accessibility-audit milestone` (dark cybersecurity first), then `@ui-design-system init` to clear the UIS-07 catalog gap.
+
+---
+
+## Accessibility audit - milestone 2026-11-05 (@ui-accessibility-audit)
+
+**Verdict:** **pass** - 0 critical, 0 serious, 0 WCAG A/AA failures across 30 URLs; no waivers required.
+**Report:** `.work.ui/reports/20261105-accessibility-audit-milestone.md`
+**Tool:** axe-core 4.10.1 via `@axe-core/playwright` in the `web` container, tags wcag2a/2aa/21a/21aa/22a/22aa + best-practice; DOM, keyboard, reflow, and contrast checks in the same run.
+**Findings:** F1 duplicate `nav.menu` label on header + footer nav (29 pages) - `Header.tsx:41`, `Footer.tsx:28`; F2 CTA `<aside>` nested in `<section>` (20 pages) - `CtaCard.tsx:26`; F3 SPEC §9 44px target claim vs 20px text links (AA 2.5.8 met by spacing); F4 form errors lack `aria-invalid`/`aria-describedby`; F5 admin placeholder-labels (out of scope).
+**Evidence:** skip link first tab 10/10, ring = channel accent and 4.61-10.36:1 vs bg, reflow clean at 320px, reduced motion honoured, one `h1` and no heading skips on 30/30, `pnpm test:a11y` 10 passed + 1 flaky (hydration timeout, retry pass), `pnpm check` 10/10 contrast.
+**Gaps:** no AT/screen-reader pass, no forced-colors or 400% zoom, keyboard walk sampled on 3 pages, audit ran on `next dev` not a production build.
+**Next recommended:** `@ui-design-system init`; decide on F1/F2 before the next component-build pass.
+
+---
+
+## A11y fixes + CATALOG init - 2026-11-05
+
+**A11y F1:** footer `nav` label moved from `nav.menu` to a new `nav.footer` key (`en` "Site links", `es` "Enlaces del sitio") - `apps/web/src/components/Footer.tsx:28`, `apps/web/src/messages/{en,es}.json`. Catalog parity 269 keys.
+**A11y F2:** CTA panel `<aside>` -> `<section aria-label>` - `apps/web/src/components/CtaCard.tsx:26`. No CSS targeted the `aside` element; only `.sn-cta` / `.sn-action` classes.
+**F3:** ten `20261105-SCREEN-SPEC-amendment-01.md` files record the target-size wording change (controls 44px, text links 24px + spacing); parent SPECs untouched per the amendment rule.
+**F4/F5:** recorded as debt (form error wiring, admin placeholder labels); not fixed this pass.
+**Verification (production build, `next start` on :3100):** `npx playwright test` **57 passed / 1 skipped**; axe re-scan with `best-practice` on 8 pages (EN/ES, contact, article) -> 0 violations; nav labels `["Menu","Site links"]` / `["Menú","Enlaces del sitio"]`; `pnpm lint`, `pnpm typecheck`, `pnpm check` (269 keys, 10/10 contrast), `pnpm build` pass. Running the suite against `next dev` instead produced hydration timeouts and layout flakiness - build first, always.
+**CATALOG:** `.work.ui/design-system/CATALOG.md` rebuilt from foundation doc 03 - 21 rows, DTCG token names, behavior sources (native controls; Radix only with an APG justification), APG pattern per row, states, a11y notes; shipped-surface map added.
+
+---
+
+## S0 primitives + imagery - 2026-11-05 (@ui-component-build)
+
+**Primitives shipped:** `apps/web/src/components/ui/` - `button`, `card`, `chip` (+`ChipLink`), `section-header`, `text-field`, `text-area`, `select-field`, `consent-field`, `field-error`, `trust-line`.
+**Refactors:** `LeadForm`, `ContactForm`, `BriefSignup` now use the field set (duplicated markup retired); `TrustBlock` uses `Card` + `SectionHeader` + `Chip`; `TopicRail` uses `ChipLink`; `Notices` lost its off-token amber/blue palette and uses theme tokens; `LeadForm` success state uses `Card` + `Chip` + `TrustLine`.
+**A11y F4:** `TextField`/`TextArea`/`SelectField` wire `aria-invalid` + `aria-describedby` to an optional `error`, so a field-level message is announced with the field; the forms still surface server errors through `FieldError`'s polite live region.
+**Imagery:** retail, energy and manufacturing bands replaced with licensed photographs; `credits.json` has 10 entries; report `.work.ui/reports/20261105-imagery-audit.md`.
+**Verification (production build, `next start` :3100):** `pnpm build` pass; `npx playwright test` **57 passed / 1 skipped**; axe on 11 URLs incl. the three new bands -> 0 violations; `pnpm lint` / `pnpm typecheck` / `pnpm check` (269 keys, 10/10 contrast) pass.
+**Known gaps:** Storybook still absent (waiver recorded); `Skeleton`/`Toc` (P1) unbuilt; admin placeholder labels (F5) open.

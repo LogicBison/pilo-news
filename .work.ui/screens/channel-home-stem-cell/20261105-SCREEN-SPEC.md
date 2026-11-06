@@ -1,7 +1,7 @@
 # Stem Cell Treatments — channel home screen SPEC
 
 **What it is:** screen SPEC for the `stem-cell` channel home (`/{industry}` → `/stem-cell`, `/es/stem-cell`), the page that carries this channel's skin and lead CTA.
-**Status:** Review (2026-11-05) — amended after review findings · **Needs:** operator approval; `@ui-visual-verify milestone` after approval.
+**Status:** Approved (2026-11-05) — operator approval after the 2026-11-05 review amendments · **Needs:** `@ui-accessibility-audit milestone`.
 
 ## 1. Summary
 
@@ -141,4 +141,4 @@ Palette from `industries.theme`: deep teal `#0f4c5c` primary + rust `#9a3412` ac
 
 ## Next action
 
-Operator approval of this Review SPEC, then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone` for this channel.
+`@ui-accessibility-audit milestone` — dark `cybersecurity` first, then the other nine.

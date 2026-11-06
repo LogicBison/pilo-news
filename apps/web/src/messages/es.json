@@ -10,7 +10,8 @@
     "contact": "Contacto",
     "search": "Buscar",
     "admin": "Admin",
-    "menu": "Menú"
+    "menu": "Menú",
+    "footer": "Enlaces del sitio"
   },
   "localeSwitch": {
     "label": "Idioma",

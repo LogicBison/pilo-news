@@ -2,9 +2,11 @@
 
 ## Session status
 
-**Closed:** 2026-11-05 - editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
+**Closed:** 2026-11-05 - SPEC approvals, a11y milestone audit (+F1/F2 fixes), S0 catalog primitives, and photographic bands on all ten channels. 57 e2e / 1 skipped on a production build; axe 0 violations on 11 URLs; 10/10 contrast; build + lint + typecheck green.
 
 **Updated:** 2026-11-05
+
+**Prior session (closed 2026-11-05):** editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
 
 **Repository state:** v1 implemented plus the post-v1 operator scope. Master plan v1.1
 (Approved) executed end to end: schema/migrations (001-007), **ten** live channels
@@ -20,11 +22,13 @@ generated channel inventory (`docs/channel-inventory.md`). **Foundation-complete
 Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.**
 
 **Recommended pick-up file:** `.work/plans/NEXT.md`
-**Next session focus:** approve the ten `Review` channel-home SPECs; run
-`@ui-accessibility-audit milestone`; initialize `@ui-design-system init`; close the
+**Next session focus:** SPECs approved, a11y audit passed with F1/F2 fixed, S0 primitives shipped,
+and all ten channel bands are photographic; next is closing the
 new channels' content gaps (manufacturing EN 10 / ES 41, energy EN 16 / ES 39,
-retail EN 10 / ES 1); then prd deploy/rollback and k6. Visual-verify report:
-`.work.ui/reports/20261105-visual-verify-milestone.md`.
+retail EN 10 / ES 1), then `@ui-component-build plan - S1`; prd deploy/rollback and k6 after. Reports:
+`.work.ui/reports/20261105-visual-verify-milestone.md`,
+`.work.ui/reports/20261105-accessibility-audit-milestone.md`,
+`.work.ui/reports/20261105-imagery-audit.md`.
 Skins live in `apps/web/src/lib/skins.ts` + `apps/web/src/app/skins.css`; palettes come
 from migration 009 plus the three new deployment profiles.
 Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev industry <slug>`
@@ -40,7 +44,7 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 1. Run **`@session-control start`**.
 2. Read `.cursorrules` and this file.
 3. Read `.work/plans/NEXT.md`.
-4. Approve the ten `Review` SPECs, then run `@ui-accessibility-audit milestone`;
+4. Run `@ui-accessibility-audit milestone` (ten channel SPECs approved 2026-11-05);
    read `.work.ui/reports/20261105-visual-verify-milestone.md`.
 5. Add a vertical by copying `apps/api/config/deployments/<slug>.json`, running
    `apply-profile` (see `docs/deployment-profile.md`), then `./bin/channels.sh --write`.
@@ -170,6 +174,12 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | 2026-11-05 | channel inventory | `docs/channel-inventory.md` generated from `/v1/industries` (10 channels, EN/ES URLs, layout, default); `apps/web/scripts/channel-inventory.mjs` + `bin/channels.sh`; `./bin/start.sh test` fails when stale |
 | 2026-11-05 | visual verify | `@ui-visual-verify milestone`: **pass with gaps** on 10 channels; UIS-07/10 done; 57 e2e / 1 skipped; axe 11/11; report in `.work.ui/reports/20261105-visual-verify-milestone.md` |
 | 2026-11-05 | session close | commit + push; handoff/next refreshed |
+| 2026-11-05 | spec approval | operator approved all ten channel-home SPECs (`Review` -> `Approved`); SPEC headers + `HANDOFF_UI`/`NEXT_UI` updated |
+| 2026-11-05 | a11y audit | `@ui-accessibility-audit milestone`: **pass** on 30 URLs (10 channels EN/ES + flows + articles); 0 critical/serious; 2 moderate best-practice (nav labels, CTA landmark); report + `HANDOFF_UI`/`NEXT_UI` updated |
+| 2026-11-05 | a11y fixes | F1 footer `nav.footer` label (en/es catalogs, 269 keys) + F2 CTA `<aside>` -> `<section>`; axe re-scan 8 pages 0 violations (incl. best-practice); F3 in ten SPEC amendments; F4/F5 left as debt |
+| 2026-11-05 | CATALOG init | `.work.ui/design-system/CATALOG.md` rebuilt from foundation doc 03: 21 rows, DTCG token names, behavior sources, APG patterns, states, a11y notes |
+| 2026-11-05 | S0 primitives | 10 files under `apps/web/src/components/ui/`; LeadForm/ContactForm/BriefSignup/TrustBlock/TopicRail/Notices refactored; field errors wired via `aria-invalid`/`aria-describedby` |
+| 2026-11-05 | imagery | 10/10 photographic bands; retail/energy/manufacturing replaced SVG line-art with CC BY/BY-SA photos (credits.json); report `.work.ui/reports/20261105-imagery-audit.md` |
 
 ---
 
@@ -221,10 +231,10 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
 - Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
-- The UI now has ten channels/skins, a verified editorial-conversion v2 build and an **Approved** direction with all ten SPECs bound and reviewed (`Review`); the formal visual/a11y milestone audit has not run.
-- New channel coverage is uneven: manufacturing EN 10 vs ES 41, energy EN 16 vs ES 39, retail EN 10 vs ES 1; the three new channels use original SVG bands, not licensed photos. Profiles are applied to dev, not prd; legal/terms review (U11) still applies.
+- The UI has ten channels/skins, a verified editorial-conversion v2 build, an **Approved** direction with all ten SPECs **approved**, a passed a11y milestone audit, shipped S0 primitives, and photographic bands on all ten channels. Storybook, the P1 primitives (`Skeleton`, `Toc`) and the vision tier remain open.
+- New channel coverage is uneven: manufacturing EN 10 vs ES 41, energy EN 16 vs ES 39, retail EN 10 vs ES 1. All ten channels now use licensed photos (retail, energy, manufacturing replaced their SVG bands 2026-11-05). Profiles are applied to dev, not prd; legal/terms review (U11) still applies.
 - The cybersecurity channel uses a dark scheme; fill/border contrast of the new conversion fields was checked visually, but the matrix is not yet in `check-themes.mjs`.
-- Photo licences are recorded per file; two channels are CC BY-SA and depend on the in-caption credit staying rendered.
+- Photo licences are recorded per file (`apps/web/public/photos/credits.json`); four channels are CC BY/BY-SA and depend on the in-caption credit staying rendered (financial, cybersecurity, stem-cell, plus retail, energy, manufacturing).
 - AI summaries are fail-open; some items are intentionally left without a
   summary when validation rejects output.
 - CI is written but has not run on GitHub yet.
@@ -238,4 +248,4 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Approve the ten `Review` SPECs; run `@ui-accessibility-audit milestone`; initialize the CATALOG; close the new channels' content gaps; answer U9/U10/U1 and run `.work/plans/operations/20261105-launch.md`.
+Close the new channels' content gaps (manufacturing EN 10, retail ES 1); then `@ui-component-build plan - S1`; answer U9/U10/U1 and run `.work/plans/operations/20261105-launch.md`.

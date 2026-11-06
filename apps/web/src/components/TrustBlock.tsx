@@ -1,5 +1,9 @@
 import { t, type Locale } from "@/lib/i18n";
 
+import { Card } from "./ui/card";
+import { Chip } from "./ui/chip";
+import { SectionHeader } from "./ui/section-header";
+
 /**
  * Process and trust block: what happens after a request is sent.
  * Copy is deliberately plain — no urgency, no fabricated social proof.
@@ -12,18 +16,17 @@ export function TrustBlock({ locale }: { locale: Locale }) {
   ];
 
   return (
-    <section aria-labelledby="trust-heading" className="sn-card p-6">
-      <div className="flex items-center gap-2">
-        <span className="sn-kicker" aria-hidden="true" />
-        <p className="sn-eyebrow">{t(locale, "trust.eyebrow")}</p>
-      </div>
-      <h2 id="trust-heading" className="sn-section-title mt-2 font-semibold text-[var(--sn-text)]">
-        {t(locale, "trust.title")}
-      </h2>
+    <Card as="section" aria-labelledby="trust-heading" className="p-6">
+      <SectionHeader
+        id="trust-heading"
+        kicker={t(locale, "trust.eyebrow")}
+        title={t(locale, "trust.title")}
+        weight="semibold"
+      />
       <ol className="mt-5 grid gap-4">
         {steps.map((step, index) => (
           <li key={step.title} className="flex gap-3">
-            <span className="sn-chip h-fit">{index + 1}</span>
+            <Chip className="h-fit">{index + 1}</Chip>
             <div>
               <h3 className="text-sm font-semibold text-[var(--sn-text)]">{step.title}</h3>
               <p className="mt-1 text-sm leading-relaxed text-[var(--sn-muted)]">{step.body}</p>
@@ -34,6 +37,6 @@ export function TrustBlock({ locale }: { locale: Locale }) {
       <p className="mt-5 border-t border-[var(--sn-border)] pt-4 text-xs leading-relaxed text-[var(--sn-muted)]">
         {t(locale, "trust.note")}
       </p>
-    </section>
+    </Card>
   );
 }

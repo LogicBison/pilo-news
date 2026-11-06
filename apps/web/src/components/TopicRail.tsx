@@ -1,7 +1,7 @@
-import Link from "next/link";
-
 import type { Topic } from "@/lib/api";
 import { localePath } from "@/lib/i18n";
+
+import { ChipLink } from "./ui/chip";
 
 export function TopicRail({
   topics,
@@ -23,15 +23,15 @@ export function TopicRail({
       <ul className="mt-3 flex flex-wrap gap-2">
         {topics.map((topic) => (
           <li key={topic.slug}>
-            <Link
+            <ChipLink
               href={localePath(locale as "en" | "es", `/${industry}/search?topic=${topic.slug}`)}
-              className="sn-chip sn-chip-link px-3 py-1.5"
+              className="px-3 py-1.5"
             >
               {topic.label}
               {typeof topic.count === "number" ? (
                 <span className="text-xs text-[var(--sn-muted)]">{topic.count}</span>
               ) : null}
-            </Link>
+            </ChipLink>
           </li>
         ))}
       </ul>

@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-05
+**Updated:** 2026-11-05 (session close)
 
 ---
 
@@ -47,6 +47,12 @@
 | Three additional channels | `manufacturing`, `energy`, `retail` profiles applied to dev; Forge/Grid/Market skins; original SVG bands; 45/45 sources pass |
 | Channel inventory | `docs/channel-inventory.md` generated from `/v1/industries`; `apps/web/scripts/channel-inventory.mjs` + `bin/channels.sh`; checked by `./bin/start.sh test` |
 | Channel SPECs | 10 × `.work.ui/screens/channel-home-<slug>/` (all `Review`) |
+| SPEC approval | Ten channel-home SPECs operator-approved 2026-11-05 (`Status: Approved`); unblocks component build |
+| A11y milestone audit | `@ui-accessibility-audit milestone`: **pass** - 30 URLs, 0 critical/serious, 2 moderate best-practice findings, no waivers; report in `.work.ui/reports/20261105-accessibility-audit-milestone.md` |
+| A11y fixes | F1 footer `nav.footer` label + F2 CTA `<aside>` -> `<section>`; re-scan 0 violations; F3 recorded in ten SPEC amendments |
+| CATALOG | `.work.ui/design-system/CATALOG.md` rebuilt: 21 rows with token names, behavior source, APG pattern, states |
+| S0 primitives | `apps/web/src/components/ui/`: button, card, chip, section-header, text-field, text-area, select-field, consent-field, field-error, trust-line; forms/trust/topic surfaces refactored onto them |
+| Imagery | 10/10 photographic bands; retail, energy, manufacturing replaced SVG line-art with CC BY / BY-SA photos; `credits.json` + `.work.ui/reports/20261105-imagery-audit.md` |
 
 ---
 
@@ -62,17 +68,16 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Approve the ten channel SPECs | Visual verify pass with gaps; approval is the operator's gate |
-| **1** | Accessibility audit | `@ui-accessibility-audit milestone`; dark cybersecurity first |
-| **2** | CATALOG + new-channel content coverage | `@ui-design-system init`; manufacturing EN 10, retail ES 1 |
-| **3** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
-| **4** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
+| **0** | New-channel content coverage | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
+| **1** | `@ui-component-build plan - S1` | contact, about, admin screens on the shipped primitives |
+| **2** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
+| **3** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
 
 ---
 
 ## Current iteration
 
-*(Complete - M1-M8 + deployment profiles + source quality + five profile-only channels + certified UI foundation + ten distinct channel skins + lead qualification + editorial-conversion v2 (reference intake, balanced columns, clear forms; direction Approved, 10 SPECs bound + reviewed to `Review`) + three new channels (manufacturing, energy, retail). Visual verify milestone: pass with gaps. Next: approve SPECs, accessibility audit, CATALOG init, content gaps, pending ops.)*
+*(Complete - M1-M8, deployment profiles, source quality, ten channel skins, lead qualification, editorial-conversion v2, the three new channels, ten approved channel SPECs, the a11y milestone audit with F1/F2 fixes, the S0 catalog primitives, and photographic bands on all ten channels. Next: new-channel content coverage, then S1 screens; prd deploy/rollback and k6 remain.)*
 
 ### Concept / NFR registry
 

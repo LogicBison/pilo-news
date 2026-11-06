@@ -2,7 +2,7 @@
 
 > **Path:** `<repo-root>/.work.ui/plans/NEXT_UI.md` · **`@ui-component-build`** owns `## Current UI iteration`.
 
-**Status:** UI v2 implemented and verified · direction **Approved** · **10/10 SPEC Review** · **visual verify pass with gaps** · **Needs:** approve the ten Review SPECs + `@ui-accessibility-audit milestone`
+**Status:** UI v2 implemented and verified · direction **Approved** · **10/10 SPEC Approved** · **visual verify pass with gaps** · **a11y milestone pass** · **a11y F1/F2 fixed** · **S0 primitives shipped** · **10/10 photo bands** · **Needs:** content coverage + S1 screens
 
 ---
 
@@ -28,6 +28,8 @@
 | Three new channels | manufacturing, energy, retail full profiles + 5/4/4 sources + Forge/Grid/Market skins + 3 SPECs + 10-row reference map |
 | Channel verification | 45/45 sources pass `verify-sources --industry all`; 57 e2e passed / 1 skipped; 80 pages 200 + no overflow; `pnpm check` 10/10 |
 | Visual verify milestone | **pass with gaps**; 10 channels, 0 visual regressions; report + UIS-07/10 concept run |
+| Ten SPECs approved | operator approved all ten channel-home SPECs 2026-11-05; `Status: Approved` in each |
+| Accessibility audit | `@ui-accessibility-audit milestone`: **pass**, 30 URLs, 0 critical/serious, 2 moderate best-practice findings; report `.work.ui/reports/20261105-accessibility-audit-milestone.md` |
 
 ---
 
@@ -43,11 +45,9 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Approve the ten `Review` SPECs | Visual verify pass with gaps; approval is the operator's gate |
-| **1** | `@ui-accessibility-audit milestone` | Dark cybersecurity first; axe is green, audit adds manual checks |
-| **2** | `@ui-design-system init` | Clear the UIS-07 catalog gap; register P0 primitives |
-| **3** | Content coverage for the new channels | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
-| **4** | `@ui-component-build plan - S0/S1` | primitives + remaining screens (contact, about, admin) |
+| **0** | Content coverage for the new channels | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
+| **1** | `@ui-component-build plan - S1` | contact, about, admin composed on the shipped primitives |
+| **2** | P1 primitives | `Skeleton` (article/search blank states) and `Toc` |
 
 ---
 
@@ -61,7 +61,7 @@
 
 ## Current UI iteration
 
-**v2 conversion spine — complete; bind pending.** The channel-home and article conversion surfaces are rebuilt and verified. Remaining work is governance (direction ratification, token aliases, SPEC bind, milestone audit) and the non-public screens.
+**S0 — catalog primitives: complete.** Ten primitives built (`button`, `card`, `chip`, `section-header`, `text-field`, `text-area`, `select-field`, `consent-field`, `field-error`, `trust-line`); `LeadForm`, `ContactForm`, `BriefSignup`, `TrustBlock`, `TopicRail`, `Notices` consume them, retiring the duplicated field markup and the off-token notice palette. Channel imagery is photographic on all ten channels. Next: content coverage, then S1 screens.
 
 ---
 
@@ -80,9 +80,17 @@
 | U-09 | All ten channel SPECs reviewed, amended, re-check PASS → `Review` | 2026-11-05 |
 | U-10 | Three channels added (manufacturing, energy, retail); skins + profiles + sources verified | 2026-11-05 |
 | U-11 | Visual verify milestone pass with gaps + UIS-07/10 concept run | 2026-11-05 |
+| U-12 | Ten channel-home SPECs operator-approved (`Review` -> `Approved`) | 2026-11-05 |
+| U-13 | Accessibility milestone audit: pass on 30 URLs; F1-F5 recorded | 2026-11-05 |
+| U-14 | A11y F1/F2 fixed: footer `nav.footer` label, CTA `<aside>` -> `<section>`; re-scan 0 violations | 2026-11-05 |
+| U-15 | F3 resolved: ten `20261105-SCREEN-SPEC-amendment-01.md` files (target-size wording) | 2026-11-05 |
+| U-16 | CATALOG rebuilt from foundation doc 03: 21 rows, tokens, behavior sources, APG, states | 2026-11-05 |
+| U-17 | S0 primitives shipped (10 files under `components/ui/`); forms/trust/topic surfaces refactored onto them; field errors wired via `aria-invalid` + `aria-describedby` | 2026-11-05 |
+| U-18 | Imagery audit: all ten bands verified; retail, energy, manufacturing moved from SVG line-art to licensed photographs (credits recorded) | 2026-11-05 |
+| U-19 | Admin console inputs gained `aria-label`s (a11y F5) | 2026-11-05 |
 
 ---
 
 ## Next action
 
-Approve the ten `Review` SPECs, then run `@ui-accessibility-audit milestone`; initialize the CATALOG and close the new channels' content gaps before launch.
+Close the new channels' content gaps (manufacturing EN 10, retail ES 1); then `@ui-component-build plan - S1` for the contact, about, and admin screens.

@@ -386,9 +386,9 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               }
             }}
           >
-            <input name="slug" placeholder={t(locale, "admin.slug")} required className="sn-card px-3 py-2 text-sm" />
-            <input name="name" placeholder={t(locale, "admin.name")} required className="sn-card px-3 py-2 text-sm" />
-            <input name="code" placeholder={t(locale, "admin.code")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="slug" aria-label={t(locale, "admin.slug")} placeholder={t(locale, "admin.slug")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="name" aria-label={t(locale, "admin.name")} placeholder={t(locale, "admin.name")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="code" aria-label={t(locale, "admin.code")} placeholder={t(locale, "admin.code")} required className="sn-card px-3 py-2 text-sm" />
             <select name="layout" className="sn-card px-3 py-2 text-sm">
               <option value="editorial">editorial</option>
               <option value="professional">professional</option>
@@ -434,8 +434,8 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               if (ok) form.reset();
             }}
           >
-            <input name="name" placeholder={t(locale, "admin.name")} required className="sn-card px-3 py-2 text-sm" />
-            <input name="feed_url" placeholder={t(locale, "admin.feedUrl")} required className="sn-card px-3 py-2 text-sm md:col-span-2" />
+            <input name="name" aria-label={t(locale, "admin.name")} placeholder={t(locale, "admin.name")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="feed_url" aria-label={t(locale, "admin.feedUrl")} placeholder={t(locale, "admin.feedUrl")} required className="sn-card px-3 py-2 text-sm md:col-span-2" />
             <select name="language" className="sn-card px-3 py-2 text-sm" defaultValue="en">
               <option value="en">en</option>
               <option value="es">es</option>
@@ -489,10 +489,10 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               if (ok) form.reset();
             }}
           >
-            <input name="slug" placeholder="slug" required className="sn-card px-3 py-2 text-sm" />
-            <input name="label_en" placeholder="Label EN" required className="sn-card px-3 py-2 text-sm" />
-            <input name="label_es" placeholder="Label ES" required className="sn-card px-3 py-2 text-sm" />
-            <input name="weight" type="number" step="0.1" defaultValue="1" className="sn-card px-3 py-2 text-sm" />
+            <input name="slug" aria-label="slug" placeholder="slug" required className="sn-card px-3 py-2 text-sm" />
+            <input name="label_en" aria-label="Label EN" placeholder="Label EN" required className="sn-card px-3 py-2 text-sm" />
+            <input name="label_es" aria-label="Label ES" placeholder="Label ES" required className="sn-card px-3 py-2 text-sm" />
+            <input name="weight" type="number" step="0.1" defaultValue="1" aria-label={t(locale, "admin.sortOrder")} className="sn-card px-3 py-2 text-sm" />
             <button type="submit" className="sn-btn px-4 py-2">{t(locale, "admin.create")}</button>
           </form>
           <ul className="mt-4 space-y-2">
@@ -606,8 +606,8 @@ export function AdminConsole({ locale }: { locale: Locale }) {
               }
             }}
           >
-            <input name="label" placeholder={t(locale, "admin.label")} required className="sn-card px-3 py-2 text-sm" />
-            <input name="rate_limit" type="number" defaultValue="600" className="w-32 sn-card px-3 py-2 text-sm" />
+            <input name="label" aria-label={t(locale, "admin.label")} placeholder={t(locale, "admin.label")} required className="sn-card px-3 py-2 text-sm" />
+            <input name="rate_limit" type="number" defaultValue="600" aria-label={t(locale, "admin.prefix")} className="w-32 sn-card px-3 py-2 text-sm" />
             <button type="submit" className="sn-btn px-4 py-2">{t(locale, "admin.create")}</button>
           </form>
           {newKey ? <p className="mt-3 rounded border border-amber-300 bg-amber-50 p-3 text-sm"><strong>{t(locale, "admin.keyShownOnce")}</strong><br /><code className="break-all">{newKey}</code></p> : null}

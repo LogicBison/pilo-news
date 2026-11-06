@@ -25,7 +25,7 @@ export function Footer({ industry, locale }: { industry: Industry; locale: Local
           </p>
           <p className="mt-2 max-w-md text-sm text-[var(--sn-muted)]">{industry.disclaimer}</p>
         </div>
-        <nav aria-label={t(locale, "nav.menu")} className="grid grid-cols-2 gap-2 text-sm">
+        <nav aria-label={t(locale, "nav.footer")} className="grid grid-cols-2 gap-2 text-sm">
           <Link href={localePath(locale, `/${industry.slug}/about`)} className="sn-link-quiet">
             {t(locale, "nav.about")}
           </Link>

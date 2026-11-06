@@ -1,7 +1,7 @@
 # Logistics & Supply Chain — channel home screen SPEC
 
 **What it is:** screen SPEC for the `logistics` channel home (`/{industry}` → `/logistics`, `/es/logistics`), the page that carries this channel's skin and lead CTA.
-**Status:** Review (2026-11-05) — amended after review findings · **Needs:** operator approval; `@ui-visual-verify milestone` after approval.
+**Status:** Approved (2026-11-05) — operator approval after the 2026-11-05 review amendments · **Needs:** `@ui-accessibility-audit milestone`.
 
 ## 1. Summary
 
@@ -141,4 +141,4 @@ Palette from `industries.theme`: graphite-green `#1f3d33` primary + burnt orange
 
 ## Next action
 
-Operator approval of this Review SPEC, then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone` for this channel.
+`@ui-accessibility-audit milestone` — dark `cybersecurity` first, then the other nine.

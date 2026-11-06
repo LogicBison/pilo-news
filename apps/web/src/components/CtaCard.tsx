@@ -23,7 +23,7 @@ export function CtaCard({
   const promises = [t(locale, "cta.promise1"), t(locale, "cta.promise2"), t(locale, "cta.promise3")];
 
   return (
-    <aside
+    <section
       aria-label={headline}
       className={`sn-cta sn-action self-start ${compact ? "p-4" : "p-6 md:p-7"}`}
     >
@@ -67,6 +67,6 @@ export function CtaCard({
           <p className="sn-action-disclaimer mt-3">{industry.disclaimer}</p>
         </div>
       </div>
-    </aside>
+    </section>
   );
 }

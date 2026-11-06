@@ -5,6 +5,10 @@ import { useState } from "react";
 import { track } from "@/lib/analytics";
 import { t, type Locale } from "@/lib/i18n";
 
+import { Button } from "./ui/button";
+import { ConsentField } from "./ui/consent-field";
+import { TextField } from "./ui/text-field";
+
 type Status = "idle" | "sending" | "success" | "error" | "rate-limited";
 
 interface BriefSignupProps {
@@ -102,34 +106,28 @@ export function BriefSignup({ industry, locale, placement, articleId, sourcePage
         </div>
         <form onSubmit={onSubmit} onFocus={onStart} className="grid gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1 text-sm font-semibold">
-              <span>
-                {t(locale, "brief.name")}
-                <span className="sn-req" aria-hidden="true">
-                  {" "}*
-                </span>
-              </span>
-              <input name="name" required maxLength={100} autoComplete="given-name" className="sn-input" />
-            </label>
-            <label className="flex flex-col gap-1 text-sm font-semibold">
-              <span>
-                {t(locale, "brief.email")}
-                <span className="sn-req" aria-hidden="true">
-                  {" "}*
-                </span>
-              </span>
-              <input name="email" type="email" required autoComplete="email" className="sn-input" />
-            </label>
+            <TextField
+              label={t(locale, "brief.name")}
+              name="name"
+              required
+              maxLength={100}
+              autoComplete="given-name"
+            />
+            <TextField
+              label={t(locale, "brief.email")}
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+            />
           </div>
-          <label className="flex items-start gap-2 text-xs leading-relaxed text-[var(--sn-muted)]">
-            <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4" />
-            <span>
-              <span className="sn-req" aria-hidden="true">
-                *
-              </span>{" "}
-              {t(locale, "brief.consent")}
-            </span>
-          </label>
+          <ConsentField
+            name="consent"
+            className="text-xs leading-relaxed text-[var(--sn-muted)]"
+            boxClassName="mt-0.5 h-4 w-4"
+          >
+            {t(locale, "brief.consent")}
+          </ConsentField>
           <input
             type="text"
             name="website"
@@ -140,9 +138,9 @@ export function BriefSignup({ industry, locale, placement, articleId, sourcePage
             placeholder={t(locale, "lead.honeypot")}
           />
           <div className="flex flex-wrap items-center gap-3">
-            <button type="submit" className="sn-btn" disabled={status === "sending"}>
+            <Button type="submit" disabled={status === "sending"}>
               {status === "sending" ? t(locale, "brief.sending") : t(locale, "brief.submit")}
-            </button>
+            </Button>
             <p className="text-xs text-[var(--sn-muted)]">{t(locale, "brief.privacyNote")}</p>
           </div>
           {status === "error" || status === "rate-limited" ? (

@@ -66,7 +66,7 @@ Example ids used: **W2, W3, W6, W9** (`examples/websites/manifest.md`). They cov
 
 ## Catalog
 
-Detailed rows, props, and a11y notes: `.work.ui/design-system/CATALOG.md` — still the scaffold template, so `@ui-design-system init` is the next step after tokens (`.work.ui/design-system/CATALOG.md:1-11`).
+Detailed rows, props, and a11y notes: `.work.ui/design-system/CATALOG.md` — refreshed 2026-11-05 by `@ui-design-system init` (21 rows: shipped patterns + planned P0/P1/P2 primitives, token names, behavior source, APG pattern, states, a11y notes).
 
 ## Decisions needed
 

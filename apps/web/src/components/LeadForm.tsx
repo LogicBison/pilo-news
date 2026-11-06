@@ -7,6 +7,16 @@ import type { CtaQualification } from "@/lib/api";
 import { t, type Locale } from "@/lib/i18n";
 import { localized } from "@/lib/theme";
 
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Chip } from "./ui/chip";
+import { ConsentField } from "./ui/consent-field";
+import { FieldError } from "./ui/field-error";
+import { SelectField } from "./ui/select-field";
+import { TextArea } from "./ui/text-area";
+import { TextField } from "./ui/text-field";
+import { TrustLine } from "./ui/trust-line";
+
 interface LeadFormProps {
   industry: string;
   industryName: string;
@@ -93,8 +103,8 @@ export function LeadForm({
 
   if (status === "success") {
     return (
-      <div role="status" className="sn-card p-6">
-        <span className="sn-chip">{t(locale, "lead.received")}</span>
+      <Card role="status" className="p-6">
+        <Chip>{t(locale, "lead.received")}</Chip>
         <h3 className="sn-section-title mt-3 font-semibold text-[var(--sn-text)]">
           {t(locale, "lead.title")}
         </h3>
@@ -105,7 +115,7 @@ export function LeadForm({
         <a href="#brief-signup" className="sn-btn sn-btn-ghost mt-4">
           {t(locale, "brief.submit")}
         </a>
-      </div>
+      </Card>
     );
   }
 
@@ -122,141 +132,93 @@ export function LeadForm({
       <p className="sn-required-note mt-2">{t(locale, "common.requiredNote")}</p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <label className="flex flex-col gap-1 text-sm font-semibold">
-          <span>
-            {t(locale, "lead.name")}
-            <span className="sn-req" aria-hidden="true">
-              {" "}*
-            </span>
-          </span>
-          <input name="name" required maxLength={100} autoComplete="name" className="sn-input" />
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-semibold">
-          <span>
-            {t(locale, "lead.email")}
-            <span className="sn-req" aria-hidden="true">
-              {" "}*
-            </span>
-          </span>
-          <input
-            name="email"
-            type="email"
-            required
-            maxLength={200}
-            autoComplete="email"
-            className="sn-input"
-          />
-        </label>
+        <TextField
+          label={t(locale, "lead.name")}
+          name="name"
+          required
+          maxLength={100}
+          autoComplete="name"
+        />
+        <TextField
+          label={t(locale, "lead.email")}
+          name="email"
+          type="email"
+          required
+          maxLength={200}
+          autoComplete="email"
+        />
       </div>
 
       {options.length > 0 ? (
-        <label className="mt-3 flex flex-col gap-1 text-sm font-semibold">
-          <span>
-            {localized(qualify?.label, locale) || t(locale, "lead.message")}
-            {qualify?.required !== false ? (
-              <span className="sn-req" aria-hidden="true">
-                {" "}*
-              </span>
-            ) : null}
-          </span>
-          <select
-            name="qualification"
-            required={qualify?.required !== false}
-            defaultValue=""
-            className="sn-input"
-          >
-            <option value="" disabled>
-              {t(locale, "lead.chooseOption")}
+        <SelectField
+          label={localized(qualify?.label, locale) || t(locale, "lead.message")}
+          name="qualification"
+          required={qualify?.required !== false}
+          defaultValue=""
+          wrapperClassName="mt-3"
+        >
+          <option value="" disabled>
+            {t(locale, "lead.chooseOption")}
+          </option>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {localized(option.label, locale)}
             </option>
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {localized(option.label, locale)}
-              </option>
-            ))}
-          </select>
-        </label>
+          ))}
+        </SelectField>
       ) : null}
 
       {logistics ? (
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <label className="flex flex-col gap-1 text-sm font-semibold">
-            <span>
-              {t(locale, "lead.phone")}
-              <span className="sn-req" aria-hidden="true">
-                {" "}*
-              </span>
-            </span>
-            <input
-              name="phone"
-              type="tel"
-              required
-              maxLength={40}
-              autoComplete="tel"
-              className="sn-input"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm font-semibold">
-            <span>
-              {t(locale, "lead.company")}
-              <span className="sn-req" aria-hidden="true">
-                {" "}*
-              </span>
-            </span>
-            <input
-              name="company"
-              required
-              maxLength={120}
-              autoComplete="organization"
-              className="sn-input"
-            />
-          </label>
+          <TextField
+            label={t(locale, "lead.phone")}
+            name="phone"
+            type="tel"
+            required
+            maxLength={40}
+            autoComplete="tel"
+          />
+          <TextField
+            label={t(locale, "lead.company")}
+            name="company"
+            required
+            maxLength={120}
+            autoComplete="organization"
+          />
         </div>
       ) : (
         <details className="sn-more">
           <summary>{t(locale, "lead.optionalDetails")}</summary>
           <div className="sn-more-body grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1 text-sm font-medium">
-              <span>
-                {t(locale, "lead.phone")}{" "}
-                <span className="font-normal text-[var(--sn-muted)]">
-                  ({t(locale, "common.optional")})
-                </span>
-              </span>
-              <input
-                name="phone"
-                type="tel"
-                maxLength={40}
-                autoComplete="tel"
-                className="sn-input"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-sm font-medium">
-              <span>
-                {t(locale, "lead.company")}{" "}
-                <span className="font-normal text-[var(--sn-muted)]">
-                  ({t(locale, "common.optional")})
-                </span>
-              </span>
-              <input
-                name="company"
-                maxLength={120}
-                autoComplete="organization"
-                className="sn-input"
-              />
-            </label>
+            <TextField
+              label={t(locale, "lead.phone")}
+              name="phone"
+              type="tel"
+              maxLength={40}
+              autoComplete="tel"
+              labelWeight="medium"
+              optionalLabel={t(locale, "common.optional")}
+            />
+            <TextField
+              label={t(locale, "lead.company")}
+              name="company"
+              maxLength={120}
+              autoComplete="organization"
+              labelWeight="medium"
+              optionalLabel={t(locale, "common.optional")}
+            />
           </div>
         </details>
       )}
 
-      <label className="mt-3 flex flex-col gap-1 text-sm font-semibold">
-        <span>
-          {t(locale, "lead.details")}{" "}
-          <span className="font-normal text-[var(--sn-muted)]">
-            ({t(locale, "common.optional")})
-          </span>
-        </span>
-        <textarea name="message" rows={3} maxLength={2000} className="sn-input" />
-      </label>
+      <TextArea
+        label={t(locale, "lead.details")}
+        name="message"
+        rows={3}
+        maxLength={2000}
+        wrapperClassName="mt-3"
+        optionalLabel={t(locale, "common.optional")}
+      />
 
       <div aria-hidden="true" className="hidden">
         <label>
@@ -265,32 +227,24 @@ export function LeadForm({
         </label>
       </div>
 
-      <label className="mt-4 flex items-start gap-3 text-sm">
-        <input type="checkbox" name="consent" required className="mt-1 h-4 w-4" />
-        <span>
-          <span className="sn-req" aria-hidden="true">
-            *
-          </span>{" "}
-          {t(locale, "lead.consent")}{" "}
-          <a
-            href={`/${locale === "es" ? "es/" : ""}${industry}/privacy`}
-            className="font-semibold underline"
-          >
-            {t(locale, "lead.consentLink")}
-          </a>
-        </span>
-      </label>
+      <ConsentField name="consent" className="mt-4">
+        {t(locale, "lead.consent")}{" "}
+        <a
+          href={`/${locale === "es" ? "es/" : ""}${industry}/privacy`}
+          className="font-semibold underline"
+        >
+          {t(locale, "lead.consentLink")}
+        </a>
+      </ConsentField>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button type="submit" disabled={status === "sending"} className="sn-btn">
+        <Button type="submit" disabled={status === "sending"}>
           {status === "sending" ? t(locale, "lead.sending") : t(locale, "lead.submit")}
-        </button>
-        <span className="sn-chip">{t(locale, "lead.responseTime")}</span>
+        </Button>
+        <Chip>{t(locale, "lead.responseTime")}</Chip>
       </div>
-      <p className="mt-3 text-xs text-[var(--sn-muted)]">{t(locale, "lead.privacyNote")}</p>
-      <div aria-live="polite" className="mt-3 text-sm text-[var(--sn-danger)]">
-        {message}
-      </div>
+      <TrustLine className="mt-3">{t(locale, "lead.privacyNote")}</TrustLine>
+      <FieldError message={message} />
     </form>
   );
 }
