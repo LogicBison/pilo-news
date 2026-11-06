@@ -190,6 +190,27 @@ class AIClient:
         AI_COST.labels(model=self.model).inc(cost)
         await increment(f"ai:spend:{monthly_bucket()}", cost)
 
+    async def complete_json(
+        self,
+        *,
+        system: str,
+        user: str,
+        timeout: float = 60.0,
+        max_tokens: int = 1600,
+    ) -> str:
+        if not self.available():
+            raise AIError("AI provider is not configured")
+        result = await self._chat(
+            [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            temperature=0.1,
+            timeout=timeout,
+            max_tokens=max_tokens,
+        )
+        return result.text
+
     async def summarize(self, *, title: str, excerpt: str, language: str) -> str | None:
         table = prompt_table(language)
         messages = [

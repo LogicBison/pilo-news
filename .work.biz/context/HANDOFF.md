@@ -1,24 +1,28 @@
 # HANDOFF — Session Bookmark
 
-> **Date:** 2026-11-05
-> **Status:** Open — offer brief built into the app; product feasibility verified
-> **Needs:** D4–D6 in the feasibility doc; commit of the app-code changes (outside `.work.biz` scope)
+> **Date:** 2026-11-06
+> **Status:** Open — 2026-11-06 — goal: design AI-generatable free offers per channel, per-channel generation guides, and an offer inventory
+> **Needs:** owner approval of the offer architecture; named reviewers per reference channel; D4-D6 still open
 
 ## Current session
 
 | Step | Status |
 |------|--------|
-| Context load (strategy, gates, earlier recommendations) | done |
-| Offer + lead-gen brief for `ai` / `ui` | done — `.work.biz/strategy/20261105-offer-and-leadgen-brief.md` |
-| Owner decisions D1–D3 | pending |
+| Context load (strategy, gates, earlier recommendations, live API) | done |
+| Offer analysis + recommendations | done - `.work.biz/strategy/20261106-ai-offer-system.md` |
+| Offer inventory + generator/check | done - `.work.biz/strategy/offer-inventory.md` |
+| 11 channel generation guides | done - `.work.biz/strategy/offer-guides/` |
+| Owner approval + named reviewers | pending |
 
 ## Pending for next session
 
 | # | Task | Priority |
 |---|------|----------|
-| 1 | Answer D1–D3 in the brief; then `ai` ships R3 (UTM) + R4 (funnel read-out) | high |
-| 2 | `ui` ships R9 (CTA truth) + R10 (form resilience) | high |
-| 3 | U18 lead pricing + partner model still open | blocker for R6 |
+| 1 | Approve the two-format offer architecture | high |
+| 2 | Name legal and cybersecurity reviewers | high |
+| 3 | Publish issue 1 for legal and cybersecurity | high |
+| 4 | Wire delivery through `pilo-mail` (U8/D-002) | high |
+| 5 | Build financial and manufacturing generators | medium |
 
 ## Key decisions (locked in)
 
@@ -27,10 +31,11 @@
 | D-001 | Three surfaces first (brief capture, proof strip, trust block), review 2027-01-05 |
 | D-002 | Email gateway = `pilo-mail` (Brevo upstream); integration deferred |
 | D2 (proposed) | No paid subscription in v1 — partner-funded leads only |
+| D-015 | One jurisdiction-tagged offer dataset with a visible filter; no one-calendar-per-country; IP default only with override |
 
 ## Next action
 
-Answer D1–D3 in `.work.biz/strategy/20261105-offer-and-leadgen-brief.md`; then hand §4 packages to `@x-director`.
+Approve the architecture and name the legal and cybersecurity reviewers; then publish issue 1 for both before building a third generator.
 
 ---
 
@@ -143,3 +148,57 @@ Answer D1–D3 in `.work.biz/strategy/20261105-offer-and-leadgen-brief.md`; then
 **Findings worth flagging:** the real risk is not the build, it is overlap with the cybersecurity channel and saturated AI coverage. A topic hub on cybersecurity is the cheaper demand test.
 **Blockers:** D-010 (sequence), partner for the inquiry (U18), asset reviewer (D-005), traffic baseline (U10).
 **Next recommended:** approve D-010 and run the 21-day topic test before writing a profile.
+
+
+---
+
+## Latest action (@biz-session start)
+
+**Date:** 2026-11-06
+**Request:** "what improvements can be made to the system, including the free offer on each channel, that makes sense and can be generated using AI, and generate a guide on for each channel on how to generate the deliverables for the subscribers... and include the inventory of offers (similarly to the channel inventory)."
+**Classified intent:** strategy / free-offer architecture + per-channel generation guides + offer inventory.
+**Executed:**
+1. Loaded `.work.biz` context, the offer brief, the feasibility verification, the KEV plan, and the live API for all 11 channels.
+2. Found the real gap: every current offer is capture-only. Nine channels capture a generic weekly brief, two capture an asset waitlist, zero publish an issue, and email delivery is still deferred.
+3. Wrote `.work.biz/strategy/20261106-ai-offer-system.md`: verdict, current-state table, 10 gaps, two-format architecture (reference vs brief), per-channel recommendation, AI boundaries, pipeline, 10 ranked recommendations, rollout, measurement, risks, decisions.
+4. Wrote `.work.biz/strategy/offers/catalog.json` (11 channels) and `.work.biz/strategy/offer-inventory.md` (generated from the live API + catalog).
+5. Wrote `.work.biz/strategy/offer-guides/README.md` plus 11 channel guides, each with reader/job, deliverable, sources, AI scope, prompt values, validation, review, distribution, metrics, build notes, and banned claims.
+6. Added `.work.biz/scripts/offer-inventory.mjs` + `offers.sh` with `--write` / `--check`.
+7. Engineering follow-through (same day): built the offer issue pipeline in `.work/features/offer-generation/20261106-SPEC.md`; legal (Federal Register, scope `US`) and cybersecurity (CISA KEV, scope `global`) drafts exist with 12 rows each; the worker queues due drafts automatically; no publish or email.
+**Findings worth flagging:** the weekly brief is a feed digest, not a reason to subscribe; the two asset cards had no published issue behind them; review capacity, not generation, is the binding constraint; three channels should stay on a brief rather than fake a reference.
+**Blockers:** a public issue page and publish path are not built; named reviewers are needed only for publish; email remains U8/D-002.
+**Next recommended:** review the two drafts (`./bin/offers.sh list`, `show <id> --markdown`), then build the public issue page and publish path. Email stays owner-owned.
+
+
+---
+
+## Latest action (@biz-director)
+
+**Date:** 2026-11-06
+**Request:** "we need to focus on what AI can do — for example, something that it can do is make a selection of the top news of the last 7 days and sent the briefing to the reader, that's something really easy to do, what other products can be generated similarly, that needs to be determined, for example, for legal, a calendar was offered, so, maybe the calendar of events can be generated in a way that we don't need to generate one per country, or maybe per country might be easy, based on the reader's IP address, set up a calendar based on the source data from some free API with the information, or, just put the information together based on regular searches by the AI. What other products can be put together similarly?"
+**Classified intent:** product ideas / AI-generatable products → `@biz-products generate`
+**Executed:**
+1. Loaded the offer analysis, offer inventory, per-channel guides, live draft pipeline, and the existing source adapters.
+2. Wrote `.work.biz/strategy/20261106-ai-generated-products.md`: AI capability ladder, jurisdiction decision, 8 product concepts, prioritization matrix, per-channel map, and the 7-Day Desk Brief MVP.
+3. Recommendation: one dataset with jurisdiction-tagged rows and a filter, not one calendar per country. IP sets a default with a visible override; AI search is discovery only, never a source.
+4. Product order: 7-Day Desk Brief, public issue page + jurisdiction filter, change log, personalized watchlist, then EU/recall/checklist/answer pack/export.
+5. Recorded D-015: one jurisdiction-tagged dataset with a visible filter; IP default only with an override; no per-country generator.
+**Findings worth flagging:** the 7-day brief is cheap and universal but weakly differentiated; the calendar cost is source acquisition and review, not generation; a per-country generator multiplies maintenance and hides gaps.
+**Blockers:** product priority decision; email U8; traffic baseline U10; partner intent U18.
+**Next recommended:** build the 7-Day Desk Brief for one channel and test it with ten readers before adding another adapter.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-06
+**Request:** "all approved - any questions you answer them with your recommendations - verify the uncomitted code, provide professional/valuable improvements to the system, make sure all is ready, completed, operational."
+**Frameworks involved:** .ai, .ai.ui, .ai.biz
+**Classified bucket(s):** engineering + ui + business
+**Executed:**
+1. Accepted the product catalog and D-015 as the jurisdiction direction: one dataset with jurisdiction tags and a visible filter, no per-country generator.
+2. Confirmed the renderer now exposes the two drafts through the admin Offers tab; no publish or email yet.
+3. Kept the next product choice open: 7-Day Desk Brief vs public reference page.
+**Coordination notes:** the technical pipeline is live; the business promise still waits on a public page and delivery.
+**Blockers:** public issue page, publish/reviewer, email (U8), product priority.
+**Next recommended:** choose the next build and keep the 7-Day Desk Brief as the baseline.

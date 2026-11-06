@@ -88,6 +88,23 @@ async def enqueue(*, run_id: str, industry: str, trigger: str, full_reset: bool 
     )
 
 
+async def enqueue_offer(*, issue_id: str, industry: str, offer: str, issue_date: str) -> str:
+    client = await get_redis()
+    return str(
+        await client.xadd(
+            STREAM,
+            {
+                "kind": "offer",
+                "issue_id": issue_id,
+                "industry": industry,
+                "offer": offer,
+                "issue_date": issue_date,
+                "attempts": "0",
+            },
+        )
+    )
+
+
 async def promote_retries() -> int:
     client = await get_redis()
     now = time.time()
@@ -164,7 +181,33 @@ async def scheduler_tick() -> int:
     return enqueued
 
 
+async def _process_offer_job(fields: dict[str, str]) -> None:
+    from datetime import date
+
+    from news_api.offers.application.build import build_offer_issue
+
+    try:
+        await build_offer_issue(
+            fields["industry"],
+            offer_slug=fields["offer"],
+            issue_date=date.fromisoformat(fields["issue_date"]),
+        )
+    except Exception as exc:
+        # build_offer_issue already marks the issue failed; retry happens on a
+        # later scheduler tick after the retry window.
+        log.warning(
+            "worker.offer_failed",
+            industry=fields.get("industry"),
+            offer=fields.get("offer"),
+            issue_date=fields.get("issue_date"),
+            error=type(exc).__name__,
+        )
+
+
 async def process_job(job_id: str, fields: dict[str, str]) -> None:
+    if fields.get("kind") == "offer":
+        await _process_offer_job(fields)
+        return
     try:
         await run_ingest(
             fields["industry"],

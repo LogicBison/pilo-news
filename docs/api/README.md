@@ -73,6 +73,20 @@ Mutating calls require `X-CSRF-Token` equal to the `sn_csrf` cookie.
 `asset` are mutually exclusive; `asset` needs a configured `cta.asset`. The
 public industry payload exposes the effective `offers` map.
 
+## Offer issues (admin)
+
+Dated reference offers are generated from public sources and stored as drafts.
+
+- `GET /v1/admin/offers?industry=&status=&limit=` lists issues.
+- `GET /v1/admin/offers/{id}` returns the rows and sources.
+- `POST /v1/admin/offers/build` queues a build for `{industry, offer?, issue_date?, dry_run?}`.
+- `dry_run: true` returns rows without writing and returns `200`; a queued build returns `202`.
+
+The worker queues the latest due issue every five minutes. It never publishes and
+never sends email. The issue carries an explicit `scope`: `US` for the Federal
+Register adapter, `global` for CISA KEV. A new jurisdiction is a new adapter with
+its own scope, not a wider title. CLI: `./bin/offers.sh build --industry legal --dry-run`.
+
 ## Adding a channel
 
 `POST /v1/admin/industries` is data-only: slug, name, code, theme, locales,

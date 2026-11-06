@@ -685,6 +685,55 @@
         "title": "LoginRequest",
         "type": "object"
       },
+      "OfferBuildRequest": {
+        "properties": {
+          "dry_run": {
+            "default": false,
+            "title": "Dry Run",
+            "type": "boolean"
+          },
+          "force": {
+            "default": false,
+            "title": "Force",
+            "type": "boolean"
+          },
+          "industry": {
+            "maxLength": 40,
+            "minLength": 2,
+            "title": "Industry",
+            "type": "string"
+          },
+          "issue_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Date"
+          },
+          "offer": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offer"
+          }
+        },
+        "required": [
+          "industry"
+        ],
+        "title": "OfferBuildRequest",
+        "type": "object"
+      },
       "PartnerCreate": {
         "properties": {
           "contact_email": {
@@ -2029,6 +2078,164 @@
           }
         },
         "summary": "Export Lead",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/offers": {
+      "get": {
+        "operationId": "list_offer_issues_v1_admin_offers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "industry",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Industry"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response List Offer Issues V1 Admin Offers Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Offer Issues",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/offers/build": {
+      "post": {
+        "operationId": "trigger_offer_build_v1_admin_offers_build_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferBuildRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Trigger Offer Build V1 Admin Offers Build Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Trigger Offer Build",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/offers/{issue_id}": {
+      "get": {
+        "operationId": "get_offer_issue_v1_admin_offers__issue_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "issue_id",
+            "required": true,
+            "schema": {
+              "title": "Issue Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Offer Issue V1 Admin Offers  Issue Id  Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Offer Issue",
         "tags": [
           "admin"
         ]

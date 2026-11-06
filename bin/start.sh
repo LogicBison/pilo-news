@@ -218,8 +218,12 @@ cmd_test() {
 	if command -v node >/dev/null 2>&1; then
 		info "inventory: channel list"
 		./bin/channels.sh --check
+		if [ -x .work.biz/scripts/offers.sh ]; then
+			info "inventory: offer list"
+			.work.biz/scripts/offers.sh --check
+		fi
 	else
-		warn "node not found - channel inventory check skipped"
+		warn "node not found - inventory checks skipped"
 	fi
 	ok "all checks passed"
 }

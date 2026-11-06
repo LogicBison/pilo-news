@@ -58,6 +58,8 @@ DOCS_TECH_STACK.md
 ./bin/start.sh --env dev up        # postgres, redis, api, worker, web
 ./bin/start.sh --env dev refresh   # force a news fetch now (scheduled: every 12 h)
 ./bin/start.sh --env dev status    # prints the actual web/API URLs and health
+./bin/offers.sh build --industry legal --dry-run   # draft a dated offer without writing
+./bin/offers.sh list                               # generated offer drafts
 curl -s "http://localhost:$(grep '^API_PORT=' .env.dev | cut -d= -f2)/v1/health"
 curl -s "http://localhost:$(grep '^API_PORT=' .env.dev | cut -d= -f2)/v1/news?industry=legal&locale=en&limit=5"
 ```
@@ -81,6 +83,15 @@ End-to-end and accessibility tests run against a production build; see
 Until the scaffold lands, the commands above are **planned**, not verified.
 
 ---
+
+## Offer issues
+
+The free reference offers are generated from public records, not hand-written. Two adapters ship today:
+
+- `legal`: US Federal Register rules from a legal-relevant agency set, monthly.
+- `cybersecurity`: CISA KEV additions, weekly on Wednesday.
+
+The worker checks due offers every five minutes and queues a draft. It never publishes or emails. The issue scope is explicit: `US` for Federal Register, `global` for CISA KEV. The command is `./bin/offers.sh build --industry <slug> [--dry-run]`; the admin API is `GET /v1/admin/offers` and `POST /v1/admin/offers/build`.
 
 ## Industries
 

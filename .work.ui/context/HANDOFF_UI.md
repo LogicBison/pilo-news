@@ -381,3 +381,13 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Imagery:** retail, energy and manufacturing bands replaced with licensed photographs; `credits.json` has 10 entries; report `.work.ui/reports/20261105-imagery-audit.md`.
 **Verification (production build, `next start` :3100):** `pnpm build` pass; `npx playwright test` **57 passed / 1 skipped**; axe on 11 URLs incl. the three new bands -> 0 violations; `pnpm lint` / `pnpm typecheck` / `pnpm check` (269 keys, 10/10 contrast) pass.
 **Known gaps:** Storybook still absent (waiver recorded); `Skeleton`/`Toc` (P1) unbuilt; admin placeholder labels (F5) open.
+
+---
+
+## Admin Offers tab - 2026-11-06 (@x-director)
+
+**Scope:** `.work.ui/screens/admin-console/20261106-SCREEN-SPEC-amendment-02.md`.
+**Shipped:** Offers tab between Channels and Sources: issue list, row count, status, generated time, expandable detail with sourced rows and source version, and a `Build now` action. No publish or email control.
+**Copy:** EN/ES added (380 catalog keys); the intro states drafts only.
+**Verification:** `pnpm lint`, `pnpm typecheck`, `pnpm check` (380 keys, 11/11 contrast), `pnpm build`; Playwright `admin.spec.ts` 5/5 on the dev server, including the new Offers test.
+**Gap:** the tab has no public counterpart and no publish gate.

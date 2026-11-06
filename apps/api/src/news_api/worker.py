@@ -14,6 +14,7 @@ from news_api.articles.application.queue import (
     recover_orphans,
     scheduler_tick,
 )
+from news_api.offers.application.scheduler import offer_scheduler_tick
 from news_api.platform.cache import close_redis, get_redis
 from news_api.platform.db import dispose
 from news_api.platform.logging import configure_logging, get_logger
@@ -45,6 +46,7 @@ async def run_worker() -> None:
 
     consumer = consumer_name()
     last_schedule = 0.0
+    last_offer_schedule = 0.0
     try:
         while not stop.is_set():
             now = time.monotonic()
@@ -57,6 +59,12 @@ async def run_worker() -> None:
                     QUEUE_DEPTH.labels(stream="news:jobs").set(await client.xlen("news:jobs"))
                 except Exception as exc:
                     log.warning("worker.scheduler_error", error=type(exc).__name__)
+            if now - last_offer_schedule >= 300:
+                last_offer_schedule = now
+                try:
+                    await offer_scheduler_tick()
+                except Exception as exc:
+                    log.warning("worker.offer_scheduler_error", error=type(exc).__name__)
             try:
                 await consume_once(consumer, block_ms=2000)
             except Exception as exc:

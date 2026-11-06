@@ -43,3 +43,18 @@ test("admin can manage a channel's cadence and free offers", async ({ page }) =>
   await expect(row.getByRole("radio", { name: /weekly brief/i })).toBeVisible();
   await expect(row.getByRole("button", { name: /save channel settings/i })).toBeVisible();
 });
+
+test("admin can inspect generated offer drafts", async ({ page }) => {
+  test.skip(!password, "E2E_ADMIN_PASSWORD is not set");
+  await page.goto("/en/admin");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password ?? "");
+  await page.getByRole("button", { name: /sign in/i }).click();
+  await page.getByRole("tab", { name: /offers/i }).click();
+
+  await expect(page.getByText(/generated drafts from public sources/i)).toBeVisible();
+  const row = page.getByRole("row").filter({ hasText: "legal-regulatory-calendar" }).first();
+  await expect(row).toContainText(/draft/i);
+  await row.getByRole("button", { name: /^view$/i }).click();
+  await expect(page.getByRole("link", { name: /securities and exchange commission/i }).first()).toBeVisible();
+});

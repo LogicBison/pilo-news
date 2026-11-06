@@ -69,6 +69,7 @@ LEADS = _counter("leads_total", "Leads", ("industry", "status"))
 LEADS_RATE_LIMITED = _counter("leads_rate_limited_total", "Leads rate limited", ("industry",))
 LEAD_ROUTE_LATENCY = _histogram("lead_route_latency_seconds", "Lead routing latency", ("industry",))
 CTA_EVENTS = _counter("cta_events_total", "CTA funnel events", ("industry", "event", "placement"))
+OFFER_ISSUES = _counter("offer_issues_total", "Generated offer issues", ("offer", "status"))
 
 ADMIN_AUTH = _counter("admin_auth_total", "Admin auth attempts", ("result",))
 ADMIN_MUTATIONS = _counter("admin_mutations_total", "Admin mutations", ("action",))

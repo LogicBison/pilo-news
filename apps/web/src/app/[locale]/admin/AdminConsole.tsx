@@ -11,6 +11,7 @@ import { t, type Locale } from "@/lib/i18n";
 type Tab =
   | "overview"
   | "channels"
+  | "offers"
   | "sources"
   | "topics"
   | "articles"
@@ -25,6 +26,7 @@ type Tab =
 const TABS: readonly Tab[] = [
   "overview",
   "channels",
+  "offers",
   "sources",
   "topics",
   "articles",
@@ -67,6 +69,34 @@ interface AdminIndustry {
   auto_fetch_enabled: boolean;
   offers: OfferConfig;
   asset?: string | null;
+}
+
+interface OfferItem {
+  headline: string;
+  change: string;
+  date: string;
+  jurisdiction: string;
+  action: string;
+  source_name: string;
+  source_url: string;
+}
+
+interface OfferIssue {
+  id: string;
+  industry: string;
+  offer_slug: string;
+  issue_date: string;
+  scope: string;
+  status: string;
+  title: string;
+  standfirst: string;
+  items: OfferItem[];
+  sources: { name: string; url: string }[];
+  source_version: string | null;
+  reviewer: string | null;
+  error: string | null;
+  generated_at: string;
+  published_at: string | null;
 }
 
 interface ChannelDraft {
@@ -173,6 +203,15 @@ const RUN_STATUS_KEY: Record<string, string> = {
   failed: "admin.failed",
 };
 
+const OFFER_STATUS_KEY: Record<string, string> = {
+  queued: "admin.queued",
+  building: "admin.running",
+  draft: "admin.offerDraft",
+  empty: "admin.offerEmpty",
+  failed: "admin.failed",
+  published: "admin.published",
+};
+
 /** Quiet row action — keeps destructive controls below the panel's primary submit. */
 const QUIET_BUTTON =
   "rounded border border-[var(--sn-border)] px-3 py-1.5 text-sm text-[var(--sn-text)] transition-colors hover:border-[var(--sn-primary)] disabled:opacity-60";
@@ -233,6 +272,11 @@ function runStatusLabel(status: string, locale: Locale): string {
   return key ? t(locale, key) : status;
 }
 
+function offerStatusLabel(status: string, locale: Locale): string {
+  const key = OFFER_STATUS_KEY[status];
+  return key ? t(locale, key) : status;
+}
+
 /** Visually hidden table caption — the table stays readable, the panel keeps its name. */
 function Caption({ children }: { children: ReactNode }) {
   return <caption className="sr-only">{children}</caption>;
@@ -288,6 +332,8 @@ export function AdminConsole({
   const [leads, setLeads] = useState<Lead[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [funnel, setFunnel] = useState<FunnelData | null>(null);
+  const [offers, setOffers] = useState<OfferIssue[]>([]);
+  const [openOffer, setOpenOffer] = useState<string | null>(null);
 
   const [auditAction, setAuditAction] = useState("");
   const [newKey, setNewKey] = useState("");
@@ -334,6 +380,8 @@ export function AdminConsole({
     setLeads([]);
     setPartners([]);
     setFunnel(null);
+    setOffers([]);
+    setOpenOffer(null);
     if (typeof document !== "undefined") {
       // `sn_admin` is httpOnly; only the readable CSRF cookie can be cleared here.
       document.cookie = "sn_csrf=; Max-Age=0; path=/";
@@ -413,6 +461,9 @@ export function AdminConsole({
           setIndustries(data.data ?? []);
           if (data.defaults) setDefaultFetchInterval(data.defaults.fetch_interval_minutes);
         }
+      } else if (activeTab === "offers") {
+        const data = await read<{ data: OfferIssue[] }>("/api/proxy/v1/admin/offers?limit=50");
+        if (data) setOffers(data.data ?? []);
       } else if (activeTab === "sources") {
         const data = await read<{ data: Source[] }>(
           `/api/proxy/v1/admin/sources?industry=${encodeURIComponent(activeIndustry)}`,
@@ -641,6 +692,15 @@ export function AdminConsole({
       },
     );
     if (ok) setChannelDraft(null);
+  }
+
+  async function buildOffer(issue: OfferIssue) {
+    await mutate(
+      `offer:build:${issue.industry}:${issue.offer_slug}`,
+      "/api/proxy/v1/admin/offers/build",
+      "POST",
+      { industry: issue.industry, offer: issue.offer_slug, force: true },
+    );
   }
 
   async function handleCreateSource(event: FormEvent<HTMLFormElement>) {
@@ -1222,6 +1282,136 @@ export function AdminConsole({
                 })
               )}
             </ul>
+          </section>
+        ) : null}
+
+        {tab === "offers" ? (
+          <section>
+            <p className="text-sm text-[var(--sn-muted)]">{t(locale, "admin.offersIntro")}</p>
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-sm">
+                <Caption>{t(locale, "admin.tabs.offers")}</Caption>
+                <thead>
+                  <tr className="border-b border-[var(--sn-border)]">
+                    <Th>{t(locale, "admin.industry")}</Th>
+                    <Th>{t(locale, "admin.offerIssue")}</Th>
+                    <Th>{t(locale, "admin.issueDate")}</Th>
+                    <Th>{t(locale, "admin.scope")}</Th>
+                    <Th numeric>{t(locale, "admin.offerRows")}</Th>
+                    <Th>{t(locale, "admin.status")}</Th>
+                    <Th>{t(locale, "admin.offerGenerated")}</Th>
+                    <Th>{t(locale, "admin.action")}</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {offers.length === 0 ? (
+                    <EmptyRow columns={8} locale={locale} />
+                  ) : (
+                    offers.map((issue) => {
+                      const open = openOffer === issue.id;
+                      const busyKey = `offer:build:${issue.industry}:${issue.offer_slug}`;
+                      return (
+                        <Fragment key={issue.id}>
+                          <tr className="border-b border-[var(--sn-border)] align-top">
+                            <td className="p-2">
+                              {issue.industry}
+                              <br />
+                              <span className="text-xs text-[var(--sn-muted)]">{issue.offer_slug}</span>
+                            </td>
+                            <td className="p-2">
+                              {issue.title}
+                              <br />
+                              <span className="text-xs text-[var(--sn-muted)]">
+                                {issue.reviewer ?? t(locale, "admin.notSigned")}
+                              </span>
+                            </td>
+                            <td className="whitespace-nowrap p-2">{issue.issue_date}</td>
+                            <td className="p-2">{issue.scope}</td>
+                            <td className="p-2 text-right tabular-nums">{issue.items.length}</td>
+                            <td className="p-2">{offerStatusLabel(issue.status, locale)}</td>
+                            <td className="whitespace-nowrap p-2">
+                              {new Date(issue.generated_at).toLocaleString()}
+                            </td>
+                            <td className="whitespace-nowrap p-2 text-right">
+                              <button
+                                type="button"
+                                aria-expanded={open}
+                                onClick={() => setOpenOffer(open ? null : issue.id)}
+                                className={QUIET_BUTTON}
+                              >
+                                {open ? t(locale, "admin.hide") : t(locale, "admin.view")}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void buildOffer(issue)}
+                                disabled={busy === busyKey}
+                                className={[QUIET_BUTTON, "ml-2"].join(" ")}
+                              >
+                                {busy === busyKey ? t(locale, "admin.saving") : t(locale, "admin.buildOffer")}
+                              </button>
+                            </td>
+                          </tr>
+                          {open ? (
+                            <tr className="border-b border-[var(--sn-border)] bg-[var(--sn-surface)]">
+                              <td colSpan={8} className="p-3">
+                                <p className="text-sm text-[var(--sn-text)]">{issue.standfirst}</p>
+                                {issue.error ? (
+                                  <p role="alert" className="mt-2 text-sm font-medium text-[var(--sn-accent)]">
+                                    {issue.error}
+                                  </p>
+                                ) : null}
+                                <div className="mt-3 overflow-x-auto">
+                                  <table className="w-full text-sm">
+                                    <Caption>{t(locale, "admin.offerIssue")}</Caption>
+                                    <thead>
+                                      <tr className="border-b border-[var(--sn-border)]">
+                                        <Th>{t(locale, "admin.createdAt")}</Th>
+                                        <Th>{t(locale, "admin.titleColumn")}</Th>
+                                        <Th>{t(locale, "admin.action")}</Th>
+                                        <Th>{t(locale, "admin.source")}</Th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {issue.items.length === 0 ? (
+                                        <EmptyRow columns={4} locale={locale} />
+                                      ) : (
+                                        issue.items.map((item) => (
+                                          <tr key={`${issue.id}:${item.source_url}:${item.date}`} className="border-b border-[var(--sn-border)] align-top">
+                                            <td className="whitespace-nowrap p-2">{item.date}</td>
+                                            <td className="max-w-md p-2">
+                                              <p className="font-medium">{item.headline}</p>
+                                              <p className="mt-1 text-xs text-[var(--sn-muted)]">{item.change}</p>
+                                            </td>
+                                            <td className="max-w-xs p-2 text-xs">{item.action}</td>
+                                            <td className="p-2 text-xs">
+                                              <a
+                                                href={item.source_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="underline"
+                                              >
+                                                {item.source_name}
+                                              </a>
+                                            </td>
+                                          </tr>
+                                        ))
+                                      )}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <p className="mt-3 text-xs text-[var(--sn-muted)]">
+                                  {t(locale, "admin.offerSourceVersion")}: {issue.source_version ?? "-"}
+                                </p>
+                              </td>
+                            </tr>
+                          ) : null}
+                        </Fragment>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </section>
         ) : null}
 

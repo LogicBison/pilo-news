@@ -15,3 +15,8 @@ Strategy artifacts live here. **Designed** by `@biz-strategy design`, written by
 | `one-pager.md` § `## Strategy bets` | Chosen bet, kill signal, review date | `@biz-strategy design` (then `greenfield`) |
 | `certification.md` | Gate certification record | `@biz-strategy certify` |
 | `linkedin-icp.md` | LinkedIn Ideal Customer Profile | `@biz-social icp` |
+| `20261106-ai-generated-products.md` | AI-generatable product catalog, jurisdiction options, and 7-day brief MVP | `@biz-director` (2026-11-06) |
+| `20261106-ai-offer-system.md` | Free-offer architecture, gaps, ranked recommendations, rollout | `@biz-session start` (2026-11-06) |
+| `offer-inventory.md` | Generated inventory of the free offer on every channel | `.work.biz/scripts/offers.sh --write` |
+| `offers/catalog.json` | Machine-readable offer plan the inventory reads | hand-edited with the offer change |
+| `offer-guides/` | Common pipeline + one generation guide per channel | `@biz-session start` (2026-11-06) |

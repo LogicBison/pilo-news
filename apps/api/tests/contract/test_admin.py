@@ -309,3 +309,73 @@ async def test_channel_cadence_and_offer_switches(client, admin_client) -> None:
     audit = await admin_client.get("/v1/admin/audit?action=industry.update")
     assert audit.status_code == 200
     assert any(item["entity_id"] == "legal" for item in audit.json()["data"])
+
+
+@pytest.mark.asyncio
+async def test_admin_offer_list_and_dry_run(admin_client, monkeypatch) -> None:
+    from news_api.offers.application import build as build_module
+    from news_api.offers.domain.models import AdapterResult, RawRecord
+
+    listed = await admin_client.get("/v1/admin/offers")
+    assert listed.status_code == 200
+    assert listed.json()["data"] == []
+
+    async def fake_fetch(*_args, **_kwargs) -> AdapterResult:
+        return AdapterResult(
+            records=[
+                RawRecord(
+                    title="US rule takes effect",
+                    date="2026-12-01",
+                    jurisdiction="US",
+                    action="Takes effect",
+                    source_name="Federal Register",
+                    source_url="https://www.federalregister.gov/documents/2026/11/01/a",
+                    summary="A filing change.",
+                )
+            ],
+            source_version="test-1",
+            source_count=1,
+        )
+
+    monkeypatch.setattr(build_module, "fetch_records", fake_fetch)
+    built = await admin_client.post(
+        "/v1/admin/offers/build",
+        json={
+            "industry": "legal",
+            "offer": "legal-regulatory-calendar",
+            "issue_date": "2026-11-03",
+            "dry_run": True,
+        },
+    )
+    assert built.status_code == 200, built.text
+    data = built.json()["data"]
+    assert data["status"] == "dry-run"
+    assert data["rows"] == 1
+    assert data["scope"] == "US"
+
+    from news_api.articles.application import queue
+
+    enqueued: list[dict] = []
+
+    async def fake_enqueue(**kwargs):
+        enqueued.append(kwargs)
+        return "1-0"
+
+    monkeypatch.setattr(queue, "enqueue_offer", fake_enqueue)
+    queued = await admin_client.post(
+        "/v1/admin/offers/build",
+        json={
+            "industry": "legal",
+            "offer": "legal-regulatory-calendar",
+            "issue_date": "2026-11-03",
+        },
+    )
+    assert queued.status_code == 202, queued.text
+    assert queued.json()["status"] == "queued"
+    assert enqueued[0]["offer"] == "legal-regulatory-calendar"
+
+
+@pytest.mark.asyncio
+async def test_admin_offer_invalid_id_is_not_found(admin_client) -> None:
+    response = await admin_client.get("/v1/admin/offers/not-a-uuid")
+    assert response.status_code == 404

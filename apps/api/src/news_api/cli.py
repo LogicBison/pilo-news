@@ -18,6 +18,7 @@ from news_api.channels.infrastructure.repo import list_channels
 from news_api.editorial.infrastructure.repo import create_api_key, list_api_keys
 from news_api.platform.cache import close_redis, lock_holder
 from news_api.platform.db import dispose
+from news_api.platform.errors import DomainError
 from news_api.platform.logging import configure_logging, get_logger
 from news_api.platform.security import generate_api_key, hash_password
 from news_api.platform.settings import get_settings
@@ -127,6 +128,71 @@ async def _verify_sources(args: argparse.Namespace) -> int:
     return 0 if report["summary"]["failed"] == 0 else 1
 
 
+async def _offer(args: argparse.Namespace) -> int:
+    from datetime import date
+
+    from news_api.offers.application.build import build_offer_issue
+    from news_api.offers.infrastructure.repo import (
+        get_issue_by_id,
+        issue_dto,
+        list_issues,
+    )
+
+    if args.offer_command == "build":
+        parsed = None
+        if args.date:
+            try:
+                parsed = date.fromisoformat(args.date)
+            except ValueError:
+                print("invalid --date; use YYYY-MM-DD", file=sys.stderr)
+                return 2
+        try:
+            result = await build_offer_issue(
+                args.industry,
+                offer_slug=args.offer,
+                issue_date=parsed,
+                dry_run=args.dry_run,
+            )
+        except DomainError as exc:
+            print(exc.detail, file=sys.stderr)
+            return 2
+        except Exception as exc:  # noqa: BLE001 - CLI reports the failure
+            print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(result, indent=2, default=str))
+        return 0
+
+    if args.offer_command == "list":
+        industry_id = None
+        if args.industry:
+            from news_api.channels.infrastructure.repo import get_channel
+
+            channel = await get_channel(args.industry, enabled_only=False)
+            if not channel:
+                print(f"unknown industry: {args.industry}", file=sys.stderr)
+                return 2
+            industry_id = channel.id
+        rows = await list_issues(industry_id=industry_id, limit=args.limit)
+        print(json.dumps([issue_dto(row) for row in rows], indent=2, default=str))
+        return 0
+
+    if args.offer_command == "show":
+        row = await get_issue_by_id(args.issue_id)
+        if not row:
+            print("offer issue not found", file=sys.stderr)
+            return 2
+        payload = issue_dto(row)
+        if args.markdown:
+            from news_api.offers.application.render import render_issue_markdown
+
+            print(render_issue_markdown(payload))
+            return 0
+        print(json.dumps(payload, indent=2, default=str))
+        return 0
+
+    return 2
+
+
 async def _run(args: argparse.Namespace) -> int:
     if args.command == "refresh":
         return await _refresh(args)
@@ -142,6 +208,8 @@ async def _run(args: argparse.Namespace) -> int:
         return await _apply_profile(args)
     if args.command == "verify-sources":
         return await _verify_sources(args)
+    if args.command == "offer":
+        return await _offer(args)
     return 2
 
 
@@ -193,6 +261,27 @@ def build_parser() -> argparse.ArgumentParser:
     )
     verify.add_argument("--industry", default="all")
     verify.set_defaults(func=_verify_sources)
+
+    offer = sub.add_parser("offer", help="build and inspect dated offer issues")
+    offer_sub = offer.add_subparsers(dest="offer_command", required=True)
+    build = offer_sub.add_parser("build", help="build a draft issue from public sources")
+    build.add_argument("--industry", required=True)
+    build.add_argument(
+        "--offer", default=None, help="offer slug (defaults to the channel definition)"
+    )
+    build.add_argument(
+        "--date", default=None, help="issue date YYYY-MM-DD (defaults to the latest due date)"
+    )
+    build.add_argument("--dry-run", action="store_true", help="print rows without writing")
+    build.set_defaults(func=_offer)
+    list_issues_parser = offer_sub.add_parser("list", help="list generated issues")
+    list_issues_parser.add_argument("--industry", default=None)
+    list_issues_parser.add_argument("--limit", type=int, default=20)
+    list_issues_parser.set_defaults(func=_offer)
+    show = offer_sub.add_parser("show", help="show one issue")
+    show.add_argument("issue_id")
+    show.add_argument("--markdown", action="store_true", help="render the issue as markdown")
+    show.set_defaults(func=_offer)
     return parser
 
 

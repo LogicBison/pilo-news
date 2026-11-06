@@ -1,8 +1,31 @@
 # Touch Scope — declare your change boundary before a work session
 #
-# Session: 2026-11-06 — @biz-products scope - cybersecurity KEV digest
+# Session: 2026-11-06 — @biz-session start - AI-generatable free offers, per-channel generation guides, offer inventory
 
-.work.biz/plans/plan_kev-digest.md
-.work.biz/touch-scope
-.work.biz/strategy/20261105-offer-and-leadgen-brief.md
 .work.biz/context/HANDOFF.md
+.work.biz/plans/NEXT.md
+.work.biz/plans/UNKNOWNS.md
+.work.biz/decisions/DECISIONS.md
+.work.biz/strategy/README.md
+.work.biz/strategy/20261106-ai-generated-products.md
+.work.biz/strategy/20261106-ai-offer-system.md
+.work.biz/strategy/offer-inventory.md
+.work.biz/strategy/offers/catalog.json
+.work.biz/strategy/offer-guides/README.md
+.work.biz/strategy/offer-guides/legal.md
+.work.biz/strategy/offer-guides/financial.md
+.work.biz/strategy/offer-guides/behavioral-health.md
+.work.biz/strategy/offer-guides/education.md
+.work.biz/strategy/offer-guides/logistics.md
+.work.biz/strategy/offer-guides/cybersecurity.md
+.work.biz/strategy/offer-guides/stem-cell.md
+.work.biz/strategy/offer-guides/manufacturing.md
+.work.biz/strategy/offer-guides/energy.md
+.work.biz/strategy/offer-guides/retail.md
+.work.biz/strategy/offer-guides/digital-technology.md
+.work.biz/scripts/offer-inventory.mjs
+.work.biz/scripts/offers.sh
+.work.biz/touch-scope
+.work.biz/scripts/
+.work.biz/strategy/offers/
+.work.biz/strategy/offer-guides/

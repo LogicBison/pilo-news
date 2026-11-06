@@ -1,0 +1,56 @@
+{
+  "legal": {
+    "offer_slug": "legal-regulatory-calendar",
+    "name": "US Regulatory Calendar",
+    "adapter": "federal_register",
+    "scope": "US",
+    "cadence": {
+      "kind": "monthly",
+      "weekday": 1,
+      "nth": 1
+    },
+    "lookback_days": 120,
+    "max_rows": 12,
+    "enabled": true,
+    "banned_claims": [
+      "legal advice",
+      "applies to you",
+      "guaranteed outcome",
+      "we win"
+    ],
+    "agency_slugs": [
+      "securities-and-exchange-commission",
+      "federal-trade-commission",
+      "consumer-financial-protection-bureau",
+      "equal-employment-opportunity-commission",
+      "national-labor-relations-board",
+      "labor-management-standards-office",
+      "employment-standards-administration",
+      "employment-and-training-administration",
+      "u-s-citizenship-and-immigration-services",
+      "executive-office-for-immigration-review",
+      "government-ethics-office",
+      "patent-and-trademark-office",
+      "federal-labor-relations-authority"
+    ]
+  },
+  "cybersecurity": {
+    "offer_slug": "cybersecurity-kev-digest",
+    "name": "CISA KEV Digest",
+    "adapter": "cisa_kev",
+    "scope": "global",
+    "cadence": {
+      "kind": "weekly",
+      "weekday": 2
+    },
+    "lookback_days": 28,
+    "max_rows": 12,
+    "enabled": true,
+    "banned_claims": [
+      "you are secure",
+      "patch is sufficient",
+      "no risk",
+      "guaranteed protection"
+    ]
+  }
+}

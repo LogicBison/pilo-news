@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "updated": "2026-11-06",
+  "channels": {
+    "legal": {
+      "offer_slug": "legal-regulatory-calendar",
+      "offer_name": "US Regulatory Calendar",
+      "offer_type": "asset",
+      "status": "waitlist",
+      "tier": 0,
+      "cadence": "monthly, first Tuesday",
+      "scope": "US",
+      "deliverable": "dated table of US federal rule effective dates, comment windows, filing deadlines, and the one action each date triggers",
+      "sources": [
+        "Federal Register API",
+        "agency press releases",
+        "legal channel feeds"
+      ],
+      "ai_scope": "extract US federal dates and entities from primary notices; draft one-line plain-language rows; never interpret whether a rule applies",
+      "guide": "offer-guides/legal.md",
+      "reviewer": "legal reviewer required",
+      "never_say": [
+        "legal advice",
+        "we win",
+        "guaranteed outcome",
+        "applies to you"
+      ]
+    },
+    "financial": {
+      "offer_slug": "financial-rule-change-tracker",
+      "offer_name": "US Rule-Change Tracker",
+      "offer_type": "asset",
+      "status": "planned",
+      "tier": 1,
+      "cadence": "monthly, second Wednesday",
+      "scope": "US",
+      "deliverable": "dated table of US proposed and final rules, compliance dates, and the operational change each one forces",
+      "sources": [
+        "SEC press releases and rulemaking",
+        "Federal Reserve",
+        "financial channel feeds"
+      ],
+      "ai_scope": "extract US rule status, dates, and affected entities; summarize the operational change; never rate an investment or predict markets",
+      "guide": "offer-guides/financial.md",
+      "reviewer": "financial compliance reviewer required",
+      "never_say": [
+        "investment advice",
+        "returns",
+        "risk-free",
+        "buy",
+        "sell"
+      ]
+    },
+    "behavioral-health": {
+      "offer_slug": "behavioral-health-practice-payer-brief",
+      "offer_name": "Practice & Payer Brief",
+      "offer_type": "brief",
+      "status": "brief live",
+      "tier": 3,
+      "cadence": "weekly, Thursday",
+      "scope": "US",
+      "deliverable": "five-item weekly brief on payer policy, telehealth rules, and safety alerts that change practice operations",
+      "sources": [
+        "FDA MedWatch",
+        "EMA",
+        "CMS",
+        "state licensing boards",
+        "behavioral-health channel feeds"
+      ],
+      "ai_scope": "summarize regulator and payer notices; label operational impact; never give clinical guidance or triage",
+      "guide": "offer-guides/behavioral-health.md",
+      "reviewer": "clinical operations reviewer required",
+      "never_say": [
+        "medical advice",
+        "diagnosis",
+        "treatment recommendation",
+        "safe for patients"
+      ]
+    },
+    "education": {
+      "offer_slug": "education-enrollment-deadline-brief",
+      "offer_name": "Enrollment Deadline Brief",
+      "offer_type": "brief",
+      "status": "brief live",
+      "tier": 3,
+      "cadence": "weekly during term, monthly otherwise",
+      "scope": "US",
+      "deliverable": "five-item brief on enrollment dates, accreditation actions, and aid deadlines with a dated action list",
+      "sources": [
+        "state higher-ed boards",
+        "NCES",
+        "accreditor notices",
+        "education channel feeds"
+      ],
+      "ai_scope": "extract dates and institution names; summarize the decision the date forces; never guarantee admission, aid, or outcomes",
+      "guide": "offer-guides/education.md",
+      "reviewer": "education policy reviewer required",
+      "never_say": [
+        "guaranteed admission",
+        "guaranteed aid",
+        "accredited by",
+        "best program"
+      ]
+    },
+    "logistics": {
+      "offer_slug": "logistics-port-customs-digest",
+      "offer_name": "US Port & Customs Notice Digest",
+      "offer_type": "asset",
+      "status": "planned",
+      "tier": 2,
+      "cadence": "weekly, Monday",
+      "scope": "US",
+      "deliverable": "dated table of US port disruptions, customs notices, and border changes with the lane each one touches",
+      "sources": [
+        "US CBP CSMS",
+        "US port authority notices",
+        "logistics channel feeds"
+      ],
+      "ai_scope": "extract US notice dates, ports, and effective windows; summarize the operational change; never quote a rate or transit-time guarantee",
+      "guide": "offer-guides/logistics.md",
+      "reviewer": "customs or freight operations reviewer required",
+      "never_say": [
+        "rate guarantee",
+        "transit-time guarantee",
+        "cheapest",
+        "guaranteed capacity"
+      ]
+    },
+    "cybersecurity": {
+      "offer_slug": "cybersecurity-kev-digest",
+      "offer_name": "CISA KEV Digest",
+      "offer_type": "asset",
+      "status": "waitlist",
+      "tier": 0,
+      "cadence": "weekly, Wednesday",
+      "scope": "global",
+      "deliverable": "5-12 new known-exploited vulnerabilities, filtered to the reader's vendor stack, one action per row",
+      "sources": [
+        "CISA KEV JSON",
+        "NVD 2.0",
+        "cybersecurity channel feeds"
+      ],
+      "ai_scope": "filter, dedupe, and paraphrase the required action; never claim a system is safe or a patch is sufficient",
+      "guide": "offer-guides/cybersecurity.md",
+      "reviewer": "security reviewer required",
+      "never_say": [
+        "you are secure",
+        "patch is sufficient",
+        "no risk",
+        "guaranteed protection"
+      ]
+    },
+    "stem-cell": {
+      "offer_slug": "stem-cell-trial-regulatory-digest",
+      "offer_name": "US Trial & Regulatory Digest",
+      "offer_type": "asset",
+      "status": "planned",
+      "tier": 2,
+      "cadence": "monthly, third Tuesday",
+      "scope": "US",
+      "deliverable": "dated table of US trial status changes, FDA notices, and manufacturing updates with a plain-language change line",
+      "sources": [
+        "ClinicalTrials.gov",
+        "FDA",
+        "stem-cell channel feeds"
+      ],
+      "ai_scope": "extract US registry status, phase, sponsor, and dates; summarize what changed; never call a therapy safe, effective, or approved",
+      "guide": "offer-guides/stem-cell.md",
+      "reviewer": "clinical or regulatory reviewer required",
+      "never_say": [
+        "safe",
+        "effective",
+        "cure",
+        "approved treatment",
+        "clinical advice"
+      ]
+    },
+    "manufacturing": {
+      "offer_slug": "manufacturing-recall-tracker",
+      "offer_name": "US Recall & Regulator Notice Tracker",
+      "offer_type": "asset",
+      "status": "planned",
+      "tier": 1,
+      "cadence": "monthly, second Thursday",
+      "scope": "US",
+      "deliverable": "dated table of US recalls, safety notices, and regulator actions with product, hazard, and action",
+      "sources": [
+        "CPSC",
+        "FDA",
+        "manufacturing channel feeds"
+      ],
+      "ai_scope": "extract US product, hazard, and remedy; link the notice; never certify compliance or reinterpret a standard",
+      "guide": "offer-guides/manufacturing.md",
+      "reviewer": "quality or EHS reviewer required",
+      "never_say": [
+        "compliant",
+        "certified",
+        "safe",
+        "meets ISO"
+      ]
+    },
+    "energy": {
+      "offer_slug": "energy-grid-queue-digest",
+      "offer_name": "US Grid Queue & Docket Digest",
+      "offer_type": "asset",
+      "status": "planned",
+      "tier": 2,
+      "cadence": "monthly, first Thursday",
+      "scope": "US",
+      "deliverable": "dated table of US interconnection queue changes, docket milestones, and rate-case dates with the project each one touches",
+      "sources": [
+        "ISO/RTO queue pages",
+        "LBNL queue data",
+        "state PUC dockets",
+        "energy channel feeds"
+      ],
+      "ai_scope": "extract US queue status, dates, and jurisdictions; summarize the milestone; never forecast prices or interconnection outcomes",
+      "guide": "offer-guides/energy.md",
+      "reviewer": "energy regulatory reviewer required",
+      "never_say": [
+        "price guarantee",
+        "will be approved",
+        "guaranteed interconnection",
+        "cheapest power"
+      ]
+    },
+    "retail": {
+      "offer_slug": "retail-consumer-policy-calendar",
+      "offer_name": "US Consumer Policy & Recall Calendar",
+      "offer_type": "asset",
+      "status": "planned",
+      "tier": 2,
+      "cadence": "monthly, fourth Tuesday",
+      "scope": "US",
+      "deliverable": "dated table of US consumer-protection effective dates, recalls, and comment windows with the commercial action",
+      "sources": [
+        "FTC",
+        "CPSC",
+        "retail channel feeds"
+      ],
+      "ai_scope": "extract US dates, products, and obligations; summarize the commercial change; never forecast demand or promise sales lift",
+      "guide": "offer-guides/retail.md",
+      "reviewer": "retail compliance reviewer required",
+      "never_say": [
+        "sales lift",
+        "demand forecast",
+        "guaranteed conversion",
+        "best seller"
+      ]
+    },
+    "digital-technology": {
+      "offer_slug": "digital-technology-ai-policy-brief",
+      "offer_name": "AI Infrastructure & Policy Brief",
+      "offer_type": "brief",
+      "status": "brief live",
+      "tier": 3,
+      "cadence": "weekly, Tuesday",
+      "scope": "US + EU",
+      "deliverable": "five-item weekly brief on model releases, platform policy changes, chip export rules, and datacenter constraints",
+      "sources": [
+        "official model and platform changelogs",
+        "EU AI Act",
+        "BIS export controls",
+        "digital-technology channel feeds"
+      ],
+      "ai_scope": "summarize official releases and policy text; link the primary source; never benchmark a model or predict procurement outcomes",
+      "guide": "offer-guides/digital-technology.md",
+      "reviewer": "technology policy reviewer required",
+      "never_say": [
+        "best model",
+        "benchmark winner",
+        "guaranteed savings",
+        "future-proof"
+      ]
+    }
+  }
+}

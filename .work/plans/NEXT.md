@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-06 (channel automation + free-offer controls implemented; 87 Playwright green)
+**Updated:** 2026-11-06 (offer generation + admin Offers tab; 137 API tests)
 
 ---
 
@@ -94,6 +94,60 @@
 | **3** | UI S4 SPECs + P1 primitives | `search`, `privacy`, `terms`; `Skeleton`, `Toc` |
 | **4** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
 | **5** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
+
+---
+
+## Completed iteration - M13: offer issue generation (2026-11-06)
+
+**Milestone ref:** `.work/features/offer-generation/20261106-SPEC.md`
+**Status:** complete 2026-11-06 - 7/7 tasks
+**Started:** 2026-11-06
+
+### In scope
+- US-first jurisdiction policy; scope is explicit on every issue
+- `offer_issues` storage (migration 014)
+- generic builder: fetch, normalize, AI draft with fallback, validate, persist draft
+- Federal Register (legal, US) and CISA KEV (cybersecurity, global) adapters
+- automatic draft generation from the worker scheduler
+- CLI + admin read/build API; no publish, no email
+
+### Out of scope (explicit)
+- email delivery, double opt-in, unsubscribe
+- reviewer sign-off and public issue page
+- EU/Asia adapters
+- the other six reference offers
+
+### Tasks
+| ID | Description | Files | Status | Notes |
+|----|-------------|-------|--------|-------|
+| M13-T1 | Jurisdiction policy + storage | `migrations/014_offer_issues.sql`, `offers/domain/*`, SPEC §2 | done | US for Federal Register, global for KEV |
+| M13-T2 | Source adapters | `offers/infrastructure/{federal_register,kev,fetch,adapters}.py` | done | fixtures cover parsing; live dry-runs pass |
+| M13-T3 | AI draft + fallback | `offers/application/draft.py`, `AiClient.complete_json` | done | 8k token cap; fallback on invalid JSON |
+| M13-T4 | Builder + repo | `offers/application/build.py`, `offers/infrastructure/repo.py` | done | idempotent per date; empty/failed states |
+| M13-T5 | Automatic scheduler + worker | `offers/application/scheduler.py`, `worker.py`, `queue.py` | done | queued via the existing stream; never publishes |
+| M13-T6 | CLI + admin API + tests/docs | `cli.py`, `offers/http/routes.py`, `bin/offers.sh`, docs, tests | done | `offer build/list/show`; 137 API tests |
+| M13-T7 | Admin Offers tab | `AdminConsole.tsx`, messages, e2e | done | list, expand rows, build now; no publish/email |
+
+### Acceptance criteria
+- [x] a legal issue can be generated from Federal Register and stored as a draft
+- [x] a cybersecurity issue can be generated from CISA KEV and stored as a draft
+- [x] the worker queues due offers automatically; no duplicate issue per date
+- [x] every issue carries an explicit scope; no `US + EU` claim in v1
+- [x] no publish or email path exists
+- [x] migration idempotent; full checks green
+
+### Verification
+- `./bin/start.sh --env dev test` -> api 137 passed, ruff/format/mypy clean; web checks green
+- live dry-runs: legal 12 rows, cyber 12 rows, both `drafted_by=ai`
+- live drafts: legal `2026-11-03`, cyber `2026-11-04`
+- admin API: list, detail, dry-run 200, queued 202
+- worker restart clean with the offer scheduler
+
+### Residual risks
+- reviewer sign-off, publish, and email are not built
+- EU/Asia are not built; the next jurisdiction is a new adapter and scope
+- live link checking of every row is a publish-gate task, not a build-gate task
+- AI can return invalid JSON; the builder falls back to source rows rather than failing the issue
 
 ---
 

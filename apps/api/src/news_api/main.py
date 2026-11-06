@@ -18,6 +18,7 @@ from news_api.editorial.http.refresh import router as refresh_router
 from news_api.editorial.http.sources import router as admin_sources_router
 from news_api.editorial.http.topics import router as admin_topics_router
 from news_api.middleware import RequestContextMiddleware
+from news_api.offers.http.routes import router as admin_offers_router
 from news_api.platform.cache import close_redis, ping
 from news_api.platform.db import dispose, fetch_one
 from news_api.platform.errors import register_exception_handlers
@@ -149,3 +150,4 @@ app.include_router(audit_router)
 app.include_router(admin_industries_router)
 app.include_router(admin_leads_router)
 app.include_router(funnel_router)
+app.include_router(admin_offers_router)

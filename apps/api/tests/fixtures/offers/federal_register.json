@@ -1,0 +1,38 @@
+{
+  "count": 3,
+  "results": [
+    {
+      "title": "Rule A",
+      "publication_date": "2026-11-01",
+      "effective_on": "2026-12-01",
+      "comments_close_on": null,
+      "html_url": "https://www.federalregister.gov/documents/2026/11/01/a",
+      "citation": "91 FR 1",
+      "agencies": [{ "name": "Agency A" }],
+      "type": "Rule",
+      "abstract": "Rule A changes a filing."
+    },
+    {
+      "title": "Rule B",
+      "publication_date": "2026-11-02",
+      "effective_on": null,
+      "comments_close_on": "2026-11-20",
+      "html_url": "https://www.federalregister.gov/documents/2026/11/02/b",
+      "citation": "91 FR 2",
+      "agencies": [{ "name": "Agency B" }],
+      "type": "Proposed Rule",
+      "abstract": "Rule B opens a comment window."
+    },
+    {
+      "title": "Old Rule",
+      "publication_date": "2020-01-01",
+      "effective_on": "2020-02-01",
+      "comments_close_on": null,
+      "html_url": "https://www.federalregister.gov/documents/2020/01/01/old",
+      "citation": "85 FR 1",
+      "agencies": [{ "name": "Agency C" }],
+      "type": "Rule",
+      "abstract": "Old."
+    }
+  ]
+}
