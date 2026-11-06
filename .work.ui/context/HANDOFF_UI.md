@@ -2,15 +2,15 @@
 
 > **Path:** `<repo-root>/.work.ui/context/HANDOFF_UI.md` · Maintained by **`ui-*` skills**. Session bookends: **`@session-control`** when `.ai/` is present (full repo); `.work.ui`-scoped session verbs (start / status / context / add / commit / close / push) via **`@ui-session`**.
 
-**Status:** UI v2 implemented and verified; direction **Approved**; **10/10 SPEC Approved**; **visual verify: pass with gaps**; **a11y milestone: pass**; **a11y F1/F2 fixed**; **S0 primitives shipped**; **10/10 photo bands** · 45/45 sources verified · **Needs:** content coverage, then `@ui-component-build plan - S1`.
+**Status:** UI v2 implemented and verified; direction **Approved**; **11 channel SPECs Approved**; **visual verify: pass with gaps**; **a11y milestone: pass**; **S0 primitives shipped**; **S1 screens shipped** (contact, about, admin-console; 78 Playwright green) · **Needs:** P1 primitives, S4 SPECs.
 
 ## Session status
 
-**Open:** 2026-11-05 - goal: x-director UI improvement via lead-generation reference intake; editorial conversion v2 built and verified
+**Closed:** 2026-11-06 - S1 screens shipped: contact, about and admin-console implemented from approved SPECs; production build + 80 Playwright tests green; axe 0 critical/serious on 21 URLs.
 
-**Updated:** 2026-11-05
+**Updated:** 2026-11-06
 
-**UI layer state:** Foundation certified. Ten skins live (seven photo bands + three original illustration bands); the conversion spine is open/editorial (full-bleed proof, photo, conversion bands; balanced 2-column coverage; filled fields). Ten channel-home SPECs are `Approved` (2026-11-05). Catalog primitives still pending (`@ui-design-system init`).
+**UI layer state:** Foundation certified. Eleven skins live (photo bands on every channel); the conversion spine is open/editorial (full-bleed proof, photo, conversion bands; balanced 2-column coverage; filled fields). Eleven channel-home SPECs are `Approved`; the three S1 screens are `Implemented` (2026-11-06). S0 primitives shipped; P1 (`Skeleton`, `Toc`) remain planned.
 
 **Recommended pick-up:** `.work.ui/plans/NEXT_UI.md`
 
@@ -30,11 +30,12 @@
 | visual-verify | **pass with gaps** - 10 channels, 0 visual regressions; gaps: CATALOG, Storybook, vision tier | 2026-11-05 |
 | accessibility-audit | **pass** - 30 URLs, 0 critical/serious; F1/F2 fixed 2026-11-05, re-scan 0 violations | 2026-11-05 |
 | catalog | **S0 shipped** - 10 primitives built under `components/ui/`, 21 catalog rows, forms refactored onto them | 2026-11-05 |
+| s1-screens | **implemented** - contact, about, admin-console built from approved SPECs; 78 Playwright pass | 2026-11-06 |
 | imagery | **pass** - 10/10 photographic bands; retail/energy/manufacturing replaced SVG line-art; credits recorded | 2026-11-05 |
 
 ## Active UI milestone
 
-- **Milestone:** S0 - catalog primitives (starts after certify; see `20261105-04-screen-map.md`)
+- **Milestone:** S1 - contact, about, admin-console: **complete 2026-11-06**. Next: P1 primitives (`Skeleton`, `Toc`) or S4 SPECs (`search`, `privacy`, `terms`).
 - **NEXT_UI:** [.work.ui/plans/NEXT_UI.md](../plans/NEXT_UI.md)
 
 ---

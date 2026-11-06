@@ -40,6 +40,12 @@ export default async function IndustryLayout({
       } as CSSProperties}
       className="min-h-screen bg-[var(--sn-bg)] text-[var(--sn-text)]"
     >
+      <link
+        rel="alternate"
+        type="application/rss+xml"
+        title={`${channel.name} — System News`}
+        href={`${localePath(locale, `/${industry}`)}/feed.xml`}
+      />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-[var(--sn-primary)] focus:px-4 focus:py-2 focus:text-white"

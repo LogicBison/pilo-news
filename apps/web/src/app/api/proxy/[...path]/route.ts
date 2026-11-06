@@ -31,8 +31,12 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
       cache: "no-store",
       redirect: "manual",
     });
-    const response = new NextResponse(await upstream.arrayBuffer(), {
-      status: upstream.status,
+    // 204/205/304 must not carry a body: Response throws on a non-null body
+    // for these statuses, which used to surface as a false 503 from this proxy.
+    const status = upstream.status;
+    const noBody = status === 204 || status === 205 || status === 304;
+    const response = new NextResponse(noBody ? null : await upstream.arrayBuffer(), {
+      status,
       headers: {
         "content-type": upstream.headers.get("content-type") ?? "application/json",
         "cache-control": "no-store",

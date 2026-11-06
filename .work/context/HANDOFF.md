@@ -2,9 +2,11 @@
 
 ## Session status
 
-**Closed:** 2026-11-06 - eleven channels. M9 shipped config-driven asset cards and one secondary rung; M10 added the digital-technology demand test (three topics, `placement="topic"`, migration 012); M11 built the eleventh channel (`digital-technology`): its own `datacenter` skin with a CC BY-SA photo, six grade-A feeds, 26 EN + 1 ES items, and the channel inventory regenerated. 113 api tests; web checks; 64 Playwright passed / 1 skipped; 11/11 contrast.
+**Closed:** 2026-11-06 - S1 screens shipped: contact, about and admin-console implemented from approved SPECs. 80 Playwright tests pass on a production build (admin sign-in included); axe 0 critical/serious on 21 URLs; 329 catalog keys; 11/11 contrast. Every channel now publishes an RSS 2.0 feed in both locales. Along the way: the funnel proxy no longer returns a false 503 on 204, and the about page stopped claiming a seven-day window while every channel runs 30 days.
 
 **Updated:** 2026-11-06
+
+**Prior session (closed 2026-11-06):** eleven channels. M9 shipped config-driven asset cards and one secondary rung; M10 added the digital-technology demand test (three topics, `placement="topic"`, migration 012); M11 built the eleventh channel (`digital-technology`): its own `datacenter` skin with a CC BY-SA photo, six grade-A feeds, 26 EN + 1 ES items, and the channel inventory regenerated. 113 api tests; web checks; 64 Playwright passed / 1 skipped; 11/11 contrast.
 
 **Prior session (closed 2026-11-05):** lead-generation offer rungs built after the UI close: ask-one-question and gated-asset leads (migration 010), funnel read-out + admin tab, UTM capture, briefs archive, topic hubs, disposable-domain rejection; plus the biz offer brief and the product-feasibility verification. 108 API tests; 57 e2e / 1 skipped on a production build; axe 0 violations on 11 URLs; build + lint + typecheck + check green.
 
@@ -139,7 +141,16 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | M11 2026-11-06 | `apply-profile` digital-technology: 14 created; second run 0 created / 0 updated; `/v1/industries` returns 11 channels |
 | M11 2026-11-06 | full Playwright on a production build: **64 passed, 1 skipped** (11-channel layout loop + new channel test) |
 | M11 2026-11-06 | `pnpm check`: 11 channels pass contrast; `bin/channels.sh --check`: 11 channels, ok |
+| S1 2026-11-06 | contact + about + admin-console shipped; e2e 78 pass; admin sign-in verified end to end |
 | Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
+| S1 screens 2026-11-06 | `pnpm build` + `pnpm test` on the production bundle: **78 passed, 0 failed** (admin spec ran with credentials) |
+| S1 a11y 2026-11-06 | axe scan of 15 URLs incl. contact EN/ES, about EN/ES, `/en/admin`: 0 critical/serious |
+| S1 catalog 2026-11-06 | `pnpm check`: 328 keys in EN and ES; 11/11 channels pass contrast |
+| Funnel proxy 2026-11-06 | `POST /api/proxy/v1/cta-events` returned 503 for every 204 while the write succeeded; now returns 204 |
+| Field primitives 2026-11-06 | `TextField`/`TextArea` put hint/error outside the label so the accessible name stays the label |
+| Coverage measured 2026-11-06 | bundle items EN/ES: legal 37/37, financial 38/36, education 38/27, manufacturing 36/38, retail 35/24, digital-technology 37/16 |
+| RSS 2026-11-06 | `/{industry}/feed.xml` and `/es/...`: 200 with `application/rss+xml`, 30 items, unknown channel 404; discovery link in head + footer link |
+| A11y sweep 2026-11-06 | production build, 21 URLs incl. search/privacy/terms EN+ES and `/en/admin`: 0 critical or serious violations |
 
 ---
 
@@ -265,7 +276,7 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
 - Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
 - The UI has ten channels/skins, a verified editorial-conversion v2 build, an **Approved** direction with all ten SPECs **approved**, a passed a11y milestone audit, shipped S0 primitives, and photographic bands on all ten channels. Storybook, the P1 primitives (`Skeleton`, `Toc`) and the vision tier remain open.
-- New channel coverage is uneven: manufacturing EN 10 vs ES 41, energy EN 16 vs ES 39, retail EN 10 vs ES 1. All ten channels now use licensed photos (retail, energy, manufacturing replaced their SVG bands 2026-11-05). Profiles are applied to dev, not prd; legal/terms review (U11) still applies.
+- Channel coverage is uneven at the edges, not empty: the thinnest locale is digital-technology ES (16 items), then retail ES (24). All eleven channels use licensed photos; profiles are applied to dev, not prd; legal/terms review (U11) still applies.
 - The cybersecurity channel uses a dark scheme; fill/border contrast of the new conversion fields was checked visually, but the matrix is not yet in `check-themes.mjs`.
 - Photo licences are recorded per file (`apps/web/public/photos/credits.json`); four channels are CC BY/BY-SA and depend on the in-caption credit staying rendered (financial, cybersecurity, stem-cell, plus retail, energy, manufacturing).
 - AI summaries are fail-open; some items are intentionally left without a
@@ -284,4 +295,4 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Read the digital-technology window at 2026-11-27 and the asset test at 2026-11-20 against their pre-registered rules; name the digest reviewer (D-005); strengthen ES coverage on the new channel; then `@ui-component-build plan - S1`.
+Read the digital-technology window at 2026-11-27 and the asset test at 2026-11-20 against their pre-registered rules; name the digest reviewer (D-005); then `@ui-design-system plan` for the P1 primitives (`Skeleton`, `Toc`), or `@ui-screen-spec create - search` to open S4.

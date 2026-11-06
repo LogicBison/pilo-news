@@ -2,7 +2,7 @@
 
 > **Path:** `<repo-root>/.work.ui/plans/NEXT_UI.md` · **`@ui-component-build`** owns `## Current UI iteration`.
 
-**Status:** UI v2 implemented and verified · direction **Approved** · **10/10 SPEC Approved** · **visual verify pass with gaps** · **a11y milestone pass** · **a11y F1/F2 fixed** · **S0 primitives shipped** · **10/10 photo bands** · **Needs:** content coverage + S1 screens
+**Status:** UI v2 implemented and verified · direction **Approved** · **11 channel SPECs Approved** · **visual verify pass with gaps** · **a11y milestone pass** · **S0 primitives shipped** · **S1 screens shipped** (contact, about, admin-console; 78 Playwright tests green on a production build) · **Needs:** P1 primitives, S4 SPECs
 
 ---
 
@@ -45,9 +45,9 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Content coverage for the new channels | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
-| **1** | `@ui-component-build plan - S1` | contact, about, admin composed on the shipped primitives |
-| **2** | P1 primitives | `Skeleton` (article/search blank states) and `Toc` |
+| **0** | P1 primitives | `Skeleton` (article/search blank states) and `Toc`; both are `planned` in the catalog and block nothing today |
+| **1** | S4 screen SPECs | `search`, `privacy`, `terms`; `search` needs the pagination question answered first (screen-map open question 1) |
+| **2** | S2 per-channel review pass | no new components; theme and copy check on the three S1 screens across all 11 channels |
 
 ---
 
@@ -61,9 +61,7 @@
 
 ## Current UI iteration
 
-**S0 — catalog primitives: complete.** Ten primitives built (`button`, `card`, `chip`, `section-header`, `text-field`, `text-area`, `select-field`, `consent-field`, `field-error`, `trust-line`); `LeadForm`, `ContactForm`, `BriefSignup`, `TrustBlock`, `TopicRail`, `Notices` consume them, retiring the duplicated field markup and the off-token notice palette. Channel imagery is photographic on all ten channels. Next: content coverage, then S1 screens.
-
----
+**S1 — contact, about, admin-console: complete (2026-11-06).** Three SPECs authored, reviewed, approved, implemented, and verified. The milestone closed with a production build and 78 Playwright tests passing, including the new layout, contact, about and admin cases.
 
 ## Done this UI iteration
 
@@ -88,9 +86,13 @@
 | U-17 | S0 primitives shipped (10 files under `components/ui/`); forms/trust/topic surfaces refactored onto them; field errors wired via `aria-invalid` + `aria-describedby` | 2026-11-05 |
 | U-18 | Imagery audit: all ten bands verified; retail, energy, manufacturing moved from SVG line-art to licensed photographs (credits recorded) | 2026-11-05 |
 | U-19 | Admin console inputs gained `aria-label`s (a11y F5) | 2026-11-05 |
+| S1-1 | `contact` screen: config-driven desk address, client validation, per-field errors, failure/429 states with the desk email, success panel with send-another, open rail | 2026-11-06 |
+| S1-2 | `about` screen: 65ch measure, "rolling window" copy fix (the seven-day claim contradicted 30-day retention), brief suppressed wherever `cta.asset` is set | 2026-11-06 |
+| S1-3 | `admin-console`: empty sign-in, session-check state, 401 return, APG tabs, no browser dialogs, two-step confirms, inline hide/pin, audit action filter, `SN_DEFAULT_INDUSTRY` workspace, labelled forms, scoped tables | 2026-11-06 |
+| S1-4 | Verification: production build, 78 Playwright tests pass (0 skipped with credentials), axe 0 critical/serious | 2026-11-06 |
 
 ---
 
 ## Next action
 
-Close the new channels' content gaps (manufacturing EN 10, retail ES 1); then `@ui-component-build plan - S1` for the contact, about, and admin screens.
+`@ui-design-system plan` for the P1 primitives (`Skeleton`, `Toc`), or `@ui-screen-spec create - search` to open S4. Content coverage is now a refresh question, not a gap: every channel serves content in both locales (lowest: digital-technology ES 16).

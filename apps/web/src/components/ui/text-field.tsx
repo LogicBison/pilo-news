@@ -38,37 +38,41 @@ export function TextField({
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
 
   return (
-    <label className={[WEIGHT[labelWeight], "flex flex-col gap-1 text-sm", wrapperClassName].filter(Boolean).join(" ")}>
-      <span>
-        {label}
-        {required ? (
-          <span className="sn-req" aria-hidden="true">
-            {" "}*
-          </span>
-        ) : null}
-        {optionalLabel ? (
-          <span className="font-normal text-[var(--sn-muted)]"> ({optionalLabel})</span>
-        ) : null}
-      </span>
-      <input
-        id={fieldId}
-        name={name}
-        required={required}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
-        className={["sn-input", className].filter(Boolean).join(" ")}
-        {...rest}
-      />
+    <div className={wrapperClassName}>
+      <label
+        className={[WEIGHT[labelWeight], "flex flex-col gap-1 text-sm"].filter(Boolean).join(" ")}
+      >
+        <span>
+          {label}
+          {required ? (
+            <span className="sn-req" aria-hidden="true">
+              {" "}*
+            </span>
+          ) : null}
+          {optionalLabel ? (
+            <span className="font-normal text-[var(--sn-muted)]"> ({optionalLabel})</span>
+          ) : null}
+        </span>
+        <input
+          id={fieldId}
+          name={name}
+          required={required}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
+          className={["sn-input", className].filter(Boolean).join(" ")}
+          {...rest}
+        />
+      </label>
       {hint ? (
-        <span id={hintId} className="text-xs font-normal text-[var(--sn-muted)]">
+        <span id={hintId} className="mt-1 block text-xs font-normal text-[var(--sn-muted)]">
           {hint}
         </span>
       ) : null}
       {error ? (
-        <span id={errorId} className="text-xs font-normal text-[var(--sn-danger)]">
+        <span id={errorId} className="mt-1 block text-xs font-normal text-[var(--sn-danger)]">
           {error}
         </span>
       ) : null}
-    </label>
+    </div>
   );
 }

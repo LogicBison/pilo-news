@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-06 (M11 complete - eleven channels live)
+**Updated:** 2026-11-06 (S1 screens complete, 78 Playwright green)
 
 ---
 
@@ -63,6 +63,11 @@
 | Digital-tech topics (M10) | three topics on cybersecurity, `placement="topic"` attribution, migration 012 + unit test |
 | Digital-technology channel (M11) | profile, `datacenter` skin + art + CC BY-SA photo, 6/6 grade-A feeds, 26 EN + 1 ES items |
 | Channel inventory | `docs/channel-inventory.md` regenerated: **11 channels** |
+| S1 screens | `contact`, `about`, `admin-console` implemented from approved SPECs; 80 Playwright tests pass on a production build with admin credentials |
+| Channel RSS | `/{industry}/feed.xml` + `/es/...` (RSS 2.0, 40-item cap), discovery link in the channel head and a footer link; README + domain SPEC R1 updated |
+| Form primitives a11y | `TextField`/`TextArea` moved the hint and error outside the label, so the accessible name is the label only |
+| Funnel proxy fix | `api/proxy` returned a false 503 for every 204 (the write still happened); `cta-events` now answers 204 and stops logging failures |
+| About copy fix | "seven-day window" replaced by "rolling window" in EN/ES — every channel runs 30-day retention and the API does not expose the value |
 
 ---
 
@@ -81,8 +86,8 @@
 | **0** | Read the digital-technology window | closes **2026-11-27**; topic placements (`placement="topic"`) + channel inquiries against the rule in `.work.biz/plans/plan_digital-technology-channel.md` §11 (D-014 keep/kill) |
 | **1** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions per `plan_kev-digest.md` §11 |
 | **1b** | Name the digest reviewer (D-005) | the generator cannot publish an issue without a named signer |
-| **2** | New-channel content coverage | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
-| **3** | `@ui-component-build plan - S1` | contact, about, admin screens on the shipped primitives |
+| **2** | Channel content refresh | coverage is real in both locales (lowest digital-technology ES 16); the stale "EN 10 / ES 1" notes are retired |
+| **3** | UI S4 SPECs + P1 primitives | `search`, `privacy`, `terms`; `Skeleton`, `Toc` |
 | **4** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
 | **5** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
 
@@ -157,6 +162,26 @@
 | M11-T4 | 2026-11-06 | inventory at 11 channels, `--check` green |
 | M11-T5 | 2026-11-06 | 11 channels in the layout loop; skin/credit asserted |
 | M11-T6 | 2026-11-06 | guide + README mention |
+
+---
+
+## Completed iteration - S1: contact, about, admin-console (2026-11-06)
+
+**Milestone ref:** S1 · `.work.ui/plans/foundation/20261105-04-screen-map.md` (revised 2026-11-06) · SPECs under `.work.ui/screens/{contact,about,admin-console}/`.
+**Status:** complete 2026-11-06 — 3/3 screens implemented and verified
+
+### Tasks
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| S1-T1 | Contact screen: config address, client validation, failure states with the desk email, success panel | `contact/page.tsx`, `ContactForm.tsx`, messages | done |
+| S1-T2 | About screen: measure, rolling-window copy, brief suppression on `cta.asset` | `about/page.tsx`, messages | done |
+| S1-T3 | Admin console: session states, APG tabs, inline hide/pin, confirmations, audit filter, default channel | `admin/AdminConsole.tsx`, `admin/page.tsx` | done |
+| S1-T4 | Field primitives: error/hint outside the label; e2e + axe for the new screens | `ui/text-field.tsx`, `ui/text-area.tsx`, `e2e/*` | done |
+
+### Verification
+- `pnpm build` on the production bundle; `pnpm test` → **78 passed, 0 failed** (admin tests run with credentials).
+- axe: 0 critical or serious on the 15 scanned URLs, including `/legal/contact`, `/es/legal/contact`, `/legal/about`, `/es/legal/about`, `/en/admin`.
+- `pnpm check`: 328 catalog keys in EN and ES; 11/11 channels pass contrast.
 
 ---
 

@@ -98,7 +98,7 @@ Source of truth: `.work/docs/integration/industries-v1.1.0/data.json` (mirrored 
 
 ## API in one paragraph
 
-`GET /v1/news?industry={slug}&locale={en|es}` returns a `{data, meta}` envelope with cursor pagination and ETags; `GET /v1/news/bundle` returns a reference-compatible single-language bundle (splash, columns, topics, sources, desk brief) for LogicBison-style clients. Every response belongs to exactly one industry and one language. Public reads need no key; `X-API-Key` raises rate limits. Errors are RFC 7807. Breaking changes require `/v2`. Full contract: `.work/standards/20261105-api-style-guide.md`.
+`GET /v1/news?industry={slug}&locale={en|es}` returns a `{data, meta}` envelope with cursor pagination and ETags; `GET /v1/news/bundle` returns a reference-compatible single-language bundle (splash, columns, topics, sources, desk brief) for LogicBison-style clients. Every response belongs to exactly one industry and one language. Every channel also publishes an RSS 2.0 feed at `/{industry}/feed.xml` (and `/es/{industry}/feed.xml`), discovered from the page head. Public reads need no key; `X-API-Key` raises rate limits. Errors are RFC 7807. Breaking changes require `/v2`. Full contract: `.work/standards/20261105-api-style-guide.md`.
 
 ---
 

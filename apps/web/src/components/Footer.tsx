@@ -44,6 +44,13 @@ export function Footer({ industry, locale }: { industry: Industry; locale: Local
           <Link href={localePath(locale, `/${industry.slug}/search`)} className="sn-link-quiet">
             {t(locale, "nav.search")}
           </Link>
+          <a
+            href={localePath(locale, `/${industry.slug}/feed.xml`)}
+            type="application/rss+xml"
+            className="sn-link-quiet"
+          >
+            {t(locale, "footer.rss")}
+          </a>
         </nav>
       </div>
     </footer>

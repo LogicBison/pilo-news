@@ -17,7 +17,10 @@ export default async function AdminPage({
   const { locale } = await params;
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <AdminConsole locale={resolveLocale(locale)} />
+      <AdminConsole
+        locale={resolveLocale(locale)}
+        defaultIndustry={process.env.SN_DEFAULT_INDUSTRY ?? "legal"}
+      />
     </main>
   );
 }

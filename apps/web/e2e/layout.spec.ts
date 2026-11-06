@@ -102,3 +102,16 @@ for (const slug of CHANNELS) {
     });
   });
 }
+
+test.describe("contact and about layout", () => {
+  const paths = ["/legal/contact", "/es/legal/contact", "/legal/about", "/es/legal/about"];
+  for (const path of paths) {
+    test(`${path} has no horizontal overflow`, async ({ page }) => {
+      for (const width of [1280, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        await hydrated(page, path);
+        await expectNoHorizontalOverflow(page);
+      }
+    });
+  }
+});

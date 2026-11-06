@@ -38,17 +38,17 @@ export default async function AboutPage({ params }: Params) {
         <h1 className="text-3xl font-extrabold tracking-tight text-[var(--sn-text)]">
           {t(resolved, "about.title", { industry: name })}
         </h1>
-        <p className="text-base leading-relaxed text-[var(--sn-muted)]">
+        <p className="max-w-[65ch] text-base leading-relaxed text-[var(--sn-muted)]">
           {t(resolved, "about.body1", { industry: name })}
         </p>
-        <p className="text-base leading-relaxed text-[var(--sn-muted)]">
+        <p className="max-w-[65ch] text-base leading-relaxed text-[var(--sn-muted)]">
           {t(resolved, "about.body2", { industry: name })}
         </p>
         <section aria-labelledby="how-heading" className="sn-editorial-block">
           <h2 id="how-heading" className="text-xl font-semibold text-[var(--sn-text)]">
             {t(resolved, "about.howTitle")}
           </h2>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--sn-muted)]">
+          <ul className="mt-3 max-w-[65ch] list-disc space-y-2 pl-5 text-sm text-[var(--sn-muted)]">
             <li>{t(resolved, "about.how1")}</li>
             <li>{t(resolved, "about.how2")}</li>
             <li>{t(resolved, "about.how3")}</li>
@@ -70,12 +70,14 @@ export default async function AboutPage({ params }: Params) {
             qualify={channel.cta.qualify}
           />
         </div>
-        <BriefSignup
-          industry={industry}
-          locale={resolved}
-          placement="brief-about"
-          sourcePage={localePath(resolved, `/${industry}/about`)}
-        />
+        {channel.cta.asset ? null : (
+          <BriefSignup
+            industry={industry}
+            locale={resolved}
+            placement="brief-about"
+            sourcePage={localePath(resolved, `/${industry}/about`)}
+          />
+        )}
       </article>
       <aside className="sn-search-aside h-fit lg:sticky lg:top-24">
         <TrustBlock locale={resolved} />

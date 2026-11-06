@@ -59,6 +59,82 @@ test("contact form shows success without navigating", async ({ page }) => {
   await expect(page.getByRole("status")).toContainText(/message received/i);
 });
 
+test("contact blocks an invalid email before any request", async ({ page }) => {
+  let calls = 0;
+  await page.route("**/api/proxy/v1/contact", async (route) => {
+    calls += 1;
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: "x" }) });
+  });
+  await page.goto("/legal/contact");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await page.getByLabel("Name").fill("Test Reader");
+  await page.getByLabel("Email").fill("not-an-email");
+  await page.getByLabel("Message").fill("This is a test correction request.");
+  await page.getByRole("button", { name: /send message/i }).click();
+  await expect(page.getByText(/valid email/i)).toBeVisible();
+  expect(calls).toBe(0);
+});
+
+test("contact failure keeps the entered values and offers the desk email", async ({ page }) => {
+  await page.route("**/api/proxy/v1/contact", async (route) => {
+    await route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ detail: "boom" }) });
+  });
+  await page.goto("/legal/contact");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await page.getByLabel("Name").fill("Test Reader");
+  await page.getByLabel("Email").fill("reader@example.com");
+  await page.getByLabel("Message").fill("This is a test correction request.");
+  await page.getByRole("button", { name: /send message/i }).click();
+  await expect(page.getByText(/could not be sent/i)).toBeVisible();
+  await expect(page.getByLabel("Name")).toHaveValue("Test Reader");
+});
+
+test("about copy carries no stale retention number", async ({ page }) => {
+  await page.goto("/legal/about");
+  await expect(page.locator("main")).not.toContainText(/seven-day/i);
+  await page.goto("/es/legal/about");
+  await expect(page.locator("main")).not.toContainText(/siete días/i);
+});
+
+test("about suppresses the brief where the channel offers an asset", async ({ page }) => {
+  await page.goto("/legal/about");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.locator("#brief-signup")).toHaveCount(0);
+  await page.goto("/education/about");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.locator("#brief-signup")).toBeVisible();
+});
+
+test("channel RSS feed is valid and localized", async ({ request }) => {
+  const en = await request.get("/legal/feed.xml");
+  expect(en.status()).toBe(200);
+  expect(en.headers()["content-type"]).toContain("application/rss+xml");
+  const xml = await en.text();
+  expect(xml).toContain("<rss");
+  expect(xml).toContain("<language>en</language>");
+  expect(xml).toContain("/legal/article/");
+  expect((xml.match(/<item>/g) ?? []).length).toBeGreaterThan(5);
+
+  const es = await request.get("/es/legal/feed.xml");
+  expect(es.status()).toBe(200);
+  expect(await es.text()).toContain("<language>es</language>");
+
+  const unknown = await request.get("/nope/feed.xml");
+  expect(unknown.status()).toBe(404);
+});
+
+test("channel pages advertise their feed", async ({ page }) => {
+  await page.goto("/legal");
+  const href = await page
+    .locator('link[rel="alternate"][type="application/rss+xml"]')
+    .getAttribute("href");
+  expect(href).toBe("/legal/feed.xml");
+  await expect(page.getByRole("link", { name: "RSS" })).toHaveAttribute(
+    "href",
+    "/legal/feed.xml",
+  );
+});
+
 test("gated asset cards follow the channel, not a hardcoded slug", async ({ page }) => {
   await page.goto("/cybersecurity");
   await page.waitForSelector('html[data-hydrated="true"]');
