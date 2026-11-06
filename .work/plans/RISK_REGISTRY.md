@@ -27,6 +27,7 @@ Status: **Open** | **Mitigated** | **Accepted** | **Closed**
 | R19 | Off-peak vs peak DeepSeek pricing changes run cost materially | operational | M | L | Schedule runs off-peak when possible; monthly cap; cost alert | Open | eng |
 | R20 | Low lead quality or missed partner SLA erodes the revenue model | business | M | H | Qualification status, 24 h routing SLA, partner ack tracking, funnel dashboard (ADR 013, M8-T8) | Open | owner |
 | R21 | Lead PII/consent breach (spam, DSAR miss, retention overrun) | privacy / security | M | H | Explicit consent + version, hashed IP/UA, 24-month retention, DSAR export/erase, no PII in logs (T13/T14) | Open | eng |
+| R22 | Content-sensitive layout gates flap: coverage balance and card heights shift whenever ingestion brings longer titles or excerpts | product / test | M | L | Card bodies clamp to 3 lines at >=768px (M9-T6); balance measured across ten channels each run; a new channel re-measures before merge | Mitigated | eng |
 
 ## Review log
 

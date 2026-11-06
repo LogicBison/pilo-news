@@ -333,6 +333,14 @@
     "note": "Información general, no asesoramiento legal, financiero ni médico."
   },
   "asset": {
+    "legal-regulatory-calendar": {
+      "title": "Calendario regulatorio legal",
+      "body": "Una lista con fechas de presentaciones, plazos de comentarios y vencimientos de cumplimiento para despachos y equipos internos. Trimestral, en lenguaje claro, gratis. Te lo enviamos cuando esté lista la primera edición."
+    },
+    "cybersecurity-kev-digest": {
+      "title": "Vulnerabilidades explotadas, semanal",
+      "body": "Una lista semanal de las vulnerabilidades que los atacantes ya están explotando, limitada a los proveedores que usas, con la acción que toca tomar. Gratis. Te lo enviamos cuando esté lista la primera edición."
+    },
     "eyebrow": "Documento de referencia",
     "name": "Nombre",
     "email": "Correo",

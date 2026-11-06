@@ -42,6 +42,8 @@ async def test_bundle_shape_and_layout(client) -> None:
     assert data["industry"]["slug"] == "legal"
     assert data["industry"]["theme"]["layout"] == "editorial"
     assert data["industry"]["cta"]["kind"] == "consultation"
+    # R16: which asset a channel offers is channel config, not JSX.
+    assert data["industry"]["cta"]["asset"] == "legal-regulatory-calendar"
 
 
 @pytest.mark.asyncio

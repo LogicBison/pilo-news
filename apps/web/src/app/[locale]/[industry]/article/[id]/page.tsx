@@ -58,7 +58,7 @@ export default async function ArticlePage({ params }: Params) {
   const article = articleResult.data;
   const channel = industryResult.ok ? industryResult.data : fallbackIndustry(industry);
   const pagePath = localePath(resolved, `/${industry}/article/${id}`);
-  const asset = assetFor("legal-regulatory-calendar");
+  const asset = channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
 
   return (
     <>
@@ -142,13 +142,13 @@ export default async function ArticlePage({ params }: Params) {
           sourcePage={pagePath}
         />
 
-        {asset && channel.slug === "legal" ? (
+        {asset ? (
           <AssetOffer
             industry={industry}
             locale={resolved}
             asset={asset.slug}
-            title={asset.title[resolved]}
-            body={asset.body[resolved]}
+            title={t(resolved, asset.titleKey)}
+            body={t(resolved, asset.bodyKey)}
             sourcePage={pagePath}
           />
         ) : null}
@@ -185,13 +185,15 @@ export default async function ArticlePage({ params }: Params) {
             sourcePage={pagePath}
             qualify={channel.cta.qualify}
           />
-          <BriefSignup
-            industry={industry}
-            locale={resolved}
-            placement="brief-article"
-            articleId={article.id}
-            sourcePage={pagePath}
-          />
+          {asset ? null : (
+            <BriefSignup
+              industry={industry}
+              locale={resolved}
+              placement="brief-article"
+              articleId={article.id}
+              sourcePage={pagePath}
+            />
+          )}
         </div>
       </article>
       <StickyCta industry={industry} locale={resolved} articleId={article.id} />

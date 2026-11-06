@@ -54,7 +54,7 @@ export default async function ChannelHome({ params }: Params) {
   const bundle = result.data;
   const channel = bundle.industry;
   const homePath = localePath(resolved, `/${industry}`);
-  const asset = assetFor("legal-regulatory-calendar");
+  const asset = channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
 
   return (
     <>
@@ -99,13 +99,13 @@ export default async function ChannelHome({ params }: Params) {
           ) : null}
         </>
       )}
-      {asset && industry === "legal" ? (
+      {asset ? (
         <AssetOffer
           industry={industry}
           locale={resolved}
           asset={asset.slug}
-          title={asset.title[resolved]}
-          body={asset.body[resolved]}
+          title={t(resolved, asset.titleKey)}
+          body={t(resolved, asset.bodyKey)}
           sourcePage={localePath(resolved, `/${industry}`)}
         />
       ) : null}
@@ -134,12 +134,14 @@ export default async function ChannelHome({ params }: Params) {
             qualify={channel.cta.qualify}
           />
         </div>
-        <BriefSignup
-          industry={industry}
-          locale={resolved}
-          placement="brief-home"
-          sourcePage={homePath}
-        />
+        {asset ? null : (
+          <BriefSignup
+            industry={industry}
+            locale={resolved}
+            placement="brief-home"
+            sourcePage={homePath}
+          />
+        )}
       </section>
       <StickyCta industry={industry} locale={resolved} />
       <p className="mt-6 text-center text-xs text-[var(--sn-muted)]">

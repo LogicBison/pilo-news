@@ -28,7 +28,7 @@ Everything else (proof strip, trust block, sticky bar) exists to make those two 
 
 Recommendation: ship S1 properly, then S3 for one channel, then S2. S4 ships with S1 (built: `/{industry}/briefs`).
 
-Feasibility changed the pick: the legal calendar is buildable for US + EU only, and the cheapest honest proof is the **cybersecurity KEV digest** (free, daily, global). The logistics rate index cannot be built at all — replacement in the feasibility doc §4.
+Feasibility changed the pick: the legal calendar is buildable for US + EU only, and the cheapest honest proof is the **cybersecurity KEV digest** (free, global; **weekly, Wednesday** — measured at 6.6 additions/week, see `.work.biz/plans/plan_kev-digest.md`; D-003 pending). The logistics rate index cannot be built at all — replacement in the feasibility doc §4.
 
 **Paid subscription: no.** No payment surface, no traffic baseline, and the partner-funded model (U18) is not signed. A paid tier now would convert nothing and cost a checkout flow.
 

@@ -37,6 +37,7 @@
         "es": "Noticias, no asesoría de seguridad. Aplique parches y confirme con su equipo."
       },
       "cta": {
+        "asset": "cybersecurity-kev-digest",
         "body": {
           "en": "Tell us your stack and exposure. We route qualified requests to an independent partner.",
           "es": "Cuéntenos su stack y exposición. Canalizamos solicitudes calificadas a un socio independiente."

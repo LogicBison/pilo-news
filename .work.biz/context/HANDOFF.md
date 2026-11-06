@@ -98,3 +98,33 @@ Answer D1–D3 in `.work.biz/strategy/20261105-offer-and-leadgen-brief.md`; then
 **Evidence:** API `pytest` 108 passed; web `lint`/`typecheck`/`check` (306 keys, 10/10 contrast) pass; production build + Playwright 57 passed / 1 skipped; axe 0 violations on 7 URLs incl. the new pages.
 **Blockers:** D4–D6; U18 partner model for the SLA loop; U8 email delivery (owner: pre-production).
 **Next recommended:** approve D4–D6; build the cybersecurity KEV digest as the first real asset; commit the app changes.
+
+---
+
+## Latest action (@biz-products scope)
+
+**Date:** 2026-11-06
+**Request:** "scope the cybersecurity KEV digest as the first gated asset"
+**Mode:** scope (one concept, MVP depth)
+**Executed:**
+1. Loaded context: offer brief, feasibility verification, lead-generation strategy, gates/decisions, tech fingerprint (RSS-only sources, no issue table, waitlist asset card, inert SMTP).
+2. Measured the live CISA KEV feed (2026-11-06): 1,768 rows, catalog 2026.11.04, 6.6 additions/week, 6 rows with a future due date, top-20 vendors cover 64%.
+3. Wrote `.work.biz/plans/plan_kev-digest.md`: verdict, evidence table, 7-item MVP, out-of-scope list, DoD, first users, 30-day metric, build shape (migration 011 + `news_api.digests` + CLI + two endpoints + one page), 4–6 day estimate, variant matrix, 14-day card test, kill criteria, graded open questions.
+4. Corrected the cadence claim in the offer brief (`daily` → `weekly, Wednesday`, D-003 pending).
+**Findings worth flagging:** the deadline angle is dead (1,762/1,768 due dates past, US-federal only); the list is a commodity already republished by free tools; the recurring cost is human review, not generation; the asset card is hardcoded to the legal channel (`apps/web/src/app/[locale]/[industry]/page.tsx:57`).
+**Blockers:** D-003…D-006; no named reviewer (D6); email delivery deferred (D-002); traffic baseline unknown (U10).
+**Next recommended:** approve D-003…D-006 and run the 14-day card test before any generator work.
+
+---
+
+## Latest action (@x-director) — gap resolution
+
+**Date:** 2026-11-06
+**Request:** "resolve all gaps"
+**Frameworks involved:** .ai, .ai.biz
+**Executed:**
+1. D-008 recorded: where a channel offers a gated asset, the asset card is the single secondary rung; the brief signup no longer renders there (one email-list ask per page).
+2. D-009 recorded: the asset a channel offers now lives in channel config (`cta.asset`), superseding D-007; seeded by `apps/api/migrations/011_seed_asset_offers.sql` and the legal/cybersecurity profiles.
+3. M9 added to the master plan §19 (v1.2) with a traceability row, so the iteration is no longer off-plan.
+**Blockers:** D-005 (named reviewer) still gates the digest generator; the 14-day window opened 2026-11-06 and closes 2026-11-20.
+**Next recommended:** read the funnel at 2026-11-20 against the pre-registered rule in `.work.biz/plans/plan_kev-digest.md` §11.

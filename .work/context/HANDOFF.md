@@ -2,11 +2,13 @@
 
 ## Session status
 
-**Closed:** 2026-11-05 - lead-generation offer rungs built after the UI close: ask-one-question and gated-asset leads (migration 010), funnel read-out + admin tab, UTM capture, briefs archive, topic hubs, disposable-domain rejection; plus the biz offer brief and the product-feasibility verification. 108 API tests; 57 e2e / 1 skipped on a production build; axe 0 violations on 11 URLs; build + lint + typecheck + check green.
+**Closed:** 2026-11-06 - M9 shipped: each channel's gated reference asset now comes from channel config (`cta.asset`), the asset card replaces the brief rung where it exists, and the 14-day test window is open to 2026-11-20. Also: the KEV digest MVP scoped in `.work.biz/plans/plan_kev-digest.md` (D-003…D-009), the coverage-balance layout fixed, plan v1.2 + SPEC amendment 01. 111 api tests; web checks; 59 Playwright passed / 1 skipped; migration 011 idempotent.
 
-**Updated:** 2026-11-05
+**Updated:** 2026-11-06
 
-**Prior session (closed 2026-11-05, same day):** SPEC approvals, a11y milestone audit (+F1/F2), S0 catalog primitives, photographic bands on all ten channels. Then the earlier close: editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
+**Prior session (closed 2026-11-05):** lead-generation offer rungs built after the UI close: ask-one-question and gated-asset leads (migration 010), funnel read-out + admin tab, UTM capture, briefs archive, topic hubs, disposable-domain rejection; plus the biz offer brief and the product-feasibility verification. 108 API tests; 57 e2e / 1 skipped on a production build; axe 0 violations on 11 URLs; build + lint + typecheck + check green.
+
+**Prior session (closed 2026-11-05, earlier):** SPEC approvals, a11y milestone audit (+F1/F2), S0 catalog primitives, photographic bands on all ten channels. Then the earlier close: editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
 
 **Repository state:** v1 implemented plus the post-v1 operator scope. Master plan v1.1
 (Approved) executed end to end: schema/migrations (001-007), **ten** live channels
@@ -19,13 +21,16 @@ enforced policy (`verify-sources`), the default industry switches at runtime
 **editorial-conversion v2** grammar: open/square marketing surfaces, full-bleed
 proof/photo/conversion bands, balanced two-column coverage, filled forms, and a
 generated channel inventory (`docs/channel-inventory.md`). **Foundation-complete: yes. Plan-master-ready: yes.
-Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.**
+Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.** M9 (gated-asset card test) is complete: the asset a channel offers comes from `cta.asset`, one secondary rung per page, and the 14-day measurement window is open until 2026-11-20.
+
+**Waiver retired (2026-11-06):** **M9 — gated-asset card test** is now a `§19` row in `.work/plans/full/20261105-full-plan.md` (v1.2), so the earlier post-v1 waiver no longer applies.
 
 **Recommended pick-up file:** `.work/plans/NEXT.md`
-**Next session focus:** SPECs approved, a11y audit passed with F1/F2 fixed, S0 primitives shipped,
-and all ten channel bands are photographic; next is closing the
-new channels' content gaps (manufacturing EN 10 / ES 41, energy EN 16 / ES 39,
-retail EN 10 / ES 1), then `@ui-component-build plan - S1`; prd deploy/rollback and k6 after. Reports:
+**Next session focus:** M9 is complete — the cybersecurity KEV digest card is live from channel config,
+the brief rung is suppressed where an asset exists, and the 14-day test window closes **2026-11-20**.
+Read `/v1/admin/funnel` then against the pre-registered rule, and name the reviewer (D-005) before any
+generator work. After that: new-channel content gaps (manufacturing EN 10, retail ES 1), then
+`@ui-component-build plan - S1`; prd deploy/rollback and k6 after. Reports:
 `.work.ui/reports/20261105-visual-verify-milestone.md`,
 `.work.ui/reports/20261105-accessibility-audit-milestone.md`,
 `.work.ui/reports/20261105-imagery-audit.md`.
@@ -134,6 +139,10 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | Skin system 2026-11-05 | 7 distinct skins live (`data-skin` per channel), 7 motifs + 7 original illustration bands, screenshots desktop+mobile, `pnpm lint/typecheck/check` green |
 | Per-channel art 2026-11-05 | 7 inline masthead emblems, article illustration strips, 7 channel-home SPECs under `.work.ui/screens/` |
 | Realistic imagery 2026-11-05 | 7 licensed photos (credits.json, 2 CC BY-SA with in-page credit), next/image band + article strip, line art kept as motif/emblem/fallback |
+| M9 2026-11-06 | `./bin/start.sh --env dev test` → api 111 passed, ruff/format/mypy clean; web lint/type/check (310 keys, 10/10 contrast); inventory ok |
+| M9 2026-11-06 | full Playwright on a production build → 59 passed, 1 skipped, 0 failed (layout 40, a11y, public incl. asset-card rule) |
+| M9 2026-11-06 | migration 011 → `applied: 1`, second run `applied: 0`; `apply-profile` legal + cybersecurity `skipped`; `/v1/news/bundle` carries `cta.asset` for those two only |
+| M9 2026-11-06 | coverage balance measured on ten channels at 1280px: max spread 178px vs the 260 gate |
 | Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
 
 ---
@@ -183,6 +192,9 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | 2026-11-05 | CATALOG init | `.work.ui/design-system/CATALOG.md` rebuilt from foundation doc 03: 21 rows, DTCG token names, behavior sources, APG patterns, states, a11y notes |
 | 2026-11-05 | S0 primitives | 10 files under `apps/web/src/components/ui/`; LeadForm/ContactForm/BriefSignup/TrustBlock/TopicRail/Notices refactored; field errors wired via `aria-invalid`/`aria-describedby` |
 | 2026-11-05 | imagery | 10/10 photographic bands; retail/energy/manufacturing replaced SVG line-art with CC BY/BY-SA photos (credits.json); report `.work.ui/reports/20261105-imagery-audit.md` |
+| 2026-11-06 | M9 asset card test | `cta.asset` in channel config (migration 011 + profiles), card resolved from config, brief rung suppressed where an asset exists, SPEC amendment 01, e2e coverage; D-008/D-009 recorded |
+| 2026-11-06 | M9 gap fixes + repair | plan v1.2 with M9; coverage card clamp (energy 330px -> 85px, worst channel 178px); full suite 59 passed / 1 skipped |
+| 2026-11-06 | biz scope | `.work.biz/plans/plan_kev-digest.md` (KEV digest MVP scope), D-003…D-009, 14-day window pre-registered |
 
 ---
 
@@ -230,6 +242,26 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ---
 
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-06
+**Request:** "resolve all gaps"
+**Frameworks involved:** .ai, .ai.ui (delegated to .ai; no ui-director run — the design rule was an operator decision, D-008)
+**Classified framework bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc yes (unused) | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. `@ai-director` — R16 literal: `industries.cta.asset` (channel config) seeded by `apps/api/migrations/011_seed_asset_offers.sql`, profiles updated, `/v1/news/bundle` passthrough asserted in `test_bundle.py`; web resolves the card from `channel.cta.asset`. Decision D-009 supersedes D-007.
+2. `@ai-director` (ui rule by operator decision D-008) — one secondary rung: the brief signup no longer renders where `cta.asset` is set; SPEC R16 amended; e2e asserts the rule on four channels.
+3. `@ai-director` — plan traceability: M9 added to `.work/plans/full/20261105-full-plan.md` §19 (v1.2) with a traceability row; the waiver is now retired.
+4. Re-verified: api 111 passed, web lint/type/check clean, migration 011 `applied: 1` then `applied: 0`, full Playwright 58 passed / 1 skipped / 1 failed.
+**User correction:** none
+**Coordination notes:** the design rule was taken natively (single-model) rather than routed to `@ui-director`; recorded so the routing is auditable.
+**Blockers:** `layout.spec.ts:31` energy coverage balance fails on new content (330px vs 260) — not caused by M9 (ingestion at 16:03, after the 15:58 green run; energy renders neither card nor asset). Needs a separate layout decision.
+**Next recommended:** `@code-implementation complete`, then `@session-control close commit` split in two (apps/, then `.work*`).
+
+---
+
 ## Known residual risks
 
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
@@ -254,4 +286,4 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Close the new channels' content gaps (manufacturing EN 10, retail ES 1); then `@ui-component-build plan - S1`; answer U9/U10/U1 and run `.work/plans/operations/20261105-launch.md`.
+Read the 14-day asset test at 2026-11-20 (funnel per placement, pre-registered rule) and name the digest reviewer (D-005); then close the new channels' content gaps and run `@ui-component-build plan - S1`.

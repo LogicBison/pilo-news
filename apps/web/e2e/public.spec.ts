@@ -58,3 +58,40 @@ test("contact form shows success without navigating", async ({ page }) => {
   await page.getByRole("button", { name: /send message/i }).click();
   await expect(page.getByRole("status")).toContainText(/message received/i);
 });
+
+test("gated asset cards follow the channel, not a hardcoded slug", async ({ page }) => {
+  await page.goto("/cybersecurity");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.getByRole("heading", { name: /known-exploited vulnerabilities, weekly/i })).toBeVisible();
+
+  await page.locator("article a").filter({ hasText: /./ }).first().click();
+  await expect(page).toHaveURL(/\/cybersecurity\/article\//);
+  await expect(page.getByRole("heading", { name: /known-exploited vulnerabilities, weekly/i })).toBeVisible();
+
+  await page.goto("/es/cybersecurity");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.getByRole("heading", { name: /vulnerabilidades explotadas, semanal/i })).toBeVisible();
+
+  await page.goto("/legal");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.getByRole("heading", { name: /legal regulatory calendar/i })).toBeVisible();
+  await expect(page.locator("#brief-signup")).toHaveCount(0);
+
+  await page.goto("/education");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.getByRole("heading", { name: /legal regulatory calendar/i })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /known-exploited vulnerabilities/i })).toHaveCount(0);
+  await expect(page.locator("#brief-signup")).toBeVisible();
+});
+
+test("a gated asset replaces the brief rung on the channels that offer one", async ({ page }) => {
+  await page.goto("/cybersecurity");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.locator("#brief-signup")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /known-exploited vulnerabilities, weekly/i })).toBeVisible();
+
+  await page.goto("/financial");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.locator("#brief-signup")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /known-exploited vulnerabilities/i })).toHaveCount(0);
+});

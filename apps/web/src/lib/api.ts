@@ -68,6 +68,8 @@ export interface CtaQualification {
 
 export interface CtaConfig {
   kind?: "consultation" | "brief";
+  /** Gated reference asset slug this channel offers (R16: comes from channel config). */
+  asset?: string;
   headline?: Record<string, string>;
   body?: Record<string, string>;
   label?: Record<string, string>;

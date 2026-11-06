@@ -1398,6 +1398,18 @@ body {
   [data-list="magazine"] .sn-columns {
     column-count: 2;
   }
+
+  /* Uniform card bodies keep the multi-column balance predictable. Unclamped
+     excerpts left the energy split at 330px on 1280px content; three lines
+     brings every channel inside 180px. Mobile keeps the full text, because
+     there the columns collapse to one. */
+  .sn-columns .sn-story > p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
 }
 
 @media (min-width: 1024px) {

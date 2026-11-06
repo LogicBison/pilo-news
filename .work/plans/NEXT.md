@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-05 (session close)
+**Updated:** 2026-11-06 (M9 complete)
 
 ---
 
@@ -56,6 +56,10 @@
 | Lead-gen rungs | migration 010 `question`/`asset` lead kinds + 3 funnel events; ask-one-question rung; asset waitlist; briefs archive; topic hubs; UTM capture; disposable-domain rejection |
 | Funnel read-out | `GET /v1/admin/funnel` + admin tab; OpenAPI snapshot; contract tests |
 | Offer + feasibility | `.work.biz/strategy/20261105-offer-and-leadgen-brief.md` and `20261105-product-feasibility-verification.md` |
+| KEV digest scope | `.work.biz/plans/plan_kev-digest.md`: verdict, evidence (1,768 KEV rows, 6.6/week), MVP, 14-day test, kill criteria |
+| M9 asset card test | `cta.asset` in channel config + migration 011, channel-config-driven card, one secondary rung, e2e rule, SPEC amendment 01 |
+| Coverage balance repair | `skins.css` card clamp: energy 330px -> 85px, worst channel 178px vs the 260 gate |
+| Plan v1.2 | M9 added to `.work/plans/full/20261105-full-plan.md` §19 + traceability row |
 
 ---
 
@@ -71,8 +75,8 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Build the first gated asset | cybersecurity KEV digest - free, daily, global; cheapest honest proof of the offer ladder |
-| **1** | Answer D4-D6 | jurisdiction scope, logistics replacement, asset reviewer (`.work.biz/strategy/20261105-product-feasibility-verification.md`) |
+| **0** | Read the 14-day asset test | window opened 2026-11-06, closes **2026-11-20**; `asset_interest` events vs CTA impressions from `/v1/admin/funnel`, against the pre-registered rule in `.work.biz/plans/plan_kev-digest.md` §11 |
+| **1** | Name the digest reviewer (D-005) | the generator cannot publish an issue without a named signer |
 | **2** | New-channel content coverage | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
 | **3** | `@ui-component-build plan - S1` | contact, about, admin screens on the shipped primitives |
 | **4** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
@@ -80,11 +84,86 @@
 
 ---
 
-## Current iteration
+## Current iteration - M9: asset card test (post-v1 operator scope)
 
-*(Complete - M1-M8, deployment profiles, source quality, ten channel skins, lead qualification, editorial-conversion v2, the three new channels, ten approved channel SPECs, the a11y milestone audit with F1/F2 fixes, the S0 catalog primitives, and photographic bands on all ten channels. Next: new-channel content coverage, then S1 screens; prd deploy/rollback and k6 remain.)*
+**Milestone ref:** M9 · `.work/plans/full/20261105-full-plan.md` §19 (added v1.2, 2026-11-06). Origin: D-003…D-006 in `.work.biz/plans/plan_kev-digest.md` §15.
+**Status:** complete 2026-11-06 — milestone verify pass with gaps (gaps closed the same day)
+**Started:** 2026-11-06
+**Source of truth for scope:** `.work.biz/plans/plan_kev-digest.md` §11 (14-day card test)
 
-### Concept / NFR registry
+### In scope
+- enable the cybersecurity KEV digest card on the cybersecurity channel (home + article), both locales, as a waitlist with no send-date promise
+- make the asset registry channel-keyed instead of a hardcoded legal slug
+- e2e assertions for three channels (cybersecurity has a card, education does not, legal still does)
+- pre-register the 14-day measurement window and its decision rule before any result exists
+
+### Out of scope (explicit)
+- any digest generator, KEV/NVD adapter, migration, API endpoint, or issue page (gated behind the card test passing)
+- email delivery (D-002 defers `pilo-mail`)
+- the legal card's copy or behaviour
+- channel-inventory regeneration beyond what `./bin/start.sh test` already enforces
+
+### Tasks
+| ID | Description | Files | Status | Notes |
+|----|-------------|-------|--------|-------|
+| M9-T1 | Asset card resolved from channel config, copy in catalogs | `apps/web/src/lib/assets.ts`, `apps/web/src/lib/api.ts`, `apps/web/src/messages/en.json`, `apps/web/src/messages/es.json`, `apps/web/src/app/[locale]/[industry]/page.tsx`, `apps/web/src/app/[locale]/[industry]/article/[id]/page.tsx` | done | S. File list expanded during the task: copy moved to `messages/{en,es}.json` per CONVENTIONS §10. SC1: (1) drift = the two message catalogs, now declared; (2) 3-month failure = a renamed key renders the raw key string, because `t()` falls back to the key — covered by the new e2e heading assertions; (3) assumed `AssetOffer` props unchanged, re-read this session; (4) yes, e2e asserts exact copy for both assets; (5) 0 lint/type warnings |
+| M9-T2 | E2E coverage for the card across channels | `apps/web/e2e/public.spec.ts` | done | S. SC1: (1) no drift; (2) failure = running against `next dev` times out on cold compile (observed twice), e2e must run on a production build; (3) assumed `playwright.config.ts` baseURL, re-read; (4) the test is the coverage; (5) 0 warnings |
+| M9-T3 | Pre-register the 14-day test window | `.work.biz/plans/plan_kev-digest.md` | done | S. SC1: (1) no drift; (2) failure = a 0 denominator read as 0% — the rule says report `unknown`; (3) assumed `/v1/admin/funnel` exposes channel impressions, verified earlier this session; (4) n-a, documentation; (5) 0 warnings |
+| M9-T4 | `cta.asset` in profiles + idempotent seed | `apps/api/config/deployments/legal.json`, `apps/api/config/deployments/cybersecurity.json`, `apps/api/migrations/011_seed_asset_offers.sql`, `apps/api/tests/contract/test_bundle.py` | done | S. Gap-fix for R16 (D-009). SC1: (1) no drift; (2) failure = a profile apply overwriting an operator's asset choice — the seed uses `cta -> 'asset' IS NULL` and apply-profile reports `skipped`; (3) assumed `apply.py` reconciles `cta`, re-read at `implementation/apply.py:179`; (4) contract test asserts `cta.asset`; (5) 0 warnings |
+| M9-T5 | One secondary rung: asset replaces the brief signup | `apps/web/src/app/[locale]/[industry]/page.tsx`, `apps/web/src/app/[locale]/[industry]/article/[id]/page.tsx`, `apps/web/e2e/public.spec.ts`, `.work/features/industry-sites/20261106-SPEC-amendment-01.md` | done | S. Gap-fix for the three-asks finding (D-008). SC1: (1) no drift beyond the SPEC amendment, now declared; (2) failure = a channel that sets `cta.asset` to a slug missing from the registry loses both rungs silently — the card is the only rung there; e2e covers the two real channels, a future typo would need the same assertion; (3) assumed `channel.cta` reaches the page for every channel, verified via `/v1/news/bundle`; (4) yes, `#brief-signup` count assertions; (5) 0 warnings |
+| M9-T6 | Fix the energy coverage imbalance (repair) | `apps/web/src/app/skins.css` | done | S. code-repair from milestone. SC1: (1) no drift beyond the stylesheet, declared; (2) failure = a clamp that hides a real excerpt on a narrow desktop — 3 lines at 768px is the floor, mobile keeps full text; (3) assumed the card body is a direct `<p>` child, verified in `StoryCard.tsx:45`; (4) layout.spec.ts:31 is the test; (5) 0 warnings |
+
+### Acceptance criteria
+- [x] the KEV card renders on the cybersecurity channel home and article, EN and ES (curl + e2e)
+- [x] no card copy promises a send date ("when the first issue is ready" only)
+- [x] the legal card renders exactly as today (e2e `/legal`)
+- [x] e2e covers render / absence / unchanged on three channels
+- [x] measurement window and decision rule recorded before any result is read
+
+### Validation steps
+- [x] `pnpm lint && pnpm typecheck && pnpm check` → clean, 310 catalog keys, 10/10 contrast
+- [x] `pnpm build`, then the full Playwright suite on the production server → **58 passed, 1 skipped** (admin sign-in needs `E2E_ADMIN_PASSWORD`)
+- [x] `./bin/start.sh --env dev test` → api 111 passed (ruff/format/mypy clean), web lint/type/check clean, inventory ok
+- [x] migration `011_seed_asset_offers.sql` → `applied: 1`, re-run `applied: 0`; `apply-profile` for legal + cybersecurity reports `skipped` (profile matches DB)
+- [x] re-verified 2026-11-06: full Playwright on a production build → **59 passed, 1 skipped, 0 failed** (after the coverage-balance repair)
+- [x] manual: `/cybersecurity`, `/es/cybersecurity`, article, `/education` (absent), `/legal` (unchanged)
+
+### Owner blockers
+- none for the card test. D-005 (named reviewer) gates the generator, not the card.
+- ~~**plan traceability (waived)**~~ resolved 2026-11-06: M9 is now a `§19` row in the master plan (v1.2); the waiver line in `.work/context/HANDOFF.md:26` can be retired at close.
+- ~~**SPEC ambiguity (R16)**~~ resolved 2026-11-06 by D-009 (`.work.biz/decisions/DECISIONS.md:30`): the asset a channel offers is `cta.asset` in channel config; D-007 superseded.
+- ~~**Open failure, not caused by M9:** energy coverage balance (330px vs 260)~~ **repaired 2026-11-06** (M9-T6): coverage card excerpts clamp to three lines at >=768px; measured spreads now max 178px across ten channels, gate unchanged.
+
+### Concept / NFR registry (this iteration)
+| Concept id | Applies | Status | Evidence / trigger |
+|------------|---------|--------|-------------------|
+| MOD-01 | no | n-a | a registry lookup change; no service split or module boundary moves |
+| MOD-02 | no | n-a | no new network hop or synchronous chain |
+| MOD-03 | no | n-a | no new infrastructure line item |
+| MOD-04 | no | n-a | no new operational surface |
+| MOD-05 | no | n-a | no deployable/architecture choice |
+| MOD-06 | **yes** | done (output due before `complete`) | agent-authored diff touching 5 files; blast radius is two page renderings, reversible in one commit; reviewable by diff |
+| MOD-07 | no | n-a | no prompt composition change |
+| MOD-08 | no | n-a | no IaC change |
+
+### Cross-LLM verification
+- Triggered: no — four-file UI change with e2e coverage
+
+### Done this iteration
+| Task | Completed | Notes |
+|------|-----------|-------|
+| M9-T1 | 2026-11-06 | `assets.ts` now carries `channel` + message keys; `assetForChannel(slug)`; both pages resolve by channel; `cybersecurity-kev-digest` waitlist card with EN/ES copy in `messages/*.json` |
+| M9-T2 | 2026-11-06 | one e2e test covering cyber home/article EN, cyber home ES, legal unchanged, education absent |
+| M9-T3 | 2026-11-06 | 14-day window pre-registered in `plan_kev-digest.md` §11 (starts 2026-11-06, ends 2026-11-20) |
+| M9-T4 | 2026-11-06 | `cta.asset` seeded by migration 011 + profiles; contract test asserts it; `/v1/news/bundle` exposes it for legal and cybersecurity only |
+| M9-T5 | 2026-11-06 | brief rung suppressed where `cta.asset` is set; SPEC R16 amended; e2e asserts the rule on cybersecurity, legal, education, financial |
+| M9-T6 | 2026-11-06 | coverage card excerpts clamp to 3 lines at >=768px; energy 330px -> 85px, worst channel 178px; layout gate unchanged |
+
+---
+
+### Concept / NFR registry - previous iteration (M1-M8, complete)
+
+
 
 | Concept | Applies | Output |
 |---------|---------|--------|

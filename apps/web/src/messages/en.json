@@ -333,6 +333,14 @@
     "note": "General information, not legal, financial, or medical advice."
   },
   "asset": {
+    "legal-regulatory-calendar": {
+      "title": "Legal regulatory calendar",
+      "body": "A dated list of the filings, comment windows, and compliance deadlines that apply to law firms and in-house teams. Quarterly, plain language, free. We email it when the first issue is ready."
+    },
+    "cybersecurity-kev-digest": {
+      "title": "Known-exploited vulnerabilities, weekly",
+      "body": "A weekly list of the vulnerabilities attackers are already exploiting, limited to the vendors you run, with the one action to take. Free. We email it when the first issue is ready."
+    },
     "eyebrow": "Reference document",
     "name": "First name",
     "email": "Email",
