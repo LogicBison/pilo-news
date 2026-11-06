@@ -95,3 +95,18 @@ test("a gated asset replaces the brief rung on the channels that offer one", asy
   await expect(page.locator("#brief-signup")).toBeVisible();
   await expect(page.getByRole("heading", { name: /known-exploited vulnerabilities/i })).toHaveCount(0);
 });
+
+test("the digital-technology channel renders with its own skin and no asset card", async ({ page }) => {
+  await page.goto("/digital-technology");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page).toHaveURL(/\/digital-technology$/);
+  await expect(page.locator('[data-skin="datacenter"]').first()).toBeVisible();
+  await expect(page.locator("h1")).toBeVisible();
+  await expect(page.locator("#brief-signup")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /known-exploited vulnerabilities|legal regulatory calendar/i })).toHaveCount(0);
+  await expect(page.getByText(/CC BY-SA 3\.0/).first()).toBeVisible();
+
+  await page.goto("/es/digital-technology");
+  await page.waitForSelector('html[data-hydrated="true"]');
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
+});

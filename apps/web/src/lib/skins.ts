@@ -8,7 +8,8 @@ export type SkinKey =
   | "lab"
   | "forge"
   | "grid"
-  | "market";
+  | "market"
+  | "datacenter";
 
 export type HeroVariant = "split" | "ledger" | "poster" | "ribbon";
 export type RuleStyle = "double" | "hairline" | "dotted" | "dashed" | "none" | "accent";
@@ -242,6 +243,29 @@ const MARKET: Skin = {
   references: ["hubspot", "ellevest"],
 };
 
+
+const DATACENTER: Skin = {
+  key: "datacenter",
+  label: "Datacenter",
+  hero: "ledger",
+  motif: "/skins/digital-technology/motif.svg",
+  scene: "/skins/digital-technology/scene.svg",
+  photo: "/photos/digital-technology/band.jpg",
+  photoSmall: "/photos/digital-technology/band-800.jpg",
+  credit: {
+    label: "Photo: Victorgrigas · CC BY-SA 3.0",
+    href: "https://commons.wikimedia.org/wiki/File:Wikimedia_Foundation_Servers-8055_13.jpg",
+  },
+  radius: "2px",
+  rule: "hairline",
+  eyebrow: "mono",
+  cta: "open",
+  rail: "scroll",
+  list: "grid3",
+  bar: "center",
+  references: ["semianalysis", "thedatacenter"],
+};
+
 export const SKINS: Record<string, Skin> = {
   legal: CHAMBERS,
   financial: TERMINAL,
@@ -253,6 +277,7 @@ export const SKINS: Record<string, Skin> = {
   manufacturing: FORGE,
   energy: GRID,
   retail: MARKET,
+  "digital-technology": DATACENTER,
 };
 
 const LAYOUT_FALLBACK: Record<string, Skin> = {

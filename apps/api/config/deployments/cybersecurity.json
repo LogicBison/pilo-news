@@ -194,6 +194,85 @@
               "explotación"
             ]
           }
+        },
+        {
+          "slug": "ai-infrastructure",
+          "label": {
+            "en": "AI Infrastructure",
+            "es": "Infraestructura de IA"
+          },
+          "weight": 1.3,
+          "keywords": {
+            "en": [
+              "gpu",
+              "accelerator",
+              "inference",
+              "training cluster",
+              "tpu",
+              "datacenter",
+              "data center",
+              "hyperscaler"
+            ],
+            "es": [
+              "gpu",
+              "acelerador",
+              "inferencia",
+              "centro de datos",
+              "clúster",
+              "hiperescalar"
+            ]
+          }
+        },
+        {
+          "slug": "chips-supply",
+          "label": {
+            "en": "Chips & Supply",
+            "es": "Chips y Suministro"
+          },
+          "weight": 1.25,
+          "keywords": {
+            "en": [
+              "semiconductor",
+              "foundry",
+              "wafer",
+              "lithography",
+              "export control",
+              "chipmaker"
+            ],
+            "es": [
+              "semiconductor",
+              "fundición",
+              "oblea",
+              "litografía",
+              "control de exportaciones",
+              "fabricante de chips"
+            ]
+          }
+        },
+        {
+          "slug": "ai-rules",
+          "label": {
+            "en": "AI Rules",
+            "es": "Normas de IA"
+          },
+          "weight": 1.2,
+          "keywords": {
+            "en": [
+              "ai act",
+              "ai regulation",
+              "algorithmic",
+              "model transparency",
+              "ai governance",
+              "ai liability"
+            ],
+            "es": [
+              "reglamento de ia",
+              "regulación de ia",
+              "algorítmic",
+              "transparencia de modelos",
+              "gobernanza de ia"
+            ]
+          }
         }
       ],
       "sources": [

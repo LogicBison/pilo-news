@@ -128,3 +128,18 @@ Answer D1–D3 in `.work.biz/strategy/20261105-offer-and-leadgen-brief.md`; then
 3. M9 added to the master plan §19 (v1.2) with a traceability row, so the iteration is no longer off-plan.
 **Blockers:** D-005 (named reviewer) still gates the digest generator; the 14-day window opened 2026-11-06 and closes 2026-11-20.
 **Next recommended:** read the funnel at 2026-11-20 against the pre-registered rule in `.work.biz/plans/plan_kev-digest.md` §11.
+
+---
+
+## Latest action (@biz-products scope)
+
+**Date:** 2026-11-06
+**Request:** "scope - digital technology channel"
+**Mode:** scope (one concept, MVP depth)
+**Executed:**
+1. Probed ten candidate feeds (8 EN, 2 ES) — all answered 200 with 10–50 items.
+2. Wrote `.work.biz/plans/plan_digital-technology-channel.md`: verdict, evidence, 6-item MVP, out-of-scope, DoD, users, metric, 1.5–2 day build shape, variants, a 21-day topic test that costs about an hour, kill criteria, graded questions, D-010…D-013.
+3. Corrected the record on two points the evidence did not support: channel build is config-only, but the e2e channel arrays are hardcoded; and liveness of feeds is not quality — `verify-sources` still has to grade them.
+**Findings worth flagging:** the real risk is not the build, it is overlap with the cybersecurity channel and saturated AI coverage. A topic hub on cybersecurity is the cheaper demand test.
+**Blockers:** D-010 (sequence), partner for the inquiry (U18), asset reviewer (D-005), traffic baseline (U10).
+**Next recommended:** approve D-010 and run the 21-day topic test before writing a profile.

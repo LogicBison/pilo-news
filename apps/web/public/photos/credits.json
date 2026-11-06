@@ -98,5 +98,15 @@
     "license_url": "https://creativecommons.org/licenses/by/3.0",
     "source": "https://commons.wikimedia.org/wiki/File:002_Production_line_-_car_assembly_line_in_General_Motors_Manufacturing_Poland_-_Gliwice,_Poland.jpg",
     "file": "apps/web/public/photos/manufacturing/band.jpg"
+  },
+  {
+    "channel": "digital-technology",
+    "title": "Wikimedia Foundation Servers-8055 13.jpg",
+    "creator": "Victorgrigas",
+    "creator_url": "",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Wikimedia_Foundation_Servers-8055_13.jpg",
+    "file": "apps/web/public/photos/digital-technology/band.jpg"
   }
 ]

@@ -8,7 +8,7 @@
 
 <!-- CHANNEL_INVENTORY_BEGIN -->
 **Base URL:** http://localhost:43991 · **Default channel:** `/stem-cell` (root `/` redirects) · **Admin:** http://localhost:43991/admin · **API health:** http://localhost:46105/v1/health
-**Channels:** 10
+**Channels:** 11
 
 | # | Channel | Slug | English | Spanish | Layout | Default |
 |---|---|---|---|---|---|---|
@@ -22,6 +22,7 @@
 | 8 | Manufacturing & Industrial Operations | `manufacturing` | http://localhost:43991/manufacturing | http://localhost:43991/es/manufacturing | professional |  |
 | 9 | Energy & Utilities | `energy` | http://localhost:43991/energy | http://localhost:43991/es/energy | professional |  |
 | 10 | Retail & E-commerce | `retail` | http://localhost:43991/retail | http://localhost:43991/es/retail | editorial |  |
+| 11 | Digital Technology | `digital-technology` | http://localhost:43991/digital-technology | http://localhost:43991/es/digital-technology | professional |  |
 
 **Patterns:** `/{slug}/search` · `/{slug}/about` · `/{slug}/contact` · `/{slug}/article/{id}` · `/es/{slug}/...`
 <!-- CHANNEL_INVENTORY_END -->

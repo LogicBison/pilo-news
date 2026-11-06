@@ -1,0 +1,791 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExtendedIndustryVerticalConfigurations",
+  "version": "1.2.0",
+  "industries": {
+    "psychiatry_psychology": {
+      "industryId": "ind_behavioral_health",
+      "name": "Psychiatry & Clinical Psychology",
+      "code": "BEHAVIORAL_HEALTH_EHR",
+      "complianceFrameworks": ["HIPAA", "42_CFR_PART_2", "GDPR_HEALTH"],
+      "terminology": {
+        "primaryEntity": "Client / Patient",
+        "secondaryEntity": "Clinician / Therapist",
+        "recordUnit": "Therapy Session / Assessment",
+        "actionItem": "Treatment Objective",
+        "statusField": "Care Plan Status"
+      },
+      "customFields": [
+        {
+          "key": "dsm5_icd11_diagnoses",
+          "label": "DSM-5 / ICD-11 Diagnostics",
+          "dataType": "array_string",
+          "required": true
+        },
+        {
+          "key": "phq9_gad7_scores",
+          "label": "Psychometric Assessment Scores (PHQ-9 / GAD-7)",
+          "dataType": "json_object",
+          "required": false
+        },
+        {
+          "key": "controlled_substance_prescription",
+          "label": "Schedule II-V Controlled Medications",
+          "dataType": "boolean",
+          "required": true
+        },
+        {
+          "key": "crisis_safety_plan",
+          "label": "Suicide / Self-Harm Safety Plan Active",
+          "dataType": "boolean",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "intake_assessment", "label": "Initial Evaluation & Intake", "isInitial": true },
+        { "id": "diagnostic_formulation", "label": "Diagnostic & Case Formulation" },
+        { "id": "active_therapy", "label": "Active Treatment / Psychotherapy" },
+        { "id": "med_management", "label": "Psychiatric Medication Management" },
+        { "id": "remission_maintenance", "label": "Maintenance / Step-Down Care" },
+        { "id": "discharged", "label": "Successfully Discharged", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "TELEHEALTH",
+          "protocol": "WEBRTC_SIP",
+          "authMechanism": "OAUTH2_E2EE"
+        },
+        {
+          "systemType": "E_PRESCRIBING",
+          "protocol": "NCPDP_SCRIPT",
+          "authMechanism": "MUTUAL_TLS_CERT"
+        }
+      ]
+    },
+    "education_academics": {
+      "industryId": "ind_education",
+      "name": "Education & Higher Academics",
+      "code": "EDTECH_LMS",
+      "complianceFrameworks": ["FERPA", "COPPA", "GDPR"],
+      "terminology": {
+        "primaryEntity": "Student / Learner",
+        "secondaryEntity": "Instructor / Advisor",
+        "recordUnit": "Course / Academic Term",
+        "actionItem": "Assignment / Exam",
+        "statusField": "Enrollment Status"
+      },
+      "customFields": [
+        {
+          "key": "student_id_number",
+          "label": "Student ID",
+          "dataType": "string",
+          "required": true
+        },
+        {
+          "key": "gpa_cumulative",
+          "label": "Cumulative GPA",
+          "dataType": "number",
+          "required": false
+        },
+        {
+          "key": "degree_program",
+          "label": "Major / Degree Track",
+          "dataType": "string",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "applicant", "label": "Admissions Applicant", "isInitial": true },
+        { "id": "enrolled", "label": "Actively Enrolled" },
+        { "id": "academic_probation", "label": "Academic Review" },
+        { "id": "graduated", "label": "Degree Awarded", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "LMS",
+          "protocol": "LTI_V1_3",
+          "authMechanism": "OAUTH2"
+        },
+        {
+          "systemType": "SIS",
+          "protocol": "REST_JSON",
+          "authMechanism": "BEARER_TOKEN"
+        }
+      ]
+    },
+    "legal_compliance": {
+      "industryId": "ind_legal",
+      "name": "Legal Services & Corporate Governance",
+      "code": "LEGAL_TECH",
+      "complianceFrameworks": ["ABA_ETHICS", "SOC2_TYPE_II", "GDPR"],
+      "terminology": {
+        "primaryEntity": "Client",
+        "secondaryEntity": "Lead Counsel / Attorney",
+        "recordUnit": "Matter / Case",
+        "actionItem": "Legal Motion / Filing",
+        "statusField": "Litigation Phase"
+      },
+      "customFields": [
+        {
+          "key": "docket_number",
+          "label": "Court Docket / Index Number",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "privilege_level",
+          "label": "Attorney-Client Privilege Status",
+          "dataType": "enum",
+          "options": ["Work Product", "Confidential", "Public Filing"],
+          "required": true
+        },
+        {
+          "key": "statute_of_limitations_date",
+          "label": "Statute of Limitations Deadline",
+          "dataType": "date",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "conflict_check", "label": "Conflict of Interest Check", "isInitial": true },
+        { "id": "discovery", "label": "Discovery & Evidence Gathering" },
+        { "id": "pleadings", "label": "Pleadings & Motions" },
+        { "id": "trial_settlement", "label": "Trial / Settlement Negotiation" },
+        { "id": "closed", "label": "Matter Closed", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "E_DISCOVERY",
+          "protocol": "REST_JSON",
+          "authMechanism": "API_KEY"
+        },
+        {
+          "systemType": "COURT_EFILING",
+          "protocol": "SOAP_XML",
+          "authMechanism": "SAML_2_0"
+        }
+      ]
+    },
+    "financial_banking": {
+      "industryId": "ind_finance",
+      "name": "Financial Services & Banking",
+      "code": "FINTECH_CORE",
+      "complianceFrameworks": ["AML_KYC", "FINRA", "SEC", "PCI_DSS_V4"],
+      "terminology": {
+        "primaryEntity": "Account Holder",
+        "secondaryEntity": "Compliance Officer",
+        "recordUnit": "Financial Transaction / Portfolio",
+        "actionItem": "KYC Review / Audit",
+        "statusField": "Account Risk Status"
+      },
+      "customFields": [
+        {
+          "key": "kyc_verification_status",
+          "label": "KYC/AML Clearance Status",
+          "dataType": "enum",
+          "options": ["Pending", "Verified", "Flagged", "Rejected"],
+          "required": true
+        },
+        {
+          "key": "risk_score",
+          "label": "Internal Risk Score (0-100)",
+          "dataType": "number",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "onboarding", "label": "KYC Onboarding", "isInitial": true },
+        { "id": "underwriting", "label": "Credit / Risk Underwriting" },
+        { "id": "active", "label": "Active & Servicing" },
+        { "id": "frozen", "label": "Account Suspended / Frozen" },
+        { "id": "closed", "label": "Account Terminated", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "CORE_BANKING",
+          "protocol": "ISO_20022_XML",
+          "authMechanism": "MUTUAL_TLS_CERT"
+        },
+        {
+          "systemType": "CREDIT_BUREAU",
+          "protocol": "REST_JSON",
+          "authMechanism": "BEARER_TOKEN"
+        }
+      ]
+    },
+    "logistics_supply_chain": {
+      "industryId": "ind_logistics",
+      "name": "Logistics & Supply Chain",
+      "code": "SUPPLY_CHAIN_WMS",
+      "complianceFrameworks": ["DOT", "IATA", "C-TPAT"],
+      "terminology": {
+        "primaryEntity": "Consignment / Waybill",
+        "secondaryEntity": "Freight Handler / Driver",
+        "recordUnit": "Shipment / Order Manifest",
+        "actionItem": "Customs Clearance / Delivery",
+        "statusField": "Transit Status"
+      },
+      "customFields": [
+        {
+          "key": "tracking_number",
+          "label": "Global Tracking Code",
+          "dataType": "string",
+          "required": true
+        },
+        {
+          "key": "hazardous_materials",
+          "label": "HAZMAT Flag",
+          "dataType": "boolean",
+          "required": true
+        }
+      ],
+      "workflowStates": [
+        { "id": "dispatch", "label": "Order Received & Dispatched", "isInitial": true },
+        { "id": "in_transit", "label": "In Transit / Freight" },
+        { "id": "customs_hold", "label": "Customs Inspection" },
+        { "id": "out_for_delivery", "label": "Out for Final Delivery" },
+        { "id": "delivered", "label": "Delivered & Signed (POD)", "isTerminal": true }
+      ],
+      "integrations": [
+        {
+          "systemType": "EDI_VAN",
+          "protocol": "EDIFACT_X12",
+          "authMechanism": "AS2_ENCRYPTION"
+        },
+        {
+          "systemType": "TELEMATICS",
+          "protocol": "MQTT",
+          "authMechanism": "API_KEY"
+        }
+      ]
+    },
+    "cybersecurity": {
+      "industryId": "ind_cybersecurity",
+      "name": "Cybersecurity & Incident Response",
+      "code": "CYBERSECURITY_OPS",
+      "complianceFrameworks": ["SOC2_TYPE_II", "ISO_27001", "NIST_CSF", "GDPR"],
+      "terminology": {
+        "primaryEntity": "Client / Asset Owner",
+        "secondaryEntity": "Security Analyst",
+        "recordUnit": "Incident / Alert",
+        "actionItem": "Remediation Task",
+        "statusField": "Incident Status"
+      },
+      "customFields": [
+        {
+          "key": "cve_ids",
+          "label": "CVE / KEV Identifiers",
+          "dataType": "array_string",
+          "required": false
+        },
+        {
+          "key": "affected_assets",
+          "label": "Affected Assets",
+          "dataType": "array_string",
+          "required": true
+        },
+        {
+          "key": "mitre_technique",
+          "label": "MITRE ATT&CK Technique",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "severity",
+          "label": "Severity",
+          "dataType": "enum",
+          "options": ["Critical", "High", "Medium", "Low"],
+          "required": true
+        },
+        {
+          "key": "breach_notification_due",
+          "label": "Breach Notification Deadline",
+          "dataType": "date",
+          "required": false
+        },
+        {
+          "key": "containment_evidence",
+          "label": "Containment Evidence",
+          "dataType": "json_object",
+          "required": false
+        }
+      ],
+      "workflowStates": [
+        {"id": "triage", "label": "Triage & Scoping", "isInitial": true},
+        {"id": "contained", "label": "Contained"},
+        {"id": "eradicated", "label": "Eradicated"},
+        {"id": "recovered", "label": "Recovered"},
+        {"id": "closed", "label": "Closed with Post-Incident Review", "isTerminal": true}
+      ],
+      "integrations": [
+        {
+          "systemType": "SIEM",
+          "protocol": "SYSLOG_CEF",
+          "authMechanism": "API_KEY"
+        },
+        {
+          "systemType": "EDR",
+          "protocol": "REST",
+          "authMechanism": "OAUTH2"
+        }
+      ]
+    },
+    "stem_cell_biotech": {
+      "industryId": "ind_stem_cell",
+      "name": "Stem Cell & Regenerative Medicine",
+      "code": "REGENERATIVE_MED_RESEARCH",
+      "complianceFrameworks": ["HIPAA", "FDA_21_CFR_PART_11", "GCP_ICH_E6", "GDPR_HEALTH"],
+      "terminology": {
+        "primaryEntity": "Donor / Patient",
+        "secondaryEntity": "Principal Investigator",
+        "recordUnit": "Protocol / Cell Batch",
+        "actionItem": "Deviation / CAPA",
+        "statusField": "Protocol Status"
+      },
+      "customFields": [
+        {
+          "key": "cell_line_id",
+          "label": "Cell Line Identifier",
+          "dataType": "string",
+          "required": true
+        },
+        {
+          "key": "protocol_phase",
+          "label": "Protocol Phase",
+          "dataType": "enum",
+          "options": ["Preclinical", "Phase I", "Phase II", "Phase III", "Phase IV"],
+          "required": true
+        },
+        {
+          "key": "irb_approval_date",
+          "label": "IRB / Ethics Approval Date",
+          "dataType": "date",
+          "required": true
+        },
+        {
+          "key": "donor_consent_scope",
+          "label": "Donor Consent Scope",
+          "dataType": "json_object",
+          "required": true
+        },
+        {
+          "key": "chain_of_identity",
+          "label": "Chain of Identity",
+          "dataType": "array_string",
+          "required": true
+        },
+        {
+          "key": "adverse_event_grade",
+          "label": "Adverse Event Grade (CTCAE)",
+          "dataType": "enum",
+          "options": ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5"],
+          "required": false
+        }
+      ],
+      "workflowStates": [
+        {"id": "enrollment", "label": "Enrollment & Consent", "isInitial": true},
+        {"id": "culture_expansion", "label": "Culture Expansion"},
+        {"id": "quality_release", "label": "Quality Release"},
+        {"id": "administration", "label": "Administration"},
+        {"id": "follow_up", "label": "Follow-Up Complete", "isTerminal": true}
+      ],
+      "integrations": [
+        {
+          "systemType": "LIMS",
+          "protocol": "HL7_FHIR",
+          "authMechanism": "OAUTH2"
+        },
+        {
+          "systemType": "EIRB",
+          "protocol": "REST",
+          "authMechanism": "SAML"
+        }
+      ]
+    },
+    "manufacturing": {
+      "industryId": "ind_manufacturing",
+      "name": "Advanced Manufacturing",
+      "code": "MFG_CONTROL",
+      "complianceFrameworks": ["ISO_9001", "IATF_16949", "OSHA", "GDPR"],
+      "terminology": {
+        "primaryEntity": "Customer / OEM",
+        "secondaryEntity": "Plant Engineer",
+        "recordUnit": "Work Order / Lot",
+        "actionItem": "Corrective Action",
+        "statusField": "Production Status"
+      },
+      "customFields": [
+        {
+          "key": "part_number",
+          "label": "Part Number",
+          "dataType": "string",
+          "required": true
+        },
+        {
+          "key": "lot_size",
+          "label": "Lot Size",
+          "dataType": "number",
+          "required": true
+        },
+        {
+          "key": "machine_id",
+          "label": "Machine / Line Identifier",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "defect_code",
+          "label": "Defect Code",
+          "dataType": "enum",
+          "options": ["Dimensional", "Material", "Assembly", "Surface", "Functional"],
+          "required": false
+        },
+        {
+          "key": "recall_scope",
+          "label": "Recall / Safety-Notice Scope",
+          "dataType": "array_string",
+          "required": false
+        },
+        {
+          "key": "maintenance_due",
+          "label": "Maintenance Due",
+          "dataType": "date",
+          "required": false
+        }
+      ],
+      "workflowStates": [
+        {"id": "planned", "label": "Planned", "isInitial": true},
+        {"id": "in_production", "label": "In Production"},
+        {"id": "quality_hold", "label": "Quality Hold"},
+        {"id": "released", "label": "Released"},
+        {"id": "shipped", "label": "Shipped", "isTerminal": true}
+      ],
+      "integrations": [
+        {
+          "systemType": "MES",
+          "protocol": "OPC_UA",
+          "authMechanism": "CERTIFICATE"
+        },
+        {
+          "systemType": "ERP",
+          "protocol": "REST",
+          "authMechanism": "OAUTH2"
+        }
+      ]
+    },
+    "energy": {
+      "industryId": "ind_energy",
+      "name": "Energy & Utilities",
+      "code": "ENERGY_GRID_OPS",
+      "complianceFrameworks": ["NERC_CIP", "FERC", "IEC_62443", "GDPR"],
+      "terminology": {
+        "primaryEntity": "Ratepayer / Account",
+        "secondaryEntity": "Grid Engineer / Operator",
+        "recordUnit": "Interconnection Request / Outage",
+        "actionItem": "Switching Order",
+        "statusField": "Interconnection Status"
+      },
+      "customFields": [
+        {
+          "key": "queue_position",
+          "label": "Interconnection Queue Position",
+          "dataType": "number",
+          "required": false
+        },
+        {
+          "key": "capacity_mw",
+          "label": "Capacity (MW)",
+          "dataType": "number",
+          "required": true
+        },
+        {
+          "key": "substation_id",
+          "label": "Substation / Node Identifier",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "outage_window",
+          "label": "Outage Window",
+          "dataType": "json_object",
+          "required": false
+        },
+        {
+          "key": "fuel_type",
+          "label": "Fuel Type",
+          "dataType": "enum",
+          "options": ["Solar", "Wind", "Battery Storage", "Natural Gas", "Nuclear", "Hydro", "Hydrogen"],
+          "required": true
+        },
+        {
+          "key": "ppa_reference",
+          "label": "PPA / Contract Reference",
+          "dataType": "string",
+          "required": false
+        }
+      ],
+      "workflowStates": [
+        {"id": "application", "label": "Application", "isInitial": true},
+        {"id": "feasibility", "label": "Feasibility Study"},
+        {"id": "agreement", "label": "Interconnection Agreement"},
+        {"id": "construction", "label": "Construction"},
+        {"id": "in_service", "label": "In Service", "isTerminal": true}
+      ],
+      "integrations": [
+        {
+          "systemType": "SCADA",
+          "protocol": "DNP3",
+          "authMechanism": "CERTIFICATE"
+        },
+        {
+          "systemType": "RTO_QUEUE_API",
+          "protocol": "REST",
+          "authMechanism": "OAUTH2"
+        }
+      ]
+    },
+    "retail": {
+      "industryId": "ind_retail",
+      "name": "Retail & Consumer Commerce",
+      "code": "RETAIL_COMMERCE",
+      "complianceFrameworks": ["PCI_DSS_V4", "CCPA", "GDPR", "FTC_MAIL_ORDER"],
+      "terminology": {
+        "primaryEntity": "Shopper / Customer",
+        "secondaryEntity": "Category Manager",
+        "recordUnit": "Order / SKU",
+        "actionItem": "Replenishment Task",
+        "statusField": "Fulfilment Status"
+      },
+      "customFields": [
+        {
+          "key": "sku",
+          "label": "SKU",
+          "dataType": "string",
+          "required": true
+        },
+        {
+          "key": "unit_price",
+          "label": "Unit Price (decimal)",
+          "dataType": "number",
+          "required": true
+        },
+        {
+          "key": "promo_window",
+          "label": "Promotion Window",
+          "dataType": "json_object",
+          "required": false
+        },
+        {
+          "key": "recall_lot",
+          "label": "Recall Lot",
+          "dataType": "array_string",
+          "required": false
+        },
+        {
+          "key": "channel_mix",
+          "label": "Channel Mix",
+          "dataType": "enum",
+          "options": ["Online", "In-store", "Marketplace", "Wholesale"],
+          "required": false
+        },
+        {
+          "key": "returns_rate",
+          "label": "Returns Rate",
+          "dataType": "number",
+          "required": false
+        }
+      ],
+      "workflowStates": [
+        {"id": "cart", "label": "Cart", "isInitial": true},
+        {"id": "paid", "label": "Paid"},
+        {"id": "picking", "label": "Picking"},
+        {"id": "shipped", "label": "Shipped"},
+        {"id": "closed", "label": "Delivered or Returned", "isTerminal": true}
+      ],
+      "integrations": [
+        {
+          "systemType": "POS",
+          "protocol": "REST",
+          "authMechanism": "API_KEY"
+        },
+        {
+          "systemType": "WMS",
+          "protocol": "REST",
+          "authMechanism": "OAUTH2"
+        },
+        {
+          "systemType": "MARKETPLACE_FEED",
+          "protocol": "SFTP",
+          "authMechanism": "SSH_KEY"
+        }
+      ]
+    },
+    "technology_science": {
+      "industryId": "ind_technology_science",
+      "name": "Technology & Science",
+      "code": "TECH_SCIENCE_RND",
+      "complianceFrameworks": ["ISO_27001", "NIST_800_171", "GDPR", "EAR_ITAR_EXPORT_CONTROL"],
+      "terminology": {
+        "primaryEntity": "Sponsor / Laboratory",
+        "secondaryEntity": "Research Engineer",
+        "recordUnit": "Experiment / Study",
+        "actionItem": "Programme Milestone",
+        "statusField": "Programme Status"
+      },
+      "customFields": [
+        {
+          "key": "research_domain",
+          "label": "Research Domain",
+          "dataType": "enum",
+          "options": ["Physical Sciences", "Life Sciences", "Engineering", "Computing", "Materials Science"],
+          "required": true
+        },
+        {
+          "key": "technology_readiness_level",
+          "label": "Technology Readiness Level (1-9)",
+          "dataType": "number",
+          "required": false
+        },
+        {
+          "key": "grant_or_contract",
+          "label": "Grant / Contract Reference",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "equipment_id",
+          "label": "Instrument / Equipment Identifier",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "publication_status",
+          "label": "Publication Status",
+          "dataType": "enum",
+          "options": ["Draft", "Preprint", "Submitted", "Under Review", "Published", "Retracted"],
+          "required": false
+        },
+        {
+          "key": "export_control_class",
+          "label": "Export Control Classification",
+          "dataType": "enum",
+          "options": ["None", "EAR", "ITAR", "EU Dual-Use"],
+          "required": false
+        },
+        {
+          "key": "peer_review_record",
+          "label": "Peer Review Record",
+          "dataType": "json_object",
+          "required": false
+        }
+      ],
+      "workflowStates": [
+        {"id": "proposal", "label": "Proposal", "isInitial": true},
+        {"id": "funded", "label": "Funded"},
+        {"id": "in_experiment", "label": "In Experiment"},
+        {"id": "peer_review", "label": "Peer Review"},
+        {"id": "published", "label": "Published", "isTerminal": true}
+      ],
+      "integrations": [
+        {
+          "systemType": "ELN",
+          "protocol": "REST",
+          "authMechanism": "OAUTH2"
+        },
+        {
+          "systemType": "HPC_SCHEDULER",
+          "protocol": "SLURM_REST",
+          "authMechanism": "CERTIFICATE"
+        },
+        {
+          "systemType": "ORCID_CROSSREF",
+          "protocol": "REST",
+          "authMechanism": "API_KEY"
+        }
+      ]
+    },
+    "digital_technology": {
+      "industryId": "ind_digital_technology",
+      "name": "Digital Technology",
+      "code": "DIGITAL_TECH_PLATFORM",
+      "complianceFrameworks": ["SOC2_TYPE_II", "ISO_27001", "GDPR", "EU_AI_ACT"],
+      "terminology": {
+        "primaryEntity": "Customer / Tenant",
+        "secondaryEntity": "Platform Engineer",
+        "recordUnit": "Workload / Model",
+        "actionItem": "Change Request",
+        "statusField": "Deployment Status"
+      },
+      "customFields": [
+        {
+          "key": "gpu_hours",
+          "label": "GPU Hours",
+          "dataType": "number",
+          "required": false
+        },
+        {
+          "key": "model_id",
+          "label": "Model Identifier",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "dataset_provenance",
+          "label": "Dataset Provenance",
+          "dataType": "json_object",
+          "required": false
+        },
+        {
+          "key": "chip_lot",
+          "label": "Chip / Hardware Lot",
+          "dataType": "string",
+          "required": false
+        },
+        {
+          "key": "datacenter_region",
+          "label": "Datacenter Region",
+          "dataType": "enum",
+          "options": ["US-East", "US-West", "EU-West", "EU-Central", "APAC"],
+          "required": true
+        },
+        {
+          "key": "availability_sla",
+          "label": "Availability SLA (%)",
+          "dataType": "number",
+          "required": false
+        },
+        {
+          "key": "ai_risk_class",
+          "label": "EU AI Act Risk Class",
+          "dataType": "enum",
+          "options": ["Minimal", "Limited", "High", "Unacceptable"],
+          "required": false
+        }
+      ],
+      "workflowStates": [
+        {"id": "requested", "label": "Requested", "isInitial": true},
+        {"id": "provisioned", "label": "Provisioned"},
+        {"id": "training_or_serving", "label": "Training / Serving"},
+        {"id": "degraded", "label": "Degraded"},
+        {"id": "retired", "label": "Retired", "isTerminal": true}
+      ],
+      "integrations": [
+        {
+          "systemType": "CLOUD_CONTROL_PLANE",
+          "protocol": "REST",
+          "authMechanism": "OAUTH2"
+        },
+        {
+          "systemType": "OBSERVABILITY",
+          "protocol": "OTLP",
+          "authMechanism": "API_KEY"
+        },
+        {
+          "systemType": "MODEL_REGISTRY",
+          "protocol": "REST",
+          "authMechanism": "OAUTH2"
+        }
+      ]
+    }
+  }
+}

@@ -74,7 +74,7 @@ export default async function TopicPage({ params }: Params) {
         )}
       </div>
       <div>
-        <CtaCard industry={channel} locale={resolved} placement="article" compact />
+        <CtaCard industry={channel} locale={resolved} placement="topic" compact />
         <div className="mt-6">
           <BriefSignup
             industry={industry}

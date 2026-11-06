@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-06 (M9 complete)
+**Updated:** 2026-11-06 (M11 complete - eleven channels live)
 
 ---
 
@@ -60,6 +60,9 @@
 | M9 asset card test | `cta.asset` in channel config + migration 011, channel-config-driven card, one secondary rung, e2e rule, SPEC amendment 01 |
 | Coverage balance repair | `skins.css` card clamp: energy 330px -> 85px, worst channel 178px vs the 260 gate |
 | Plan v1.2 | M9 added to `.work/plans/full/20261105-full-plan.md` §19 + traceability row |
+| Digital-tech topics (M10) | three topics on cybersecurity, `placement="topic"` attribution, migration 012 + unit test |
+| Digital-technology channel (M11) | profile, `datacenter` skin + art + CC BY-SA photo, 6/6 grade-A feeds, 26 EN + 1 ES items |
+| Channel inventory | `docs/channel-inventory.md` regenerated: **11 channels** |
 
 ---
 
@@ -75,8 +78,9 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Read the 14-day asset test | window opened 2026-11-06, closes **2026-11-20**; `asset_interest` events vs CTA impressions from `/v1/admin/funnel`, against the pre-registered rule in `.work.biz/plans/plan_kev-digest.md` §11 |
-| **1** | Name the digest reviewer (D-005) | the generator cannot publish an issue without a named signer |
+| **0** | Read the digital-technology window | closes **2026-11-27**; topic placements (`placement="topic"`) + channel inquiries against the rule in `.work.biz/plans/plan_digital-technology-channel.md` §11 (D-014 keep/kill) |
+| **1** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions per `plan_kev-digest.md` §11 |
+| **1b** | Name the digest reviewer (D-005) | the generator cannot publish an issue without a named signer |
 | **2** | New-channel content coverage | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
 | **3** | `@ui-component-build plan - S1` | contact, about, admin screens on the shipped primitives |
 | **4** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
@@ -84,7 +88,148 @@
 
 ---
 
-## Current iteration - M9: asset card test (post-v1 operator scope)
+## Current iteration - M11: digital-technology channel
+
+**Milestone ref:** M11 · `.work/plans/full/20261105-full-plan.md` §19 (v1.4, 2026-11-06). Scope: `.work.biz/plans/plan_digital-technology-channel.md` §4. Decisions: D-011 (name), D-013 (skin), D-014 (build now).
+**Status:** complete 2026-11-06 — 6/6 tasks
+**Started:** 2026-11-06
+
+### In scope
+- a live `digital-technology` channel: EN + ES, own theme, five topics, six graded feeds
+- its own skin and art, or the GRID skin if no licensed photo clears
+- a refreshed `docs/channel-inventory.md` (11 channels) that passes `--check`
+- e2e, contrast, and full-suite coverage for the eleventh channel
+
+### Out of scope (explicit)
+- the asset card (`cta.asset`) — D-012 is open; a slug with no registry entry would silently drop the card
+- partner routing and the readiness-review inquiry for this channel (U18)
+- a second skin family; Asia sources; translation beyond EN/ES
+- the keep/kill read-out itself (2026-11-27, M10 window)
+
+### Tasks
+| ID | Description | Files | Status | Notes |
+|----|-------------|-------|--------|-------|
+| M11-T1 | Profile: theme, locales, disclaimers, CTA, 5 topics, 6 sources | `apps/api/config/deployments/digital-technology.json` | done | M. violet-on-white theme (radius 2px, mono headings), 5 topics, 6 sources (4 EN + 2 ES), `cta.qualify` with three options, no `cta.asset`. Dry-run: 14 created, 0 warnings. SC1: (1) no drift, one new file; (2) failure = someone applies the profile expecting the site default to move — `default_industry` is reported, not written (`apply.py:121-131`); (3) assumed deployment-level fields are report-only, verified; (4) theme contrast is checked by my own ratios (min 5.19) and by the API on create (T3) — `pnpm check` cannot see an unapplied profile; (5) 0 warnings | M. square corners, mono headings; topics `ai-infrastructure`, `chips-supply`, `ai-rules`, `datacenter-power`, `platform-pricing`; 6 sources (4 EN + 2 ES) from the probed list; no `cta.asset` |
+| M11-T2 | Skin `datacenter` + motif/scene + licensed photo + credit | `apps/web/src/lib/skins.ts`, `apps/web/public/skins/digital-technology/motif.svg`, `…/scene.svg`, `apps/web/public/photos/digital-technology/*`, `apps/web/public/photos/credits.json` | done | M. paths follow the channel, not the skin key (as energy/grid does). photo: Wikimedia Foundation servers, **CC BY-SA 3.0**, Victorgrigas, cropped to 1600×640 + 800×320, credit in `credits.json` and in the skin. SC1: (1) no drift beyond the asset directory name, declared; (2) failure = BY-SA share-alike on a cropped band — the in-page credit must stay rendered or the licence is breached (same risk the other four BY/BY-SA channels carry); (3) assumed `credits.json` needs a full-width JSON rewrite, verified by re-parsing (11 entries); (4) assets serve 200, but the skin's **visual render is unverified until the channel exists** — T3 confirms it; (5) 0 warnings |
+| M11-T3 | Grade the feeds, apply, ingest to 14 items | `verify-sources`, `apply-profile`, `refresh` | done | M. **6/6 sources grade A**, 0 failures, 0 coverage warnings; applied (14 created), second apply 0 created / 0 updated; **26 EN + 1 ES** items on the first refresh. SC1: (1) no drift, config only; (2) failure = ES coverage stays at 1 until the Spanish feeds publish more — the channel is EN-heavy on day one, same as retail; (3) assumed the two ES feeds cover chips/AI, they are general technology; (4) `verify-sources` is the test; (5) 0 warnings |
+| M11-T4 | Regenerate the channel inventory and prove it fresh | `docs/channel-inventory.md` | done | S. regenerated from the live API: **11 channels**, EN/ES URLs, default channel unchanged; `--check` green and it runs inside `./bin/start.sh test`. SC1: (1) no drift; (2) failure = the file is generated from the dev base, so a prd inventory needs its own regeneration (`ENV_FILE`/`APP_BASE_URL`); (3) assumed the generator enumerates `/v1/industries`, confirmed; (4) `--check` is the test; (5) 0 warnings |
+| M11-T5 | Tests: 11 channels in the e2e loops, contrast, full suite | `apps/web/e2e/layout.spec.ts`, `apps/web/e2e/public.spec.ts` | done | S. slug added to the layout loop (4 tests) and a public test asserts the `datacenter` skin div, the brief rung, the absence of another channel's card, and the CC BY-SA credit. SC1: (1) drift = the public spec, declared; (2) failure = the test asserts a credit line that only exists because the photo needs it — if the photo is replaced with a CC0 file the assertion should drop with it; (3) assumed `data-skin` is on `<html>`, **wrong** — it is on the channel wrapper div, test fixed after the first run failed; (4) yes, the four assertions; (5) 1 self-inflicted test bug, fixed and re-run |
+| M11-T6 | Docs: channel guide and README mention | `docs/guides/switching-channels.md`, `README.md` | done | S. channel added to the guide's current set and a `Live channels` row in the README. SC1: (1) no drift; (2) failure = the guide's list drifts again on the twelfth channel — the inventory file is the canonical list and the guide points to it; (3) assumed no other doc lists channels exhaustively, spot-checked `docs/`; (4) n-a, documentation; (5) 0 warnings |
+
+### Acceptance criteria
+- [ ] `/digital-technology` and `/es/digital-technology` return 200 with a bundle, sitemap lists both
+- [ ] every enabled source grades A or B; zero coverage warnings
+- [ ] `docs/channel-inventory.md` says 11 channels and `./bin/channels.sh --check` passes
+- [ ] `pnpm check` passes contrast for 11 channels; layout + public + axe green
+- [ ] ≥14 published items before the channel is enabled
+
+### Validation steps
+- [ ] `./bin/start.sh --env dev test`
+- [ ] `docker compose --env-file .env.dev -f docker-compose.dev.yml exec api bash -c "cd /app && python -m news_api.cli verify-sources --industry digital-technology"`
+- [ ] `./bin/channels.sh --check`
+- [ ] full Playwright on a production build
+
+### Owner blockers
+- **D-013 (skin):** no answer yet. Default in this plan: new `datacenter` skin, GRID fallback if no licensed photo clears.
+- **D-011 (name):** default "Digital Technology" / `digital-technology` / "Tecnología Digital".
+
+### Concept / NFR registry (this iteration)
+| Concept id | Applies | Status | Evidence / trigger |
+|------------|---------|--------|-------------------|
+| MOD-01 | no | n-a | a new channel is data; no boundary moves |
+| MOD-02 | no | n-a | no new network hop (same API, same worker) |
+| MOD-03 | **yes** | pending | one more channel polled on the existing cadence; measure first-week article count against the AI cap |
+| MOD-04 | no | n-a | no new operational surface |
+| MOD-05 | no | n-a | no deployable change |
+| MOD-06 | **yes** | pending | agent-authored profile, skin, and test edits; blast radius is one channel page and the inventory |
+| MOD-07 | no | n-a | no prompt change |
+| MOD-08 | no | n-a | no IaC change |
+
+### Cross-LLM verification
+- Triggered: no — channel-as-data with existing gates
+
+### Done this iteration
+| Task | Completed | Notes |
+|------|-----------|-------|
+| M11-T1 | 2026-11-06 | profile written and validated (14 entities on dry-run) |
+| M11-T2 | 2026-11-06 | `datacenter` skin, two SVGs, CC BY-SA photo with credit |
+| M11-T3 | 2026-11-06 | 6/6 feeds grade A; applied; 26 EN + 1 ES items |
+| M11-T4 | 2026-11-06 | inventory at 11 channels, `--check` green |
+| M11-T5 | 2026-11-06 | 11 channels in the layout loop; skin/credit asserted |
+| M11-T6 | 2026-11-06 | guide + README mention |
+
+---
+
+## Completed iteration - M10: digital-technology topic test (2026-11-06)
+
+**Milestone ref:** M10 · `.work/plans/full/20261105-full-plan.md` §19 (added v1.3, 2026-11-06). Source of scope: `.work.biz/plans/plan_digital-technology-channel.md` §11; decision D-010.
+**Status:** complete 2026-11-06 — 4/4 tasks, window open to 2026-11-27
+**Started:** 2026-11-06
+
+### In scope
+- three digital-technology topics on the cybersecurity profile, with EN/ES keywords and weights
+- topic-page CTAs attributed as `placement="topic"` so the funnel read-out can answer the question
+- a contract assertion that the topics are seeded
+- the 21-day window and decision rule pre-registered before any result exists
+
+### Out of scope (explicit)
+- the `digital-technology` channel profile, its skin, art, or sources — **moved to M11 by D-014**; this iteration only measures
+- any change to the other nine channels' topics
+- new routes or components — topic hubs already ship
+- the asset (`ai-rules-calendar`) and its reviewer
+
+### Tasks
+| ID | Description | Files | Status | Notes |
+|----|-------------|-------|--------|-------|
+| M10-T1 | Three topics on the cybersecurity profile | `apps/api/config/deployments/cybersecurity.json` | done | S. `ai-infrastructure` 1.3, `chips-supply` 1.25, `ai-rules` 1.2, EN/ES keywords; existing four untouched (apply #2: 0 created, 0 updated). SC1: (1) no drift, one file; (2) failure = a broad keyword (`datacenter`) pulls real-estate or utility stories into the cyber channel — the read-out is what catches it; (3) assumed the four existing topics keep their values, confirmed by the second apply reporting 0 updated; (4) keyword precision has no unit test; T4 records the read-out as the test; (5) 0 warnings |
+| M10-T2 | Attribute topic-page CTAs | `apps/web/src/app/[locale]/[industry]/topic/[slug]/page.tsx`, `apps/web/src/components/CtaCard.tsx` | done | S. `"topic"` added to the CtaCard union; the page passes it; the brief rung keeps `brief-topic`. SC1: (1) drift = the union in `CtaCard.tsx` had to open up, now declared; (2) failure = a placement string is untyped at the analytics boundary, so a typo would silently create a funnel row — the union narrows it to compile time; (3) assumed `CtaButton` takes a plain string, verified at `Cta.tsx:18`; (4) no permanent test asserts the placement (the probe was removed) — coverage gap recorded here, T3 covers the topic seed not the placement; (5) 0 warnings |
+| M10-T3 | Contract assertion for the seeded topics | `apps/api/tests/unit/test_digital_topics_profile.py`, `apps/api/migrations/012_seed_digital_technology_topics.sql` | done | S. **File list changed during the task:** the contract test cannot work — `cybersecurity` is not seeded into the test database (only the five 002 seeds are), so the bundle returns 404 there. Instead: migration 012 seeds the topics for every environment (idempotent via the unique slug constraint), and a unit test guards the profile so a topic cannot be dropped silently. SC1: (1) drift = migration + unit test instead of the contract file, declared; (2) failure = the migration and the profile carry the same topic data and can drift — the unit test pins the profile, nothing pins the SQL; (3) assumed the test DB runs migrations only, confirmed in `tests/conftest.py:52`; (4) yes, two unit assertions; (5) 1 ruff SIM300 fixed and re-gated |
+| M10-T4 | Pre-register the 21-day window and rule | `.work.biz/plans/plan_digital-technology-channel.md`, `.work.biz/decisions/DECISIONS.md` | done | S. window **2026-11-06 → 2026-11-27**; denominator = CTA impressions with `placement="topic"` (or sessions when U10 lands); numerator = `cta_click` + `brief-topic` starts; rule retargeted from build/kill to keep/kill by **D-014**. SC1: (1) drift = the decisions ledger and the plan doc, declared; (2) failure = the window is read against a denominator that U10 may never supply — the rule names the fallback and marks the result `estimated`; (3) assumed the funnel keeps emitting `topic` rows, verified by the T2 probe; (4) n-a, documentation; (5) 0 warnings |
+
+### Acceptance criteria
+- [ ] `/cybersecurity/topic/ai-infrastructure`, `/chips-supply`, `/ai-rules` render in EN and ES (empty state is acceptable until stories match)
+- [ ] `/v1/admin/funnel` reports a `topic` placement row
+- [ ] `apply-profile --only-industry cybersecurity` is idempotent (second run: 0 created / 0 updated)
+- [ ] the window and decision rule are written before any result is read
+
+### Validation steps
+- [x] `./bin/start.sh --env dev test` → api 113 passed, web checks, inventory ok
+- [x] migration 012 applied (`applied: 1`), re-run `applied: 0`; cybersecurity bundle still returns 7 topics
+- [ ] `docker compose --env-file .env.dev -f docker-compose.dev.yml exec api bash -c "cd /app && python -m news_api.cli apply-profile --file config/deployments/cybersecurity.json --only-industry cybersecurity --dry-run"`
+- [ ] manual: the six topic URLs (3 topics × 2 locales) plus `/en/admin` funnel tab
+- [x] full Playwright on a production build → 59 passed, 1 skipped (probe confirmed `placement: "topic"` on impression + click)
+- [ ] playwright system libs: re-run `pnpm exec playwright install-deps chromium` after any container recreate — the Dockerfile.dev does not install them (found this session)
+
+### Owner blockers
+- **U10 (traffic baseline):** without sessions, the rule falls back to CTA impressions as the denominator; mark the result `estimated`.
+- D-011/D-012/D-013 are not needed until the channel decision.
+
+### Concept / NFR registry (this iteration)
+| Concept id | Applies | Status | Evidence / trigger |
+|------------|---------|--------|-------------------|
+| MOD-01 | no | n-a | no boundary moves |
+| MOD-02 | no | n-a | no new network hop |
+| MOD-03 | no | n-a | no new line item |
+| MOD-04 | no | n-a | no new operational surface |
+| MOD-05 | no | n-a | no deployable change |
+| MOD-06 | **yes** | pending | agent-authored one-line placement change + fixture data; blast radius is one CTA attribution string; tested by the funnel read-out |
+| MOD-07 | no | n-a | no prompt change |
+| MOD-08 | no | n-a | no IaC change |
+
+### Cross-LLM verification
+- Triggered: no — three-file change with a contract test
+
+### Done this iteration
+| Task | Completed | Notes |
+|------|-----------|-------|
+| M10-T1 | 2026-11-06 | three topics on the cybersecurity profile; applied and idempotent |
+| M10-T2 | 2026-11-06 | topic CTAs report `placement="topic"` (probe-confirmed) |
+| M10-T3 | 2026-11-06 | migration 012 seeds the topics; unit test pins the profile |
+| M10-T4 | 2026-11-06 | 21-day window pre-registered; D-014 turns it into a keep/kill check |
+
+---
+
+## Completed iteration - M9: asset card test (2026-11-06)
 
 **Milestone ref:** M9 · `.work/plans/full/20261105-full-plan.md` §19 (added v1.2, 2026-11-06). Origin: D-003…D-006 in `.work.biz/plans/plan_kev-digest.md` §15.
 **Status:** complete 2026-11-06 — milestone verify pass with gaps (gaps closed the same day)

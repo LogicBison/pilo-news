@@ -45,7 +45,7 @@ list slugs:
 curl -s http://localhost:46105/v1/industries | python3 -c "import sys,json; print([c['slug'] for c in json.load(sys.stdin)['data']])"
 ```
 
-current set: `legal`, `financial`, `behavioral-health`, `education`, `logistics`, `cybersecurity`, `stem-cell`, `manufacturing`, `energy`, `retail`.
+current set: `legal`, `financial`, `behavioral-health`, `education`, `logistics`, `cybersecurity`, `stem-cell`, `manufacturing`, `energy`, `retail`, `digital-technology`.
 canonical list with EN/ES URLs: `docs/channel-inventory.md` (regenerate with `./bin/channels.sh --write`).
 
 ## add an industry or custom subject

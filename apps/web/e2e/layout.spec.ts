@@ -11,6 +11,7 @@ const CHANNELS = [
   "manufacturing",
   "energy",
   "retail",
+  "digital-technology",
 ];
 
 async function hydrated(page: import("@playwright/test").Page, path: string) {

@@ -13,7 +13,7 @@ export function CtaCard({
 }: {
   industry: Industry;
   locale: Locale;
-  placement: "hero" | "article" | "about" | "search" | "footer";
+  placement: "hero" | "article" | "topic" | "about" | "search" | "footer";
   articleId?: string;
   compact?: boolean;
 }) {

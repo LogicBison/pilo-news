@@ -2,7 +2,7 @@
 
 ## Session status
 
-**Closed:** 2026-11-06 - M9 shipped: each channel's gated reference asset now comes from channel config (`cta.asset`), the asset card replaces the brief rung where it exists, and the 14-day test window is open to 2026-11-20. Also: the KEV digest MVP scoped in `.work.biz/plans/plan_kev-digest.md` (D-003…D-009), the coverage-balance layout fixed, plan v1.2 + SPEC amendment 01. 111 api tests; web checks; 59 Playwright passed / 1 skipped; migration 011 idempotent.
+**Closed:** 2026-11-06 - eleven channels. M9 shipped config-driven asset cards and one secondary rung; M10 added the digital-technology demand test (three topics, `placement="topic"`, migration 012); M11 built the eleventh channel (`digital-technology`): its own `datacenter` skin with a CC BY-SA photo, six grade-A feeds, 26 EN + 1 ES items, and the channel inventory regenerated. 113 api tests; web checks; 64 Playwright passed / 1 skipped; 11/11 contrast.
 
 **Updated:** 2026-11-06
 
@@ -21,23 +21,15 @@ enforced policy (`verify-sources`), the default industry switches at runtime
 **editorial-conversion v2** grammar: open/square marketing surfaces, full-bleed
 proof/photo/conversion bands, balanced two-column coverage, filled forms, and a
 generated channel inventory (`docs/channel-inventory.md`). **Foundation-complete: yes. Plan-master-ready: yes.
-Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.** M9 (gated-asset card test) is complete: the asset a channel offers comes from `cta.asset`, one secondary rung per page, and the 14-day measurement window is open until 2026-11-20.
+Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.** M9 (gated-asset card test) is complete: the asset a channel offers comes from `cta.asset`, one secondary rung per page, and the 14-day measurement window is open until 2026-11-20. **Ten channels became eleven:** `digital-technology` is live in EN and ES with its own `datacenter` skin, six grade-A feeds (4 EN, 2 ES) and 26 EN + 1 ES items on the first refresh; the channel inventory reads 11.
 
 **Waiver retired (2026-11-06):** **M9 — gated-asset card test** is now a `§19` row in `.work/plans/full/20261105-full-plan.md` (v1.2), so the earlier post-v1 waiver no longer applies.
 
 **Recommended pick-up file:** `.work/plans/NEXT.md`
-**Next session focus:** M9 is complete — the cybersecurity KEV digest card is live from channel config,
-the brief rung is suppressed where an asset exists, and the 14-day test window closes **2026-11-20**.
-Read `/v1/admin/funnel` then against the pre-registered rule, and name the reviewer (D-005) before any
-generator work. After that: new-channel content gaps (manufacturing EN 10, retail ES 1), then
-`@ui-component-build plan - S1`; prd deploy/rollback and k6 after. Reports:
-`.work.ui/reports/20261105-visual-verify-milestone.md`,
-`.work.ui/reports/20261105-accessibility-audit-milestone.md`,
-`.work.ui/reports/20261105-imagery-audit.md`.
-Skins live in `apps/web/src/lib/skins.ts` + `apps/web/src/app/skins.css`; palettes come
-from migration 009 plus the three new deployment profiles.
-Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev industry <slug>`
-(quick reference: `docs/guides/switching-channels.md`).
+**Next session focus:** eleven channels live. Two readings are open and both close on a date, not a mood:
+the digital-technology keep/kill on **2026-11-27** (topic placements + inquiries, D-014) and the asset test on
+**2026-11-20**. The ES side of the new channel is thin (1 item) and the two Spanish feeds are general technology.
+Before any further channel work: read the funnel, name the digest reviewer (D-005), then S1 screens.
 
 **Lost or new?** Read `.cursorrules`, then `.work/plans/NEXT.md` and
 `.work.ui/reports/20261105-visual-verify-milestone.md`.
@@ -143,6 +135,10 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | M9 2026-11-06 | full Playwright on a production build → 59 passed, 1 skipped, 0 failed (layout 40, a11y, public incl. asset-card rule) |
 | M9 2026-11-06 | migration 011 → `applied: 1`, second run `applied: 0`; `apply-profile` legal + cybersecurity `skipped`; `/v1/news/bundle` carries `cta.asset` for those two only |
 | M9 2026-11-06 | coverage balance measured on ten channels at 1280px: max spread 178px vs the 260 gate |
+| M11 2026-11-06 | `verify-sources --industry digital-technology`: 6 sources, 6 pass, 0 fail, 0 coverage warnings |
+| M11 2026-11-06 | `apply-profile` digital-technology: 14 created; second run 0 created / 0 updated; `/v1/industries` returns 11 channels |
+| M11 2026-11-06 | full Playwright on a production build: **64 passed, 1 skipped** (11-channel layout loop + new channel test) |
+| M11 2026-11-06 | `pnpm check`: 11 channels pass contrast; `bin/channels.sh --check`: 11 channels, ok |
 | Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
 
 ---
@@ -195,6 +191,8 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | 2026-11-06 | M9 asset card test | `cta.asset` in channel config (migration 011 + profiles), card resolved from config, brief rung suppressed where an asset exists, SPEC amendment 01, e2e coverage; D-008/D-009 recorded |
 | 2026-11-06 | M9 gap fixes + repair | plan v1.2 with M9; coverage card clamp (energy 330px -> 85px, worst channel 178px); full suite 59 passed / 1 skipped |
 | 2026-11-06 | biz scope | `.work.biz/plans/plan_kev-digest.md` (KEV digest MVP scope), D-003…D-009, 14-day window pre-registered |
+| 2026-11-06 | M10 topics | three digital-tech topics on the cybersecurity profile, `placement="topic"` attribution, migration 012 + unit test, D-010/D-014 |
+| 2026-11-06 | M11 channel | `digital-technology` profile, `datacenter` skin (motif/scene/CC BY-SA photo), 6 grade-A feeds, 26 EN + 1 ES items, inventory at 11 channels, e2e + docs |
 
 ---
 
@@ -286,4 +284,4 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Read the 14-day asset test at 2026-11-20 (funnel per placement, pre-registered rule) and name the digest reviewer (D-005); then close the new channels' content gaps and run `@ui-component-build plan - S1`.
+Read the digital-technology window at 2026-11-27 and the asset test at 2026-11-20 against their pre-registered rules; name the digest reviewer (D-005); strengthen ES coverage on the new channel; then `@ui-component-build plan - S1`.
