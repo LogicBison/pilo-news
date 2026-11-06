@@ -77,6 +77,14 @@ export interface CtaConfig {
   qualify?: CtaQualification;
 }
 
+/** Free reader offers the channel currently publishes. */
+export interface OfferConfig {
+  consultation: boolean;
+  brief: boolean;
+  question: boolean;
+  asset: boolean;
+}
+
 export interface Industry {
   slug: string;
   name: string;
@@ -88,6 +96,7 @@ export interface Industry {
   disclaimer: string;
   disclaimers: Record<string, string>;
   cta: CtaConfig;
+  offers: OfferConfig;
   timezone: string;
 }
 

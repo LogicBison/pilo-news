@@ -33,6 +33,7 @@ export function fallbackIndustry(slug: string, tagline = "Industry news for prof
       },
       label: { en: "Request a consultation", es: "Solicitar una consulta" },
     },
+    offers: { consultation: true, brief: true, question: true, asset: false },
     timezone: "America/El_Salvador",
   };
 }

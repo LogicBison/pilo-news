@@ -219,6 +219,7 @@ async def bundle(channel: Channel, *, locale: str | None, request_id: str) -> di
             "theme": channel.theme,
             "disclaimer": channel.disclaimer(requested),
             "cta": channel.cta,
+            "offers": channel.effective_offers,
             "timezone": channel.timezone,
         },
     }

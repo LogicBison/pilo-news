@@ -1,5 +1,7 @@
 import type { Industry } from "@/lib/api";
-import { t, type Locale } from "@/lib/i18n";
+import { assetFor } from "@/lib/assets";
+import { localePath, t, type Locale } from "@/lib/i18n";
+import { offersOf } from "@/lib/offers";
 import { localized } from "@/lib/theme";
 
 import { CtaButton } from "./Cta";
@@ -20,6 +22,13 @@ export function CtaCard({
   const headline = localized(industry.cta.headline, locale) || t(locale, "lead.title");
   const body = localized(industry.cta.body, locale) || t(locale, "lead.intro");
   const label = localized(industry.cta.label, locale) || t(locale, "cta.primary");
+  const offers = offersOf(industry);
+  const assetOnPage =
+    placement !== "topic" && Boolean(industry.cta.asset && assetFor(industry.cta.asset));
+  const leadHref =
+    placement === "topic"
+      ? `${localePath(locale, `/${industry.slug}`)}#lead-form`
+      : "#lead-form";
   const promises = [t(locale, "cta.promise1"), t(locale, "cta.promise2"), t(locale, "cta.promise3")];
 
   return (
@@ -58,12 +67,21 @@ export function CtaCard({
             placement={placement}
             articleId={articleId}
             label={label}
+            href={leadHref}
           />
-          <p className="mt-3">
-            <a href="#brief-signup" className="sn-action-link">
-              {t(locale, "cta.briefLink")}
-            </a>
-          </p>
+          {offers.brief || (offers.asset && assetOnPage) ? (
+            <p className="mt-3">
+              {offers.brief ? (
+                <a href="#brief-signup" className="sn-action-link">
+                  {t(locale, "cta.briefLink")}
+                </a>
+              ) : (
+                <a href="#asset-heading" className="sn-action-link">
+                  {t(locale, "cta.assetLink")}
+                </a>
+              )}
+            </p>
+          ) : null}
           <p className="sn-action-disclaimer mt-3">{industry.disclaimer}</p>
         </div>
       </div>

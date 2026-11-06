@@ -5,12 +5,19 @@ from typing import Any
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
+from news_api.channels.domain.offers import (
+    OFFER_KEYS,
+    default_offers,
+    merge_offers,
+    validate_offers,
+)
 from news_api.channels.domain.theme import DEFAULT_THEMES, is_reserved_slug, validate_theme
 from news_api.channels.infrastructure import repo as channels_repo
 from news_api.dependencies import admin_auth, admin_mutation
 from news_api.editorial.infrastructure.repo import record_audit
 from news_api.platform.errors import Conflict, NotFound, ValidationProblem
 from news_api.platform.i18n import SUPPORTED_LOCALES
+from news_api.platform.settings import get_settings
 
 router = APIRouter(prefix="/v1/admin/industries", tags=["admin"])
 
@@ -39,6 +46,9 @@ class IndustryCreate(BaseModel):
     retention_days: int = Field(default=7, ge=1, le=90)
     sort_order: int = Field(default=100, ge=0, le=10000)
     enabled: bool = True
+    fetch_interval_minutes: int | None = Field(default=None, ge=5, le=1440)
+    auto_fetch_enabled: bool = True
+    offers: dict[str, bool] | None = None
     topics: list[TopicSeed] = Field(default_factory=list)
 
 
@@ -47,9 +57,13 @@ class IndustryUpdate(BaseModel):
     theme: dict[str, Any] | None = None
     disclaimers: dict[str, str] | None = None
     retention_days: int | None = Field(default=None, ge=1, le=90)
+    fetch_interval_minutes: int | None = Field(default=None, ge=5, le=1440)
+    auto_fetch_enabled: bool | None = None
+    offers: dict[str, bool] | None = None
 
 
 def admin_channel(channel: Any) -> dict[str, Any]:
+    default_interval = get_settings().refresh_interval_minutes
     return {
         "slug": channel.slug,
         "name": channel.name,
@@ -60,17 +74,35 @@ def admin_channel(channel: Any) -> dict[str, Any]:
         "theme": channel.theme,
         "disclaimers": channel.disclaimers,
         "cta": channel.cta,
+        "asset": channel.cta.get("asset"),
+        "offers": channel.effective_offers,
         "timezone": channel.timezone,
         "retention_days": channel.retention_days,
         "enabled": channel.enabled,
         "sort_order": channel.sort_order,
+        "fetch_interval_minutes": channel.fetch_interval_minutes,
+        "auto_fetch_enabled": channel.auto_fetch_enabled,
+        "effective_fetch_interval_minutes": channel.effective_fetch_interval(default_interval),
     }
+
+
+def _offers_for_create(cta: dict[str, Any], patch: dict[str, bool] | None) -> dict[str, bool]:
+    defaults = default_offers(cta)
+    offers = defaults if patch is None else {**defaults, **patch}
+    problems = validate_offers(cta, offers)
+    if problems:
+        raise ValidationProblem("; ".join(problems))
+    return {key: bool(offers[key]) for key in OFFER_KEYS}
 
 
 @router.get("", dependencies=[Depends(admin_auth)])
 async def list_industries() -> Any:
     channels = await channels_repo.list_channels(enabled_only=False)
-    return {"data": [admin_channel(channel) for channel in channels]}
+    settings = get_settings()
+    return {
+        "data": [admin_channel(channel) for channel in channels],
+        "defaults": {"fetch_interval_minutes": settings.refresh_interval_minutes},
+    }
 
 
 @router.post("", status_code=201, dependencies=[Depends(admin_mutation)])
@@ -98,6 +130,7 @@ async def create_industry(payload: IndustryCreate, request: Request) -> Any:
         "en": "News, not professional advice.",
         "es": "Noticias, no asesoría profesional.",
     }
+    offers = _offers_for_create(payload.cta, payload.offers)
     channel = await channels_repo.create_channel(
         slug=payload.slug,
         code=payload.code,
@@ -114,6 +147,9 @@ async def create_industry(payload: IndustryCreate, request: Request) -> Any:
         sort_order=payload.sort_order,
         enabled=payload.enabled,
         topics=[topic.model_dump() for topic in payload.topics],
+        fetch_interval_minutes=payload.fetch_interval_minutes,
+        auto_fetch_enabled=payload.auto_fetch_enabled,
+        offers=offers,
     )
     if not channel:
         raise Conflict("An industry with this slug already exists.")
@@ -140,12 +176,32 @@ async def update_industry(slug: str, payload: IndustryUpdate, request: Request) 
         unknown = sorted(set(payload.disclaimers) - set(SUPPORTED_LOCALES))
         if unknown:
             raise ValidationProblem(f"Unsupported disclaimer locale(s): {', '.join(unknown)}.")
+    payload_fields = payload.model_fields_set
+    offers: dict[str, bool] | None = None
+    if "offers" in payload_fields and payload.offers is not None:
+        unknown = sorted(set(payload.offers) - set(OFFER_KEYS))
+        if unknown:
+            raise ValidationProblem(f"unknown offer(s): {', '.join(unknown)}")
+        offers = merge_offers(existing.cta, existing.offers, payload.offers)
+        problems = validate_offers(existing.cta, offers)
+        if problems:
+            raise ValidationProblem("; ".join(problems))
+    if "fetch_interval_minutes" in payload_fields:
+        clear_fetch_interval = payload.fetch_interval_minutes is None
+        fetch_interval_minutes = payload.fetch_interval_minutes
+    else:
+        clear_fetch_interval = False
+        fetch_interval_minutes = None
     await channels_repo.update_channel(
         slug,
         enabled=payload.enabled,
         theme=payload.theme,
         disclaimers=payload.disclaimers,
         retention_days=payload.retention_days,
+        fetch_interval_minutes=fetch_interval_minutes,
+        clear_fetch_interval=clear_fetch_interval,
+        auto_fetch_enabled=payload.auto_fetch_enabled,
+        offers=offers,
     )
     updated = await channels_repo.get_channel(slug, enabled_only=False)
     await record_audit(
@@ -156,8 +212,16 @@ async def update_industry(slug: str, payload: IndustryUpdate, request: Request) 
         payload={
             "fields": [
                 key
-                for key in ("enabled", "theme", "disclaimers", "retention_days")
-                if getattr(payload, key) is not None
+                for key in (
+                    "enabled",
+                    "theme",
+                    "disclaimers",
+                    "retention_days",
+                    "fetch_interval_minutes",
+                    "auto_fetch_enabled",
+                    "offers",
+                )
+                if key in payload_fields
             ]
         },
     )

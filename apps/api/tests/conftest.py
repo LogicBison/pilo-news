@@ -68,6 +68,12 @@ async def _truncate() -> None:
             )
         )
         await conn.execute(text("UPDATE industries SET enabled = TRUE"))
+        await conn.execute(
+            text(
+                "UPDATE industries SET fetch_interval_minutes = NULL, "
+                "auto_fetch_enabled = TRUE, offers = '{}'::jsonb"
+            )
+        )
         await conn.execute(text("UPDATE partners SET status = 'active'"))
         await conn.execute(text("DELETE FROM sources WHERE feed_url LIKE 'https://example.org/%'"))
         await conn.execute(text("DELETE FROM industries WHERE slug LIKE 'e2e-%'"))

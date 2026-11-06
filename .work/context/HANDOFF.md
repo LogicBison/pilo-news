@@ -2,6 +2,15 @@
 
 ## Session status
 
+**2026-11-06 (channel automation):** the worker already fetched automatically on a
+12-hour deployment default. Added a per-channel cadence that overrides it (`NULL` =
+default), an automatic-fetch pause, and operator switches for the four free offers
+(consultation, weekly brief, ask-one-question, gated asset). Migration 013; admin
+Channels tab rewritten as a managed list with an inline editor; public pages render
+only active offers. Verified: 124 API tests, 87 Playwright on a production build,
+and a browser save/restore check against the dev API. SPEC:
+`.work/features/channel-automation/20261106-SPEC.md`.
+
 **Closed:** 2026-11-06 - S1 screens shipped: contact, about and admin-console implemented from approved SPECs. 80 Playwright tests pass on a production build (admin sign-in included); axe 0 critical/serious on 21 URLs; 329 catalog keys; 11/11 contrast. Every channel now publishes an RSS 2.0 feed in both locales. Along the way: the funnel proxy no longer returns a false 503 on 204, and the about page stopped claiming a seven-day window while every channel runs 30 days.
 
 **Updated:** 2026-11-06
@@ -141,6 +150,10 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | M11 2026-11-06 | `apply-profile` digital-technology: 14 created; second run 0 created / 0 updated; `/v1/industries` returns 11 channels |
 | M11 2026-11-06 | full Playwright on a production build: **64 passed, 1 skipped** (11-channel layout loop + new channel test) |
 | M11 2026-11-06 | `pnpm check`: 11 channels pass contrast; `bin/channels.sh --check`: 11 channels, ok |
+| M12 2026-11-06 | migration 013 applied then re-ran clean (`applied: 0`); scheduler unit tests cover override/default/pause |
+| M12 2026-11-06 | `./bin/start.sh --env dev test` -> api 124 passed, ruff/format/mypy clean; web lint/type/check 364 keys, 11/11 contrast |
+| M12 2026-11-06 | `pnpm build` + full Playwright on the production build -> **87 passed** (pre-polish; final dev rerun 84 passed, 2 flaky, 1 navigation flake passing in isolation) |
+| M12 2026-11-06 | browser save check: legal question offer off -> public `offers.question=false`; restored -> `true` |
 | S1 2026-11-06 | contact + about + admin-console shipped; e2e 78 pass; admin sign-in verified end to end |
 | Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
 | S1 screens 2026-11-06 | `pnpm build` + `pnpm test` on the production bundle: **78 passed, 0 failed** (admin spec ran with credentials) |
@@ -204,6 +217,7 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | 2026-11-06 | biz scope | `.work.biz/plans/plan_kev-digest.md` (KEV digest MVP scope), D-003…D-009, 14-day window pre-registered |
 | 2026-11-06 | M10 topics | three digital-tech topics on the cybersecurity profile, `placement="topic"` attribution, migration 012 + unit test, D-010/D-014 |
 | 2026-11-06 | M11 channel | `digital-technology` profile, `datacenter` skin (motif/scene/CC BY-SA photo), 6 grade-A feeds, 26 EN + 1 ES items, inventory at 11 channels, e2e + docs |
+| 2026-11-06 | M12 channel automation | migration 013; per-channel fetch cadence + pause; four free-offer switches; admin Channels editor; public offer gating; 124 API tests, 87 Playwright |
 
 ---
 

@@ -5,7 +5,7 @@
 System News aggregates industry news from approved publisher feeds, scores and de-duplicates it, writes a short original summary for each story in its own language, and serves it two ways:
 
 1. a **themed landing-page/news site per industry** - `/{industry}` in English, `/es/{industry}` in Spanish - and
-2. a **versioned REST API** (`/v1`) that any client can consume - LogicBison first. Updates run **twice a day** by default (configurable) and can be force-triggered on demand.
+2. a **versioned REST API** (`/v1`) that any client can consume - LogicBison first. Updates run **twice a day** by default; each channel can override that cadence in the editorial console, and any refresh can be force-triggered on demand.
 
 Every channel carries one professional CTA that routes consented inquiries to a partner professional (ADR 013). Lead generation is a primary goal, not a footer afterthought.
 

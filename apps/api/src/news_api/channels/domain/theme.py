@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from news_api.channels.domain.offers import resolve_offers
 from news_api.platform.jsons import as_dict
 
 REQUIRED_TOKENS = (
@@ -114,6 +115,16 @@ class Channel:
     retention_days: int
     enabled: bool
     sort_order: int = 0
+    fetch_interval_minutes: int | None = None
+    auto_fetch_enabled: bool = True
+    offers: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def effective_offers(self) -> dict[str, bool]:
+        return resolve_offers(self.cta, self.offers)
+
+    def effective_fetch_interval(self, default_minutes: int) -> int:
+        return self.fetch_interval_minutes or default_minutes
 
     @property
     def theme_summary(self) -> dict[str, Any]:
@@ -147,6 +158,13 @@ def channel_from_row(row: dict[str, Any]) -> Channel:
         retention_days=int(row.get("retention_days") or 7),
         enabled=bool(row.get("enabled", True)),
         sort_order=int(row.get("sort_order") or 0),
+        fetch_interval_minutes=(
+            int(row["fetch_interval_minutes"])
+            if row.get("fetch_interval_minutes") is not None
+            else None
+        ),
+        auto_fetch_enabled=bool(row.get("auto_fetch_enabled", True)),
+        offers=as_dict(row.get("offers")),
     )
 
 

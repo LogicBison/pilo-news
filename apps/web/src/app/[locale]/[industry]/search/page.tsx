@@ -10,6 +10,7 @@ import { BriefSignup } from "@/components/BriefSignup";
 import { getIndustry, getNews } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { offersOf } from "@/lib/offers";
 import { pageMetadata } from "@/lib/seo";
 
 type Params = {
@@ -37,6 +38,7 @@ export default async function SearchPage({ params, searchParams }: Params) {
   const industryResult = await getIndustry(industry, resolved);
   if (!industryResult.ok && industryResult.status === 404) notFound();
   const channel = industryResult.ok ? industryResult.data : fallbackIndustry(industry);
+  const offers = offersOf(channel);
   const query = (q ?? "").trim();
   const validQuery = query.length >= 3 && query.length <= 64;
   const result =
@@ -89,23 +91,27 @@ export default async function SearchPage({ params, searchParams }: Params) {
           </div>
         ) : null}
 
-        <div className="sn-lead-standalone mt-10">
-          <LeadForm
+        {offers.consultation ? (
+          <div className="sn-lead-standalone mt-10">
+            <LeadForm
+              industry={industry}
+              industryName={channel.name}
+              locale={resolved}
+              kind={channel.cta.kind ?? "consultation"}
+              placement="search"
+              sourcePage={localePath(resolved, `/${industry}/search`)}
+              qualify={channel.cta.qualify}
+            />
+          </div>
+        ) : null}
+        {offers.brief ? (
+          <BriefSignup
             industry={industry}
-            industryName={channel.name}
             locale={resolved}
-            kind={channel.cta.kind ?? "consultation"}
-            placement="search"
+            placement="brief-search"
             sourcePage={localePath(resolved, `/${industry}/search`)}
-            qualify={channel.cta.qualify}
           />
-        </div>
-        <BriefSignup
-          industry={industry}
-          locale={resolved}
-          placement="brief-search"
-          sourcePage={localePath(resolved, `/${industry}/search`)}
-        />
+        ) : null}
       </div>
       <aside className="sn-search-aside h-fit lg:sticky lg:top-24">
         <TrustBlock locale={resolved} />

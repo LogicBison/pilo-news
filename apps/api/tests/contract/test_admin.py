@@ -245,3 +245,67 @@ async def test_admin_funnel_readout(client) -> None:
     assert isinstance(body["channels"], list)
     bad = await client.get("/v1/admin/funnel?days=0")
     assert bad.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_channel_cadence_and_offer_switches(client, admin_client) -> None:
+    listed = await admin_client.get("/v1/admin/industries")
+    assert listed.status_code == 200
+    assert listed.json()["defaults"]["fetch_interval_minutes"] == 720
+
+    updated = await admin_client.patch(
+        "/v1/admin/industries/legal",
+        json={
+            "fetch_interval_minutes": 60,
+            "auto_fetch_enabled": False,
+            "offers": {"question": False, "brief": True, "asset": False},
+        },
+    )
+    assert updated.status_code == 200, updated.text
+    data = updated.json()["data"]
+    assert data["fetch_interval_minutes"] == 60
+    assert data["effective_fetch_interval_minutes"] == 60
+    assert data["auto_fetch_enabled"] is False
+    assert data["offers"] == {
+        "consultation": True,
+        "brief": True,
+        "question": False,
+        "asset": False,
+    }
+
+    public = await client.get("/v1/industries/legal?locale=en")
+    assert public.status_code == 200
+    assert public.json()["data"]["offers"] == data["offers"]
+
+    bundle = await client.get("/v1/news/bundle?industry=legal&locale=en")
+    assert bundle.status_code == 200
+    assert bundle.json()["data"]["industry"]["offers"] == data["offers"]
+
+    cleared = await admin_client.patch(
+        "/v1/admin/industries/legal",
+        json={"fetch_interval_minutes": None, "auto_fetch_enabled": True},
+    )
+    assert cleared.status_code == 200, cleared.text
+    assert cleared.json()["data"]["fetch_interval_minutes"] is None
+    assert cleared.json()["data"]["effective_fetch_interval_minutes"] == 720
+
+    too_fast = await admin_client.patch(
+        "/v1/admin/industries/legal", json={"fetch_interval_minutes": 3}
+    )
+    assert too_fast.status_code == 422
+
+    unknown = await admin_client.patch(
+        "/v1/admin/industries/legal", json={"offers": {"newsletter": True}}
+    )
+    assert unknown.status_code == 422
+
+    both = await admin_client.patch(
+        "/v1/admin/industries/legal",
+        json={"offers": {"brief": True, "asset": True}},
+    )
+    assert both.status_code == 422
+    assert "brief and asset" in both.json()["detail"]
+
+    audit = await admin_client.get("/v1/admin/audit?action=industry.update")
+    assert audit.status_code == 200
+    assert any(item["entity_id"] == "legal" for item in audit.json()["data"])

@@ -8,6 +8,7 @@ import { StoryCard } from "@/components/StoryCard";
 import { getIndustry, getNews, getTopics } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { offersOf } from "@/lib/offers";
 import { pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string; slug: string }> };
@@ -41,6 +42,7 @@ export default async function TopicPage({ params }: Params) {
   ]);
   if (!channelResult.ok && channelResult.status === 404) notFound();
   const channel = channelResult.ok ? channelResult.data : fallbackIndustry(industry);
+  const offers = offersOf(channel);
   const topic = topicResult.ok ? topicResult.data.find((item) => item.slug === slug) : undefined;
   if (topicResult.ok && !topic) notFound();
   const articles = newsResult.ok ? newsResult.data : [];
@@ -74,15 +76,19 @@ export default async function TopicPage({ params }: Params) {
         )}
       </div>
       <div>
-        <CtaCard industry={channel} locale={resolved} placement="topic" compact />
-        <div className="mt-6">
-          <BriefSignup
-            industry={industry}
-            locale={resolved}
-            placement="brief-topic"
-            sourcePage={sourcePage}
-          />
-        </div>
+        {offers.consultation ? (
+          <CtaCard industry={channel} locale={resolved} placement="topic" compact />
+        ) : null}
+        {offers.brief ? (
+          <div className="mt-6">
+            <BriefSignup
+              industry={industry}
+              locale={resolved}
+              placement="brief-topic"
+              sourcePage={sourcePage}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

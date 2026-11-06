@@ -132,10 +132,14 @@ def _stagger(industry: str) -> int:
 
 async def scheduler_tick() -> int:
     settings = get_settings()
-    interval_seconds = settings.refresh_interval_minutes * 60
+    default_interval = settings.refresh_interval_minutes
     now = utcnow()
     enqueued = 0
     for channel in await list_channels(enabled_only=True):
+        if not channel.auto_fetch_enabled:
+            continue
+        interval_minutes = channel.effective_fetch_interval(default_interval)
+        interval_seconds = interval_minutes * 60
         previous = await last_run(channel.id, trigger="schedule")
         if previous:
             started = previous["started_at"]
@@ -150,7 +154,13 @@ async def scheduler_tick() -> int:
         run_id = await create_run(channel.id, trigger="schedule", requested_by="scheduler")
         await enqueue(run_id=run_id, industry=channel.slug, trigger="schedule")
         enqueued += 1
-        log.info("scheduler.enqueued", industry=channel.slug, run_id=run_id)
+        log.info(
+            "scheduler.enqueued",
+            industry=channel.slug,
+            run_id=run_id,
+            interval_minutes=interval_minutes,
+            schedule_source="channel" if channel.fetch_interval_minutes else "default",
+        )
     return enqueued
 
 

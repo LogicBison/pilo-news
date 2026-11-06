@@ -17,6 +17,7 @@ import { TopicRail } from "@/components/TopicRail";
 import { getBundle, getIndustry } from "@/lib/api";
 import { assetFor } from "@/lib/assets";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { offersOf } from "@/lib/offers";
 import { resolveSkin } from "@/lib/skins";
 import { itemListJsonLd, pageMetadata } from "@/lib/seo";
 
@@ -54,7 +55,8 @@ export default async function ChannelHome({ params }: Params) {
   const bundle = result.data;
   const channel = bundle.industry;
   const homePath = localePath(resolved, `/${industry}`);
-  const asset = channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
+  const offers = offersOf(channel);
+  const asset = offers.asset && channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
 
   return (
     <>
@@ -109,41 +111,43 @@ export default async function ChannelHome({ params }: Params) {
           sourcePage={localePath(resolved, `/${industry}`)}
         />
       ) : null}
-      <section className="sn-convert" aria-labelledby="convert-heading">
-        <div className="max-w-2xl">
-          <div className="flex items-center gap-2">
-            <span className="sn-kicker" aria-hidden="true" />
-            <p className="sn-eyebrow">{t(resolved, "convert.eyebrow")}</p>
+      {offers.consultation ? (
+        <section className="sn-convert" aria-labelledby="convert-heading">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="sn-kicker" aria-hidden="true" />
+              <p className="sn-eyebrow">{t(resolved, "convert.eyebrow")}</p>
+            </div>
+            <h2 id="convert-heading" className="sn-section-title mt-2 text-[var(--sn-text)]">
+              {t(resolved, "convert.title")}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--sn-muted)]">
+              {t(resolved, "convert.body")}
+            </p>
           </div>
-          <h2 id="convert-heading" className="sn-section-title mt-2 text-[var(--sn-text)]">
-            {t(resolved, "convert.title")}
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-[var(--sn-muted)]">
-            {t(resolved, "convert.body")}
-          </p>
-        </div>
-        <div className="sn-convert-grid">
-          <TrustBlock locale={resolved} />
-          <LeadForm
-            industry={industry}
-            industryName={channel.name}
-            locale={resolved}
-            kind={channel.cta.kind ?? "consultation"}
-            placement="home"
-            sourcePage={homePath}
-            qualify={channel.cta.qualify}
-          />
-        </div>
-        {asset ? null : (
-          <BriefSignup
-            industry={industry}
-            locale={resolved}
-            placement="brief-home"
-            sourcePage={homePath}
-          />
-        )}
-      </section>
-      <StickyCta industry={industry} locale={resolved} />
+          <div className="sn-convert-grid">
+            <TrustBlock locale={resolved} />
+            <LeadForm
+              industry={industry}
+              industryName={channel.name}
+              locale={resolved}
+              kind={channel.cta.kind ?? "consultation"}
+              placement="home"
+              sourcePage={homePath}
+              qualify={channel.cta.qualify}
+            />
+          </div>
+        </section>
+      ) : null}
+      {offers.brief ? (
+        <BriefSignup
+          industry={industry}
+          locale={resolved}
+          placement="brief-home"
+          sourcePage={homePath}
+        />
+      ) : null}
+      {offers.consultation ? <StickyCta industry={industry} locale={resolved} /> : null}
       <p className="mt-6 text-center text-xs text-[var(--sn-muted)]">
         <Link href={localePath(resolved, `/${industry}/about`)} className="hover:underline">
           {t(resolved, "nav.about")}

@@ -5,6 +5,7 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent, ReactNode } from "react";
 
 import { Button, SelectField, TextArea, TextField } from "@/components/ui";
+import type { OfferConfig } from "@/lib/api";
 import { t, type Locale } from "@/lib/i18n";
 
 type Tab =
@@ -61,6 +62,21 @@ interface AdminIndustry {
   slug: string;
   name: string;
   enabled: boolean;
+  fetch_interval_minutes: number | null;
+  effective_fetch_interval_minutes: number;
+  auto_fetch_enabled: boolean;
+  offers: OfferConfig;
+  asset?: string | null;
+}
+
+interface ChannelDraft {
+  slug: string;
+  autoFetch: boolean;
+  useDefault: boolean;
+  hours: string;
+  consultation: boolean;
+  question: boolean;
+  secondary: "none" | "brief" | "asset";
 }
 interface Source {
   id: string;
@@ -275,6 +291,8 @@ export function AdminConsole({
 
   const [auditAction, setAuditAction] = useState("");
   const [newKey, setNewKey] = useState("");
+  const [defaultFetchInterval, setDefaultFetchInterval] = useState(720);
+  const [channelDraft, setChannelDraft] = useState<ChannelDraft | null>(null);
 
   const [articleForm, setArticleForm] = useState<{ id: string; kind: "hide" | "pin" } | null>(null);
   const [hideReason, setHideReason] = useState("");
@@ -347,14 +365,18 @@ export function AdminConsole({
   useEffect(() => {
     if (!operator) return;
     let cancelled = false;
-    void apiRequest<{ data: AdminIndustry[] }>("/api/proxy/v1/admin/industries").then((result) => {
+    void apiRequest<{ data: AdminIndustry[]; defaults?: { fetch_interval_minutes: number } }>(
+      "/api/proxy/v1/admin/industries",
+    ).then((result) => {
       if (cancelled) return;
       if (result.status === 401) {
         expire();
         return;
       }
-      if (result.ok) setIndustries(result.data?.data ?? []);
-      else setStatus({ kind: "error", text: failureText(result, locale) });
+      if (result.ok) {
+        setIndustries(result.data?.data ?? []);
+        if (result.data?.defaults) setDefaultFetchInterval(result.data.defaults.fetch_interval_minutes);
+      } else setStatus({ kind: "error", text: failureText(result, locale) });
     });
     return () => {
       cancelled = true;
@@ -383,8 +405,14 @@ export function AdminConsole({
         const runsData = await read<{ data: Run[] }>("/api/proxy/v1/admin/refresh");
         if (runsData) setRuns(runsData.data ?? []);
       } else if (activeTab === "channels") {
-        const data = await read<{ data: AdminIndustry[] }>("/api/proxy/v1/admin/industries");
-        if (data) setIndustries(data.data ?? []);
+        const data = await read<{
+          data: AdminIndustry[];
+          defaults?: { fetch_interval_minutes: number };
+        }>("/api/proxy/v1/admin/industries");
+        if (data) {
+          setIndustries(data.data ?? []);
+          if (data.defaults) setDefaultFetchInterval(data.defaults.fetch_interval_minutes);
+        }
       } else if (activeTab === "sources") {
         const data = await read<{ data: Source[] }>(
           `/api/proxy/v1/admin/sources?industry=${encodeURIComponent(activeIndustry)}`,
@@ -553,6 +581,66 @@ export function AdminConsole({
       theme: { layout: "editorial" },
     });
     if (ok) form.reset();
+  }
+
+  function formatInterval(minutes: number, activeLocale: Locale): string {
+    if (minutes % 60 === 0) {
+      return t(activeLocale, "admin.hoursValue", { n: minutes / 60 });
+    }
+    return t(activeLocale, "admin.minutesValue", { n: minutes });
+  }
+
+  function openChannelEditor(item: AdminIndustry) {
+    setStatus(null);
+    fillChannelDraft(item);
+  }
+
+  function fillChannelDraft(item: AdminIndustry) {
+    const interval = item.fetch_interval_minutes ?? defaultFetchInterval;
+    setChannelDraft({
+      slug: item.slug,
+      autoFetch: item.auto_fetch_enabled,
+      useDefault: item.fetch_interval_minutes === null,
+      hours: String(Number((interval / 60).toFixed(2))),
+      consultation: item.offers.consultation,
+      question: item.offers.question,
+      secondary: item.offers.asset ? "asset" : item.offers.brief ? "brief" : "none",
+    });
+  }
+
+  function patchChannelDraft(patch: Partial<ChannelDraft>) {
+    setChannelDraft((current) => (current ? { ...current, ...patch } : current));
+  }
+
+  async function saveChannel(event: FormEvent<HTMLFormElement>, item: AdminIndustry) {
+    event.preventDefault();
+    if (!channelDraft) return;
+    const hours = Number(channelDraft.hours);
+    const minutes = Math.round(hours * 60);
+    if (!Number.isFinite(hours) || minutes < 5 || minutes > 1440) {
+      setStatus({ kind: "error", text: t(locale, "admin.cadenceInvalid") });
+      return;
+    }
+    if (channelDraft.secondary === "asset" && !item.asset) {
+      setStatus({ kind: "error", text: t(locale, "admin.assetUnavailable") });
+      return;
+    }
+    const ok = await mutate(
+      `channel:save:${item.slug}`,
+      `/api/proxy/v1/admin/industries/${item.slug}`,
+      "PATCH",
+      {
+        auto_fetch_enabled: channelDraft.autoFetch,
+        fetch_interval_minutes: channelDraft.useDefault ? null : minutes,
+        offers: {
+          consultation: channelDraft.consultation,
+          question: channelDraft.question,
+          brief: channelDraft.secondary === "brief",
+          asset: channelDraft.secondary === "asset",
+        },
+      },
+    );
+    if (ok) setChannelDraft(null);
   }
 
   async function handleCreateSource(event: FormEvent<HTMLFormElement>) {
@@ -775,7 +863,19 @@ export function AdminConsole({
     auditAction && !auditActions.includes(auditAction) ? [auditAction, ...auditActions] : auditActions;
   const industryOptions = industries.some((item) => item.slug === industry)
     ? industries
-    : [...industries, { slug: industry, name: industry, enabled: true }];
+    : [
+        ...industries,
+        {
+          slug: industry,
+          name: industry,
+          enabled: true,
+          fetch_interval_minutes: null,
+          effective_fetch_interval_minutes: defaultFetchInterval,
+          auto_fetch_enabled: true,
+          offers: { consultation: true, brief: true, question: true, asset: false },
+          asset: null,
+        },
+      ];
 
   return (
     <div className="min-w-0">
@@ -863,44 +963,263 @@ export function AdminConsole({
 
         {tab === "channels" ? (
           <section>
-            <form className="sn-card grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={handleCreateIndustry}>
-              <TextField name="slug" label={t(locale, "admin.slug")} required autoComplete="off" />
-              <TextField name="name" label={t(locale, "admin.name")} required />
-              <TextField name="code" label={t(locale, "admin.code")} required />
-              <div className="flex items-end">
-                <Button type="submit" disabled={busy === "channel:create"}>
-                  {busy === "channel:create" ? t(locale, "admin.saving") : t(locale, "admin.createIndustry")}
-                </Button>
-              </div>
-            </form>
-            <p className="mt-2 text-xs text-[var(--sn-muted)]">{t(locale, "common.requiredNote")}</p>
+            <div className="sn-card p-4">
+              <p className="text-sm text-[var(--sn-text)]">{t(locale, "admin.channelsIntro")}</p>
+              <p className="mt-1 text-xs text-[var(--sn-muted)]">
+                {t(locale, "admin.deploymentDefault", {
+                  interval: formatInterval(defaultFetchInterval, locale),
+                })}
+              </p>
+            </div>
+
+            <details className="sn-card mt-4 p-4">
+              <summary className="cursor-pointer text-sm font-semibold">
+                {t(locale, "admin.newIndustry")}
+              </summary>
+              <form
+                className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+                onSubmit={handleCreateIndustry}
+              >
+                <TextField name="slug" label={t(locale, "admin.slug")} required autoComplete="off" />
+                <TextField name="name" label={t(locale, "admin.name")} required />
+                <TextField name="code" label={t(locale, "admin.code")} required />
+                <div className="flex items-end">
+                  <Button type="submit" disabled={busy === "channel:create"}>
+                    {busy === "channel:create" ? t(locale, "admin.saving") : t(locale, "admin.createIndustry")}
+                  </Button>
+                </div>
+              </form>
+              <p className="mt-2 text-xs text-[var(--sn-muted)]">{t(locale, "common.requiredNote")}</p>
+            </details>
+
             <ul className="mt-4 border-t border-[var(--sn-border)]">
               {industries.length === 0 ? (
                 <li className="border-b border-[var(--sn-border)] py-3 text-sm text-[var(--sn-muted)]">
                   {t(locale, "admin.empty")}
                 </li>
               ) : (
-                industries.map((item) => (
-                  <li
-                    key={item.slug}
-                    className="flex flex-wrap items-center gap-3 border-b border-[var(--sn-border)] py-3 text-sm"
-                  >
-                    <span className="font-medium">{item.name}</span>
-                    <span className="text-[var(--sn-muted)]">/{item.slug}</span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        void mutate(`channel:${item.slug}`, `/api/proxy/v1/admin/industries/${item.slug}`, "PATCH", {
-                          enabled: !item.enabled,
-                        })
-                      }
-                      disabled={busy === `channel:${item.slug}`}
-                      className={[QUIET_BUTTON, "ml-auto"].join(" ")}
-                    >
-                      {item.enabled ? t(locale, "admin.disable") : t(locale, "admin.enable")}
-                    </button>
-                  </li>
-                ))
+                industries.map((item) => {
+                  const editing = channelDraft?.slug === item.slug;
+                  const interval = item.fetch_interval_minutes ?? defaultFetchInterval;
+                  const schedule = !item.enabled
+                    ? t(locale, "admin.channelDisabled")
+                    : !item.auto_fetch_enabled
+                      ? t(locale, "admin.autoFetchOff")
+                      : item.fetch_interval_minutes !== null
+                        ? t(locale, "admin.customCadence", {
+                            interval: formatInterval(interval, locale),
+                          })
+                        : t(locale, "admin.defaultCadence", {
+                            interval: formatInterval(interval, locale),
+                          });
+                  const activeOffers = [
+                    item.offers.consultation && t(locale, "admin.offerConsultation"),
+                    item.offers.question && t(locale, "admin.offerQuestion"),
+                    item.offers.brief && t(locale, "admin.secondaryBrief"),
+                    item.offers.asset && t(locale, "admin.secondaryAsset"),
+                  ]
+                    .filter((value): value is string => Boolean(value))
+                    .join(" · ");
+                  return (
+                    <li key={item.slug} className="border-b border-[var(--sn-border)] py-4 text-sm">
+                      <div className="flex flex-wrap items-start gap-3">
+                        <div className="min-w-0">
+                          <p>
+                            <span className="font-medium">{item.name}</span>{" "}
+                            <span className="text-[var(--sn-muted)]">/{item.slug}</span>{" "}
+                            {item.enabled ? null : (
+                              <span className="sn-chip">{t(locale, "admin.disabled")}</span>
+                            )}
+                          </p>
+                          <p className="mt-1 text-xs text-[var(--sn-muted)]">{schedule}</p>
+                          <p className="text-xs text-[var(--sn-muted)]">
+                            {activeOffers || t(locale, "admin.offersInactive")}
+                          </p>
+                        </div>
+                        <div className="ml-auto flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            aria-expanded={editing}
+                            onClick={() => (editing ? setChannelDraft(null) : openChannelEditor(item))}
+                            className={QUIET_BUTTON}
+                          >
+                            {editing ? t(locale, "admin.close") : t(locale, "admin.manage")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void mutate(
+                                `channel:${item.slug}`,
+                                `/api/proxy/v1/admin/industries/${item.slug}`,
+                                "PATCH",
+                                { enabled: !item.enabled },
+                              )
+                            }
+                            disabled={busy === `channel:${item.slug}`}
+                            className={QUIET_BUTTON}
+                          >
+                            {item.enabled ? t(locale, "admin.disable") : t(locale, "admin.enable")}
+                          </button>
+                        </div>
+                      </div>
+
+                      {editing && channelDraft ? (
+                        <form
+                          className="mt-4 grid gap-4 border-t border-[var(--sn-border)] pt-4"
+                          onSubmit={(event) => void saveChannel(event, item)}
+                        >
+                          <fieldset>
+                            <legend className="text-sm font-semibold">{t(locale, "admin.automation")}</legend>
+                            <label className="mt-2 flex items-start gap-2">
+                              <input
+                                type="checkbox"
+                                checked={channelDraft.autoFetch}
+                                onChange={(event) => patchChannelDraft({ autoFetch: event.target.checked })}
+                                className="mt-0.5 h-4 w-4"
+                              />
+                              <span>
+                                {t(locale, "admin.autoFetch")}
+                                <span className="mt-0.5 block text-xs text-[var(--sn-muted)]">
+                                  {t(locale, "admin.autoFetchHint")}
+                                </span>
+                              </span>
+                            </label>
+                          </fieldset>
+
+                          <fieldset>
+                            <legend className="text-sm font-semibold">{t(locale, "admin.cadence")}</legend>
+                            <label className="mt-2 flex items-center gap-2">
+                              <input
+                                type="radio"
+                                name={`cadence-${item.slug}`}
+                                checked={channelDraft.useDefault}
+                                onChange={() =>
+                                  patchChannelDraft({
+                                    useDefault: true,
+                                    hours: String(Number((defaultFetchInterval / 60).toFixed(2))),
+                                  })
+                                }
+                              />
+                              {t(locale, "admin.cadenceDefaultOption", {
+                                interval: formatInterval(defaultFetchInterval, locale),
+                              })}
+                            </label>
+                            <label className="mt-2 flex items-center gap-2">
+                              <input
+                                type="radio"
+                                name={`cadence-${item.slug}`}
+                                checked={!channelDraft.useDefault}
+                                onChange={() => patchChannelDraft({ useDefault: false })}
+                              />
+                              {t(locale, "admin.cadenceCustomOption")}
+                            </label>
+                            {!channelDraft.useDefault ? (
+                              <div className="mt-2 max-w-xs">
+                                <TextField
+                                  name={`hours-${item.slug}`}
+                                  type="number"
+                                  step="0.25"
+                                  min="0.1"
+                                  max="24"
+                                  label={t(locale, "admin.cadenceHours")}
+                                  hint={t(locale, "admin.cadenceHoursHint")}
+                                  value={channelDraft.hours}
+                                  onChange={(event) => patchChannelDraft({ hours: event.target.value })}
+                                />
+                              </div>
+                            ) : null}
+                          </fieldset>
+
+                          <fieldset>
+                            <legend className="text-sm font-semibold">{t(locale, "admin.freeOffers")}</legend>
+                            <p className="mt-1 text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.freeOffersHint")}
+                            </p>
+                            <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                              <label className="flex items-start gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={channelDraft.consultation}
+                                  onChange={(event) =>
+                                    patchChannelDraft({ consultation: event.target.checked })
+                                  }
+                                  className="mt-0.5 h-4 w-4"
+                                />
+                                <span>
+                                  {t(locale, "admin.offerConsultation")}
+                                  <span className="mt-0.5 block text-xs text-[var(--sn-muted)]">
+                                    {t(locale, "admin.offerConsultationHint")}
+                                  </span>
+                                </span>
+                              </label>
+                              <label className="flex items-start gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={channelDraft.question}
+                                  onChange={(event) => patchChannelDraft({ question: event.target.checked })}
+                                  className="mt-0.5 h-4 w-4"
+                                />
+                                <span>
+                                  {t(locale, "admin.offerQuestion")}
+                                  <span className="mt-0.5 block text-xs text-[var(--sn-muted)]">
+                                    {t(locale, "admin.offerQuestionHint")}
+                                  </span>
+                                </span>
+                              </label>
+                            </div>
+                          </fieldset>
+
+                          <fieldset>
+                            <legend className="text-sm font-semibold">{t(locale, "admin.secondaryOffer")}</legend>
+                            <p className="mt-1 text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.secondaryOfferHint")}
+                            </p>
+                            {(
+                              [
+                                ["none", t(locale, "admin.secondaryNone"), false],
+                                ["brief", t(locale, "admin.secondaryBrief"), false],
+                                ["asset", t(locale, "admin.secondaryAsset"), !item.asset],
+                              ] as const
+                            ).map(([value, label, disabled]) => (
+                              <label key={value} className="mt-2 flex items-center gap-2">
+                                <input
+                                  type="radio"
+                                  name={`secondary-${item.slug}`}
+                                  checked={channelDraft.secondary === value}
+                                  disabled={disabled}
+                                  onChange={() => patchChannelDraft({ secondary: value })}
+                                />
+                                {label}
+                              </label>
+                            ))}
+                            {!item.asset ? (
+                              <p className="mt-1 text-xs text-[var(--sn-muted)]">
+                                {t(locale, "admin.assetUnavailable")}
+                              </p>
+                            ) : null}
+                          </fieldset>
+
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Button
+                              type="submit"
+                              disabled={busy === `channel:save:${item.slug}`}
+                            >
+                              {busy === `channel:save:${item.slug}`
+                                ? t(locale, "admin.saving")
+                                : t(locale, "admin.saveChannel")}
+                            </Button>
+                            <Button variant="ghost" onClick={() => setChannelDraft(null)}>
+                              {t(locale, "admin.cancel")}
+                            </Button>
+                            <p className="text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.propagationHint")}
+                            </p>
+                          </div>
+                        </form>
+                      ) : null}
+                    </li>
+                  );
+                })
               )}
             </ul>
           </section>

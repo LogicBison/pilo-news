@@ -66,6 +66,13 @@ Mutating calls require `X-CSRF-Token` equal to the `sn_csrf` cookie.
 `POST /v1/admin/refresh` accepts `{industry, force, full_reset, confirmation}`;
 `full_reset` requires `confirmation: "RESET"`.
 
+`PATCH /v1/admin/industries/{slug}` also controls automation and offers:
+`fetch_interval_minutes` (5-1440, `null` clears the override),
+`auto_fetch_enabled`, and `offers` with `consultation`, `brief`, `question`,
+`asset`. A channel cadence overrides `REFRESH_INTERVAL_MINUTES`. `brief` and
+`asset` are mutually exclusive; `asset` needs a configured `cta.asset`. The
+public industry payload exposes the effective `offers` map.
+
 ## Adding a channel
 
 `POST /v1/admin/industries` is data-only: slug, name, code, theme, locales,

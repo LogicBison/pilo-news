@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-06 (S1 screens complete, 78 Playwright green)
+**Updated:** 2026-11-06 (channel automation + free-offer controls implemented; 87 Playwright green)
 
 ---
 
@@ -68,6 +68,10 @@
 | Form primitives a11y | `TextField`/`TextArea` moved the hint and error outside the label, so the accessible name is the label only |
 | Funnel proxy fix | `api/proxy` returned a false 503 for every 204 (the write still happened); `cta-events` now answers 204 and stops logging failures |
 | About copy fix | "seven-day window" replaced by "rolling window" in EN/ES — every channel runs 30-day retention and the API does not expose the value |
+| Channel cadence (M12) | migration 013 (`fetch_interval_minutes`, `auto_fetch_enabled`); scheduler override + pause; admin API + Channels tab controls |
+| Free-offer controls (M12) | `industries.offers` for consultation/brief/question/asset; legacy-compatible defaults; brief/asset exclusivity enforced; public payload carries effective offers |
+| Offer rendering (M12) | every public page renders only active offers; CTA links no longer point at hidden sections |
+| M12 docs + tests | SPEC `.work/features/channel-automation/20261106-SPEC.md`, OpenAPI snapshot, API 124 tests, 87 Playwright green, admin save verified end to end |
 
 ---
 
@@ -93,7 +97,56 @@
 
 ---
 
-## Current iteration - M11: digital-technology channel
+## Completed iteration - M12: channel automation and free-offer controls (2026-11-06)
+
+**Milestone ref:** `.work/features/channel-automation/20261106-SPEC.md`
+**Status:** complete 2026-11-06 - 5/5 tasks
+**Started:** 2026-11-06
+
+### In scope
+- per-channel fetch cadence that overrides `REFRESH_INTERVAL_MINUTES` when set
+- automatic-fetch pause per channel; manual refresh stays available
+- operator switches for the four free offers: consultation, weekly brief, ask-one-question, gated asset
+- an intuitive Channels tab: deployment default, effective cadence, offers, inline editor
+- public rendering that never links to a disabled offer
+
+### Out of scope (explicit)
+- per-source polling schedules (`sources.poll_interval_min` stays declarative)
+- new offer kinds, new assets, or editing offer copy from the console
+- editing the deployment default from the console
+- weekly-brief delivery (U8)
+
+### Tasks
+| ID | Description | Files | Status | Notes |
+|----|-------------|-------|--------|-------|
+| M12-T1 | Schema + domain: nullable cadence, auto-fetch flag, offers map, defaults, validation | `migrations/013_channel_automation.sql`, `channels/domain/offers.py`, `theme.py` | done | idempotent migration applied twice (`applied: 0` on re-run) |
+| M12-T2 | Scheduler honors the channel override and pause | `articles/application/queue.py` | done | unit tests cover override, default, pause, window |
+| M12-T3 | Admin API + public effective offers | `editorial/http/industries.py`, `channels/http/routes.py`, `publishing/application/read_models.py` | done | validation rejects unknown keys, <5 min, brief+asset, asset without slug |
+| M12-T4 | Intuitive Channels tab and web offer gating | `admin/AdminConsole.tsx`, channel pages, `CtaCard`, `Hero`, catalogs | done | save verified in a browser against the dev API; restored after the check |
+| M12-T5 | Tests + docs + OpenAPI snapshot | API/web tests, `docs/api/*`, this file | done | 124 API tests; 87 Playwright production; `pnpm build` clean; final dev rerun had one navigation flake (passes in isolation) |
+
+### Acceptance criteria
+- [x] a set channel cadence wins over the deployment default
+- [x] paused channels skip scheduled runs; manual refresh still works
+- [x] at most one of brief/asset is active; asset requires `cta.asset`
+- [x] public pages render only active offers and expose `offers` in the payload
+- [x] admin shows the deployment default, the channel override, and the effective cadence
+- [x] migration is idempotent; full checks green
+
+### Verification
+- `./bin/start.sh --env dev test` -> api 124 passed, ruff/format/mypy clean; web lint/type/check (364 keys, 11/11 contrast); inventory ok
+- `pnpm build` -> production build passes
+- Playwright on the production build -> **87 passed** (pre-polish); after the final hint/link edits the dev rerun was 84 passed / 2 flaky / 1 navigation flake that passes in isolation, with no offer-logic failure
+- Browser save check: question offer off -> public `offers.question=false`; restored -> `true`
+
+### Residual risks
+- Scheduler override is proven by fake-clock unit tests, not by waiting for a live 12-hour tick.
+- The web asset registry (`lib/assets.ts`) is not visible to the API; an unknown slug can be enabled in the admin but renders no card. Known channels use registry slugs.
+- `auto_fetch_enabled=false` does not cancel an already-queued run.
+
+---
+
+## Completed iteration - M11: digital-technology channel
 
 **Milestone ref:** M11 · `.work/plans/full/20261105-full-plan.md` §19 (v1.4, 2026-11-06). Scope: `.work.biz/plans/plan_digital-technology-channel.md` §4. Decisions: D-011 (name), D-013 (skin), D-014 (build now).
 **Status:** complete 2026-11-06 — 6/6 tasks

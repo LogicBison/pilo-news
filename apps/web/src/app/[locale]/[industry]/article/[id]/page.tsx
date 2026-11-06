@@ -16,6 +16,7 @@ import { TrustBlock } from "@/components/TrustBlock";
 import { getArticle, getIndustry } from "@/lib/api";
 import { assetFor } from "@/lib/assets";
 import { fallbackIndustry } from "@/lib/fallback";
+import { offersOf } from "@/lib/offers";
 import { resolveSkin } from "@/lib/skins";
 import { formatDate, localePath, resolveLocale, t } from "@/lib/i18n";
 import { absoluteUrl, newsArticleJsonLd, pageMetadata } from "@/lib/seo";
@@ -58,7 +59,8 @@ export default async function ArticlePage({ params }: Params) {
   const article = articleResult.data;
   const channel = industryResult.ok ? industryResult.data : fallbackIndustry(industry);
   const pagePath = localePath(resolved, `/${industry}/article/${id}`);
-  const asset = channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
+  const offers = offersOf(channel);
+  const asset = offers.asset && channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
 
   return (
     <>
@@ -125,22 +127,26 @@ export default async function ArticlePage({ params }: Params) {
           <p className="max-w-md text-xs text-[var(--sn-muted)]">{t(resolved, "article.attribution")}</p>
         </div>
 
-        <div className="mt-8">
-          <CtaCard
-            industry={channel}
-            locale={resolved}
-            placement="article"
-            articleId={article.id}
-            compact
-          />
-        </div>
+        {offers.consultation ? (
+          <div className="mt-8">
+            <CtaCard
+              industry={channel}
+              locale={resolved}
+              placement="article"
+              articleId={article.id}
+              compact
+            />
+          </div>
+        ) : null}
 
-        <AskQuestion
-          industry={industry}
-          locale={resolved}
-          articleId={article.id}
-          sourcePage={pagePath}
-        />
+        {offers.question ? (
+          <AskQuestion
+            industry={industry}
+            locale={resolved}
+            articleId={article.id}
+            sourcePage={pagePath}
+          />
+        ) : null}
 
         {asset ? (
           <AssetOffer
@@ -173,30 +179,36 @@ export default async function ArticlePage({ params }: Params) {
           variant="strip"
         />
 
-        <div className="sn-lead-standalone mt-10 grid gap-8">
-          <TrustBlock locale={resolved} />
-          <LeadForm
-            industry={industry}
-            industryName={channel.name}
-            locale={resolved}
-            kind="consultation"
-            placement="article-end"
-            articleId={article.id}
-            sourcePage={pagePath}
-            qualify={channel.cta.qualify}
-          />
-          {asset ? null : (
-            <BriefSignup
-              industry={industry}
-              locale={resolved}
-              placement="brief-article"
-              articleId={article.id}
-              sourcePage={pagePath}
-            />
-          )}
-        </div>
+        {offers.consultation || offers.brief ? (
+          <div className="sn-lead-standalone mt-10 grid gap-8">
+            <TrustBlock locale={resolved} />
+            {offers.consultation ? (
+              <LeadForm
+                industry={industry}
+                industryName={channel.name}
+                locale={resolved}
+                kind="consultation"
+                placement="article-end"
+                articleId={article.id}
+                sourcePage={pagePath}
+                qualify={channel.cta.qualify}
+              />
+            ) : null}
+            {offers.brief ? (
+              <BriefSignup
+                industry={industry}
+                locale={resolved}
+                placement="brief-article"
+                articleId={article.id}
+                sourcePage={pagePath}
+              />
+            ) : null}
+          </div>
+        ) : null}
       </article>
-      <StickyCta industry={industry} locale={resolved} articleId={article.id} />
+      {offers.consultation ? (
+        <StickyCta industry={industry} locale={resolved} articleId={article.id} />
+      ) : null}
     </>
   );
 }

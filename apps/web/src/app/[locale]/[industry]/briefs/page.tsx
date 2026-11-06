@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/Notices";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { offersOf } from "@/lib/offers";
 import { pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string }> };
@@ -30,6 +31,7 @@ export default async function BriefsPage({ params }: Params) {
   if (!result.ok && result.status === 404) notFound();
   const channel = result.ok ? result.data : fallbackIndustry(industry);
   const sourcePage = localePath(resolved, `/${industry}/briefs`);
+  const offers = offersOf(channel);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
@@ -47,12 +49,14 @@ export default async function BriefsPage({ params }: Params) {
         </div>
       </div>
       <div>
-        <BriefSignup
-          industry={industry}
-          locale={resolved}
-          placement="brief-archive"
-          sourcePage={sourcePage}
-        />
+        {offers.brief ? (
+          <BriefSignup
+            industry={industry}
+            locale={resolved}
+            placement="brief-archive"
+            sourcePage={sourcePage}
+          />
+        ) : null}
         <p className="mt-4 text-xs text-[var(--sn-muted)]">{channel.name}</p>
       </div>
     </div>

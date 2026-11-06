@@ -7,6 +7,7 @@ import { TrustBlock } from "@/components/TrustBlock";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { offersOf } from "@/lib/offers";
 import { pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string }> };
@@ -31,6 +32,7 @@ export default async function AboutPage({ params }: Params) {
   if (!result.ok && result.status === 404) notFound();
   const channel = result.ok ? result.data : fallbackIndustry(industry);
   const name = channel.name;
+  const offers = offersOf(channel);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
@@ -59,25 +61,27 @@ export default async function AboutPage({ params }: Params) {
             {t(resolved, "about.contact")}
           </a>
         </p>
-        <div className="sn-lead-standalone pt-4">
-          <LeadForm
-            industry={industry}
-            industryName={name}
-            locale={resolved}
-            kind={channel.cta.kind ?? "consultation"}
-            placement="about"
-            sourcePage={localePath(resolved, `/${industry}/about`)}
-            qualify={channel.cta.qualify}
-          />
-        </div>
-        {channel.cta.asset ? null : (
+        {offers.consultation ? (
+          <div className="sn-lead-standalone pt-4">
+            <LeadForm
+              industry={industry}
+              industryName={name}
+              locale={resolved}
+              kind={channel.cta.kind ?? "consultation"}
+              placement="about"
+              sourcePage={localePath(resolved, `/${industry}/about`)}
+              qualify={channel.cta.qualify}
+            />
+          </div>
+        ) : null}
+        {offers.brief ? (
           <BriefSignup
             industry={industry}
             locale={resolved}
             placement="brief-about"
             sourcePage={localePath(resolved, `/${industry}/about`)}
           />
-        )}
+        ) : null}
       </article>
       <aside className="sn-search-aside h-fit lg:sticky lg:top-24">
         <TrustBlock locale={resolved} />

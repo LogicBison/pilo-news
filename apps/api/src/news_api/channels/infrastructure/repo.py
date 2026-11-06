@@ -59,6 +59,10 @@ async def update_channel(
     timezone: str | None = None,
     retention_days: int | None = None,
     sort_order: int | None = None,
+    fetch_interval_minutes: int | None = None,
+    clear_fetch_interval: bool = False,
+    auto_fetch_enabled: bool | None = None,
+    offers: dict[str, bool] | None = None,
 ) -> bool:
     import json
 
@@ -88,6 +92,17 @@ async def update_channel(
     if sort_order is not None:
         fields.append("sort_order = :sort_order")
         params["sort_order"] = sort_order
+    if clear_fetch_interval:
+        fields.append("fetch_interval_minutes = NULL")
+    elif fetch_interval_minutes is not None:
+        fields.append("fetch_interval_minutes = :fetch_interval_minutes")
+        params["fetch_interval_minutes"] = fetch_interval_minutes
+    if auto_fetch_enabled is not None:
+        fields.append("auto_fetch_enabled = :auto_fetch_enabled")
+        params["auto_fetch_enabled"] = auto_fetch_enabled
+    if offers is not None:
+        fields.append("offers = CAST(:offers AS jsonb)")
+        params["offers"] = json.dumps(offers)
     if not fields:
         return False
     fields.append("updated_at = now()")
@@ -163,6 +178,9 @@ async def industry_settings(industry_id: str) -> dict[str, Any]:
         "disclaimers": as_dict(row.get("disclaimers")),
         "cta": as_dict(row.get("cta")),
         "timezone": row["timezone"],
+        "fetch_interval_minutes": row.get("fetch_interval_minutes"),
+        "auto_fetch_enabled": bool(row.get("auto_fetch_enabled", True)),
+        "offers": as_dict(row.get("offers")),
     }
 
 
@@ -180,6 +198,9 @@ async def create_channel(
     sort_order: int,
     enabled: bool,
     topics: list[dict[str, Any]],
+    fetch_interval_minutes: int | None = None,
+    auto_fetch_enabled: bool = True,
+    offers: dict[str, bool] | None = None,
 ) -> Channel | None:
     import json
 
@@ -189,11 +210,13 @@ async def create_channel(
                 """
                 INSERT INTO industries (
                     slug, code, name, theme, locales, disclaimers, cta, timezone,
-                    retention_days, sort_order, enabled
+                    retention_days, sort_order, enabled, fetch_interval_minutes,
+                    auto_fetch_enabled, offers
                 ) VALUES (
                     :slug, :code, :name, CAST(:theme AS jsonb), :locales,
                     CAST(:disclaimers AS jsonb), CAST(:cta AS jsonb), :timezone,
-                    :retention_days, :sort_order, :enabled
+                    :retention_days, :sort_order, :enabled, :fetch_interval_minutes,
+                    :auto_fetch_enabled, CAST(:offers AS jsonb)
                 )
                 ON CONFLICT (slug) DO NOTHING
                 RETURNING id
@@ -211,6 +234,9 @@ async def create_channel(
                 "retention_days": retention_days,
                 "sort_order": sort_order,
                 "enabled": enabled,
+                "fetch_interval_minutes": fetch_interval_minutes,
+                "auto_fetch_enabled": auto_fetch_enabled,
+                "offers": json.dumps(offers or {}),
             },
         )
         inserted = row.first()

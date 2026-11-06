@@ -11,6 +11,7 @@ export function CtaButton({
   placement,
   articleId,
   label,
+  href = "#lead-form",
   className = "",
 }: {
   industry: string;
@@ -18,6 +19,7 @@ export function CtaButton({
   placement: string;
   articleId?: string;
   label: string;
+  href?: string;
   className?: string;
 }) {
   const reported = useRef(false);
@@ -30,7 +32,7 @@ export function CtaButton({
 
   return (
     <a
-      href="#lead-form"
+      href={href}
       onClick={() => track("cta_click", { industry, locale, placement, articleId })}
       className={`sn-btn ${className}`}
     >

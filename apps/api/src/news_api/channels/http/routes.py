@@ -37,6 +37,7 @@ def channel_detail(channel: Channel, locale: str) -> dict[str, Any]:
         "disclaimer": channel.disclaimer(locale),
         "disclaimers": channel.disclaimers,
         "cta": channel.cta,
+        "offers": channel.effective_offers,
         "timezone": channel.timezone,
     }
 

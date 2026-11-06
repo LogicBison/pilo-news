@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { BundleData } from "@/lib/api";
 import { formatDate, localePath, t, type Locale } from "@/lib/i18n";
+import { offersOf } from "@/lib/offers";
 
 import { CtaCard } from "./CtaCard";
 import { StoryCard } from "./StoryCard";
@@ -73,7 +74,9 @@ export function Hero({
           </ul>
         ) : null}
       </div>
-      <CtaCard industry={industry} locale={locale} placement="hero" />
+      {offersOf(industry).consultation ? (
+        <CtaCard industry={industry} locale={locale} placement="hero" />
+      ) : null}
     </section>
   );
 }
