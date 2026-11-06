@@ -53,6 +53,9 @@
 | CATALOG | `.work.ui/design-system/CATALOG.md` rebuilt: 21 rows with token names, behavior source, APG pattern, states |
 | S0 primitives | `apps/web/src/components/ui/`: button, card, chip, section-header, text-field, text-area, select-field, consent-field, field-error, trust-line; forms/trust/topic surfaces refactored onto them |
 | Imagery | 10/10 photographic bands; retail, energy, manufacturing replaced SVG line-art with CC BY / BY-SA photos; `credits.json` + `.work.ui/reports/20261105-imagery-audit.md` |
+| Lead-gen rungs | migration 010 `question`/`asset` lead kinds + 3 funnel events; ask-one-question rung; asset waitlist; briefs archive; topic hubs; UTM capture; disposable-domain rejection |
+| Funnel read-out | `GET /v1/admin/funnel` + admin tab; OpenAPI snapshot; contract tests |
+| Offer + feasibility | `.work.biz/strategy/20261105-offer-and-leadgen-brief.md` and `20261105-product-feasibility-verification.md` |
 
 ---
 
@@ -68,10 +71,12 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | New-channel content coverage | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
-| **1** | `@ui-component-build plan - S1` | contact, about, admin screens on the shipped primitives |
-| **2** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
-| **3** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
+| **0** | Build the first gated asset | cybersecurity KEV digest - free, daily, global; cheapest honest proof of the offer ladder |
+| **1** | Answer D4-D6 | jurisdiction scope, logistics replacement, asset reviewer (`.work.biz/strategy/20261105-product-feasibility-verification.md`) |
+| **2** | New-channel content coverage | manufacturing EN 10, retail ES 1; add EN feeds/broaden topics before launch |
+| **3** | `@ui-component-build plan - S1` | contact, about, admin screens on the shipped primitives |
+| **4** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
+| **5** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
 
 ---
 

@@ -99,7 +99,8 @@
     "results": "{count} resultados para {query}",
     "empty": "Ninguna historia coincide con la búsqueda.",
     "emptyBody": "Pruebe una frase más corta o revise los temas en la portada del canal.",
-    "queryLabel": "Término de búsqueda"
+    "queryLabel": "Término de búsqueda",
+    "listTitle": "Resultados"
   },
   "lead": {
     "title": "Hable con un profesional verificado",
@@ -193,7 +194,8 @@
       "audit": "Auditoría",
       "leads": "Prospectos",
       "partners": "Socios",
-      "channels": "Canales"
+      "channels": "Canales",
+      "funnel": "Embudo"
     },
     "overview": "Resumen",
     "sources": "Fuentes",
@@ -313,5 +315,48 @@
   },
   "scene": {
     "moreCoverage": "Más cobertura →"
+  },
+  "question": {
+    "eyebrow": "Pregunta una cosa",
+    "title": "Pregunta a un especialista",
+    "body": "Sin llamada ni interrogatorio. Envía la pregunta que le harías a un colega y un especialista verificado del sector responde por escrito.",
+    "name": "Tu nombre",
+    "email": "Correo",
+    "label": "Tu pregunta",
+    "hint": "Una pregunta, concreta. No incluyas números de expediente ni datos personales.",
+    "consent": "Acepto que me contacten por esta pregunta y he leído la política de privacidad.",
+    "submit": "Enviar la pregunta",
+    "sending": "Enviando...",
+    "success": "Pregunta recibida. Un especialista responde a tu correo, normalmente en un día laborable.",
+    "error": "No se envió. Revisa los datos e inténtalo de nuevo.",
+    "rateLimited": "Demasiadas preguntas desde esta red. Inténtalo más tarde.",
+    "note": "Información general, no asesoramiento legal, financiero ni médico."
+  },
+  "asset": {
+    "eyebrow": "Documento de referencia",
+    "name": "Nombre",
+    "email": "Correo",
+    "consent": "Acepto recibir este documento y novedades relacionadas, y he leído la política de privacidad.",
+    "submit": "Envíamelo cuando esté listo",
+    "sending": "Guardando...",
+    "success": "Estás en la lista. Te enviamos el documento en cuanto la primera edición tenga fecha.",
+    "error": "No se guardó. Revisa el correo e inténtalo de nuevo.",
+    "rateLimited": "Demasiadas solicitudes desde esta red. Inténtalo más tarde.",
+    "note": "Gratis. Sin anuncios ni propuestas de socios en el documento."
+  },
+  "briefs": {
+    "title": "Archivo del boletín",
+    "intro": "Cada boletín que enviamos queda aquí, con fecha y las historias que cubrió. Sin cuenta.",
+    "cadence": "Un correo a la semana, los lunes, por canal. Baja con un clic.",
+    "empty": "Aún no hay ediciones",
+    "emptyBody": "La primera edición sale cuando el envío esté conectado. Únete y la recibes primero.",
+    "subscribe": "Unirme a la lista"
+  },
+  "topic": {
+    "title": "{topic} en {industry}",
+    "intro": "Todas las historias de este tema, de la más reciente a la más antigua.",
+    "empty": "Aún no hay historias en este tema",
+    "emptyBody": "El feed está monitorizado; el tema se llenará cuando las fuentes publiquen.",
+    "listTitle": "Últimas historias"
   }
 }

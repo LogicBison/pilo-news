@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { track } from "@/lib/analytics";
 import { t, type Locale } from "@/lib/i18n";
+import { captureUtm } from "@/lib/utm";
 
 import { Button } from "./ui/button";
 import { ConsentField } from "./ui/consent-field";
@@ -53,6 +54,7 @@ export function BriefSignup({ industry, locale, placement, articleId, sourcePage
           source_page: sourcePage,
           article_id: articleId ?? null,
           website: data.get("website") || null,
+          utm: captureUtm(),
         }),
       });
       if (response.status === 429) {

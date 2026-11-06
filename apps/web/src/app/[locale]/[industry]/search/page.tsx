@@ -82,6 +82,7 @@ export default async function SearchPage({ params, searchParams }: Params) {
 
         {articles.length > 0 ? (
           <div className="mt-5 grid gap-5 md:grid-cols-2">
+            <h2 className="sr-only">{t(resolved, "search.listTitle")}</h2>
             {articles.map((article) => (
               <StoryCard key={article.id} article={article} industry={industry} locale={resolved} />
             ))}

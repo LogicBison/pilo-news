@@ -16,7 +16,29 @@ type Tab =
   | "keys"
   | "audit"
   | "leads"
-  | "partners";
+  | "partners"
+  | "funnel";
+
+interface FunnelChannel {
+  industry: string;
+  events: Record<string, number>;
+  placements: Record<string, number>;
+  leads_by_kind: Record<string, number>;
+  rates: {
+    click_rate: number | null;
+    start_rate: number | null;
+    submit_rate: number | null;
+    lead_rate: number | null;
+  };
+}
+
+interface FunnelData {
+  window_days: number;
+  industry: string;
+  stages: string[];
+  totals: { events: number; leads: number };
+  channels: FunnelChannel[];
+}
 
 interface AdminIndustry {
   slug: string;
@@ -141,6 +163,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
   const [audit, setAudit] = useState<AuditEvent[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [funnel, setFunnel] = useState<FunnelData | null>(null);
   const [message, setMessage] = useState("");
   const [newKey, setNewKey] = useState("");
   const [email, setEmail] = useState("admin@example.com");
@@ -200,6 +223,9 @@ export function AdminConsole({ locale }: { locale: Locale }) {
       } else if (activeTab === "partners") {
         const result = await apiRequest<{ data: Partner[] }>("/api/proxy/v1/admin/partners");
         setPartners(result.data?.data ?? []);
+      } else if (activeTab === "funnel") {
+        const result = await apiRequest<FunnelData>("/api/proxy/v1/admin/funnel?days=30");
+        setFunnel(result.data ?? null);
       }
     },
     [operator],
@@ -318,6 +344,7 @@ export function AdminConsole({ locale }: { locale: Locale }) {
     "audit",
     "leads",
     "partners",
+    "funnel",
   ];
 
   return (
@@ -637,6 +664,43 @@ export function AdminConsole({ locale }: { locale: Locale }) {
             <thead><tr className="border-b border-[var(--sn-border)]"><th className="p-2">{t(locale, "admin.industry")}</th><th className="p-2">{t(locale, "admin.name")}</th><th className="p-2">{t(locale, "admin.email")}</th><th className="p-2">{t(locale, "admin.status")}</th><th className="p-2" /></tr></thead>
             <tbody>{leads.map((lead) => (<tr key={lead.id} className="border-b border-[var(--sn-border)]"><td className="p-2">{lead.industry}</td><td className="p-2">{lead.name}</td><td className="p-2">{lead.email}</td><td className="p-2"><select value={lead.status} onChange={(event) => mutate(`/api/proxy/v1/admin/leads/${lead.id}`, "PATCH", { status: event.target.value })} className="sn-card px-2 py-1 text-sm">{["new","routed","contacted","qualified","closed","spam"].map((status) => <option key={status} value={status}>{status}</option>)}</select></td><td className="p-2 text-right"><a href={`/api/proxy/v1/admin/leads/${lead.id}/export`} target="_blank" rel="noreferrer" className="sn-card px-3 py-1">{t(locale, "admin.export")}</a><button type="button" onClick={() => mutate(`/api/proxy/v1/admin/leads/${lead.id}`, "DELETE")} className="ml-2 rounded border border-red-300 px-3 py-1 text-red-700">{t(locale, "admin.delete")}</button></td></tr>))}</tbody>
           </table>
+        </section>
+      ) : null}
+
+      {tab === "funnel" ? (
+        <section className="mt-6 overflow-x-auto">
+          {funnel && funnel.channels.length > 0 ? (
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-[var(--sn-border)]">
+                  <th className="p-2">{t(locale, "admin.industry")}</th>
+                  <th className="p-2">Impr.</th>
+                  <th className="p-2">Clicks</th>
+                  <th className="p-2">CTR</th>
+                  <th className="p-2">Starts</th>
+                  <th className="p-2">Submit</th>
+                  <th className="p-2">{t(locale, "admin.leads")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {funnel.channels.map((row) => (
+                  <tr key={row.industry} className="border-b border-[var(--sn-border)]">
+                    <td className="p-2 font-medium">{row.industry}</td>
+                    <td className="p-2">{row.events.cta_impression ?? 0}</td>
+                    <td className="p-2">{row.events.cta_click ?? 0}</td>
+                    <td className="p-2">{row.rates.click_rate === null ? "-" : `${Math.round(row.rates.click_rate * 1000) / 10}%`}</td>
+                    <td className="p-2">{row.events.lead_form_start ?? 0}</td>
+                    <td className="p-2">{(row.events.lead_submit ?? 0) + (row.events.question_submit ?? 0)}</td>
+                    <td className="p-2">{Object.values(row.leads_by_kind).reduce((sum, value) => sum + value, 0)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-sm text-[var(--sn-muted)]">
+              {t(locale, "admin.empty")} - {funnel ? `${funnel.window_days} d` : ""}
+            </p>
+          )}
         </section>
       ) : null}
 

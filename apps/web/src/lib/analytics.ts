@@ -4,7 +4,10 @@ export type FunnelEvent =
   | "cta_impression"
   | "cta_click"
   | "lead_form_start"
-  | "lead_submit";
+  | "lead_submit"
+  | "question_submit"
+  | "asset_interest"
+  | "brief_confirm";
 
 interface TrackOptions {
   industry: string;

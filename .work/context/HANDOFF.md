@@ -2,11 +2,11 @@
 
 ## Session status
 
-**Closed:** 2026-11-05 - SPEC approvals, a11y milestone audit (+F1/F2 fixes), S0 catalog primitives, and photographic bands on all ten channels. 57 e2e / 1 skipped on a production build; axe 0 violations on 11 URLs; 10/10 contrast; build + lint + typecheck green.
+**Closed:** 2026-11-05 - lead-generation offer rungs built after the UI close: ask-one-question and gated-asset leads (migration 010), funnel read-out + admin tab, UTM capture, briefs archive, topic hubs, disposable-domain rejection; plus the biz offer brief and the product-feasibility verification. 108 API tests; 57 e2e / 1 skipped on a production build; axe 0 violations on 11 URLs; build + lint + typecheck + check green.
 
 **Updated:** 2026-11-05
 
-**Prior session (closed 2026-11-05):** editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
+**Prior session (closed 2026-11-05, same day):** SPEC approvals, a11y milestone audit (+F1/F2), S0 catalog primitives, photographic bands on all ten channels. Then the earlier close: editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
 
 **Repository state:** v1 implemented plus the post-v1 operator scope. Master plan v1.1
 (Approved) executed end to end: schema/migrations (001-007), **ten** live channels
@@ -174,6 +174,9 @@ Dev currently defaults to `stem-cell`; switch with `./bin/start.sh --env dev ind
 | 2026-11-05 | channel inventory | `docs/channel-inventory.md` generated from `/v1/industries` (10 channels, EN/ES URLs, layout, default); `apps/web/scripts/channel-inventory.mjs` + `bin/channels.sh`; `./bin/start.sh test` fails when stale |
 | 2026-11-05 | visual verify | `@ui-visual-verify milestone`: **pass with gaps** on 10 channels; UIS-07/10 done; 57 e2e / 1 skipped; axe 11/11; report in `.work.ui/reports/20261105-visual-verify-milestone.md` |
 | 2026-11-05 | session close | commit + push; handoff/next refreshed |
+| 2026-11-05 | lead-gen rungs | migration 010 (`question`/`asset` kinds, 3 funnel events); `AskQuestion` rung on articles; `AssetOffer` waitlist (legal regulatory calendar); `/{industry}/briefs` archive; `/{industry}/topic/{slug}` hubs; UTM capture on all lead forms; disposable-domain rejection |
+| 2026-11-05 | funnel read-out | `GET /v1/admin/funnel` (stages, rates, per-channel, placement mix) + admin Funnel tab; OpenAPI snapshot regenerated; contract tests added |
+| 2026-11-05 | biz offers | `.work.biz/strategy/20261105-offer-and-leadgen-brief.md` (S1-S4, I1-I5, R1-R12, packages for ai/ui) + `20261105-product-feasibility-verification.md` (per-channel feasibility, jurisdiction matrix, V1-V10 claim audit) |
 | 2026-11-05 | spec approval | operator approved all ten channel-home SPECs (`Review` -> `Approved`); SPEC headers + `HANDOFF_UI`/`NEXT_UI` updated |
 | 2026-11-05 | a11y audit | `@ui-accessibility-audit milestone`: **pass** on 30 URLs (10 channels EN/ES + flows + articles); 0 critical/serious; 2 moderate best-practice (nav labels, CTA landmark); report + `HANDOFF_UI`/`NEXT_UI` updated |
 | 2026-11-05 | a11y fixes | F1 footer `nav.footer` label (en/es catalogs, 269 keys) + F2 CTA `<aside>` -> `<section>`; axe re-scan 8 pages 0 violations (incl. best-practice); F3 in ten SPEC amendments; F4/F5 left as debt |
@@ -243,6 +246,9 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 - E2E runs against a production build; run `pnpm build` before `pnpm test`.
 - AI validation intentionally rejects some provider output; those items publish
   without a summary.
+- **Brief promise ahead of the system:** the weekly brief copy promises a Monday email; delivery lands before production (owner-owned). Until it exists, capture is ahead of fulfilment.
+- **Asset scope is US + EU only.** No Asia source coverage, no JP/KR/ZH translation, and the logistics rate index is not buildable (licensed data) - replaced by a port/customs digest per the feasibility doc.
+- **Empty archive on purpose:** `/{industry}/briefs` renders an honest empty state until the first issue publishes.
 
 ---
 

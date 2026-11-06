@@ -17,7 +17,15 @@ router = APIRouter(prefix="/v1", tags=["leads"])
 
 class CtaEventRequest(BaseModel):
     industry: str = Field(min_length=2, max_length=40)
-    event: Literal["cta_impression", "cta_click", "lead_form_start", "lead_submit"]
+    event: Literal[
+        "cta_impression",
+        "cta_click",
+        "lead_form_start",
+        "lead_submit",
+        "question_submit",
+        "asset_interest",
+        "brief_confirm",
+    ]
     placement: str = Field(default="", max_length=40)
     locale: str = Field(default="en", max_length=10)
     article_id: str | None = Field(default=None, max_length=36)

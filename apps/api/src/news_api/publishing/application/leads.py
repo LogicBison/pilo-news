@@ -18,6 +18,21 @@ from news_api.platform.security import hash_personal
 log = structlog.get_logger(__name__)
 
 CONSENT_VERSION = "2026-11-05-v1"
+# Throwaway mailboxes never reach a partner; rejecting them keeps CPL honest.
+DISPOSABLE_DOMAINS = frozenset(
+    {
+        "mailinator.com",
+        "guerrillamail.com",
+        "10minutemail.com",
+        "tempmail.com",
+        "temp-mail.org",
+        "yopmail.com",
+        "trashmail.com",
+        "sharklasers.com",
+        "getnada.com",
+        "dispostable.com",
+    }
+)
 SENSITIVE_PATTERNS = (
     re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
     re.compile(r"\b(?:\d[ -]?){13,19}\b"),
@@ -77,7 +92,7 @@ def check_qualification(channel: Channel, payload: dict[str, Any]) -> str | None
     if value is None or str(value).strip() == "":
         # The brief rung is deliberately two fields; a missing answer is only a
         # problem on the consultation form, where the partner needs the context.
-        if config.get("required") and payload.get("kind") != "brief":
+        if config.get("required") and payload.get("kind") not in {"brief", "question", "asset"}:
             raise ValidationProblem("Choose the option that fits your request.")
         return None
     value = str(value)
@@ -97,7 +112,10 @@ async def create_lead(
     if not payload.get("consent"):
         raise ValidationProblem("Consent is required to submit this form.")
     reject_sensitive(payload)
-    if channel.slug == "logistics":
+    domain = str(payload["email"]).rsplit("@", 1)[-1].lower()
+    if domain in DISPOSABLE_DOMAINS:
+        raise ValidationProblem("Use a permanent email address - this one looks temporary.")
+    if channel.slug == "logistics" and payload.get("kind") in {"consultation", "question"}:
         if not payload.get("phone"):
             raise ValidationProblem("A phone number is required for logistics inquiries.")
         if not payload.get("company"):
@@ -136,11 +154,11 @@ async def create_lead(
                 """
                 INSERT INTO leads (
                     industry_id, partner_id, kind, name, email, phone, company, message,
-                    qualification, locale, source_page, article_id, utm, consent_version,
+                    qualification, asset, locale, source_page, article_id, utm, consent_version,
                     consent_at, ip_hash, ua_hash, status
                 ) VALUES (
                     CAST(:industry_id AS uuid), CAST(:partner_id AS uuid), :kind, :name, :email,
-                    :phone, :company, :message, :qualification, :locale, :source_page,
+                    :phone, :company, :message, :qualification, :asset, :locale, :source_page,
                     CAST(:article_id AS uuid), CAST(:utm AS jsonb), :consent_version,
                     :consent_at, :ip_hash, :ua_hash, :status
                 ) RETURNING id
@@ -156,6 +174,7 @@ async def create_lead(
                 "company": payload.get("company"),
                 "message": payload.get("message"),
                 "qualification": qualification,
+                "asset": payload.get("asset"),
                 "locale": payload.get("locale") or "en",
                 "source_page": payload.get("source_page"),
                 "article_id": article_id,

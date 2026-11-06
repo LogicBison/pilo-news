@@ -5,6 +5,7 @@ import { useState } from "react";
 import { track } from "@/lib/analytics";
 import type { CtaQualification } from "@/lib/api";
 import { t, type Locale } from "@/lib/i18n";
+import { captureUtm } from "@/lib/utm";
 import { localized } from "@/lib/theme";
 
 import { Button } from "./ui/button";
@@ -76,6 +77,7 @@ export function LeadForm({
           source_page: sourcePage,
           article_id: articleId ?? null,
           website: data.get("website") || null,
+          utm: captureUtm(),
         }),
       });
       if (response.status === 429) {

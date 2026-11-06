@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { DeskBrief } from "@/components/DeskBrief";
+import { AssetOffer } from "@/components/AssetOffer";
 import { BriefSignup } from "@/components/BriefSignup";
 import { Hero, StoryColumns } from "@/components/Hero";
 import { JsonLd } from "@/components/JsonLd";
@@ -14,6 +15,7 @@ import { TrustBlock } from "@/components/TrustBlock";
 import { StickyCta } from "@/components/Cta";
 import { TopicRail } from "@/components/TopicRail";
 import { getBundle, getIndustry } from "@/lib/api";
+import { assetFor } from "@/lib/assets";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
 import { resolveSkin } from "@/lib/skins";
 import { itemListJsonLd, pageMetadata } from "@/lib/seo";
@@ -52,6 +54,7 @@ export default async function ChannelHome({ params }: Params) {
   const bundle = result.data;
   const channel = bundle.industry;
   const homePath = localePath(resolved, `/${industry}`);
+  const asset = assetFor("legal-regulatory-calendar");
 
   return (
     <>
@@ -96,6 +99,16 @@ export default async function ChannelHome({ params }: Params) {
           ) : null}
         </>
       )}
+      {asset && industry === "legal" ? (
+        <AssetOffer
+          industry={industry}
+          locale={resolved}
+          asset={asset.slug}
+          title={asset.title[resolved]}
+          body={asset.body[resolved]}
+          sourcePage={localePath(resolved, `/${industry}`)}
+        />
+      ) : null}
       <section className="sn-convert" aria-labelledby="convert-heading">
         <div className="max-w-2xl">
           <div className="flex items-center gap-2">

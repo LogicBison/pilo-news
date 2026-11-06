@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { t, type Locale } from "@/lib/i18n";
+import { captureUtm } from "@/lib/utm";
 
 import { Button } from "./ui/button";
 import { FieldError } from "./ui/field-error";
@@ -33,6 +34,7 @@ export function ContactForm({ industry, locale }: { industry: string; locale: Lo
           locale,
           industry,
           website: data.get("website") || null,
+          utm: captureUtm(),
         }),
       });
       if (response.status === 429) {

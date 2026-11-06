@@ -19,13 +19,14 @@ router = APIRouter(prefix="/v1", tags=["leads"])
 
 class LeadRequest(BaseModel):
     industry: str = Field(min_length=2, max_length=40)
-    kind: Literal["consultation", "brief"] = "consultation"
+    kind: Literal["consultation", "brief", "question", "asset"] = "consultation"
     name: str = Field(min_length=1, max_length=100)
     email: EmailStr
     phone: str | None = Field(default=None, max_length=40)
     company: str | None = Field(default=None, max_length=120)
     message: str | None = Field(default=None, max_length=2000)
     qualification: str | None = Field(default=None, max_length=60)
+    asset: str | None = Field(default=None, max_length=60)
     locale: str = Field(default="en", max_length=10)
     consent: bool = False
     source_page: str | None = Field(default=None, max_length=300)
@@ -64,6 +65,7 @@ async def create_lead(payload: LeadRequest, request: Request) -> Any:
             "company": payload.company,
             "message": payload.message,
             "qualification": payload.qualification,
+            "asset": payload.asset,
             "locale": payload.locale,
             "consent": payload.consent,
             "source_page": payload.source_page,

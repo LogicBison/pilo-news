@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AskQuestion } from "@/components/AskQuestion";
+import { AssetOffer } from "@/components/AssetOffer";
 import { CtaCard } from "@/components/CtaCard";
 import { BriefSignup } from "@/components/BriefSignup";
 import { StickyCta } from "@/components/Cta";
@@ -12,6 +14,7 @@ import { SkinScene } from "@/components/SkinScene";
 import { StoryCard } from "@/components/StoryCard";
 import { TrustBlock } from "@/components/TrustBlock";
 import { getArticle, getIndustry } from "@/lib/api";
+import { assetFor } from "@/lib/assets";
 import { fallbackIndustry } from "@/lib/fallback";
 import { resolveSkin } from "@/lib/skins";
 import { formatDate, localePath, resolveLocale, t } from "@/lib/i18n";
@@ -55,6 +58,7 @@ export default async function ArticlePage({ params }: Params) {
   const article = articleResult.data;
   const channel = industryResult.ok ? industryResult.data : fallbackIndustry(industry);
   const pagePath = localePath(resolved, `/${industry}/article/${id}`);
+  const asset = assetFor("legal-regulatory-calendar");
 
   return (
     <>
@@ -130,6 +134,24 @@ export default async function ArticlePage({ params }: Params) {
             compact
           />
         </div>
+
+        <AskQuestion
+          industry={industry}
+          locale={resolved}
+          articleId={article.id}
+          sourcePage={pagePath}
+        />
+
+        {asset && channel.slug === "legal" ? (
+          <AssetOffer
+            industry={industry}
+            locale={resolved}
+            asset={asset.slug}
+            title={asset.title[resolved]}
+            body={asset.body[resolved]}
+            sourcePage={pagePath}
+          />
+        ) : null}
 
         {article.related.length > 0 ? (
           <section aria-labelledby="related-heading" className="mt-10">

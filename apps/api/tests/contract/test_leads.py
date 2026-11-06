@@ -226,3 +226,53 @@ async def test_lead_qualification_is_validated_and_accepted(client) -> None:
         },
     )
     assert brief_with_bad_option.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_question_and_asset_rungs(client) -> None:
+    question = await client.post(
+        "/v1/leads",
+        json={
+            "industry": "legal",
+            "kind": "question",
+            "name": "Curious Reader",
+            "email": "reader@example.com",
+            "message": "Does the new AI Act guidance change client disclosure duties?",
+            "locale": "en",
+            "consent": True,
+        },
+    )
+    assert question.status_code == 200
+    assert set(question.json()).issubset({"id", "status"})
+
+    asset = await client.post(
+        "/v1/leads",
+        json={
+            "industry": "legal",
+            "kind": "asset",
+            "asset": "legal-regulatory-calendar",
+            "name": "Calendar Reader",
+            "email": "calendar@example.com",
+            "locale": "en",
+            "consent": True,
+        },
+    )
+    assert asset.status_code == 200
+    assert set(asset.json()).issubset({"id", "status"})
+
+
+@pytest.mark.asyncio
+async def test_disposable_email_is_rejected(client) -> None:
+    response = await client.post(
+        "/v1/leads",
+        json={
+            "industry": "legal",
+            "kind": "consultation",
+            "name": "Throwaway Person",
+            "email": "throwaway@mailinator.com",
+            "message": "Please contact me about a compliance review today.",
+            "locale": "en",
+            "consent": True,
+        },
+    )
+    assert response.status_code == 422

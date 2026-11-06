@@ -99,7 +99,8 @@
     "results": "{count} results for {query}",
     "empty": "No stories matched that search.",
     "emptyBody": "Try a shorter phrase or browse the topics on the channel home.",
-    "queryLabel": "Search query"
+    "queryLabel": "Search query",
+    "listTitle": "Search results"
   },
   "lead": {
     "title": "Talk to a vetted professional",
@@ -193,7 +194,8 @@
       "audit": "Audit",
       "leads": "Leads",
       "partners": "Partners",
-      "channels": "Channels"
+      "channels": "Channels",
+      "funnel": "Funnel"
     },
     "overview": "Overview",
     "sources": "Sources",
@@ -313,5 +315,48 @@
   },
   "scene": {
     "moreCoverage": "More coverage →"
+  },
+  "question": {
+    "eyebrow": "Ask one question",
+    "title": "Ask a specialist one question",
+    "body": "No call, no form interview. Send the question you would ask a colleague, and a vetted specialist in this field answers in writing.",
+    "name": "Your name",
+    "email": "Email",
+    "label": "Your question",
+    "hint": "One question, specific enough to answer. Do not include case numbers or personal details.",
+    "consent": "I agree to be contacted about this question and have read the privacy policy.",
+    "submit": "Send the question",
+    "sending": "Sending...",
+    "success": "Question received. A specialist replies to your email, usually within one business day.",
+    "error": "That did not send. Check the details and try again.",
+    "rateLimited": "Too many questions from this network. Try again later.",
+    "note": "General information, not legal, financial, or medical advice."
+  },
+  "asset": {
+    "eyebrow": "Reference document",
+    "name": "First name",
+    "email": "Email",
+    "consent": "I agree to receive this document and related updates, and have read the privacy policy.",
+    "submit": "Send it when it is ready",
+    "sending": "Saving...",
+    "success": "You are on the list. We email the document as soon as the first issue is dated.",
+    "error": "That did not save. Check the email address and try again.",
+    "rateLimited": "Too many requests from this network. Try again later.",
+    "note": "Free. No ads, no partner pitches in the document."
+  },
+  "briefs": {
+    "title": "The brief archive",
+    "intro": "Every brief we send lands here, dated, with the stories it covered. No account needed.",
+    "cadence": "One email a week, Monday, per channel. Stop with one click.",
+    "empty": "No issues published yet",
+    "emptyBody": "The first issue goes out after the email list is wired. Join now and you get it first.",
+    "subscribe": "Join the list"
+  },
+  "topic": {
+    "title": "{topic} in {industry}",
+    "intro": "Every story we carry on this topic, newest first.",
+    "empty": "No stories on this topic yet",
+    "emptyBody": "The feed is monitored; this topic will fill as sources publish.",
+    "listTitle": "Latest stories"
   }
 }

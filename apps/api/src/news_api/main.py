@@ -27,6 +27,7 @@ from news_api.platform.migrations import migrations_applied, run_migrations
 from news_api.platform.settings import get_settings
 from news_api.publishing.http.contact import router as contact_router
 from news_api.publishing.http.cta import router as cta_router
+from news_api.publishing.http.funnel import router as funnel_router
 from news_api.publishing.http.leads import router as leads_router
 from news_api.publishing.http.news import router as news_router
 from news_api.publishing.http.taxonomy import router as taxonomy_router
@@ -147,3 +148,4 @@ app.include_router(api_keys_router)
 app.include_router(audit_router)
 app.include_router(admin_industries_router)
 app.include_router(admin_leads_router)
+app.include_router(funnel_router)

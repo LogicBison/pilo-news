@@ -112,7 +112,10 @@
               "cta_impression",
               "cta_click",
               "lead_form_start",
-              "lead_submit"
+              "lead_submit",
+              "question_submit",
+              "asset_interest",
+              "brief_confirm"
             ],
             "title": "Event",
             "type": "string"
@@ -384,6 +387,18 @@
             ],
             "title": "Article Id"
           },
+          "asset": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset"
+          },
           "company": {
             "anyOf": [
               {
@@ -416,7 +431,9 @@
             "default": "consultation",
             "enum": [
               "consultation",
-              "brief"
+              "brief",
+              "question",
+              "asset"
             ],
             "title": "Kind",
             "type": "string"
@@ -1564,6 +1581,28 @@
           }
         },
         "summary": "Me",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/funnel": {
+      "get": {
+        "description": "Funnel read-out: CTA events and lead outcomes per channel and placement.",
+        "operationId": "funnel_v1_admin_funnel_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Funnel V1 Admin Funnel Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Funnel",
         "tags": [
           "admin"
         ]

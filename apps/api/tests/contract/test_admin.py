@@ -226,3 +226,22 @@ async def test_partner_registry(client, admin_client) -> None:
     )
     assert updated.status_code == 200
     assert updated.json()["data"]["status"] == "disabled"
+
+
+@pytest.mark.asyncio
+async def test_admin_funnel_readout(client) -> None:
+    assert (await client.get("/v1/admin/funnel")).status_code == 401
+    login = await client.post(
+        "/v1/admin/auth/login",
+        json={"email": "admin@example.com", "password": "test-admin-password"},
+    )
+    assert login.status_code == 200
+    response = await client.get("/v1/admin/funnel?days=30")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["window_days"] == 30
+    assert body["industry"] == "all"
+    assert "cta_impression" in body["stages"]
+    assert isinstance(body["channels"], list)
+    bad = await client.get("/v1/admin/funnel?days=0")
+    assert bad.status_code == 400
