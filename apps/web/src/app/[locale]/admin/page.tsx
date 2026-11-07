@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { resolveLocale } from "@/lib/i18n";
 
+import { DevelopedBy } from "@/components/DevelopedBy";
+
 import { AdminConsole } from "./AdminConsole";
 
 export const metadata: Metadata = {
@@ -15,12 +17,18 @@ export default async function AdminPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const resolved = resolveLocale(locale);
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <AdminConsole
-        locale={resolveLocale(locale)}
-        defaultIndustry={process.env.SN_DEFAULT_INDUSTRY ?? "legal"}
-      />
-    </main>
+    <>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <AdminConsole
+          locale={resolved}
+          defaultIndustry={process.env.SN_DEFAULT_INDUSTRY ?? "legal"}
+        />
+      </main>
+      <footer className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
+        <DevelopedBy locale={resolved} />
+      </footer>
+    </>
   );
 }

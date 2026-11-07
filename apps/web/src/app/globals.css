@@ -300,11 +300,74 @@ body {
   color: var(--sn-text);
 }
 
+/* The house credit: a mark, a micro-label and the wordmark, as one link. */
+.sn-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 12px 6px 8px;
+  border: 1px solid var(--sn-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sn-bg) 86%, var(--sn-surface));
+  color: var(--sn-text);
+  text-decoration: none;
+  transition:
+    border-color 0.16s var(--sn-ease),
+    background 0.16s var(--sn-ease);
+}
+
+.sn-credit:hover {
+  border-color: var(--sn-accent);
+  background: var(--sn-surface);
+}
+
+.sn-credit-mark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.sn-credit-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.12;
+}
+
+.sn-credit-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sn-muted);
+}
+
+.sn-credit-name {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.sn-credit-arrow {
+  font-size: 12px;
+  line-height: 1;
+  color: var(--sn-muted);
+  transition:
+    color 0.16s var(--sn-ease),
+    transform 0.16s var(--sn-ease);
+}
+
+.sn-credit:hover .sn-credit-arrow {
+  color: var(--sn-accent);
+  transform: translate(1px, -1px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sn-card-interactive,
   .sn-btn,
   .sn-nav-link,
-  .sn-chip-link {
+  .sn-chip-link,
+  .sn-credit,
+  .sn-credit-arrow {
     transition: none;
   }
 }

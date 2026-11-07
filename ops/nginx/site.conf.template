@@ -35,8 +35,6 @@ server {
     ssl_certificate_key __CERT_DIR__/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 1d;
 
     server_tokens off;
     client_max_body_size 2m;

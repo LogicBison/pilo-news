@@ -178,7 +178,8 @@
     "rss": "RSS",
     "contact": "Contacto",
     "language": "Idioma",
-    "copyright": "System News. Los titulares enlazan a los medios originales."
+    "copyright": "System News. Los titulares enlazan a los medios originales.",
+    "developedBy": "Desarrollado por"
   },
   "meta": {
     "siteName": "System News",

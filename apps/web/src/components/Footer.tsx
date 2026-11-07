@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { Industry } from "@/lib/api";
+import { DevelopedBy } from "./DevelopedBy";
 import { SkinEmblem } from "./SkinEmblem";
 import { localePath, t, type Locale } from "@/lib/i18n";
 import { channelBase } from "@/lib/url";
@@ -20,6 +21,9 @@ export async function Footer({ industry, locale }: { industry: Industry; locale:
           <p className="mt-2 max-w-sm text-sm text-[var(--sn-muted)]">
             {t(locale, "footer.copyright")}
           </p>
+          <div className="mt-3">
+            <DevelopedBy locale={locale} />
+          </div>
         </div>
         <div>
           <p className="text-sm font-semibold text-[var(--sn-text)]">

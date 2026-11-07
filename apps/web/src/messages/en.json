@@ -178,7 +178,8 @@
     "rss": "RSS",
     "contact": "Contact",
     "language": "Language",
-    "copyright": "System News. Headlines link to the original publishers."
+    "copyright": "System News. Headlines link to the original publishers.",
+    "developedBy": "Developed by"
   },
   "meta": {
     "siteName": "System News",

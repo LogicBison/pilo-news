@@ -2,8 +2,8 @@
 
 ## Session status
 
-**Closed:** 2026-11-07 — production edge, the apex site, and the gates that keep both honest.
-Eleven channels now serve on their own subdomains behind the host's nginx (ADR 015), `start.sh` produces and restores a portable dev→prd bundle, the apex is a real site with a lobby and a services page (ADR 016), the channel inventory cannot go stale, request logging is by outcome instead of by traffic, and the "no ads" promise is replaced by a promotion ceiling (D-021). Verified at close: 152 API tests, ruff/mypy clean, OpenAPI snapshot current, web typecheck/lint/566-key catalogue parity, production image built and served, 41 Playwright on the production build (lobby + 29 axe URLs), 12 lobby tests and `./bin/start.sh dev test` green end to end.
+**Closed:** 2026-11-07 — email through the pilo-mail gateway, a drilled dev→prd restore, the production stack on `169.58.4.85`, and the LogicBison credit.
+Email leaves through `smtp.iterwire.com:2525` as `info@links.heraldfox.com`; a real message reached the owner's gmail with DKIM/DMARC pass. `init-env` now generates Postgres/Redis passwords, `preflight` resolves the email lane, the menu restore can apply config/media/nginx, and the bundle restored 11 channels / 676 articles / 52 sources into a clean Postgres 16. Production is up on `vmi3435240` with the data restored; HTTPS is the remaining step (the TLS template's duplicate session directives were found and fixed). Every public footer now carries the LogicBison mark and wordmark.
 
 **Prior close — 2026-11-06:** offer generation, reviewer-gated public references, and lead/contact attribution.
 Per-channel cadence and offer switches shipped; legal/cyber drafts generate automatically; public reference pages and publish/unpublish shipped; contact and lead attribution now store source/UTM/session/country with hashed network identifiers. 143 API tests, admin e2e 7/7, production build green. Remaining: email delivery, named reviewers, `GEO_COUNTRY_HEADER` edge value, and marketing-consent confirmation.
@@ -31,10 +31,10 @@ and a browser save/restore check against the dev API. SPEC:
 
 1. Run **`@session-control start`**.
 2. Read `.cursorrules`, this file, `.work/plans/NEXT.md`.
-3. **Production edge (O9):** on the host, `./bin/start.sh --env prd domains --write --http-only`,
-   include `ops/nginx/sites` in nginx, reload, then `certs --run`, `domains --write`,
-   `certs --check`, and `./bin/start.sh --env prd hosts`. Until that passes, the public
-   TLS path is unverified (see Known residual risks).
+3. **Finish production TLS (O9):** on `169.58.4.85` the stack is up and the data is restored.
+   Pull the TLS template fix, run `./bin/start.sh --env prd domains --write`, `sudo nginx -t`,
+   reload, `sudo ./bin/start.sh --env prd certs --check`, then `curl -fsS https://heraldfox.com/v1/health`
+   and `./bin/start.sh --env prd hosts`. Until that passes, the public TLS path is unverified.
 4. **Apex:** the lobby lives in `apps/web/src/components/lobby/`; its copy is
    `.work.biz/strategy/20261107-lobby-copy.md` (140 keys, EN/ES). Change copy there
    first, then in `apps/web/src/messages/`.
@@ -42,8 +42,10 @@ and a browser save/restore check against the dev API. SPEC:
 6. Re-run `python -m news_api.cli verify-sources --industry all` after any portfolio
    change; it must exit 0.
 7. Still pending from M8: k6 (`tests/perf/k6-smoke.js`), remote CI, CATALOG init.
-8. For launch: answer U1 brand, U8 delivery, U9 analytics, U10 traffic, then run
+8. For launch: answer U1 brand, U9 analytics, U10 traffic, then run
    `.work/plans/operations/20261105-launch.md`.
+9. **Deploy the footer credit:** `git pull` on the host, `./bin/start.sh --env prd up`,
+   then check the channel, lobby and admin footers on the live hosts.
 
 ### Conditional reads
 
@@ -75,10 +77,10 @@ and a browser save/restore check against the dev API. SPEC:
 | M8 hardening | done (prd deploy pending) | metrics/alerts/dashboards, runbooks, security review, backup drill |
 | Any-industry template | done | create-channel endpoint + web + docs + tests |
 | Isolation | done | random host ports; `*-net`/`*-data`; DB/Redis internal |
-| Backups | done | `.tar.gz` volume archive + restore drill 2026-11-05 |
+| Backups | done | volume archive + 2026-11-05 drill; pg_dump bundle drill 2026-11-07 |
 | CI | written, not run on GitHub | `.github/workflows/ci.yml` |
 | k6 / Lighthouse CI | scripts written, not run in prd | `tests/perf/k6-smoke.js` |
-| prd deploy/rollback | images build + smoke; no host DNS deploy yet | owner U7/O7 |
+| prd deploy | stack up on 169.58.4.85, data restored; TLS pending | owner O9 |
 | deployment profile | done | `apply-profile` CLI, `config/deployments/*.json` (6), `docs/deployment-profile.md`; ports/adapters seam |
 | source quality | done | `verify-sources` CLI, 26/26 feeds grade A, 0 coverage warnings, ADR 014, `docs/source-quality.md` |
 | custom industry proof | done | `cybersecurity` and `stem-cell` created from profiles only, serving content |
@@ -86,7 +88,7 @@ and a browser save/restore check against the dev API. SPEC:
 | instant industry switch | done | `./bin/start.sh industry financial` -> `/` redirects to `/financial`, no rebuild |
 
 | channel subdomains | done | ADR 015, `middleware.ts` + `lib/url.ts`, `start.sh hosts` 14/14 |
-| host nginx edge | config + tooling done, TLS unissued | `ops/nginx/`, `start.sh domains`/`certs`, `docs/domains.md` |
+| host nginx edge | HTTP answers; TLS template fixed, cert/reload pending | `ops/nginx/`, `start.sh domains`/`certs`, `docs/domains.md` |
 | dev→prd migration | done and drilled | `start.sh backup`/`restore`; restored into fresh postgres and into the prd stack |
 | apex site | done | ADR 016, lobby + services + legal pages, `GET /v1/desks`, `e2e/lobby.spec.ts` |
 | channel inventory | gated | environment-free block, live/profile fallback, CI check |
@@ -100,7 +102,12 @@ and a browser save/restore check against the dev API. SPEC:
 
 | Gate | Command | Result |
 |---|---|---|
-| API | `./bin/start.sh dev test` (ruff, format, mypy, pytest) | 152 passed, no issues |
+| API (2026-11-07) | `pytest -q` in the dev api | 164 passed |
+| Web (2026-11-07) | `pnpm lint`, `tsc --noEmit`, `pnpm check` | clean, 567 keys |
+| Email (2026-11-07) | live send through the gateway | delivered; `dkim=pass d=links.heraldfox.com`, `dmarc=pass` |
+| Restore drill (2026-11-07) | bundle replayed into a clean Postgres 16 | 11 channels / 676 articles / 52 sources / 16 migrations |
+| Footer (2026-11-07) | rendered `/`, `/legal`, `/es`, `/admin` | LogicBison mark and link present |
+| API (prior) | `./bin/start.sh dev test` (ruff, format, mypy, pytest) | 152 passed, no issues |
 | Web | lint, `tsc --noEmit`, catalogue/theme check | clean, 566 keys in EN and ES |
 | OpenAPI | `python scripts/export_openapi.py` + diff | snapshot current (`/v1/desks`, cta `surface`) |
 | Inventory | `./bin/channels.sh --check` (live API and profile fallback) | ok both ways, 11 rows |
@@ -113,7 +120,7 @@ and a browser save/restore check against the dev API. SPEC:
 | Logs | 30 s idle after the change | api 0, web 0, worker 0 lines |
 | Migration | 016 applied on dev and on the restored prd copy | `applied: 0, total: 16` |
 
-Not verified: the public TLS path (no public DNS or root on this machine), certbot issuance, and the nginx reload on the production host — all three are operator steps documented in `docs/domains.md`.
+Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, reload, `certs --check`), and the footer credit on the live hosts. Both are the next session's first steps.
 
 ## Open owner actions
 
@@ -123,14 +130,16 @@ Not verified: the public TLS path (no public DNS or root on this machine), certb
 | O2 | ~~VPS provider/budget~~ approved | - | owner | ADR 005 |
 | O3 | ~~NFR targets~~ approved | - | owner | doc 04 §5 |
 | O4 | ~~Stack files~~ approved/created | - | owner | operations proposal |
-| O5 | Fill remaining unknowns: U1 brand, U7 roles, U9 analytics, U10 traffic, U11 legal review, U12 sponsored (U8 closed: pilo-mail gateway chosen, integration deferred) | launch | owner | `.work/plans/UNKNOWNS.md` |
+| O5 | Fill remaining unknowns: U1 brand, U7 roles, U9 analytics, U10 traffic, U11 legal review, U12 sponsored (U8 closed: gateway integrated and tested) | launch | owner | `.work/plans/UNKNOWNS.md` |
 | O6 | ~~Master plan~~ approved | - | owner | full plan v1.1 |
 | O7 | prd domain/DNS + provider | prd deploy | owner | launch checklist |
 | O8 | CDN/off-site backup bucket (optional) | RPO | owner | backup doc |
-| O9 | Issue the production certificate on the host: `domains --write --http-only` → reload → `certs --run` → `domains --write` → `certs --check` | production TLS | owner | `docs/domains.md` |
+| O9 | Finish production TLS on `169.58.4.85`: pull the template fix, `domains --write`, `nginx -t`, reload, `certs --check`, `hosts` | public HTTPS | owner | `docs/domains.md` |
 | O10 | Approve the `.github/workflows/ci.yml` inventory gate before it runs on a PR | CI | owner | workflow file |
 | O11 | Delete the now-unused `Caddyfile` (ADR 015 replaced the edge) | tidiness | owner | repo root |
 | O12 | Decide the brand string across surfaces (D-018 covers the apex; channel footers still say System News) | consistency | owner | `.work.biz/decisions/` |
+| O13 | Deploy the footer credit: `git pull` + `./bin/start.sh --env prd up` on the host | live attribution | owner | `apps/web/src/components/DevelopedBy.tsx` |
+| O14 | Reconcile the host's local TLS template edit before pulling; the repo now carries the fix | clean pull | owner | `ops/nginx/site.conf.template` |
 
 ---
 
@@ -138,6 +147,10 @@ Not verified: the public TLS path (no public DNS or root on this machine), certb
 
 | Date | Session | Artifacts |
 |------|---------|-----------|
+| 2026-11-07 | email | pilo-mail gateway transport lanes, `info@links.heraldfox.com`, DKIM/DMARC pass, real delivery |
+| 2026-11-07 | restore hardening | `init-env` DB/Redis passwords + URL sync, preflight email lane, menu restore `--all`, bundle drill |
+| 2026-11-07 | production deploy | `vmi3435240` (169.58.4.85): stack up, data restored, HTTP-only nginx; TLS template fix |
+| 2026-11-07 | footer credit | LogicBison mark + wordmark on channel, lobby and admin footers |
 | 2026-11-07 | production edge | channel subdomains behind host nginx (ADR 015), `start.sh` domains/certs/preflight/hosts, dev→prd bundle backup+restore, `docs/domains.md`, `docs/guides/migrate-dev-to-prod.md` |
 | 2026-11-07 | apex site | lobby + services + network legal pages (ADR 016), `GET /v1/desks`, migration 016 (`surface`, `desk_enter`), 140 `lobby.*` keys, `e2e/lobby.spec.ts`, apex sitemap/robots |
 | 2026-11-07 | lobby review | four defects fixed from owner screenshots (anchor-colour specificity, page-relative section links, `{desks}` placeholder, form-field contrast), contact form added (D-020), "no ads" claims replaced (D-021) |
@@ -184,7 +197,7 @@ Not verified: the public TLS path (no public DNS or root on this machine), certb
 | # | Unknown | Blocks | Owner |
 |---|---|---|---|
 | U1 | Brand name across surfaces (apex ratified as Herald Fox by D-018; channels unchanged) | consistency | owner |
-| U8 / U20 | Email delivery (`pilo-mail`) — holds the weekly brief card out of the lobby | brief offer, G1 | owner |
+| U8 / U20 | Email delivery — integrated and tested through the gateway; the weekly-brief campaign is still unbuilt | brief campaign, G1 | owner |
 | D-005 / U19 | Named reviewers — holds the reviewer signature line in the services copy | content-generation claim, G2 | owner |
 | U9 | Analytics/consent vendor | lobby funnel depth beyond first-party | owner |
 | U10 | Traffic baseline | lobby keep/kill thresholds | owner |
@@ -244,7 +257,7 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 | Risk | Why it matters | Mitigation |
 |------|----------------|------------|
-| TLS path never exercised here | no public DNS or root on this machine, so certbot and the nginx 443 blocks are unproven until O9 runs | `certs --check` verifies SAN coverage per host; `docs/domains.md` is the runbook |
+| TLS reload not re-verified | the host rejected the first 443 config on duplicate session directives; the template is fixed, but `nginx -t`, reload and `certs --check` still need to pass | O9 is the first step next session |
 | nginx config validated syntactically only | `nginx -t` passes but no request has gone through the real edge | `start.sh hosts` runs the same contract over HTTP once the host proxy is live |
 | CI inventory gate unapproved | the step would run on the next PR before the owner signs off | listed as O10 |
 | Brand string split | apex says Herald Fox, channel footers still say System News | D-018 with a 2026-12-15 outcome date |
@@ -258,7 +271,7 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 - AI summaries are fail-open; some items are intentionally left without a
   summary when validation rejects output.
 - CI is written but has not run on GitHub yet.
-- prd images build and smoke; a real host/DNS deploy + rollback drill is still an owner action.
+- prd stack is up on 169.58.4.85 with the data restored; TLS and a rollback drill remain.
 - `k6` and Lighthouse budgets are scripts only; no prd measurement yet.
 - E2E runs against a production build; run `pnpm build` before `pnpm test`.
 - AI validation intentionally rejects some provider output; those items publish
@@ -271,9 +284,9 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Open `.work/plans/NEXT.md`. The one thing that unblocks production is O9: run the
-three certificate phases on the host, then `./bin/start.sh --env prd hosts` and
-`certs --check` to prove the edge before any traffic is pointed at it.
+Open `.work/plans/NEXT.md`. First finish O9 on `169.58.4.85` (pull the template fix,
+`domains --write`, `nginx -t`, reload, `certs --check`, `hosts`), then deploy the footer
+credit with `./bin/start.sh --env prd up`.
 
 ## Cross-framework action (@x-director)
 

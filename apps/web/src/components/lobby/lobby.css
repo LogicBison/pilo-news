@@ -1164,6 +1164,10 @@
   border-bottom: 1px solid var(--lb-signal);
 }
 
+.lb-foot-legal .sn-credit {
+  align-self: center;
+}
+
 .lb-foot-legal {
   margin-top: 40px;
   padding-top: 18px;

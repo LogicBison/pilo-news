@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-07 (production edge, apex lobby, lobby review, operational gates; 152 API tests)
+**Updated:** 2026-11-07 (email through the gateway, restore drill, production stack, footer credit; 164 API tests)
 
 ---
 
@@ -8,6 +8,10 @@
 
 | Item | Artifact |
 |------|----------|
+| Email transport | `start.sh`/settings gateway lane, `info@links.heraldfox.com`, delivered with DKIM/DMARC pass |
+| Restore hardening | `init-env` DB/Redis passwords + URL sync, preflight email lane, menu restore `--all`, bundle drill |
+| Production stack | `vmi3435240` (169.58.4.85): stack up, data restored, HTTP-only nginx; TLS template fix |
+| Footer credit | LogicBison mark + wordmark on channel, lobby and admin footers; 567 keys |
 | Foundation P0-P6 | `.work/plans/foundation/` docs 01-04 |
 | Master plan v1.1 | `.work/plans/full/20261105-full-plan.md` |
 | M1 scaffold + dev/prd stack | compose, Dockerfiles, `bin/start.sh` |
@@ -100,11 +104,11 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Issue the production certificate and turn the edge on | `./bin/start.sh --env prd domains --write --http-only` → include `ops/nginx/sites` → reload → `certs --run` → `domains --write` → `certs --check` → `hosts`. Nothing is publicly reachable until this runs (O9) |
+| **0** | Finish production TLS on `169.58.4.85` | pull the template fix, `domains --write`, `nginx -t`, reload, `certs --check`, `hosts` (O9) |
 | **1** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |
 | **2** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions |
 | **3** | Name the digest reviewer (D-005) | unblocks the content-generation signature line on `/services` (G2) |
-| **4** | Wire email delivery (D-002) | restores the weekly-brief card on the lobby (G1) |
+| **4** | ~~Wire email delivery (D-002)~~ done | gateway live and tested; the weekly-brief campaign is still unbuilt |
 | **5** | Answer U32/U33 | who takes the scope call, and what a service is priced on |
 | **6** | Settle the brand string (D-018 outcome, 2026-12-15) | apex says Herald Fox; channel footers still say System News |
 
@@ -115,12 +119,13 @@
 | # | Item | Notes |
 |---|------|-------|
 | O5 | Answer U1-U12 | brand/domain, publisher portfolio, pilot, analytics, traffic |
-| O9 | Issue the production certificate | `docs/domains.md`, three phases; nothing is publicly reachable until it runs |
+| O9 | Finish production TLS | `docs/domains.md`; `nginx -t`, reload and `certs --check` still need to pass |
 | O10 | Approve the CI inventory gate | `.github/workflows/ci.yml` runs it on the next PR |
 | O11 | Delete the unused `Caddyfile` | ADR 015 replaced the edge |
-| U8 / D-002 | Email delivery (`pilo-mail`) | holds the lobby's brief card and every "weekly brief" promise |
+| U8 / D-002 | Email transport is live; the weekly-brief campaign | holds the lobby's brief card and every "weekly brief" promise |
 | D-005 / U19 | Named reviewers | holds the reviewer signature in the services copy |
 | U32 / U33 | Scope-call owner, pricing shape | gates the services band and the pilot SKU |
+| O13 | Deploy the footer credit | `git pull` + `./bin/start.sh --env prd up` on the host |
 
 ---
 

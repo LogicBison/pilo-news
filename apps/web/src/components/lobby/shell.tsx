@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { DevelopedBy } from "@/components/DevelopedBy";
 import { t, type Locale } from "@/lib/i18n";
 
 import "./lobby.css";
@@ -193,6 +194,7 @@ export function LobbyFooter({
       </div>
       <div className="lb-foot-legal">
         <span>{t(locale, "lobby.footer.legal")}</span>
+        <DevelopedBy locale={locale} />
         <span>
           © {new Date().getFullYear()} {t(locale, "lobby.brand.name")}
         </span>
