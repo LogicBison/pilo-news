@@ -1,5 +1,7 @@
 from functools import lru_cache
+from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -53,14 +55,50 @@ class Settings(BaseSettings):
     # for example "cf-ipcountry". Never trust a client-supplied value.
     geo_country_header: str = ""
 
+    # --- email transport (contact/lead notifications) ----------------------
+    # SMTP_TRANSPORT selects where a message is handed off; the sender is the
+    # same on every lane:
+    #   ""        the flat SMTP_* block (historical behaviour, any provider)
+    #   gateway   the pilo-mail relay gateway -> Brevo from one fixed IP
+    #   direct    pilo-mail submission (Mailu), delivered from the host itself
+    # A selected lane with no host is not an error: the deployment simply does
+    # not send, and every caller logs notify.skipped.
+    smtp_transport: Literal["", "gateway", "direct"] = ""
+    smtp_from: str = ""
+    smtp_starttls: bool = True
+    smtp_ssl: bool = False
+    smtp_timeout_seconds: float = 10.0
+
+    # Flat lane (only read when SMTP_TRANSPORT is empty).
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
+
+    # gateway lane: STARTTLS on 2525, one SASL account per integration.
+    smtp_gateway_host: str = ""
+    smtp_gateway_port: int = 2525
+    smtp_gateway_user: str = ""
+    smtp_gateway_password: str = ""
+    smtp_gateway_ssl: bool = False
+
+    # direct lane: pilo-mail submission; 465 is implicit TLS.
+    smtp_direct_host: str = ""
+    smtp_direct_port: int = 465
+    smtp_direct_user: str = ""
+    smtp_direct_password: str = ""
+    smtp_direct_ssl: bool = True
+
     contact_to: str = "news@example.com"
     next_public_api_base: str = "http://localhost:8080"
     sn_default_locale: str = "en"
     sn_default_industry: str = "legal"
+
+    @field_validator("smtp_transport", mode="before")
+    @classmethod
+    def _normalise_transport(cls, value: object) -> object:
+        """Accept ``GATEWAY`` / `` Gateway ``; a real typo still fails the Literal."""
+        return value.strip().lower() if isinstance(value, str) else value
 
     @property
     def cookie_secure(self) -> bool:
