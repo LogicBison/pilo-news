@@ -156,6 +156,7 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | M12 2026-11-06 | browser save check: legal question offer off -> public `offers.question=false`; restored -> `true` |
 | M13 2026-11-06 | migration 014 applied twice (`applied: 0` re-run); 139 API tests; legal + cybersecurity drafts; admin Offers tab; reviewer-gated publish and public reference pages |
 | M13 2026-11-06 | offer scheduler runs in the worker; admin API list/detail/build/publish/unpublish; public reference pages; email path not built |
+| — 2026-11-06 | masthead emblem fix: digital-technology had no `datacenter` case; added rack mark + default fallback; 11/11 channel emblem e2e |
 | S1 2026-11-06 | contact + about + admin-console shipped; e2e 78 pass; admin sign-in verified end to end |
 | Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
 | S1 screens 2026-11-06 | `pnpm build` + `pnpm test` on the production bundle: **78 passed, 0 failed** (admin spec ran with credentials) |

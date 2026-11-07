@@ -54,6 +54,16 @@ for (const slug of CHANNELS) {
     });
 
 
+    test("masthead emblem is visible", async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await hydrated(page, `/${slug}`);
+      const emblem = page.locator(".sn-brandmark svg").first();
+      await expect(emblem).toBeVisible();
+      const box = await emblem.boundingBox();
+      expect(box, "emblem has a box").not.toBeNull();
+      expect(box?.width ?? 0).toBeGreaterThan(12);
+    });
+
     test("marketing surfaces are square", async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });
       await hydrated(page, `/${slug}`);

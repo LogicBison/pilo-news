@@ -401,3 +401,12 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Shipped:** reader-facing archive at `/{locale}/{industry}/references` and detail at `/{locale}/{industry}/references/{date}`; only published issues. The detail table has a jurisdiction filter, remembered in component state. The channel asset card switches from waitlist to "Read the latest issue" when an issue is published. Admin Offers tab gains reviewer-gated Publish and two-step Unpublish. ES shows English content with a notice and `noindex`.
 **Verification:** `pnpm lint`, `pnpm typecheck`, `pnpm check` (411 keys, 11/11 contrast), `pnpm build`; Playwright admin 6/6; public 13/14 with one known navigation flake that passes in isolation; axe 23/23 public URLs, plus archive EN/ES and published detail.
 **Gap:** no email delivery; no cross-issue search; ES content remains English.
+
+---
+
+## Masthead emblem fix - 2026-11-06
+
+**Bug:** `digital-technology` rendered an empty navy brandmark. `SkinEmblem` had a case for every skin except `datacenter`, so the header square had no SVG.
+**Fix:** added a datacenter server-rack mark and a default diamond fallback so a future skin cannot leave the masthead blank. `apps/web/src/components/SkinEmblem.tsx`.
+**Coverage:** new `layout.spec.ts` test asserts a visible, at least 12px SVG emblem on all 11 channels. Result: **11/11 passed**.
+**Visual check:** header screenshot for `/digital-technology` shows the rack mark on the navy square.

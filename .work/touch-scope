@@ -79,7 +79,9 @@
     "apps/web/src/app/sitemap.ts",
     "apps/web/e2e/accessibility.spec.ts",
     ".work.ui/screens/reference/",
-    ".work.ui/context/HANDOFF_UI.md"
+    ".work.ui/context/HANDOFF_UI.md",
+    "apps/web/src/components/SkinEmblem.tsx",
+    "apps/web/e2e/layout.spec.ts"
   ],
   "allowed_patterns": []
 }

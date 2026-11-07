@@ -110,5 +110,23 @@ export function SkinEmblem({ skin, className }: { skin: Skin; className?: string
           <circle cx="8" cy="16" r="1" />
         </svg>
       );
+    case "datacenter":
+      // stacked server racks with status lights
+      return (
+        <svg {...common}>
+          <rect x="4" y="4" width="16" height="5" rx="1" />
+          <rect x="4" y="10" width="16" height="5" rx="1" />
+          <rect x="4" y="16" width="16" height="4" rx="1" />
+          <path d="M7 6.5h.01M7 12.5h.01M7 18h.01M16 6.5h3M16 12.5h3M16 18h3" />
+        </svg>
+      );
+    default:
+      // Never leave the masthead blank if a new skin is added without a mark.
+      return (
+        <svg {...common}>
+          <path d="M12 3.5 20.5 12 12 20.5 3.5 12 12 3.5Z" />
+          <path d="M12 8.5v7M8.5 12h7" />
+        </svg>
+      );
   }
 }
