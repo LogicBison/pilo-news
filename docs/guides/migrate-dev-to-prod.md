@@ -14,6 +14,10 @@ and image versions; a Postgres data directory is not.
 ./bin/start.sh dev backup
 ```
 
+The bundle records the checkout's git SHA but **does not contain code or images**.
+Commit and push before you package, and clone that SHA on the target; `up` builds
+the images there.
+
 `backups/news-dev-bundle-<timestamp>.tar.gz` (mode 600) contains:
 
 | Member | What it is | Why it is needed |
@@ -34,7 +38,7 @@ the restore is verified.
 
 ```bash
 git clone <repo> /srv/system-news && cd /srv/system-news
-./bin/start.sh --env prd init-env          # creates .env.prd with random secrets
+./bin/start.sh --env prd init-env          # random SECRET_KEY, admin, Postgres and Redis passwords
 $EDITOR .env.prd                           # real domain, ports, AI key
 ./bin/start.sh --env prd preflight         # must report no blocking issues
 ```
@@ -50,6 +54,11 @@ SSL_CERT_NAME=heraldfox.com
 SN_DEFAULT_INDUSTRY=legal
 ```
 
+`init-env` already generated `SECRET_KEY`, `POSTGRES_PASSWORD`, `REDIS_PASSWORD`
+and both matching URLs. If you rotate either password, change its URL in the same
+edit: the API reads `DATABASE_URL`/`REDIS_URL`, while Postgres and Redis read the
+password variables.
+
 Then bring up the stack and land the data:
 
 ```bash
@@ -61,7 +70,8 @@ scp and/or copy the bundle to ./backups/
 `restore` verifies `SHA256SUMS`, replays the SQL, stages `config/`, `media/`,
 `ops/` and `env/` under `backups/restored/<bundle>/`, then runs migrations so a
 bundle from an older checkout is brought up to the current schema. Use
-`restore --all` to also copy config, media and nginx sites into the checkout.
+`restore --all` to also copy config, media and nginx sites into the checkout; the
+interactive menu asks the same question (`apply config, media and nginx sites?`).
 
 Redis is deliberately not in the bundle: it holds a cache and a queue, both
 rebuilt by the worker on the next cycle.
@@ -118,6 +128,7 @@ the wrong loopback port.
 | Not included | Why | What to do instead |
 |--------------|-----|--------------------|
 | Docker volumes | not portable across image versions | `db.sql.gz` is the supported path |
+| Application code and images | the bundle is data/config, not a release | clone the repo at the manifest `git.sha`; `up` builds the images |
 | TLS certificates | host-specific, issued per host | `./bin/start.sh --env prd certs` |
 | Redis data | cache + queue, rebuilt automatically | nothing |
 | `.env.prd` | generated on the target | `init-env`, then copy the credential keys you need |

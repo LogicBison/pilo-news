@@ -46,7 +46,7 @@ Commands:
   hosts     verify channel subdomain routing against the running stack
   preflight production readiness checks (secrets, hosts, ports, config)
   backup    portable bundle: postgres dump + config + env + media + manifest
-  restore   restore a bundle (default: database) or a legacy volume snapshot
+  restore   restore a bundle (asks about config/media/nginx) or a volume snapshot
   init-env  create .env.<env> from .env.example
   destroy   stop + delete volumes (typed confirmation)
   menu      interactive menu
@@ -129,9 +129,13 @@ init_env() {
 	fi
 	cp .env.example "$ENV_FILE"
 	chmod 600 "$ENV_FILE"
-	local secret admin_password web api pg redis channel_domain cert_name
+	local secret admin_password pg_password redis_password web api pg redis channel_domain cert_name pg_user pg_db
+	pg_user="$(env_value POSTGRES_USER news)"
+	pg_db="$(env_value POSTGRES_DB news)"
 	secret="$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')"
 	admin_password="$(openssl rand -base64 18 2>/dev/null | tr -d '\n' || head -c 18 /dev/urandom | base64 | tr -d '\n')"
+	pg_password="$(openssl rand -hex 24 2>/dev/null || head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+	redis_password="$(openssl rand -hex 24 2>/dev/null || head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')"
 	web="$(random_port)"; api="$(random_port)"; pg="$(random_port)"; redis="$(random_port)"
 	while [[ "$api" == "$web" || "$pg" == "$web" || "$redis" == "$web" || "$api" == "$pg" || "$api" == "$redis" || "$pg" == "$redis" ]]; do
 		web="$(random_port)"; api="$(random_port)"; pg="$(random_port)"; redis="$(random_port)"
@@ -150,17 +154,21 @@ init_env() {
 		-e "s/^STACK_SUFFIX=.*/STACK_SUFFIX=${ENV}/" \
 		-e "s/^APP_ENV=.*/APP_ENV=${ENV}/" \
 		-e "s/^SECRET_KEY=.*/SECRET_KEY=${secret}/" \
-		-e "s/^ADMIN_PASSWORD=.*/ADMIN_PASSWORD=${admin_password}/" \
+		-e "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=${admin_password}|" \
 		-e "s/^WEB_PORT=.*/WEB_PORT=${web}/" \
 		-e "s/^API_PORT=.*/API_PORT=${api}/" \
 		-e "s/^POSTGRES_PORT=.*/POSTGRES_PORT=${pg}/" \
 		-e "s/^REDIS_PORT=.*/REDIS_PORT=${redis}/" \
+		-e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${pg_password}/" \
+		-e "s#^DATABASE_URL=.*#DATABASE_URL=postgresql+asyncpg://${pg_user}:${pg_password}@postgres:5432/${pg_db}#" \
+		-e "s#^REDIS_URL=.*#REDIS_URL=redis://:${redis_password}@redis:6379/0#" \
 		-e "s/^SN_CHANNEL_DOMAIN=.*/SN_CHANNEL_DOMAIN=${channel_domain}/" \
 		-e "s/^SSL_CERT_NAME=.*/SSL_CERT_NAME=${cert_name}/" \
 		-e "s#^APP_BASE_URL=.*#APP_BASE_URL=http://localhost:${web}#" \
 		-e "s#^NEXT_PUBLIC_API_BASE=.*#NEXT_PUBLIC_API_BASE=http://localhost:${api}#" \
 		"$ENV_FILE"
 	rm -f "${ENV_FILE}.bak"
+	env_set REDIS_PASSWORD "$redis_password"
 	ok "created $ENV_FILE (mode 600)"
 	info "web: http://localhost:${web}  api: http://localhost:${api}/v1/health"
 	if [[ -n "$channel_domain" ]]; then
@@ -799,7 +807,7 @@ cmd_preflight() {
 		fi
 	}
 
-	local app_env secret pg_password admin_hash admin_password base_url domain channel cert
+	local app_env secret pg_password redis_password admin_hash admin_password base_url domain channel cert db_url redis_url smtp_lane smtp_host smtp_sender
 	app_env="$(env_value APP_ENV "$ENV")"
 	secret="$(env_value SECRET_KEY "")"
 	pg_password="$(env_value POSTGRES_PASSWORD "")"
@@ -809,6 +817,9 @@ cmd_preflight() {
 	domain="$(env_value APP_DOMAIN "")"
 	channel="$(channel_domain)"
 	cert="$(env_value SSL_CERT_NAME "")"
+	redis_password="$(env_value REDIS_PASSWORD "")"
+	db_url="$(env_value DATABASE_URL "")"
+	redis_url="$(env_value REDIS_URL "")"
 
 	info "preflight: $ENV ($ENV_FILE)"
 
@@ -836,9 +847,24 @@ cmd_preflight() {
 		warnings=$((warnings + 1))
 	fi
 
+	if [[ -n "$pg_password" && -n "$db_url" ]]; then
+		if [[ "$db_url" != *"$pg_password"* ]]; then
+			printf '  \033[31mFAIL\033[0m DATABASE_URL does not use POSTGRES_PASSWORD\n'
+			failures=$((failures + 1))
+		else
+			printf '  \033[32mpass\033[0m DATABASE_URL matches POSTGRES_PASSWORD\n'
+		fi
+	fi
+
 	if [[ "$ENV" == "prd" ]]; then
-		if [[ -n "$(env_value REDIS_PASSWORD "")" && "$(env_value REDIS_PASSWORD "")" != redis ]]; then
+		if [[ -n "$redis_password" && "$redis_password" != redis ]]; then
 			printf '  \033[32mpass\033[0m REDIS_PASSWORD is set\n'
+			if [[ -n "$redis_url" && "$redis_url" != *":${redis_password}@"* ]]; then
+				printf '  \033[31mFAIL\033[0m REDIS_URL does not use REDIS_PASSWORD\n'
+				failures=$((failures + 1))
+			else
+				printf '  \033[32mpass\033[0m REDIS_URL matches REDIS_PASSWORD\n'
+			fi
 		else
 			printf '  \033[31mFAIL\033[0m REDIS_PASSWORD is the default\n'
 			failures=$((failures + 1))
@@ -863,8 +889,30 @@ cmd_preflight() {
 
 	check_value warn "AI_API_KEY for ingestion summaries" "$(env_value AI_API_KEY "")" \
 		"without it the worker stores items without summaries"
-	check_value warn "SMTP_HOST for contact/lead email" "$(env_value SMTP_HOST "")" \
-		"leads are stored but nobody is notified"
+	smtp_lane="$(env_value SMTP_TRANSPORT "")"
+	case "$smtp_lane" in
+	gateway)
+		smtp_host="$(env_value SMTP_GATEWAY_HOST "")"
+		smtp_sender="$(env_value SMTP_FROM "")"
+		;;
+	direct)
+		smtp_host="$(env_value SMTP_DIRECT_HOST "")"
+		smtp_sender="$(env_value SMTP_FROM "")"
+		;;
+	*)
+		smtp_host="$(env_value SMTP_HOST "")"
+		smtp_sender="$(env_value SMTP_FROM "")"
+		[[ -n "$smtp_sender" ]] || smtp_sender="$(env_value SMTP_USER "")"
+		;;
+	esac
+	if [[ -n "$smtp_host" && -n "$smtp_sender" ]]; then
+		printf '  \033[32mpass\033[0m email transport: %s -> %s\n' "${smtp_lane:-flat}" "$smtp_host"
+	else
+		printf '  \033[33mwarn\033[0m email transport %s incomplete (host=%s sender=%s)\n' \
+			"${smtp_lane:-flat}" "${smtp_host:-none}" "${smtp_sender:-none}"
+		printf '       leads are stored but nobody is notified\n'
+		warnings=$((warnings + 1))
+	fi
 	if [[ "$ENV" == "prd" ]]; then
 		check_value warn "SSL_CERT_NAME for the nginx sites" "$cert" \
 			"set SSL_CERT_NAME to the certbot certificate hosting every channel host"
@@ -1133,7 +1181,7 @@ restore_volumes() {
 
 cmd_restore() {
 	require_compose
-	local apply_all=0
+	local apply_all=0 apply_answer=""
 	[[ "${TARGETS:-}" == *"--all"* ]] && apply_all=1
 
 	local files=()
@@ -1158,6 +1206,11 @@ cmd_restore() {
 		err "invalid choice"
 		return 1
 	}
+
+	if [[ $apply_all -eq 0 && -t 0 && "$(basename "$chosen")" == *-bundle-* ]]; then
+		read -r -p "apply config, media and nginx sites from the bundle too? [y/N] " apply_answer
+		[[ "$apply_answer" == "y" || "$apply_answer" == "Y" ]] && apply_all=1
+	fi
 
 	if [[ $ASSUME_YES -ne 1 ]]; then
 		warn "this replaces the current $ENV database"
@@ -1230,7 +1283,7 @@ menu() {
  8) migrate   run SQL migrations
  9) refresh   force a news fetch now
 10) backup    portable bundle (db + config + env + media)
-11) restore   restore a bundle or volume snapshot
+11) restore   bundle (db; optional config/media/nginx)
 12) domains   channel hosts + nginx sites
 13) preflight production readiness checks
 14) hosts     verify channel subdomain routing
