@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-06 (offer generation + admin Offers tab; 137 API tests)
+**Updated:** 2026-11-06 (offer generation, reviewer-gated publish, public reference pages; 139 API tests)
 
 ---
 
@@ -100,7 +100,7 @@
 ## Completed iteration - M13: offer issue generation (2026-11-06)
 
 **Milestone ref:** `.work/features/offer-generation/20261106-SPEC.md`
-**Status:** complete 2026-11-06 - 7/7 tasks
+**Status:** complete 2026-11-06 - 9/9 tasks
 **Started:** 2026-11-06
 
 ### In scope
@@ -109,11 +109,11 @@
 - generic builder: fetch, normalize, AI draft with fallback, validate, persist draft
 - Federal Register (legal, US) and CISA KEV (cybersecurity, global) adapters
 - automatic draft generation from the worker scheduler
-- CLI + admin read/build API; no publish, no email
+- CLI + admin read/build/publish API; public reference pages; no email
 
 ### Out of scope (explicit)
 - email delivery, double opt-in, unsubscribe
-- reviewer sign-off and public issue page
+- the actual editorial review work (the gate exists; a human still has to read)
 - EU/Asia adapters
 - the other six reference offers
 
@@ -125,19 +125,21 @@
 | M13-T3 | AI draft + fallback | `offers/application/draft.py`, `AiClient.complete_json` | done | 8k token cap; fallback on invalid JSON |
 | M13-T4 | Builder + repo | `offers/application/build.py`, `offers/infrastructure/repo.py` | done | idempotent per date; empty/failed states |
 | M13-T5 | Automatic scheduler + worker | `offers/application/scheduler.py`, `worker.py`, `queue.py` | done | queued via the existing stream; never publishes |
-| M13-T6 | CLI + admin API + tests/docs | `cli.py`, `offers/http/routes.py`, `bin/offers.sh`, docs, tests | done | `offer build/list/show`; 137 API tests |
-| M13-T7 | Admin Offers tab | `AdminConsole.tsx`, messages, e2e | done | list, expand rows, build now; no publish/email |
+| M13-T6 | CLI + admin API + tests/docs | `cli.py`, `offers/http/routes.py`, `bin/offers.sh`, docs, tests | done | `offer build/list/show/publish/unpublish`; 139 API tests |
+| M13-T7 | Admin Offers tab | `AdminConsole.tsx`, messages, e2e | done | list, expand rows, build now, publish/unpublish |
+| M13-T8 | Reviewer-gated publish + public API | `offers/http/routes.py`, `offers/http/public.py`, `repo.py`, CLI | done | publish requires reviewer; unpublished 404 |
+| M13-T9 | Public reference pages | `app/[locale]/[industry]/references/**`, asset card, sitemap | done | list/detail, EN content on ES with notice; channel card links |
 
 ### Acceptance criteria
 - [x] a legal issue can be generated from Federal Register and stored as a draft
 - [x] a cybersecurity issue can be generated from CISA KEV and stored as a draft
 - [x] the worker queues due offers automatically; no duplicate issue per date
 - [x] every issue carries an explicit scope; no `US + EU` claim in v1
-- [x] no publish or email path exists
+- [x] publish is reviewer-gated and public; email is not built
 - [x] migration idempotent; full checks green
 
 ### Verification
-- `./bin/start.sh --env dev test` -> api 137 passed, ruff/format/mypy clean; web checks green
+- `./bin/start.sh --env dev test` -> api 139 passed, ruff/format/mypy clean; web checks green
 - live dry-runs: legal 12 rows, cyber 12 rows, both `drafted_by=ai`
 - live drafts: legal `2026-11-03`, cyber `2026-11-04`
 - admin API: list, detail, dry-run 200, queued 202

@@ -154,8 +154,8 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | M12 2026-11-06 | `./bin/start.sh --env dev test` -> api 124 passed, ruff/format/mypy clean; web lint/type/check 364 keys, 11/11 contrast |
 | M12 2026-11-06 | `pnpm build` + full Playwright on the production build -> **87 passed** (pre-polish; final dev rerun 84 passed, 2 flaky, 1 navigation flake passing in isolation) |
 | M12 2026-11-06 | browser save check: legal question offer off -> public `offers.question=false`; restored -> `true` |
-| M13 2026-11-06 | migration 014 applied twice (`applied: 0` re-run); 137 API tests; legal + cybersecurity drafts generated with AI (12 rows each); admin Offers tab shipped |
-| M13 2026-11-06 | offer scheduler runs in the worker; admin API list/detail/build (dry-run 200, queued 202); no publish or email path |
+| M13 2026-11-06 | migration 014 applied twice (`applied: 0` re-run); 139 API tests; legal + cybersecurity drafts; admin Offers tab; reviewer-gated publish and public reference pages |
+| M13 2026-11-06 | offer scheduler runs in the worker; admin API list/detail/build/publish/unpublish; public reference pages; email path not built |
 | S1 2026-11-06 | contact + about + admin-console shipped; e2e 78 pass; admin sign-in verified end to end |
 | Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
 | S1 screens 2026-11-06 | `pnpm build` + `pnpm test` on the production bundle: **78 passed, 0 failed** (admin spec ran with credentials) |
@@ -220,7 +220,7 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | 2026-11-06 | M10 topics | three digital-tech topics on the cybersecurity profile, `placement="topic"` attribution, migration 012 + unit test, D-010/D-014 |
 | 2026-11-06 | M11 channel | `digital-technology` profile, `datacenter` skin (motif/scene/CC BY-SA photo), 6 grade-A feeds, 26 EN + 1 ES items, inventory at 11 channels, e2e + docs |
 | 2026-11-06 | M12 channel automation | migration 013; per-channel fetch cadence + pause; four free-offer switches; admin Channels editor; public offer gating; 124 API tests, 87 Playwright |
-| 2026-11-06 | M13 offer generation | migration 014; Federal Register + CISA KEV adapters; AI draft with fallback; automatic draft scheduling; CLI + admin API + Offers tab; 137 API tests; no publish/email |
+| 2026-11-06 | M13 offer generation | migration 014; Federal Register + CISA KEV adapters; AI draft with fallback; automatic scheduling; CLI + admin API + Offers tab; reviewer-gated publish; public reference pages; 139 API tests; email remains |
 
 ---
 
@@ -323,10 +323,10 @@ Read the digital-technology window at 2026-11-27 and the asset test at 2026-11-2
 **Frameworks involved:** .ai, .ai.ui, .ai.biz
 **Classified bucket(s):** engineering + ui + business (cross-framework)
 **Executed:**
-1. Verified the uncommitted offer pipeline: 137 API tests, ruff/format/mypy, web lint/type/check, production build, and 5 admin Playwright tests.
-2. UI: added the Offers tab to the editorial console (list, expand rows, build now, no publish/email), with EN/ES copy and e2e coverage; recorded the UI amendment.
+1. Verified the offer pipeline: 139 API tests, ruff/format/mypy, web lint/type/check, production build, and 6 admin Playwright tests.
+2. UI: added the Offers tab (list, expand rows, build now, reviewer-gated publish/unpublish) and the public reference archive/detail pages, with EN/ES copy and e2e coverage.
 3. Engineering hardening: invalid offer UUIDs return 404, source records are marked untrusted in the AI prompt, and the offer-inventory check now runs inside `./bin/start.sh test`.
 4. Business: wrote the AI product catalog, recorded D-015 (one jurisdiction-tagged dataset, not one calendar per country), and updated the biz NEXT/UNKNOWNS/HANDOFF.
-**Coordination notes:** the Offers tab consumes the existing admin API; no public route, publish path, or email path was added.
-**Blockers:** publish/reviewer and email remain out of scope; EU/recall/energy adapters are not built.
+**Coordination notes:** the Offers tab consumes the admin API; publish is reviewer-gated and public pages only show published issues; no email path was added.
+**Blockers:** named reviewers and email remain; EU/recall/energy adapters are not built.
 **Next recommended:** review the drafts in the Offers tab, then choose the 7-Day Desk Brief or the public reference page as the next build.

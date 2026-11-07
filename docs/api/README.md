@@ -80,7 +80,13 @@ Dated reference offers are generated from public sources and stored as drafts.
 - `GET /v1/admin/offers?industry=&status=&limit=` lists issues.
 - `GET /v1/admin/offers/{id}` returns the rows and sources.
 - `POST /v1/admin/offers/build` queues a build for `{industry, offer?, issue_date?, dry_run?}`.
+- `POST /v1/admin/offers/{id}/publish` requires `{reviewer}` and makes the issue public.
+- `POST /v1/admin/offers/{id}/unpublish` returns it to draft.
 - `dry_run: true` returns rows without writing and returns `200`; a queued build returns `202`.
+
+Public reference reads are `/v1/industries/{slug}/references` and
+`/v1/industries/{slug}/references/{issue_date}`. Only `published` issues are
+returned. Issue content is English; `locale=es` is marked `meta.fallback=true`.
 
 The worker queues the latest due issue every five minutes. It never publishes and
 never sends email. The issue carries an explicit `scope`: `US` for the Federal

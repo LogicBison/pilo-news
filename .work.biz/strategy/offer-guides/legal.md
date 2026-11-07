@@ -89,7 +89,7 @@ Kill after 8 weeks if no issue ships, the reviewer is missing for two issues, or
 
 ## 10. Build notes
 
-Implemented 2026-11-06: Federal Register adapter with a legal-relevant agency allow-list, `offer_issues` storage, and `news_api.cli offer build`. The first 12-row draft is generated at scope `US`. Remaining: public issue page, reviewer sign-off, email.
+Implemented 2026-11-06: Federal Register adapter with a legal-relevant agency allow-list, `offer_issues` storage, and `news_api.cli offer build`. The first 12-row draft is generated at scope `US`. Public pages and reviewer-gated publish are built; remaining: named reviewer, email.
 
 The common build seam is `offer_issues` (`industry_id`, `offer_slug`, `issue_date`, `scope`, `reviewer`, `items jsonb`, `published_at`), one CLI command `news_api.cli offer build|publish`, and one page template that renders the issue JSON. Do not fork the pipeline per channel; vary the adapter and the prompt values.
 

@@ -14,6 +14,8 @@ const pages = [
   "/legal/terms",
   "/es/legal/terms",
   "/legal/briefs",
+  "/legal/references",
+  "/es/legal/references",
   "/financial",
   "/behavioral-health",
   "/education",

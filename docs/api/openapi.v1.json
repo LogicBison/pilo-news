@@ -734,6 +734,21 @@
         "title": "OfferBuildRequest",
         "type": "object"
       },
+      "OfferPublishRequest": {
+        "properties": {
+          "reviewer": {
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Reviewer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reviewer"
+        ],
+        "title": "OfferPublishRequest",
+        "type": "object"
+      },
       "PartnerCreate": {
         "properties": {
           "contact_email": {
@@ -2241,6 +2256,100 @@
         ]
       }
     },
+    "/v1/admin/offers/{issue_id}/publish": {
+      "post": {
+        "operationId": "publish_offer_issue_v1_admin_offers__issue_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "issue_id",
+            "required": true,
+            "schema": {
+              "title": "Issue Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferPublishRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Publish Offer Issue V1 Admin Offers  Issue Id  Publish Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Publish Offer Issue",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/offers/{issue_id}/unpublish": {
+      "post": {
+        "operationId": "unpublish_offer_issue_v1_admin_offers__issue_id__unpublish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "issue_id",
+            "required": true,
+            "schema": {
+              "title": "Issue Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Unpublish Offer Issue V1 Admin Offers  Issue Id  Unpublish Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unpublish Offer Issue",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/v1/admin/partners": {
       "get": {
         "operationId": "list_partners_v1_admin_partners_get",
@@ -3296,6 +3405,99 @@
         "summary": "Get Industry",
         "tags": [
           "industries"
+        ]
+      }
+    },
+    "/v1/industries/{slug}/references": {
+      "get": {
+        "operationId": "list_references_v1_industries__slug__references_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response List References V1 Industries  Slug  References Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List References",
+        "tags": [
+          "references"
+        ]
+      }
+    },
+    "/v1/industries/{slug}/references/{issue_date}": {
+      "get": {
+        "operationId": "get_reference_v1_industries__slug__references__issue_date__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "issue_date",
+            "required": true,
+            "schema": {
+              "title": "Issue Date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Reference V1 Industries  Slug  References  Issue Date  Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Reference",
+        "tags": [
+          "references"
         ]
       }
     },

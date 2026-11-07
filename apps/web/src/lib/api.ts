@@ -100,6 +100,31 @@ export interface Industry {
   timezone: string;
 }
 
+export interface ReferenceSummary {
+  issue_date: string;
+  title: string;
+  scope: string;
+  reviewer: string | null;
+  published_at: string | null;
+  row_count: number;
+  standfirst: string;
+  language: "en";
+}
+
+export interface ReferenceDetail extends ReferenceSummary {
+  items: {
+    headline: string;
+    change: string;
+    date: string;
+    jurisdiction: string;
+    action: string;
+    source_name: string;
+    source_url: string;
+  }[];
+  sources: { name: string; url: string }[];
+  source_version: string | null;
+}
+
 export interface IndustrySummary {
   slug: string;
   name: string;
@@ -168,6 +193,27 @@ export function getIndustries(locale: Locale): Promise<ApiResult<IndustrySummary
 
 export function getIndustry(slug: string, locale: Locale): Promise<ApiResult<Industry>> {
   return apiGet<Industry>(`/industries/${encodeURIComponent(slug)}?locale=${locale}`, 300);
+}
+
+export function getReferences(
+  slug: string,
+  locale: Locale,
+): Promise<ApiResult<ReferenceSummary[]>> {
+  return apiGet<ReferenceSummary[]>(
+    `/industries/${encodeURIComponent(slug)}/references?locale=${locale}`,
+    60,
+  );
+}
+
+export function getReference(
+  slug: string,
+  issueDate: string,
+  locale: Locale,
+): Promise<ApiResult<ReferenceDetail>> {
+  return apiGet<ReferenceDetail>(
+    `/industries/${encodeURIComponent(slug)}/references/${encodeURIComponent(issueDate)}?locale=${locale}`,
+    60,
+  );
 }
 
 export function getBundle(slug: string, locale: Locale): Promise<ApiResult<BundleData>> {

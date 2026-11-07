@@ -296,6 +296,11 @@
     "notSigned": "Sin firmar",
     "source": "Fuente",
     "offerSourceVersion": "Versión de fuente",
+    "publish": "Publicar",
+    "unpublish": "Despublicar",
+    "confirmUnpublish": "Confirmar despublicación",
+    "publishReviewer": "Nombre del revisor",
+    "publishHint": "El revisor nombrado firma la edición. Publicar la hace pública de inmediato.",
     "newIndustry": "Nuevo canal",
     "propagationHint": "Las páginas públicas aplican el cambio en un máximo de cinco minutos.",
     "automation": "Automatización",
@@ -405,22 +410,47 @@
   "asset": {
     "legal-regulatory-calendar": {
       "title": "Calendario regulatorio legal",
-      "body": "Una lista con fechas de presentaciones, plazos de comentarios y vencimientos de cumplimiento para despachos y equipos internos. Trimestral, en lenguaje claro, gratis. Te lo enviamos cuando esté lista la primera edición."
+      "body": "Una lista con fechas de presentaciones, plazos de comentarios y vencimientos de cumplimiento para despachos y equipos internos. Trimestral, en lenguaje claro, gratis."
     },
     "cybersecurity-kev-digest": {
       "title": "Vulnerabilidades explotadas, semanal",
-      "body": "Una lista semanal de las vulnerabilidades que los atacantes ya están explotando, limitada a los proveedores que usas, con la acción que toca tomar. Gratis. Te lo enviamos cuando esté lista la primera edición."
+      "body": "Una lista semanal de las vulnerabilidades que los atacantes ya están explotando, limitada a los proveedores que usas, con la acción que toca tomar. Gratis."
     },
     "eyebrow": "Documento de referencia",
     "name": "Nombre",
     "email": "Correo",
     "consent": "Acepto recibir este documento y novedades relacionadas, y he leído la política de privacidad.",
-    "submit": "Envíamelo cuando esté listo",
+    "submit": "Unirme a la lista",
     "sending": "Guardando...",
-    "success": "Estás en la lista. Te enviamos el documento en cuanto la primera edición tenga fecha.",
+    "success": "Estás en la lista. Enviaremos la próxima edición cuando la entrega esté activa.",
     "error": "No se guardó. Revisa el correo e inténtalo de nuevo.",
     "rateLimited": "Demasiadas solicitudes desde esta red. Inténtalo más tarde.",
-    "note": "Gratis. Sin anuncios ni propuestas de socios en el documento."
+    "note": "Gratis. Sin anuncios ni propuestas de socios en el documento.",
+    "latestIssue": "Última edición: {date}",
+    "readLatest": "Leer la última edición",
+    "allIssues": "Todas las ediciones"
+  },
+  "reference": {
+    "title": "Ediciones de referencia",
+    "eyebrow": "Referencia",
+    "intro": "Documentos de referencia fechados y con fuentes para {industry}. Cada fila enlaza a la fuente.",
+    "empty": "Aún no hay ediciones de referencia publicadas",
+    "emptyBody": "La primera edición está en revisión. Este archivo se llena cuando se firma y publica.",
+    "notFound": "Edición de referencia no encontrada",
+    "backToChannel": "Volver a {industry}",
+    "issueDate": "Fecha de edición",
+    "scope": "Ámbito",
+    "reviewer": "Revisado por",
+    "rows": "{n} filas",
+    "englishOnly": "Esta referencia se publica en inglés. Los enlaces a las fuentes están en inglés.",
+    "sources": "Fuentes",
+    "sourceVersion": "Versión de fuente",
+    "allIssues": "Todas las ediciones de referencia",
+    "tableCaption": "Filas de referencia para {date}",
+    "tableDate": "Fecha",
+    "tableChange": "Qué cambió",
+    "tableAction": "Acción",
+    "tableSource": "Fuente"
   },
   "briefs": {
     "title": "Archivo del boletín",

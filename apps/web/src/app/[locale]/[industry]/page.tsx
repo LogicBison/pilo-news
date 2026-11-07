@@ -14,7 +14,7 @@ import { SkinScene } from "@/components/SkinScene";
 import { TrustBlock } from "@/components/TrustBlock";
 import { StickyCta } from "@/components/Cta";
 import { TopicRail } from "@/components/TopicRail";
-import { getBundle, getIndustry } from "@/lib/api";
+import { getBundle, getIndustry, getReferences } from "@/lib/api";
 import { assetFor } from "@/lib/assets";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
 import { offersOf } from "@/lib/offers";
@@ -41,7 +41,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function ChannelHome({ params }: Params) {
   const { locale, industry } = await params;
   const resolved = resolveLocale(locale);
-  const result = await getBundle(industry, resolved);
+  const [result, references] = await Promise.all([
+    getBundle(industry, resolved),
+    getReferences(industry, resolved),
+  ]);
   if (!result.ok) {
     if (result.status === 404) notFound();
     return (
@@ -57,6 +60,8 @@ export default async function ChannelHome({ params }: Params) {
   const homePath = localePath(resolved, `/${industry}`);
   const offers = offersOf(channel);
   const asset = offers.asset && channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
+  const latestReference =
+    references.ok && references.data.length > 0 ? references.data[0] : undefined;
 
   return (
     <>
@@ -109,6 +114,15 @@ export default async function ChannelHome({ params }: Params) {
           title={t(resolved, asset.titleKey)}
           body={t(resolved, asset.bodyKey)}
           sourcePage={localePath(resolved, `/${industry}`)}
+          latestReference={
+            latestReference
+              ? {
+                  href: localePath(resolved, `/${industry}/references/${latestReference.issue_date}`),
+                  archiveHref: localePath(resolved, `/${industry}/references`),
+                  issueDate: latestReference.issue_date,
+                }
+              : undefined
+          }
         />
       ) : null}
       {offers.consultation ? (

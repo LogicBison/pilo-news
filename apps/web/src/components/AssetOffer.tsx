@@ -22,6 +22,7 @@ export function AssetOffer({
   title,
   body,
   sourcePage,
+  latestReference,
 }: {
   industry: string;
   locale: Locale;
@@ -29,9 +30,36 @@ export function AssetOffer({
   title: string;
   body: string;
   sourcePage: string;
+  latestReference?: { href: string; archiveHref: string; issueDate: string };
 }) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [message, setMessage] = useState("");
+
+  if (latestReference) {
+    return (
+      <section aria-labelledby="asset-heading" className="sn-card mt-8 p-6">
+        <div className="flex items-center gap-2">
+          <span className="sn-kicker" aria-hidden="true" />
+          <p className="sn-eyebrow">{t(locale, "asset.eyebrow")}</p>
+        </div>
+        <h2 id="asset-heading" className="sn-section-title mt-2 font-bold text-[var(--sn-text)]">
+          {title}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--sn-muted)]">{body}</p>
+        <p className="mt-3 text-xs text-[var(--sn-muted)]">
+          {t(locale, "asset.latestIssue", { date: latestReference.issueDate })}
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <a href={latestReference.href} className="sn-btn">
+            {t(locale, "asset.readLatest")}
+          </a>
+          <a href={latestReference.archiveHref} className="text-sm font-semibold underline">
+            {t(locale, "asset.allIssues")}
+          </a>
+        </div>
+      </section>
+    );
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

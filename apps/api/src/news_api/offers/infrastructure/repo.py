@@ -63,6 +63,7 @@ async def upsert_issue(
             items = EXCLUDED.items,
             sources = EXCLUDED.sources,
             source_version = EXCLUDED.source_version,
+            reviewer = CASE WHEN EXCLUDED.status = 'draft' THEN NULL ELSE offer_issues.reviewer END,
             error = EXCLUDED.error,
             generated_at = now()
         RETURNING *
@@ -162,3 +163,57 @@ async def mark_issue(*, issue_id: str, status: str, error: str | None = None) ->
             ),
             {"id": issue_id, "status": status, "error": error},
         )
+
+
+async def list_published(industry_id: str, *, limit: int = 20) -> list[dict[str, Any]]:
+    return await fetch_all(
+        """
+        SELECT * FROM offer_issues
+        WHERE industry_id = CAST(:industry_id AS uuid) AND status = 'published'
+        ORDER BY issue_date DESC
+        LIMIT :limit
+        """,
+        {"industry_id": industry_id, "limit": min(max(limit, 1), 100)},
+    )
+
+
+async def get_published(industry_id: str, issue_date: date) -> dict[str, Any] | None:
+    return await fetch_one(
+        """
+        SELECT * FROM offer_issues
+        WHERE industry_id = CAST(:industry_id AS uuid)
+          AND issue_date = :issue_date AND status = 'published'
+        """,
+        {"industry_id": industry_id, "issue_date": issue_date},
+    )
+
+
+async def publish_issue(issue_id: str, reviewer: str) -> dict[str, Any] | None:
+    return await fetch_one(
+        """
+        UPDATE offer_issues SET
+            status = 'published',
+            reviewer = :reviewer,
+            published_at = now(),
+            error = NULL
+        WHERE id = CAST(:id AS uuid)
+          AND status = 'draft'
+          AND jsonb_array_length(items) > 0
+        RETURNING *
+        """,
+        {"id": issue_id, "reviewer": reviewer},
+    )
+
+
+async def unpublish_issue(issue_id: str) -> dict[str, Any] | None:
+    return await fetch_one(
+        """
+        UPDATE offer_issues SET
+            status = 'draft',
+            reviewer = NULL,
+            published_at = NULL
+        WHERE id = CAST(:id AS uuid) AND status = 'published'
+        RETURNING *
+        """,
+        {"id": issue_id},
+    )

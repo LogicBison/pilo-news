@@ -89,7 +89,7 @@ Kill after 8 weeks if no issue ships, the reviewer is missing for two issues, or
 
 ## 10. Build notes
 
-Implemented 2026-11-06: CISA KEV adapter and `offer_issues` storage; the first 12-row draft is generated at scope `global`. The vendor stack filter, public issue page, reviewer sign-off, and email remain. The page must exist before the card promises an email.
+Implemented 2026-11-06: CISA KEV adapter and `offer_issues` storage; the first 12-row draft is generated at scope `global`. Public pages and reviewer-gated publish are built; the vendor stack filter, named reviewer, and email remain. The page must exist before the card promises an email.
 
 The common build seam is `offer_issues` (`industry_id`, `offer_slug`, `issue_date`, `scope`, `reviewer`, `items jsonb`, `published_at`), one CLI command `news_api.cli offer build|publish`, and one page template that renders the issue JSON. Do not fork the pipeline per channel; vary the adapter and the prompt values.
 

@@ -136,6 +136,8 @@ async def _offer(args: argparse.Namespace) -> int:
         get_issue_by_id,
         issue_dto,
         list_issues,
+        publish_issue,
+        unpublish_issue,
     )
 
     if args.offer_command == "build":
@@ -174,6 +176,27 @@ async def _offer(args: argparse.Namespace) -> int:
             industry_id = channel.id
         rows = await list_issues(industry_id=industry_id, limit=args.limit)
         print(json.dumps([issue_dto(row) for row in rows], indent=2, default=str))
+        return 0
+
+    if args.offer_command == "publish":
+        if len(args.reviewer.strip()) < 2:
+            print("--reviewer must name the person signing the issue", file=sys.stderr)
+            return 2
+        row = await publish_issue(args.issue_id, args.reviewer.strip())
+        if not row:
+            print("only a draft with rows can be published", file=sys.stderr)
+            return 2
+        stored = await get_issue_by_id(args.issue_id)
+        print(json.dumps(issue_dto(stored) if stored else None, indent=2, default=str))
+        return 0
+
+    if args.offer_command == "unpublish":
+        row = await unpublish_issue(args.issue_id)
+        if not row:
+            print("only a published issue can be unpublished", file=sys.stderr)
+            return 2
+        stored = await get_issue_by_id(args.issue_id)
+        print(json.dumps(issue_dto(stored) if stored else None, indent=2, default=str))
         return 0
 
     if args.offer_command == "show":
@@ -282,6 +305,13 @@ def build_parser() -> argparse.ArgumentParser:
     show.add_argument("issue_id")
     show.add_argument("--markdown", action="store_true", help="render the issue as markdown")
     show.set_defaults(func=_offer)
+    publish = offer_sub.add_parser("publish", help="publish a draft after reviewer sign-off")
+    publish.add_argument("issue_id")
+    publish.add_argument("--reviewer", required=True, help="named person signing the issue")
+    publish.set_defaults(func=_offer)
+    unpublish = offer_sub.add_parser("unpublish", help="return a published issue to draft")
+    unpublish.add_argument("issue_id")
+    unpublish.set_defaults(func=_offer)
     return parser
 
 

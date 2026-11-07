@@ -13,7 +13,7 @@ import { EmptyState, FallbackNotice } from "@/components/Notices";
 import { SkinScene } from "@/components/SkinScene";
 import { StoryCard } from "@/components/StoryCard";
 import { TrustBlock } from "@/components/TrustBlock";
-import { getArticle, getIndustry } from "@/lib/api";
+import { getArticle, getIndustry, getReferences } from "@/lib/api";
 import { assetFor } from "@/lib/assets";
 import { fallbackIndustry } from "@/lib/fallback";
 import { offersOf } from "@/lib/offers";
@@ -42,9 +42,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function ArticlePage({ params }: Params) {
   const { locale, industry, id } = await params;
   const resolved = resolveLocale(locale);
-  const [articleResult, industryResult] = await Promise.all([
+  const [articleResult, industryResult, references] = await Promise.all([
     getArticle(industry, id, resolved),
     getIndustry(industry, resolved),
+    getReferences(industry, resolved),
   ]);
   if (!articleResult.ok) {
     if (articleResult.status === 404) notFound();
@@ -61,6 +62,8 @@ export default async function ArticlePage({ params }: Params) {
   const pagePath = localePath(resolved, `/${industry}/article/${id}`);
   const offers = offersOf(channel);
   const asset = offers.asset && channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
+  const latestReference =
+    references.ok && references.data.length > 0 ? references.data[0] : undefined;
 
   return (
     <>
@@ -156,6 +159,15 @@ export default async function ArticlePage({ params }: Params) {
             title={t(resolved, asset.titleKey)}
             body={t(resolved, asset.bodyKey)}
             sourcePage={pagePath}
+            latestReference={
+              latestReference
+                ? {
+                    href: localePath(resolved, `/${industry}/references/${latestReference.issue_date}`),
+                    archiveHref: localePath(resolved, `/${industry}/references`),
+                    issueDate: latestReference.issue_date,
+                  }
+                : undefined
+            }
           />
         ) : null}
 

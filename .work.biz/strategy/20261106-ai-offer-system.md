@@ -137,7 +137,7 @@ The catalog holds the machine-readable version (`strategy/offers/catalog.json`).
 
 Why three channels stay on the brief: behavioral-health and education carry review or data-fragmentation risk that a monthly reference would expose too early; digital-technology changes faster than a monthly table can stay true. They can graduate to a reference after the first six weeks of briefs produce a stable source list and a named reviewer.
 
-**Technical status (2026-11-06):** the legal and cybersecurity generators are implemented (US Federal Register and CISA KEV) and have produced 12-row drafts. The public cards still show waitlists because publish and email are not built. The other six reference offers are plans with guides, not running adapters. See `.work/features/offer-generation/20261106-SPEC.md`.
+**Technical status (2026-11-06):** the legal and cybersecurity generators are implemented (US Federal Register and CISA KEV) and have produced 12-row drafts. The public cards still show waitlists because no issue has been signed and published yet; the reviewer-gated publish and public pages are built, email is not. The other six reference offers are plans with guides, not running adapters. See `.work/features/offer-generation/20261106-SPEC.md`.
 
 ### 5.3 What each offer is not
 

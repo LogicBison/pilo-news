@@ -296,6 +296,11 @@
     "notSigned": "Not signed",
     "source": "Source",
     "offerSourceVersion": "Source version",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "confirmUnpublish": "Confirm unpublish",
+    "publishReviewer": "Reviewer name",
+    "publishHint": "The named reviewer signs the issue. Publishing makes it public immediately.",
     "newIndustry": "New channel",
     "propagationHint": "Public pages pick up the change within five minutes.",
     "automation": "Automation",
@@ -405,22 +410,47 @@
   "asset": {
     "legal-regulatory-calendar": {
       "title": "Legal regulatory calendar",
-      "body": "A dated list of the filings, comment windows, and compliance deadlines that apply to law firms and in-house teams. Quarterly, plain language, free. We email it when the first issue is ready."
+      "body": "A dated list of the filings, comment windows, and compliance deadlines that apply to law firms and in-house teams. Quarterly, plain language, free."
     },
     "cybersecurity-kev-digest": {
       "title": "Known-exploited vulnerabilities, weekly",
-      "body": "A weekly list of the vulnerabilities attackers are already exploiting, limited to the vendors you run, with the one action to take. Free. We email it when the first issue is ready."
+      "body": "A weekly list of the vulnerabilities attackers are already exploiting, limited to the vendors you run, with the one action to take. Free."
     },
     "eyebrow": "Reference document",
     "name": "First name",
     "email": "Email",
     "consent": "I agree to receive this document and related updates, and have read the privacy policy.",
-    "submit": "Send it when it is ready",
+    "submit": "Join the list",
     "sending": "Saving...",
-    "success": "You are on the list. We email the document as soon as the first issue is dated.",
+    "success": "You are on the list. We will send the next issue when delivery is live.",
     "error": "That did not save. Check the email address and try again.",
     "rateLimited": "Too many requests from this network. Try again later.",
-    "note": "Free. No ads, no partner pitches in the document."
+    "note": "Free. No ads, no partner pitches in the document.",
+    "latestIssue": "Latest issue: {date}",
+    "readLatest": "Read the latest issue",
+    "allIssues": "All issues"
+  },
+  "reference": {
+    "title": "Reference issues",
+    "eyebrow": "Reference",
+    "intro": "Dated, sourced reference documents for {industry}. Every row links to the source.",
+    "empty": "No reference issues published yet",
+    "emptyBody": "The first issue is in review. This archive fills when it is signed and published.",
+    "notFound": "Reference issue not found",
+    "backToChannel": "Back to {industry}",
+    "issueDate": "Issue date",
+    "scope": "Scope",
+    "reviewer": "Reviewed by",
+    "rows": "{n} rows",
+    "englishOnly": "This reference is published in English. The source links are in English.",
+    "sources": "Sources",
+    "sourceVersion": "Source version",
+    "allIssues": "All reference issues",
+    "tableCaption": "Reference rows for {date}",
+    "tableDate": "Date",
+    "tableChange": "What changed",
+    "tableAction": "Action",
+    "tableSource": "Source"
   },
   "briefs": {
     "title": "The brief archive",

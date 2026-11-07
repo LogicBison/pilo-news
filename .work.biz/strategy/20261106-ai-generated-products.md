@@ -196,7 +196,7 @@ Eight products, ordered by how directly they reuse the current stack.
 **How to validate in 2 weeks:** add it to the cybersecurity draft; measure filter use and return visits.
 **MVP build estimate:** 3-5 days.
 **The thing that makes it hard:** identity across devices; not needed for v1.
-**Why it has not been built:** the public issue page does not exist yet.
+**Why it has not been built:** the page exists; the jurisdiction filter is not built.
 
 ### 5.6 Document & Deadline Checklist
 
@@ -264,7 +264,7 @@ HIGH VALUE / LOW EFFORT  -> Build first
   7-Day Desk Brief
   Change Log
   Personalized Watchlist
-  Exportable Dataset (after a public issue page)
+  Exportable Dataset (after the public page is populated)
 
 HIGH VALUE / HIGH EFFORT -> Plan for phase 2
   Jurisdiction-Tagged Calendar (EU adapter)
@@ -367,7 +367,7 @@ The 7-day brief is the only product that fits every channel without a new adapte
 
 ## 10. Decisions needed
 
-1. Build the 7-Day Desk Brief first, or put the public issue page and jurisdiction filter first?
+1. Build the 7-Day Desk Brief first, or add the jurisdiction filter to the public page first?
 2. Is the jurisdiction filter a public product or a reader preference only?
 3. Is the first new adapter EU, or the next US source (recall, energy, education)?
 4. Does the partner want the export dataset, or only inquiries?

@@ -334,6 +334,8 @@ export function AdminConsole({
   const [funnel, setFunnel] = useState<FunnelData | null>(null);
   const [offers, setOffers] = useState<OfferIssue[]>([]);
   const [openOffer, setOpenOffer] = useState<string | null>(null);
+  const [publishTarget, setPublishTarget] = useState<string | null>(null);
+  const [publishReviewer, setPublishReviewer] = useState("");
 
   const [auditAction, setAuditAction] = useState("");
   const [newKey, setNewKey] = useState("");
@@ -382,6 +384,8 @@ export function AdminConsole({
     setFunnel(null);
     setOffers([]);
     setOpenOffer(null);
+    setPublishTarget(null);
+    setPublishReviewer("");
     if (typeof document !== "undefined") {
       // `sn_admin` is httpOnly; only the readable CSRF cookie can be cleared here.
       document.cookie = "sn_csrf=; Max-Age=0; path=/";
@@ -534,6 +538,8 @@ export function AdminConsole({
     setStatus(null);
     setArticleForm(null);
     setConfirming(null);
+    setPublishTarget(null);
+    setPublishReviewer("");
     focusPanel();
   }
 
@@ -692,6 +698,36 @@ export function AdminConsole({
       },
     );
     if (ok) setChannelDraft(null);
+  }
+
+  function openPublish(issue: OfferIssue) {
+    setOpenOffer(issue.id);
+    setPublishTarget(issue.id);
+    setPublishReviewer("");
+  }
+
+  async function submitPublish(issue: OfferIssue) {
+    const reviewer = publishReviewer.trim();
+    if (reviewer.length < 2) return;
+    const ok = await mutate(
+      `offer:publish:${issue.id}`,
+      `/api/proxy/v1/admin/offers/${issue.id}/publish`,
+      "POST",
+      { reviewer },
+    );
+    if (ok) {
+      setPublishTarget(null);
+      setPublishReviewer("");
+    }
+  }
+
+  async function unpublishOffer(issue: OfferIssue) {
+    const ok = await mutate(
+      `offer:unpublish:${issue.id}`,
+      `/api/proxy/v1/admin/offers/${issue.id}/unpublish`,
+      "POST",
+    );
+    if (ok) setConfirming(null);
   }
 
   async function buildOffer(issue: OfferIssue) {
@@ -1341,20 +1377,107 @@ export function AdminConsole({
                               >
                                 {open ? t(locale, "admin.hide") : t(locale, "admin.view")}
                               </button>
-                              <button
-                                type="button"
-                                onClick={() => void buildOffer(issue)}
-                                disabled={busy === busyKey}
-                                className={[QUIET_BUTTON, "ml-2"].join(" ")}
-                              >
-                                {busy === busyKey ? t(locale, "admin.saving") : t(locale, "admin.buildOffer")}
-                              </button>
+                              {issue.status === "published" ? (
+                                confirming === `offer-unpublish:${issue.id}` ? (
+                                  <span className="ml-2 inline-flex flex-wrap items-center gap-2">
+                                    <button
+                                      type="button"
+                                      autoFocus
+                                      onClick={() => void unpublishOffer(issue)}
+                                      disabled={busy === `offer:unpublish:${issue.id}`}
+                                      className={DESTRUCTIVE_BUTTON}
+                                    >
+                                      {busy === `offer:unpublish:${issue.id}`
+                                        ? t(locale, "admin.saving")
+                                        : t(locale, "admin.confirmUnpublish")}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => cancelConfirm(`offer-unpublish:${issue.id}`)}
+                                      className={QUIET_BUTTON}
+                                    >
+                                      {t(locale, "admin.cancel")}
+                                    </button>
+                                  </span>
+                                ) : (
+                                  <button
+                                    id={`confirm-trigger-offer-unpublish:${issue.id}`}
+                                    type="button"
+                                    onClick={() => setConfirming(`offer-unpublish:${issue.id}`)}
+                                    className={[DESTRUCTIVE_BUTTON, "ml-2"].join(" ")}
+                                  >
+                                    {t(locale, "admin.unpublish")}
+                                  </button>
+                                )
+                              ) : (
+                                <>
+                                  {issue.status === "draft" && issue.items.length > 0 ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => openPublish(issue)}
+                                      className={[QUIET_BUTTON, "ml-2"].join(" ")}
+                                    >
+                                      {t(locale, "admin.publish")}
+                                    </button>
+                                  ) : null}
+                                  <button
+                                    type="button"
+                                    onClick={() => void buildOffer(issue)}
+                                    disabled={busy === busyKey}
+                                    className={[QUIET_BUTTON, "ml-2"].join(" ")}
+                                  >
+                                    {busy === busyKey ? t(locale, "admin.saving") : t(locale, "admin.buildOffer")}
+                                  </button>
+                                </>
+                              )}
                             </td>
                           </tr>
                           {open ? (
                             <tr className="border-b border-[var(--sn-border)] bg-[var(--sn-surface)]">
                               <td colSpan={8} className="p-3">
                                 <p className="text-sm text-[var(--sn-text)]">{issue.standfirst}</p>
+                                {publishTarget === issue.id ? (
+                                  <form
+                                    className="mt-3 border border-[var(--sn-border)] p-3"
+                                    onSubmit={(event) => {
+                                      event.preventDefault();
+                                      void submitPublish(issue);
+                                    }}
+                                  >
+                                    <TextField
+                                      name={`reviewer-${issue.id}`}
+                                      label={t(locale, "admin.publishReviewer")}
+                                      hint={t(locale, "admin.publishHint")}
+                                      value={publishReviewer}
+                                      onChange={(event) => setPublishReviewer(event.target.value)}
+                                      maxLength={120}
+                                      required
+                                      autoFocus
+                                    />
+                                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                                      <Button
+                                        type="submit"
+                                        disabled={
+                                          publishReviewer.trim().length < 2 ||
+                                          busy === `offer:publish:${issue.id}`
+                                        }
+                                      >
+                                        {busy === `offer:publish:${issue.id}`
+                                          ? t(locale, "admin.saving")
+                                          : t(locale, "admin.publish")}
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        onClick={() => {
+                                          setPublishTarget(null);
+                                          setPublishReviewer("");
+                                        }}
+                                      >
+                                        {t(locale, "admin.cancel")}
+                                      </Button>
+                                    </div>
+                                  </form>
+                                ) : null}
                                 {issue.error ? (
                                   <p role="alert" className="mt-2 text-sm font-medium text-[var(--sn-accent)]">
                                     {issue.error}

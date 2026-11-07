@@ -19,6 +19,8 @@ from news_api.offers.infrastructure.repo import (
     issue_dto,
     list_issues,
     mark_issue,
+    publish_issue,
+    unpublish_issue,
     upsert_issue,
 )
 from news_api.platform.clock import utcnow
@@ -33,6 +35,10 @@ class OfferBuildRequest(BaseModel):
     issue_date: date | None = None
     dry_run: bool = False
     force: bool = False
+
+
+class OfferPublishRequest(BaseModel):
+    reviewer: str = Field(min_length=2, max_length=120)
 
 
 @router.get("", dependencies=[Depends(admin_auth)])
@@ -131,3 +137,45 @@ async def trigger_offer_build(
         "issue_date": target.isoformat(),
         "status": "queued",
     }
+
+
+@router.post("/{issue_id}/publish", dependencies=[Depends(admin_mutation)])
+async def publish_offer_issue(issue_id: str, payload: OfferPublishRequest, request: Request) -> Any:
+    try:
+        UUID(issue_id)
+    except ValueError:
+        raise NotFound("Offer issue not found.") from None
+    reviewer = payload.reviewer.strip()
+    if len(reviewer) < 2:
+        raise ValidationProblem("A named reviewer is required to publish.")
+    row = await publish_issue(issue_id, reviewer)
+    if not row:
+        raise Conflict("Only a draft with at least one row can be published.")
+    await record_audit(
+        actor=request.state.operator["email"],
+        action="offer.publish",
+        entity="offer_issue",
+        entity_id=issue_id,
+        payload={"reviewer": reviewer},
+    )
+    stored = await get_issue_by_id(issue_id)
+    return {"data": issue_dto(stored) if stored else None}
+
+
+@router.post("/{issue_id}/unpublish", dependencies=[Depends(admin_mutation)])
+async def unpublish_offer_issue(issue_id: str, request: Request) -> Any:
+    try:
+        UUID(issue_id)
+    except ValueError:
+        raise NotFound("Offer issue not found.") from None
+    row = await unpublish_issue(issue_id)
+    if not row:
+        raise Conflict("Only a published issue can be unpublished.")
+    await record_audit(
+        actor=request.state.operator["email"],
+        action="offer.unpublish",
+        entity="offer_issue",
+        entity_id=issue_id,
+    )
+    stored = await get_issue_by_id(issue_id)
+    return {"data": issue_dto(stored) if stored else None}

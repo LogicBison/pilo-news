@@ -391,3 +391,13 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Copy:** EN/ES added (380 catalog keys); the intro states drafts only.
 **Verification:** `pnpm lint`, `pnpm typecheck`, `pnpm check` (380 keys, 11/11 contrast), `pnpm build`; Playwright `admin.spec.ts` 5/5 on the dev server, including the new Offers test.
 **Gap:** the tab has no public counterpart and no publish gate.
+
+
+---
+
+## Public reference pages + publish gate - 2026-11-06 (@x-director)
+
+**Scope:** `.work.ui/screens/reference/20261106-SCREEN-SPEC.md`; `.work.ui/screens/admin-console/20261106-SCREEN-SPEC-amendment-02.md`.
+**Shipped:** reader-facing archive at `/{locale}/{industry}/references` and detail at `/{locale}/{industry}/references/{date}`; only published issues. The channel asset card switches from waitlist to "Read the latest issue" when an issue is published. Admin Offers tab gains reviewer-gated Publish and two-step Unpublish. ES shows English content with a notice and `noindex`.
+**Verification:** `pnpm lint`, `pnpm typecheck`, `pnpm check` (408 keys, 11/11 contrast), `pnpm build`; Playwright admin 6/6; public 13/14 with one known navigation flake that passes in isolation; axe 23/23 public URLs, plus archive EN/ES and published detail.
+**Gap:** no email delivery; no cross-issue search; ES content remains English.

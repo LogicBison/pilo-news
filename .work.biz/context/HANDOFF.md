@@ -164,10 +164,10 @@ Approve the architecture and name the legal and cybersecurity reviewers; then pu
 4. Wrote `.work.biz/strategy/offers/catalog.json` (11 channels) and `.work.biz/strategy/offer-inventory.md` (generated from the live API + catalog).
 5. Wrote `.work.biz/strategy/offer-guides/README.md` plus 11 channel guides, each with reader/job, deliverable, sources, AI scope, prompt values, validation, review, distribution, metrics, build notes, and banned claims.
 6. Added `.work.biz/scripts/offer-inventory.mjs` + `offers.sh` with `--write` / `--check`.
-7. Engineering follow-through (same day): built the offer issue pipeline in `.work/features/offer-generation/20261106-SPEC.md`; legal (Federal Register, scope `US`) and cybersecurity (CISA KEV, scope `global`) drafts exist with 12 rows each; the worker queues due drafts automatically; no publish or email.
+7. Engineering follow-through (same day): built the offer issue pipeline in `.work/features/offer-generation/20261106-SPEC.md`; legal (Federal Register, scope `US`) and cybersecurity (CISA KEV, scope `global`) drafts exist with 12 rows each; the worker queues due drafts automatically; reviewer-gated publish and public reference pages are built; email is not.
 **Findings worth flagging:** the weekly brief is a feed digest, not a reason to subscribe; the two asset cards had no published issue behind them; review capacity, not generation, is the binding constraint; three channels should stay on a brief rather than fake a reference.
-**Blockers:** a public issue page and publish path are not built; named reviewers are needed only for publish; email remains U8/D-002.
-**Next recommended:** review the two drafts (`./bin/offers.sh list`, `show <id> --markdown`), then build the public issue page and publish path. Email stays owner-owned.
+**Blockers:** named reviewers are needed before the drafts can be published; email remains U8/D-002.
+**Next recommended:** name the legal and cybersecurity reviewers, publish one issue, and read the public page. Email stays owner-owned.
 
 
 ---
@@ -181,7 +181,7 @@ Approve the architecture and name the legal and cybersecurity reviewers; then pu
 1. Loaded the offer analysis, offer inventory, per-channel guides, live draft pipeline, and the existing source adapters.
 2. Wrote `.work.biz/strategy/20261106-ai-generated-products.md`: AI capability ladder, jurisdiction decision, 8 product concepts, prioritization matrix, per-channel map, and the 7-Day Desk Brief MVP.
 3. Recommendation: one dataset with jurisdiction-tagged rows and a filter, not one calendar per country. IP sets a default with a visible override; AI search is discovery only, never a source.
-4. Product order: 7-Day Desk Brief, public issue page + jurisdiction filter, change log, personalized watchlist, then EU/recall/checklist/answer pack/export.
+4. Product order: publish one issue with a reviewer, add the jurisdiction filter, then the 7-Day Desk Brief, change log, personalized watchlist, EU/recall/checklist/answer pack/export.
 5. Recorded D-015: one jurisdiction-tagged dataset with a visible filter; IP default only with an override; no per-country generator.
 **Findings worth flagging:** the 7-day brief is cheap and universal but weakly differentiated; the calendar cost is source acquisition and review, not generation; a per-country generator multiplies maintenance and hides gaps.
 **Blockers:** product priority decision; email U8; traffic baseline U10; partner intent U18.
@@ -197,8 +197,8 @@ Approve the architecture and name the legal and cybersecurity reviewers; then pu
 **Classified bucket(s):** engineering + ui + business
 **Executed:**
 1. Accepted the product catalog and D-015 as the jurisdiction direction: one dataset with jurisdiction tags and a visible filter, no per-country generator.
-2. Confirmed the renderer now exposes the two drafts through the admin Offers tab; no publish or email yet.
+2. Confirmed the Offers tab exposes drafts, reviewer-gated publish, and public reference pages; no email yet.
 3. Kept the next product choice open: 7-Day Desk Brief vs public reference page.
 **Coordination notes:** the technical pipeline is live; the business promise still waits on a public page and delivery.
-**Blockers:** public issue page, publish/reviewer, email (U8), product priority.
+**Blockers:** reviewer names, email (U8), jurisdiction filter, product priority.
 **Next recommended:** choose the next build and keep the 7-Day Desk Brief as the baseline.

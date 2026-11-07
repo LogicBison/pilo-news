@@ -70,7 +70,16 @@
     ".work.biz/strategy/20261106-ai-generated-products.md",
     ".work.biz/decisions/DECISIONS.md",
     "bin/start.sh",
-    ".work.ui/screens/admin-console/20261106-SCREEN-SPEC-amendment-02.md"
+    ".work.ui/screens/admin-console/20261106-SCREEN-SPEC-amendment-02.md",
+    "apps/api/src/news_api/offers/http/public.py",
+    "apps/api/tests/contract/test_offer_public.py",
+    "apps/web/src/app/[locale]/[industry]/references/",
+    "apps/web/src/components/ReferenceTable.tsx",
+    "apps/web/src/components/AssetOffer.tsx",
+    "apps/web/src/app/sitemap.ts",
+    "apps/web/e2e/accessibility.spec.ts",
+    ".work.ui/screens/reference/",
+    ".work.ui/context/HANDOFF_UI.md"
   ],
   "allowed_patterns": []
 }
