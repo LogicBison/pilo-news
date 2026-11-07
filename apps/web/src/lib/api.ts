@@ -125,6 +125,19 @@ export interface ReferenceDetail extends ReferenceSummary {
   source_version: string | null;
 }
 
+/** One row of the apex lobby directory: everything a desk plate needs. */
+export interface DeskSummary {
+  slug: string;
+  name: string;
+  tagline: string;
+  locales: string[];
+  accent: string;
+  layout: "editorial" | "professional" | "academic" | string;
+  offers: { brief: boolean; asset: boolean; question: boolean; consultation: boolean };
+  fetch_interval_minutes: number | null;
+  latest_published_at: string | null;
+}
+
 export interface IndustrySummary {
   slug: string;
   name: string;
@@ -185,6 +198,10 @@ async function apiGet<T>(path: string, revalidate = 60): Promise<ApiResult<T>> {
   } catch {
     return { ok: false, status: 0, reason: "api-unavailable" };
   }
+}
+
+export function getDesks(locale: Locale): Promise<ApiResult<DeskSummary[]>> {
+  return apiGet<DeskSummary[]>(`/desks?locale=${locale}`, 300);
 }
 
 export function getIndustries(locale: Locale): Promise<ApiResult<IndustrySummary[]>> {

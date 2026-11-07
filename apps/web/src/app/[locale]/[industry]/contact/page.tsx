@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string }> };
@@ -20,12 +21,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: t(resolved, "contact.description", { industry: name }),
     path: `/${industry}/contact`,
     locale: resolved,
+    industry,
   });
 }
 
 export default async function ContactPage({ params }: Params) {
   const { locale, industry } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const result = await getIndustry(industry, resolved);
   if (!result.ok && result.status === 404) notFound();
   const channel = result.ok ? result.data : fallbackIndustry(industry);
@@ -57,7 +60,7 @@ export default async function ContactPage({ params }: Params) {
         <p className="mt-4 text-sm text-[var(--sn-muted)]">
           {t(resolved, "contact.privacyNote")}{" "}
           <a
-            href={localePath(resolved, `/${industry}/privacy`)}
+            href={localePath(resolved, `${base}/privacy`)}
             className="font-semibold underline"
           >
             {t(resolved, "footer.privacy")}

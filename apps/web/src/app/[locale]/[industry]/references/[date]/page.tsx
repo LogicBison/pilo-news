@@ -7,6 +7,7 @@ import { ReferenceTable } from "@/components/ReferenceTable";
 import { getIndustry, getReference } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { formatDay, localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string; date: string }> };
@@ -19,11 +20,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     return { title: t(resolved, "reference.notFound"), robots: { index: false, follow: false } };
   }
   const issue = result.data;
-  const metadata = pageMetadata({
+  const metadata = await pageMetadata({
     title: `${issue.title} · ${issue.issue_date}`,
     description: issue.standfirst,
     path: `/${industry}/references/${issue.issue_date}`,
     locale: resolved,
+    industry,
   });
   return resolved === "es" ? { ...metadata, robots: { index: false, follow: true } } : metadata;
 }
@@ -31,6 +33,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function ReferencePage({ params }: Params) {
   const { locale, industry, date } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const [result, industryResult] = await Promise.all([
     getReference(industry, date, resolved),
     getIndustry(industry, resolved),
@@ -47,12 +50,12 @@ export default async function ReferencePage({ params }: Params) {
   }
   const issue = result.data;
   const channel = industryResult.ok ? industryResult.data : fallbackIndustry(industry);
-  const archiveHref = localePath(resolved, `/${industry}/references`);
+  const archiveHref = localePath(resolved, `${base}/references`);
 
   return (
     <article className="mx-auto max-w-4xl">
       <Link
-        href={localePath(resolved, `/${industry}`)}
+        href={localePath(resolved, `${base}`)}
         className="text-sm font-semibold text-[var(--sn-muted)] hover:text-[var(--sn-accent)]"
       >
         ← {t(resolved, "reference.backToChannel", { industry: channel.name })}

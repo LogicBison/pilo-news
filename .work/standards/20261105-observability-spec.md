@@ -82,7 +82,22 @@
 
 **Forbidden:** email, phone, message body, authorization header, API key, feed URL with credentials, full query string.
 
-**Events:** `request.start`, `request.end`, `ingest.fetch`, `ingest.parse_error`, `article.published`, `article.hidden`, `summary.failed`, `admin.login`, `admin.mutation`, `contact.received` (no PII body).
+**Events:** `ingest.fetch`, `ingest.parse_error`, `article.published`, `article.hidden`, `summary.failed`, `admin.login`, `admin.mutation`, `contact.received` (no PII body).
+
+**Request logging is by outcome, not by traffic** (2026-11-07). Volume belongs in
+Prometheus; the log carries what a human has to read:
+
+| Outcome | Event | Level |
+|---|---|---|
+| 5xx | `request.failed` | error |
+| 4xx | `request.rejected` | warning |
+| 2xx/3xx slower than `LOG_SLOW_REQUEST_MS` (default 1000) | `request.slow` | info |
+| any other 2xx/3xx | `request.end` | debug — invisible at `LOG_LEVEL=info` |
+
+`/v1/health`, `/v1/health/ready` and `/metrics` are never logged: they are probes,
+they are already counted, and at two probes a minute they were the loudest lines
+in the log. Uvicorn runs with `--no-access-log` for the same reason — the
+middleware is the single writer of request lines.
 
 ## 5. SLOs and alerts
 

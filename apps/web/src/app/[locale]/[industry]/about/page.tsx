@@ -7,6 +7,7 @@ import { TrustBlock } from "@/components/TrustBlock";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { offersOf } from "@/lib/offers";
 import { pageMetadata } from "@/lib/seo";
 
@@ -22,12 +23,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: t(resolved, "about.description", { industry: name }),
     path: `/${industry}/about`,
     locale: resolved,
+    industry,
   });
 }
 
 export default async function AboutPage({ params }: Params) {
   const { locale, industry } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const result = await getIndustry(industry, resolved);
   if (!result.ok && result.status === 404) notFound();
   const channel = result.ok ? result.data : fallbackIndustry(industry);
@@ -57,19 +60,20 @@ export default async function AboutPage({ params }: Params) {
           </ul>
         </section>
         <p className="text-sm text-[var(--sn-muted)]">
-          <a href={localePath(resolved, `/${industry}/contact`)} className="font-semibold underline">
+          <a href={localePath(resolved, `${base}/contact`)} className="font-semibold underline">
             {t(resolved, "about.contact")}
           </a>
         </p>
         {offers.consultation ? (
           <div className="sn-lead-standalone pt-4">
             <LeadForm
+              base={base}
               industry={industry}
               industryName={name}
               locale={resolved}
               kind={channel.cta.kind ?? "consultation"}
               placement="about"
-              sourcePage={localePath(resolved, `/${industry}/about`)}
+              sourcePage={localePath(resolved, `${base}/about`)}
               qualify={channel.cta.qualify}
             />
           </div>
@@ -79,7 +83,7 @@ export default async function AboutPage({ params }: Params) {
             industry={industry}
             locale={resolved}
             placement="brief-about"
-            sourcePage={localePath(resolved, `/${industry}/about`)}
+            sourcePage={localePath(resolved, `${base}/about`)}
           />
         ) : null}
       </article>

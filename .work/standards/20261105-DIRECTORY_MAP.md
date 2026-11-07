@@ -15,7 +15,8 @@
 | `docs/` | Public developer docs (`api/`, quickstarts, OpenAPI snapshot) |
 | `docker-compose.dev.yml` | Dev stack (protected; change needs owner approval) |
 | `docker-compose.prd.yml` | Production stack (protected; change needs owner approval) |
-| `Caddyfile` | TLS + reverse proxy (prd) |
+| `Caddyfile` | Unused since ADR 015 (the host nginx is the prd edge) |
+| `ops/nginx/` | nginx template + generated per-channel sites (prd edge, ADR 015) |
 | `.env.example` | Single tracked environment template (root only) |
 | `.env.dev` / `.env.prd` | Generated, git-ignored, root only - never per service |
 | `apps/*/Dockerfile.dev` / `Dockerfile.prd` | Image per environment suffix |

@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: t(resolved, "legal.termsTitle"),
     path: `/${industry}/terms`,
     locale: resolved,
+    industry,
   });
 }
 

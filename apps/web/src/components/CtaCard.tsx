@@ -3,10 +3,11 @@ import { assetFor } from "@/lib/assets";
 import { localePath, t, type Locale } from "@/lib/i18n";
 import { offersOf } from "@/lib/offers";
 import { localized } from "@/lib/theme";
+import { channelBase } from "@/lib/url";
 
 import { CtaButton } from "./Cta";
 
-export function CtaCard({
+export async function CtaCard({
   industry,
   locale,
   placement,
@@ -19,6 +20,7 @@ export function CtaCard({
   articleId?: string;
   compact?: boolean;
 }) {
+  const base = await channelBase(industry.slug);
   const headline = localized(industry.cta.headline, locale) || t(locale, "lead.title");
   const body = localized(industry.cta.body, locale) || t(locale, "lead.intro");
   const label = localized(industry.cta.label, locale) || t(locale, "cta.primary");
@@ -27,7 +29,7 @@ export function CtaCard({
     placement !== "topic" && Boolean(industry.cta.asset && assetFor(industry.cta.asset));
   const leadHref =
     placement === "topic"
-      ? `${localePath(locale, `/${industry.slug}`)}#lead-form`
+      ? `${localePath(locale, base || "/")}#lead-form`
       : "#lead-form";
   const promises = [t(locale, "cta.promise1"), t(locale, "cta.promise2"), t(locale, "cta.promise3")];
 

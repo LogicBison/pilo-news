@@ -21,6 +21,8 @@ import { TrustLine } from "./ui/trust-line";
 interface LeadFormProps {
   industry: string;
   industryName: string;
+  /** `""` on a channel subdomain, `"/stem-cell"` on a shared host. */
+  base?: string;
   locale: Locale;
   kind: "consultation" | "brief";
   placement: string;
@@ -34,6 +36,7 @@ type Status = "idle" | "sending" | "success" | "error" | "rate-limited";
 export function LeadForm({
   industry,
   industryName,
+  base = "",
   locale,
   kind,
   placement,
@@ -233,7 +236,7 @@ export function LeadForm({
       <ConsentField name="consent" className="mt-4">
         {t(locale, "lead.consent")}{" "}
         <a
-          href={`/${locale === "es" ? "es/" : ""}${industry}/privacy`}
+          href={`${locale === "es" ? "/es" : ""}${base}/privacy`}
           className="font-semibold underline"
         >
           {t(locale, "lead.consentLink")}

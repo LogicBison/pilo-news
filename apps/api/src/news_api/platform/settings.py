@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     web_port: int = 3000
     log_level: str = "info"
     log_json: bool = True
+    # A request slower than this is a main event and gets logged at info even
+    # when successful. Everything else successful stays at debug.
+    log_slow_request_ms: int = 1000
 
     database_url: str = "postgresql+asyncpg://news:news@postgres:5432/news"
     redis_url: str = "redis://redis:6379/0"

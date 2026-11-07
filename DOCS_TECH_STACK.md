@@ -20,7 +20,7 @@
 | Language (web) | TypeScript | 5.8.x | `strict` |
 | i18n | Typed JSON catalogs + locale routes | in-repo | `en`, `es`; additive |
 | Auth | API keys (read) + JWT/Argon2id (admin) | in-repo | ADR 011 |
-| Hosting | Single VPS + Docker Compose + Caddy | compose v2 · caddy 2 | ADR 005 |
+| Hosting | Single VPS + Docker Compose, host nginx edge | compose v2 · nginx 1.24+ | ADR 005, ADR 015 |
 | CI/CD | GitHub Actions | - | ADR 012 |
 | Email | SMTP / transactional API | provider TBD | Contact notifications (U8) |
 | Refresh cadence | `REFRESH_INTERVAL_MINUTES` | default 720 | Twice daily; manual force via admin API/CLI (ADR 010) |

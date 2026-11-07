@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-import { localePath, resolveLocale } from "@/lib/i18n";
+import { LobbyPage, lobbyMetadata } from "@/components/lobby/LobbyPage";
+import { isLocale, resolveLocale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
-export default async function LocaleIndex({ params }: { params: Promise<{ locale: string }> }) {
+type Params = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { locale } = await params;
-  const resolved = resolveLocale(locale);
-  const industry = process.env.SN_DEFAULT_INDUSTRY ?? "legal";
-  redirect(localePath(resolved, `/${industry}`));
+  return lobbyMetadata(resolveLocale(locale));
 }
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-};
+export default async function LocaleIndex({ params }: Params) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+  return <LobbyPage locale={resolveLocale(locale)} />;
+}

@@ -83,6 +83,11 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: node scripts/check-messages.mjs
+      # No server and no env file: the inventory is checked against the
+      # deployment profiles, so a channel edit without a regenerated doc fails.
+      - name: Channel inventory is current
+        working-directory: .
+        run: ./bin/channels.sh --check
       - run: pnpm build
 
   security:

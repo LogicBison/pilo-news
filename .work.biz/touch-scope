@@ -1,11 +1,13 @@
 # Touch Scope — declare your change boundary before a work session
 #
-# Session: 2026-11-06 — @biz-session start - AI-generatable free offers, per-channel generation guides, offer inventory
+# Session: 2026-11-07 — @biz-director - apex lobby: plan, design direction, implementation handoff, EN/ES copy
 
 .work.biz/context/HANDOFF.md
 .work.biz/plans/NEXT.md
 .work.biz/plans/UNKNOWNS.md
 .work.biz/decisions/DECISIONS.md
+.work.biz/plans/20261107-plan-heraldfox-lobby.md
+.work.biz/strategy/20261107-lobby-copy.md
 .work.biz/strategy/README.md
 .work.biz/strategy/20261106-ai-generated-products.md
 .work.biz/strategy/20261106-ai-offer-system.md

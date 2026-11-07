@@ -3,9 +3,11 @@ import Link from "next/link";
 import type { Industry } from "@/lib/api";
 import { SkinEmblem } from "./SkinEmblem";
 import { localePath, t, type Locale } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { resolveSkin } from "@/lib/skins";
 
-export function Footer({ industry, locale }: { industry: Industry; locale: Locale }) {
+export async function Footer({ industry, locale }: { industry: Industry; locale: Locale }) {
+  const base = await channelBase(industry.slug);
   const skin = resolveSkin(industry.slug, industry.theme.layout);
   return (
     <footer className="sn-footer mt-16">
@@ -26,26 +28,26 @@ export function Footer({ industry, locale }: { industry: Industry; locale: Local
           <p className="mt-2 max-w-md text-sm text-[var(--sn-muted)]">{industry.disclaimer}</p>
         </div>
         <nav aria-label={t(locale, "nav.footer")} className="grid grid-cols-2 gap-2 text-sm">
-          <Link href={localePath(locale, `/${industry.slug}/about`)} className="sn-link-quiet">
+          <Link href={localePath(locale, `${base}/about`)} className="sn-link-quiet">
             {t(locale, "nav.about")}
           </Link>
-          <Link href={localePath(locale, `/${industry.slug}/contact`)} className="sn-link-quiet">
+          <Link href={localePath(locale, `${base}/contact`)} className="sn-link-quiet">
             {t(locale, "nav.contact")}
           </Link>
-          <Link href={localePath(locale, `/${industry.slug}/privacy`)} className="sn-link-quiet">
+          <Link href={localePath(locale, `${base}/privacy`)} className="sn-link-quiet">
             {t(locale, "footer.privacy")}
           </Link>
-          <Link href={localePath(locale, `/${industry.slug}/terms`)} className="sn-link-quiet">
+          <Link href={localePath(locale, `${base}/terms`)} className="sn-link-quiet">
             {t(locale, "footer.terms")}
           </Link>
           <Link href="/sitemap.xml" className="sn-link-quiet">
             {t(locale, "footer.sitemap")}
           </Link>
-          <Link href={localePath(locale, `/${industry.slug}/search`)} className="sn-link-quiet">
+          <Link href={localePath(locale, `${base}/search`)} className="sn-link-quiet">
             {t(locale, "nav.search")}
           </Link>
           <a
-            href={localePath(locale, `/${industry.slug}/feed.xml`)}
+            href={localePath(locale, `${base}/feed.xml`)}
             type="application/rss+xml"
             className="sn-link-quiet"
           >

@@ -4,6 +4,19 @@
 > **Status:** Open — 2026-11-06 — goal: design AI-generatable free offers per channel, per-channel generation guides, and an offer inventory
 > **Needs:** owner approval of the offer architecture; named reviewers per reference channel; D4-D6 still open
 
+## Latest action (@biz-director)
+**Date:** 2026-11-07
+**Request:** "ALL APPROVED! 1. yes, dns is pointing at the production host, but I will need your help to create a free multi-domain/wildcard certificate 2. proceed as per your recommendation, just resolve the roadblock"
+**Classified intent:** approvals close-out + operations (TLS) + unblocking the lobby launch gate
+**Executed:**
+1. D-016…D-019 appended to `.work.biz/decisions/DECISIONS.md` (ratified by the owner; all four `pending` on outcome)
+2. **G1 resolved by deferral:** the weekly-brief card is held out of the lobby grid (D-017 also removes the apex email field), leaving three fulfilable reader offers. Copy deck keys re-balanced: 135 per locale, parity checked; the held card is parked in a dedicated section with its re-enable condition
+3. **Certificate tooling** (`bin/start.sh`, `ops/nginx/site.conf.template`, `docs/domains.md`): the 443 block is now behind `bootstrap: tls-start/end` markers so `domains --write --http-only` renders a port-80-only config; `certs` prints a three-phase flow, `certs --run` does a staging dry run then issues, `certs --check` verifies per-host SAN coverage (exact and wildcard) plus expiry
+4. Verified: both nginx renders pass `nginx -t` (syntax only; bind needs root), `certs --check` correctly reports full multi-SAN, partial, and wildcard certificates against the 13 real hosts
+**Decisions recorded:** D-016 no public prices · D-017 no lobby capture · D-018 "Herald Fox" at the apex · D-019 named reviewer on every document
+**Blockers:** U32 (who takes the scope call) still gates the services band; U33 (pricing shape) gates the pilot SKU; D-002 still holds the brief card; the certificate cannot be issued from this machine (no public DNS, no root)
+**Next recommended:** on the production host, `domains --write --http-only` → nginx reload → `certs --run` → `domains --write` → `certs --check`; then hand lobby H1-H3 to `@x-director`
+
 ## Current session
 
 | Step | Status |

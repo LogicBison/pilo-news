@@ -7,10 +7,14 @@ export type FunnelEvent =
   | "lead_submit"
   | "question_submit"
   | "asset_interest"
-  | "brief_confirm";
+  | "brief_confirm"
+  | "desk_enter";
 
 interface TrackOptions {
-  industry: string;
+  /** Null on the apex lobby: the event belongs to no single desk. */
+  industry?: string | null;
+  /** Cross-desk event surface, e.g. "lobby". */
+  surface?: string;
   locale: string;
   placement: string;
   articleId?: string;
@@ -35,7 +39,8 @@ export function sessionHash(): string {
 export function track(event: FunnelEvent, options: TrackOptions): void {
   if (typeof window === "undefined") return;
   const payload = {
-    industry: options.industry,
+    industry: options.industry ?? null,
+    surface: options.surface ?? "",
     event,
     placement: options.placement,
     locale: options.locale,
@@ -43,6 +48,8 @@ export function track(event: FunnelEvent, options: TrackOptions): void {
     session_hash: sessionHash(),
     result: options.result ?? null,
   };
+  if (!options.industry && !options.surface) return;
+
   try {
     void fetch("/api/proxy/v1/cta-events", {
       method: "POST",

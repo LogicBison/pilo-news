@@ -9,6 +9,7 @@ Public reads need no key. `X-API-Key: sn_live_...` raises the rate limit. Admin 
 ```bash
 curl -s "$API/v1/health"
 curl -s "$API/v1/industries"
+curl -s "$API/v1/desks?locale=en"                 # the apex lobby, one round trip
 curl -s "$API/v1/news?industry=legal&locale=en&limit=5"
 curl -s "$API/v1/news/bundle?industry=legal&locale=es"
 curl -s "$API/v1/news/{id}?industry=legal&locale=en"
@@ -22,6 +23,22 @@ Every success uses the envelope:
 ```
 
 Errors are RFC 7807 with `type`, `title`, `status`, `detail`, `instance`, and `request_id`.
+
+## Desks
+
+`GET /v1/desks?locale={en|es}` is the lobby's projection of the channel list: one
+row per desk with `slug`, `name`, `tagline`, `locales`, `accent`, `layout`,
+`offers` (the live offer switches), `fetch_interval_minutes`, and
+`latest_published_at` (the newest published story, or null). It exists so the apex
+can render eleven desks in one request instead of eleven.
+
+## Funnel events
+
+`POST /v1/cta-events` takes either `industry` (a desk event) or `surface`
+(a cross-desk event such as `lobby`), never neither. `event` includes
+`desk_enter`, which is how a desk hand-off from the apex is counted. Lobby events
+carry `industry: null` so the funnel read-out can separate surfaces from desks
+instead of faking attribution.
 
 ## Language and fallback
 

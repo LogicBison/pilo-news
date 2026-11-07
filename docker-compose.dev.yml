@@ -1,7 +1,16 @@
 name: ${COMPOSE_PROJECT_NAME:-system-news-dev}
 
+# Bound the docker log files: a dev day of Next.js compiles and API traffic
+# should not be able to fill the disk.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
+    logging: *logging
     image: postgres:16-alpine
     networks: [data]
     env_file: .env.dev
@@ -18,6 +27,7 @@ services:
       retries: 20
 
   redis:
+    logging: *logging
     image: redis:7-alpine
     networks: [data]
     command: ["redis-server", "--appendonly", "yes"]
@@ -30,12 +40,15 @@ services:
       retries: 20
 
   api:
+    logging: *logging
     build:
       context: ./apps/api
       dockerfile: Dockerfile.dev
     networks: [default, data]
     env_file: .env.dev
-    command: ["uvicorn", "news_api.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    # No access log: the structured middleware already reports failures and
+    # slow requests, and uvicorn would print every probe twice.
+    command: ["uvicorn", "news_api.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload", "--no-access-log"]
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     volumes:
@@ -53,6 +66,7 @@ services:
       start_period: 20s
 
   worker:
+    logging: *logging
     build:
       context: ./apps/api
       dockerfile: Dockerfile.dev
@@ -68,6 +82,7 @@ services:
         condition: service_healthy
 
   web:
+    logging: *logging
     build:
       context: ./apps/web
       dockerfile: Dockerfile.dev

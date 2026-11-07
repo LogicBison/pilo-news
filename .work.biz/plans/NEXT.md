@@ -15,10 +15,13 @@
 | Pipeline | Pending (U18 partner model) |
 | Delivery | Pending (U8 / D-002) |
 | Execution | Capture live; 0 issues published |
+| Lobby (apex) | Plan + copy written 2026-11-07; G1 resolved by holding the brief card; build not started; G2 (reviewer) still open for the content-generation copy |
+| TLS / edge | Three-phase cert flow in `bin/start.sh certs` + `domains --write --http-only`; multi-SAN recommended, wildcard documented; `certs --check` verifies coverage |
 
 ## Next action
 
 1. **First step:** name a reviewer and publish one of the two drafts to the public page. Then add the jurisdiction filter, then build the 7-Day Desk Brief and test it with ten readers.
+2. **Lobby:** ratify D-016…D-019, then hand `plans/20261107-plan-heraldfox-lobby.md` H1-H3 to `@x-director` and H4-H6 to `@ui-director`. The page cannot ship before G1 and G2 close.
 
 ## Active tasks
 
@@ -38,6 +41,12 @@
 | 11 | Fix education `cta.kind` from `brief` to `consultation` | Open | current primary form duplicates the secondary brief; see analysis G11 |
 | 13 | Build the 7-Day Desk Brief MVP | Ready | 5 sourced items, 7 days, one channel; `strategy/20261106-ai-generated-products.md` §8 |
 | 14 | Add the jurisdiction filter | Not built | public page exists; filter, not one calendar per country |
+| 15 | Lobby plan + copy deck | Done 2026-11-07 | plan §13 lists the 10 build tasks; copy is 137 keys in EN and ES with parity checked |
+| 16 | Ratify D-016…D-019 | Done 2026-11-07 | owner approved; rows in `decisions/DECISIONS.md` |
+| 17 | `GET /v1/desks` | Not built | one round trip for the directory + board; needs `fetch_interval_minutes` and `latest_published_at` |
+| 18 | Answer U32/U33 | Open | who takes the scope call, and what a service is priced on |
+| 19 | Issue the production certificate | Ready | three commands in `docs/domains.md`; needs the prod host, root and port 80 |
+| 20 | Brand string across surfaces (D-018) | Open | apex says Herald Fox, channel footer still says System News |
 | 15 | Add a change log between issues | Planned | new/updated/closed rows; after the public page |
 | 16 | Decide the next adapter: EU, recall, or energy | Open | one adapter, one scope, one reviewer |
 

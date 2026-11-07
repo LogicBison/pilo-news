@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { Industry } from "@/lib/api";
 import { localePath, t, type Locale } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { resolveSkin } from "@/lib/skins";
 
 import { LocaleSwitch } from "./LocaleSwitch";
@@ -12,14 +13,15 @@ interface HeaderProps {
   locale: Locale;
 }
 
-export function Header({ industry, locale }: HeaderProps) {
-  const home = localePath(locale, `/${industry.slug}`);
+export async function Header({ industry, locale }: HeaderProps) {
+  const base = await channelBase(industry.slug);
+  const home = localePath(locale, base || "/");
   const skin = resolveSkin(industry.slug, industry.theme.layout);
   const nav = [
     { href: home, label: t(locale, "nav.home") },
-    { href: localePath(locale, `/${industry.slug}/about`), label: t(locale, "nav.about") },
-    { href: localePath(locale, `/${industry.slug}/search`), label: t(locale, "nav.search") },
-    { href: localePath(locale, `/${industry.slug}/contact`), label: t(locale, "nav.contact") },
+    { href: localePath(locale, `${base}/about`), label: t(locale, "nav.about") },
+    { href: localePath(locale, `${base}/search`), label: t(locale, "nav.search") },
+    { href: localePath(locale, `${base}/contact`), label: t(locale, "nav.contact") },
   ];
   return (
     <header className="sn-appbar">

@@ -2,7 +2,12 @@
 /**
  * Channel inventory generator/check.
  *
- * Source of truth: GET /v1/industries + APP_BASE_URL + SN_DEFAULT_INDUSTRY.
+ * Channels come from the live API when it answers (authoritative: includes
+ * channels created from the admin console) and from the deployment profiles on
+ * disk otherwise (CI, docs-only check). The address shape is environment-free on
+ * purpose: a channel is `{slug}.<channel-domain>`, never a literal port, so the
+ * committed file is identical on every machine and the check can run in CI.
+ *
  * The generated block lives in docs/channel-inventory.md between markers so the
  * surrounding prose stays hand-authored.
  *
@@ -10,22 +15,27 @@
  *   node apps/web/scripts/channel-inventory.mjs           # print the block
  *   node apps/web/scripts/channel-inventory.mjs --write   # update the doc
  *   node apps/web/scripts/channel-inventory.mjs --check   # fail when stale
+ *   node apps/web/scripts/channel-inventory.mjs --urls    # print concrete URLs for this env
  *
- * The wrapper ./bin/channels.sh supplies the dev env (ports, base URL, default
- * channel) and is what `./bin/start.sh test` runs.
+ * The wrapper ./bin/channels.sh supplies the env (ports, base URL, default
+ * channel) and is what `./bin/start.sh test` and CI run.
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const DOC = resolve(ROOT, "docs/channel-inventory.md");
+const PROFILES = resolve(ROOT, "apps/api/config/deployments");
 const BEGIN = "<!-- CHANNEL_INVENTORY_BEGIN -->";
 const END = "<!-- CHANNEL_INVENTORY_END -->";
 
 const API_URL = (process.env.API_URL || process.env.API_INTERNAL_URL || "http://127.0.0.1:46105").replace(/\/$/, "");
 const BASE = (process.env.APP_BASE_URL || "http://localhost:43991").replace(/\/$/, "");
 const DEFAULT = process.env.SN_DEFAULT_INDUSTRY || "";
+const DOMAIN =
+  process.env.SN_CHANNEL_DOMAIN ||
+  (process.env.APP_ENV === "prd" ? process.env.APP_DOMAIN || "" : "");
 const API_PUBLIC =
   process.env.API_PUBLIC_URL ||
   (process.env.API_PORT ? `http://localhost:${process.env.API_PORT}` : API_URL);
@@ -34,46 +44,101 @@ function cell(value) {
   return String(value).replaceAll("|", "\\|");
 }
 
+/** Live API first: it is the only source that knows console-created channels. */
 async function fetchChannels() {
-  const response = await fetch(`${API_URL}/v1/industries`);
-  if (!response.ok) {
-    throw new Error(`channel inventory: GET ${API_URL}/v1/industries returned ${response.status}`);
+  try {
+    const response = await fetch(`${API_URL}/v1/industries`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!response.ok) return null;
+    const payload = await response.json();
+    const channels = Array.isArray(payload?.data) ? payload.data : [];
+    if (channels.length === 0) return null;
+    return channels.map((channel) => ({
+      slug: channel.slug,
+      name: channel.name,
+      layout: channel.theme_summary?.layout ?? "unknown",
+      order: null,
+    }));
+  } catch {
+    return null;
   }
-  const payload = await response.json();
-  const channels = Array.isArray(payload?.data) ? payload.data : [];
-  if (channels.length === 0) throw new Error("channel inventory: API returned no channels");
-  return channels;
 }
 
+/** Offline fallback: every deployment profile's enabled industries. */
+function loadProfiles() {
+  let files = [];
+  try {
+    files = readdirSync(PROFILES).filter((name) => name.endsWith(".json"));
+  } catch {
+    return null;
+  }
+  const bySlug = new Map();
+  for (const file of files) {
+    let profile;
+    try {
+      profile = JSON.parse(readFileSync(resolve(PROFILES, file), "utf8"));
+    } catch {
+      continue;
+    }
+    for (const industry of profile?.industries ?? []) {
+      if (!industry?.slug || industry.enabled === false) continue;
+      if (bySlug.has(industry.slug)) continue;
+      bySlug.set(industry.slug, {
+        slug: industry.slug,
+        name: industry.name ?? industry.slug,
+        layout: industry.theme?.layout ?? "unknown",
+        order: typeof industry.sort_order === "number" ? industry.sort_order : 0,
+      });
+    }
+  }
+  if (bySlug.size === 0) return null;
+  return [...bySlug.values()].sort((a, b) => a.order - b.order || a.slug.localeCompare(b.slug));
+}
+
+export async function loadChannels() {
+  const live = await fetchChannels();
+  if (live) return { channels: live, source: "live API (`GET /v1/industries`)" };
+  const offline = loadProfiles();
+  if (offline) return { channels: offline, source: "deployment profiles (`apps/api/config/deployments/`)" };
+  throw new Error("channel inventory: no channels from the API or the deployment profiles");
+}
+
+const HOST = "{slug}.<channel-domain>";
+
 export async function buildBlock() {
-  const channels = await fetchChannels();
-  const defaultSlug = DEFAULT || channels[0].slug;
+  const { channels } = await loadChannels();
   const rows = channels.map((channel, index) => {
     const slug = channel.slug;
-    const isDefault = slug === defaultSlug ? "root" : "";
-    return `| ${index + 1} | ${cell(channel.name)} | \`${slug}\` | ${BASE}/${slug} | ${BASE}/es/${slug} | ${cell(channel.theme_summary?.layout ?? "unknown")} | ${isDefault} |`;
+    return `| ${index + 1} | ${cell(channel.name)} | \`${slug}\` | \`${slug}.<channel-domain>/\` | \`${slug}.<channel-domain>/es\` | ${cell(channel.layout)} |`;
   });
 
+  // Nothing environment-specific in here: no port, no scheme, no default
+  // channel. Those are deployment settings, and baking one machine into this
+  // file is what made the old inventory impossible to check in CI.
   return [
     BEGIN,
-    `**Base URL:** ${BASE} · **Default channel:** \`/${defaultSlug}\` (root \`/\` redirects) · **Admin:** ${BASE}/admin · **API health:** ${API_PUBLIC}/v1/health`,
-    `**Channels:** ${channels.length}`,
+    `**Channels:** ${channels.length} · **Channel host:** \`${HOST}\` (\`SN_CHANNEL_DOMAIN\`: \`localhost\` in dev, \`APP_DOMAIN\` in prd)`,
     "",
-    "| # | Channel | Slug | English | Spanish | Layout | Default |",
-    "|---|---|---|---|---|---|---|",
+    "| # | Channel | Slug | English | Spanish | Layout |",
+    "|---|---|---|---|---|---|",
     ...rows,
     "",
-    "**Patterns:** `/{slug}/search` · `/{slug}/about` · `/{slug}/contact` · `/{slug}/article/{id}` · `/es/{slug}/...`",
+    "**Path form:** `/{about|contact|search|briefs|references}` · `/topic/{slug}` · `/article/{id}` · `/feed.xml` · `/es/...` for Spanish",
+    "**Compatibility:** `{apex}/{slug}/...` still renders and canonicalises to the channel host. `/admin` is apex-only.",
+    "**Root `/`** is the lobby (`/services`, `/privacy`, `/terms` beside it); `SN_DEFAULT_INDUSTRY` now only drives the 404 home link.",
+    "**Concrete URLs for this machine:** `./bin/channels.sh --urls`",
     END,
   ].join("\n");
 }
 
 function template(block) {
+  const today = new Date().toISOString().slice(0, 10);
   return `# Channel inventory
 
-**What this is:** the canonical list of live channels, slugs, localized URLs, layout and the default channel.
-**Status:** Generated ${new Date().toISOString().slice(0, 10)} · **Needs:** re-generate after any channel change; a stale file fails the local test gate.
-**Source:** \`GET /v1/industries\` + \`APP_BASE_URL\` + \`SN_DEFAULT_INDUSTRY\`. The committed file reflects the environment base used at generation time; regenerate with the production base for a production inventory.
+**What this is:** the canonical list of live channels: name, slug, address, layout. The address of a channel is its own subdomain, never a path on the apex.
+**Status:** Generated ${today} from the live API or the deployment profiles · **Needs:** nothing manual — \`./bin/start.sh test\` and CI fail when this file is stale.
+**Source:** the live API when it answers (it knows channels created from the admin console), the deployment profiles otherwise. The generated block is deliberately environment-free: no port, no scheme, no default channel. Those are deployment settings, and baking one machine into this file is what made the previous inventory impossible to check anywhere but the machine that wrote it.
 
 ## Inventory
 
@@ -81,16 +146,25 @@ ${block}
 
 ## How to keep it updated
 
-1. Add or remove a channel (profile import or admin console).
-2. Run \`./bin/channels.sh --write\` with the stack up.
-3. Run \`./bin/channels.sh --check\` (or \`./bin/start.sh test\`); it fails when this file is stale.
-4. Commit the regenerated file with the channel change.
+It cannot drift silently. Three gates, cheapest first:
 
-The generated block is the only machine-owned part — edit the prose outside the markers by hand.
+1. \`./bin/start.sh migrate\` warns when the file no longer matches the channels in the database.
+2. \`./bin/start.sh test\` runs \`./bin/channels.sh --check\` after the API and UI checks.
+3. CI runs the same check with no server and no env file — from the deployment profiles — so a profile edit without a regenerated inventory fails the build.
+
+Regenerate, then commit:
+
+\`\`\`bash
+./bin/channels.sh --write    # live API first, profiles as fallback
+./bin/channels.sh --check    # must print ok
+./bin/channels.sh --urls     # concrete URLs for this machine, including the port
+\`\`\`
+
+The generated block between the markers is machine-owned. Edit the prose outside them by hand.
 
 ## Next action
 
-\`./bin/channels.sh --write\` after any channel change.
+Nothing while the check is green. On a channel change: \`./bin/channels.sh --write\` and commit.
 `;
 }
 
@@ -101,8 +175,27 @@ function extractBlock(text) {
   return text.slice(start, end + END.length);
 }
 
+/** Concrete, machine-specific URLs - for a screenshot, an email, a handoff. */
+function printUrls() {
+  const hosts = DOMAIN
+    ? { pattern: (slug) => `${DOMAIN === "localhost" ? "http" : "https"}://${slug}.${DOMAIN}${BASE.match(/:\d+$/)?.[0] ?? ""}`, kind: "channel host" }
+    : { pattern: (slug) => `${BASE}/${slug}`, kind: "path (no channel domain configured)" };
+  return loadChannels().then(({ channels }) => {
+    console.log(`# ${hosts.kind} · base ${BASE} · domain ${DOMAIN || "(none)"}`);
+    for (const channel of channels) {
+      console.log(`${channel.slug.padEnd(20)} ${hosts.pattern(channel.slug)}/   ${hosts.pattern(channel.slug)}/es`);
+    }
+  });
+}
+
 async function main() {
   const mode = process.argv[2] ?? "--print";
+
+  if (mode === "--urls") {
+    await printUrls();
+    return;
+  }
+
   const block = await buildBlock();
 
   if (mode === "--print") {
@@ -123,7 +216,20 @@ async function main() {
     if (!existing) {
       throw new Error(`channel inventory: markers missing in ${DOC}; restore the generated block or delete the file`);
     }
-    writeFileSync(DOC, current.replace(existing, block));
+    // The status line is machine-owned too, so a regeneration is visible in the diff.
+    const { source } = await loadChannels();
+    const today = new Date().toISOString().slice(0, 10);
+    const status =
+      `**Status:** Generated ${today} from ${source} · ` +
+      "**Needs:** nothing manual — `./bin/start.sh test` and CI fail when this file is stale.";
+    const refreshed = current
+      .replace(existing, block)
+      .replace(/^\*\*Status:\*\*.*$/m, status);
+    if (refreshed === current) {
+      console.log("channel inventory: already current");
+      return;
+    }
+    writeFileSync(DOC, refreshed);
     console.log(`channel inventory: updated ${DOC}`);
     return;
   }
@@ -144,7 +250,7 @@ async function main() {
     return;
   }
 
-  throw new Error(`unknown mode '${mode}' (use --print, --write or --check)`);
+  throw new Error(`unknown mode '${mode}' (use --print, --write, --check or --urls)`);
 }
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;

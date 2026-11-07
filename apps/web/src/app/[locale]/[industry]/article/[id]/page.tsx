@@ -19,6 +19,7 @@ import { fallbackIndustry } from "@/lib/fallback";
 import { offersOf } from "@/lib/offers";
 import { resolveSkin } from "@/lib/skins";
 import { formatDate, localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { absoluteUrl, newsArticleJsonLd, pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string; id: string }> };
@@ -36,12 +37,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: article.summary ?? article.excerpt ?? article.title,
     path: `/${industry}/article/${id}`,
     locale: resolved,
+    industry,
   });
 }
 
 export default async function ArticlePage({ params }: Params) {
   const { locale, industry, id } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const [articleResult, industryResult, references] = await Promise.all([
     getArticle(industry, id, resolved),
     getIndustry(industry, resolved),
@@ -59,7 +62,8 @@ export default async function ArticlePage({ params }: Params) {
   }
   const article = articleResult.data;
   const channel = industryResult.ok ? industryResult.data : fallbackIndustry(industry);
-  const pagePath = localePath(resolved, `/${industry}/article/${id}`);
+  const pagePath = localePath(resolved, `${base}/article/${id}`);
+  const pageUrl = await absoluteUrl(pagePath);
   const offers = offersOf(channel);
   const asset = offers.asset && channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
   const latestReference =
@@ -67,15 +71,15 @@ export default async function ArticlePage({ params }: Params) {
 
   return (
     <>
-      <JsonLd json={newsArticleJsonLd(channel, article, absoluteUrl(pagePath))} />
+      <JsonLd json={newsArticleJsonLd(channel, article, pageUrl)} />
       {articleResult.meta.fallback && resolved === "es" ? (
         <div className="mb-6">
-          <FallbackNotice locale={resolved} href={`/${industry}/article/${id}`} />
+          <FallbackNotice locale={resolved} href={pagePath} />
         </div>
       ) : null}
       <article className="mx-auto max-w-3xl">
         <Link
-          href={localePath(resolved, `/${industry}`)}
+          href={localePath(resolved, `${base}`)}
           className="text-sm font-semibold text-[var(--sn-muted)] hover:text-[var(--sn-accent)]"
         >
           ← {t(resolved, "article.backToChannel", { industry: channel.name })}
@@ -162,8 +166,8 @@ export default async function ArticlePage({ params }: Params) {
             latestReference={
               latestReference
                 ? {
-                    href: localePath(resolved, `/${industry}/references/${latestReference.issue_date}`),
-                    archiveHref: localePath(resolved, `/${industry}/references`),
+                    href: localePath(resolved, `${base}/references/${latestReference.issue_date}`),
+                    archiveHref: localePath(resolved, `${base}/references`),
                     issueDate: latestReference.issue_date,
                   }
                 : undefined
@@ -196,6 +200,7 @@ export default async function ArticlePage({ params }: Params) {
             <TrustBlock locale={resolved} />
             {offers.consultation ? (
               <LeadForm
+                base={base}
                 industry={industry}
                 industryName={channel.name}
                 locale={resolved}

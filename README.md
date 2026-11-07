@@ -74,8 +74,34 @@ checkout on the same host.
 Tests run inside the containers:
 
 ```bash
-./bin/start.sh --env dev test     # ruff, mypy, pytest, ESLint, tsc, catalogs, themes
+./bin/start.sh --env dev test     # ruff, mypy, pytest, ESLint, tsc, catalogs, themes, host routing
 ```
+
+---
+
+## Channel subdomains
+
+Every channel is its own site. Dev runs the same shape on `*.localhost`, so there
+is no proxy to install to see it:
+
+```
+http://localhost:43991/                  the lobby: every desk, services, legal
+http://stem-cell.localhost:43991/        channel home (the port is WEB_PORT)
+http://stem-cell.localhost:43991/es
+http://localhost:43991/stem-cell         path URLs still work on the apex
+```
+
+```bash
+./bin/start.sh dev hosts            # asserts the routing contract over HTTP
+./bin/start.sh dev domains          # host table; --write renders nginx sites
+```
+
+Production terminates TLS on the host's nginx: `apps/web` and `apps/api` publish
+only loopback ports, and one generated server block per channel proxies to them.
+`./bin/start.sh --env prd domains --write` renders `ops/nginx/sites/`, `certs`
+prints the certbot command, and `preflight` refuses to call a stack ready while a
+placeholder secret or an http base URL is in `.env.prd`. Details:
+`docs/domains.md`.
 
 End-to-end and accessibility tests run against a production build; see
 `apps/web/playwright.config.ts` and `e2e/`.
@@ -129,6 +155,8 @@ Source of truth: `.work/docs/integration/industries-v1.1.0/data.json` (mirrored 
 | Registries | `.work/plans/{ASSUMPTIONS,RISK_REGISTRY,UNKNOWNS}.md` |
 | Operations proposals | `.work/plans/operations/` |
 | Integration mirror | `.work/docs/integration/` |
+| Channel domains and the nginx edge | `docs/domains.md` |
+| Dev-to-production migration | `docs/guides/migrate-dev-to-prod.md` |
 
 ---
 

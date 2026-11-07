@@ -2,7 +2,10 @@
 
 ## Session status
 
-**Closed:** 2026-11-06 - offer generation, reviewer-gated public references, and lead/contact attribution.
+**Closed:** 2026-11-07 — production edge, the apex site, and the gates that keep both honest.
+Eleven channels now serve on their own subdomains behind the host's nginx (ADR 015), `start.sh` produces and restores a portable dev→prd bundle, the apex is a real site with a lobby and a services page (ADR 016), the channel inventory cannot go stale, request logging is by outcome instead of by traffic, and the "no ads" promise is replaced by a promotion ceiling (D-021). Verified at close: 152 API tests, ruff/mypy clean, OpenAPI snapshot current, web typecheck/lint/566-key catalogue parity, production image built and served, 41 Playwright on the production build (lobby + 29 axe URLs), 12 lobby tests and `./bin/start.sh dev test` green end to end.
+
+**Prior close — 2026-11-06:** offer generation, reviewer-gated public references, and lead/contact attribution.
 Per-channel cadence and offer switches shipped; legal/cyber drafts generate automatically; public reference pages and publish/unpublish shipped; contact and lead attribution now store source/UTM/session/country with hashed network identifiers. 143 API tests, admin e2e 7/7, production build green. Remaining: email delivery, named reviewers, `GEO_COUNTRY_HEADER` edge value, and marketing-consent confirmation.
 
 **2026-11-06 (channel automation):** the worker already fetched automatically on a
@@ -16,7 +19,7 @@ and a browser save/restore check against the dev API. SPEC:
 
 **Closed:** 2026-11-06 - S1 screens shipped: contact, about and admin-console implemented from approved SPECs. 80 Playwright tests pass on a production build (admin sign-in included); axe 0 critical/serious on 21 URLs; 329 catalog keys; 11/11 contrast. Every channel now publishes an RSS 2.0 feed in both locales. Along the way: the funnel proxy no longer returns a false 503 on 204, and the about page stopped claiming a seven-day window while every channel runs 30 days.
 
-**Updated:** 2026-11-06
+**Updated:** 2026-11-07
 
 **Prior session (closed 2026-11-06):** eleven channels. M9 shipped config-driven asset cards and one secondary rung; M10 added the digital-technology demand test (three topics, `placement="topic"`, migration 012); M11 built the eleventh channel (`digital-technology`): its own `datacenter` skin with a CC BY-SA photo, six grade-A feeds, 26 EN + 1 ES items, and the channel inventory regenerated. 113 api tests; web checks; 64 Playwright passed / 1 skipped; 11/11 contrast.
 
@@ -24,46 +27,23 @@ and a browser save/restore check against the dev API. SPEC:
 
 **Prior session (closed 2026-11-05, earlier):** SPEC approvals, a11y milestone audit (+F1/F2), S0 catalog primitives, photographic bands on all ten channels. Then the earlier close: editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
 
-**Repository state:** v1 implemented plus the post-v1 operator scope. Master plan v1.1
-(Approved) executed end to end: schema/migrations (001-007), **ten** live channels
-(five reference + `cybersecurity` + `stem-cell` + `manufacturing` + `energy` +
-`retail`; the last five exist only as deployment profiles), 45 verified feeds, ingestion + DeepSeek summaries, public API, EN/ES sites,
-editorial console, leads, observability, CI, docs, volume backups.
-Provisioning is a ports/adapters module (`apply-profile`), source quality is an
-enforced policy (`verify-sources`), the default industry switches at runtime
-(`SN_DEFAULT_INDUSTRY` + `./bin/start.sh industry`), and the UI ships the
-**editorial-conversion v2** grammar: open/square marketing surfaces, full-bleed
-proof/photo/conversion bands, balanced two-column coverage, filled forms, and a
-generated channel inventory (`docs/channel-inventory.md`). **Foundation-complete: yes. Plan-master-ready: yes.
-Implementation-ready: yes. v1 implemented: yes. Custom-industry-ready: yes.** M9 (gated-asset card test) is complete: the asset a channel offers comes from `cta.asset`, one secondary rung per page, and the 14-day measurement window is open until 2026-11-20. **Ten channels became eleven:** `digital-technology` is live in EN and ES with its own `datacenter` skin, six grade-A feeds (4 EN, 2 ES) and 26 EN + 1 ES items on the first refresh; the channel inventory reads 11.
-
-**Waiver retired (2026-11-06):** **M9 — gated-asset card test** is now a `§19` row in `.work/plans/full/20261105-full-plan.md` (v1.2), so the earlier post-v1 waiver no longer applies.
-
-**Recommended pick-up file:** `.work/plans/NEXT.md`
-**Next session focus:** eleven channels live. Two readings are open and both close on a date, not a mood:
-the digital-technology keep/kill on **2026-11-27** (topic placements + inquiries, D-014) and the asset test on
-**2026-11-20**. The ES side of the new channel is thin (1 item) and the two Spanish feeds are general technology.
-Before any further channel work: read the funnel, name the digest reviewer (D-005), then S1 screens.
-
-**Lost or new?** Read `.cursorrules`, then `.work/plans/NEXT.md` and
-`.work.ui/reports/20261105-visual-verify-milestone.md`.
-
----
-
 ## Fresh start - what the next session should do first
 
 1. Run **`@session-control start`**.
-2. Read `.cursorrules` and this file.
-3. Read `.work/plans/NEXT.md`.
-4. Run `@ui-accessibility-audit milestone` (ten channel SPECs approved 2026-11-05);
-   read `.work.ui/reports/20261105-visual-verify-milestone.md`.
-5. Add a vertical by copying `apps/api/config/deployments/<slug>.json`, running
-   `apply-profile` (see `docs/deployment-profile.md`), then `./bin/channels.sh --write`.
-6. Re-run `python -m news_api.cli verify-sources --industry all` after any
-   portfolio change; it must exit 0 (45/45 today).
-7. Verify pending: k6 (`tests/perf/k6-smoke.js`), prd deploy/rollback, remote CI,
-   production image smoke, CATALOG init, and the new channels' content gaps.
-8. For launch: answer U9/U8/U10/U1, then run `.work/plans/operations/20261105-launch.md`.
+2. Read `.cursorrules`, this file, `.work/plans/NEXT.md`.
+3. **Production edge (O9):** on the host, `./bin/start.sh --env prd domains --write --http-only`,
+   include `ops/nginx/sites` in nginx, reload, then `certs --run`, `domains --write`,
+   `certs --check`, and `./bin/start.sh --env prd hosts`. Until that passes, the public
+   TLS path is unverified (see Known residual risks).
+4. **Apex:** the lobby lives in `apps/web/src/components/lobby/`; its copy is
+   `.work.biz/strategy/20261107-lobby-copy.md` (140 keys, EN/ES). Change copy there
+   first, then in `apps/web/src/messages/`.
+5. After any channel add/remove: `./bin/channels.sh --write` and commit the inventory.
+6. Re-run `python -m news_api.cli verify-sources --industry all` after any portfolio
+   change; it must exit 0.
+7. Still pending from M8: k6 (`tests/perf/k6-smoke.js`), remote CI, CATALOG init.
+8. For launch: answer U1 brand, U8 delivery, U9 analytics, U10 traffic, then run
+   `.work/plans/operations/20261105-launch.md`.
 
 ### Conditional reads
 
@@ -105,74 +85,35 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | stem-cell channel | done | `config/deployments/stem-cell.json`: 6 feeds (4 EN + 2 ES), 5 topics, 53 articles after first refresh |
 | instant industry switch | done | `./bin/start.sh industry financial` -> `/` redirects to `/financial`, no rebuild |
 
+| channel subdomains | done | ADR 015, `middleware.ts` + `lib/url.ts`, `start.sh hosts` 14/14 |
+| host nginx edge | config + tooling done, TLS unissued | `ops/nginx/`, `start.sh domains`/`certs`, `docs/domains.md` |
+| dev→prd migration | done and drilled | `start.sh backup`/`restore`; restored into fresh postgres and into the prd stack |
+| apex site | done | ADR 016, lobby + services + legal pages, `GET /v1/desks`, `e2e/lobby.spec.ts` |
+| channel inventory | gated | environment-free block, live/profile fallback, CI check |
+| request logging | outcome-based | probes silent, 0 lines per 30 s idle |
+
 **Integrity:** no known waivers. Dev stack running (`system-news-dev`).
 
 ---
 
 ## Verification evidence (this session)
 
-| Check | Result |
-|-------|--------|
-| `ruff check . && ruff format --check .` (api) | pass |
-| `mypy src` (api) | pass, 86 files |
-| `pytest -q` (api) | 77 passed (unit + integration + contract, includes template tests) |
-| `pnpm lint && pnpm typecheck` (web) | pass |
-| `pnpm check` (catalogs + themes) | 220 keys; 5/5 channels pass contrast |
-| `pnpm build` (web) | pass |
-| Playwright public + axe (production build) | 9/9 pass (public, a11y, admin) |
-| Admin e2e | login, console, refresh trigger pass |
-| AI summaries | 92 articles across channels summarized; failures fail-open |
-| Backup + restore | archive created (14 MB), restore passed, `/v1/health` ok, 19 summaries intact |
-| OpenAPI snapshot | 41 paths, committed |
-| `docker compose config` | valid dev/prd (ports + networks resolved) |
-| prd images | API wheel image built + migrations/config verified; web standalone image built + `/legal` 200 |
-| Deployment profile | `apply-profile --dry-run` + real apply on dev: 0 created, 0 updated, 20 skipped (example matches seeds) |
-| Source verification 2026-11-05 (10 channels) | `verify-sources --industry all`: 10 industries, 45 sources, 45 pass, 0 fail, 0 coverage warnings |
-| Stem-cell verification | `verify-sources --industry stem-cell`: 6/6 grade A; `apply-profile --dry-run`: 0 created, 0 updated, 15 skipped |
-| Channel coverage | enabled sources per channel: 4, 4, 4, 5, 4, 5, 6 (policy floor 4) |
-| Custom channel | `cybersecurity` apply: 13 created; `/v1/news/bundle` EN/ES + web page + sitemap render |
-| Industry switch | legal -> financial -> legal via `./bin/start.sh industry`; `/` 307 to the new channel each time |
-| API tests | 107 passed (unit + integration + contract, includes quality, ports, profile, ingest) |
-| Web checks | `pnpm lint`, `pnpm typecheck`, `pnpm check` (221 keys, 6 channels contrast) |
-| E2E + axe (production build) | 8 passed, 1 skipped (admin sign-in needs `E2E_ADMIN_PASSWORD`); 0 critical/serious a11y violations |
-| Retention coherence | channel window (30d) now wins over the global scoring default; ES lists: education 1->5, cybersecurity 0->3 |
-| Content check (API) | all 6 channels serve `news` + `bundle` (EN/ES); web pages 200 for all six |
-| Logs/admin check | 11 browser routes 200; `/` 307 to `SN_DEFAULT_INDUSTRY` |
-| Browser smoke 2026-11-05 | `/` 302→`/legal`; `/legal`, `/es/legal`, `/financial`, `/behavioral-health`, article, `/legal/{about,privacy,terms,contact,search}`, `/en/admin` all 200; API `/v1/health` ok |
-| Lead magnet build 2026-11-05 | 7/7 channels 200 with proof strip + trust block + brief capture; `pnpm lint`, `pnpm typecheck`, `pnpm check` green (246 catalog keys, 7 themes) |
-| Qualification field 2026-11-05 | migration 008 applied then re-run clean (`applied: 0`); `pytest -q` 108 passed; qualification select renders on 7/7 channels EN+ES; `pnpm check` 247 keys |
-| OpenAPI snapshot 2026-11-05 | regenerated, +`qualification` only (12 lines) |
-| Skin system 2026-11-05 | 7 distinct skins live (`data-skin` per channel), 7 motifs + 7 original illustration bands, screenshots desktop+mobile, `pnpm lint/typecheck/check` green |
-| Per-channel art 2026-11-05 | 7 inline masthead emblems, article illustration strips, 7 channel-home SPECs under `.work.ui/screens/` |
-| Realistic imagery 2026-11-05 | 7 licensed photos (credits.json, 2 CC BY-SA with in-page credit), next/image band + article strip, line art kept as motif/emblem/fallback |
-| M9 2026-11-06 | `./bin/start.sh --env dev test` → api 111 passed, ruff/format/mypy clean; web lint/type/check (310 keys, 10/10 contrast); inventory ok |
-| M9 2026-11-06 | full Playwright on a production build → 59 passed, 1 skipped, 0 failed (layout 40, a11y, public incl. asset-card rule) |
-| M9 2026-11-06 | migration 011 → `applied: 1`, second run `applied: 0`; `apply-profile` legal + cybersecurity `skipped`; `/v1/news/bundle` carries `cta.asset` for those two only |
-| M9 2026-11-06 | coverage balance measured on ten channels at 1280px: max spread 178px vs the 260 gate |
-| M11 2026-11-06 | `verify-sources --industry digital-technology`: 6 sources, 6 pass, 0 fail, 0 coverage warnings |
-| M11 2026-11-06 | `apply-profile` digital-technology: 14 created; second run 0 created / 0 updated; `/v1/industries` returns 11 channels |
-| M11 2026-11-06 | full Playwright on a production build: **64 passed, 1 skipped** (11-channel layout loop + new channel test) |
-| M11 2026-11-06 | `pnpm check`: 11 channels pass contrast; `bin/channels.sh --check`: 11 channels, ok |
-| M12 2026-11-06 | migration 013 applied then re-ran clean (`applied: 0`); scheduler unit tests cover override/default/pause |
-| M12 2026-11-06 | `./bin/start.sh --env dev test` -> api 124 passed, ruff/format/mypy clean; web lint/type/check 364 keys, 11/11 contrast |
-| M12 2026-11-06 | `pnpm build` + full Playwright on the production build -> **87 passed** (pre-polish; final dev rerun 84 passed, 2 flaky, 1 navigation flake passing in isolation) |
-| M12 2026-11-06 | browser save check: legal question offer off -> public `offers.question=false`; restored -> `true` |
-| M13 2026-11-06 | migration 014 applied twice (`applied: 0` re-run); 139 API tests; legal + cybersecurity drafts; admin Offers tab; reviewer-gated publish and public reference pages |
-| M13 2026-11-06 | offer scheduler runs in the worker; admin API list/detail/build/publish/unpublish; public reference pages; email path not built |
-| — 2026-11-06 | masthead emblem fix: digital-technology had no `datacenter` case; added rack mark + default fallback; 11/11 channel emblem e2e |
-| M14 2026-11-06 | lead/contact attribution: country, session hash, contact UTM/source/hashes; admin Contacts tab; 143 API tests; 7/7 admin e2e |
-| S1 2026-11-06 | contact + about + admin-console shipped; e2e 78 pass; admin sign-in verified end to end |
-| Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
-| S1 screens 2026-11-06 | `pnpm build` + `pnpm test` on the production bundle: **78 passed, 0 failed** (admin spec ran with credentials) |
-| S1 a11y 2026-11-06 | axe scan of 15 URLs incl. contact EN/ES, about EN/ES, `/en/admin`: 0 critical/serious |
-| S1 catalog 2026-11-06 | `pnpm check`: 328 keys in EN and ES; 11/11 channels pass contrast |
-| Funnel proxy 2026-11-06 | `POST /api/proxy/v1/cta-events` returned 503 for every 204 while the write succeeded; now returns 204 |
-| Field primitives 2026-11-06 | `TextField`/`TextArea` put hint/error outside the label so the accessible name stays the label |
-| Coverage measured 2026-11-06 | bundle items EN/ES: legal 37/37, financial 38/36, education 38/27, manufacturing 36/38, retail 35/24, digital-technology 37/16 |
-| RSS 2026-11-06 | `/{industry}/feed.xml` and `/es/...`: 200 with `application/rss+xml`, 30 items, unknown channel 404; discovery link in head + footer link |
-| A11y sweep 2026-11-06 | production build, 21 URLs incl. search/privacy/terms EN+ES and `/en/admin`: 0 critical or serious violations |
+| Gate | Command | Result |
+|---|---|---|
+| API | `./bin/start.sh dev test` (ruff, format, mypy, pytest) | 152 passed, no issues |
+| Web | lint, `tsc --noEmit`, catalogue/theme check | clean, 566 keys in EN and ES |
+| OpenAPI | `python scripts/export_openapi.py` + diff | snapshot current (`/v1/desks`, cta `surface`) |
+| Inventory | `./bin/channels.sh --check` (live API and profile fallback) | ok both ways, 11 rows |
+| Routing | `./bin/start.sh dev hosts` | 14/14 |
+| Production image | `docker compose -f docker-compose.prd.yml build web` + serve | built, all apex routes 200, 11 plates |
+| Playwright (prod) | lobby + accessibility + public + layout | 111 passed; lobby + axe alone 41 passed |
+| Playwright (dev) | full suite incl. admin | 115 passed, 0 failed (3 flaky, retried green) |
+| Contrast | every text node on six apex pages | 0 failures below 4.5:1 (dev and prod) |
+| Links | every internal href on six apex pages | 26/26 return 200 |
+| Logs | 30 s idle after the change | api 0, web 0, worker 0 lines |
+| Migration | 016 applied on dev and on the restored prd copy | `applied: 0, total: 16` |
 
----
+Not verified: the public TLS path (no public DNS or root on this machine), certbot issuance, and the nginx reload on the production host — all three are operator steps documented in `docs/domains.md`.
 
 ## Open owner actions
 
@@ -186,6 +127,10 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | O6 | ~~Master plan~~ approved | - | owner | full plan v1.1 |
 | O7 | prd domain/DNS + provider | prd deploy | owner | launch checklist |
 | O8 | CDN/off-site backup bucket (optional) | RPO | owner | backup doc |
+| O9 | Issue the production certificate on the host: `domains --write --http-only` → reload → `certs --run` → `domains --write` → `certs --check` | production TLS | owner | `docs/domains.md` |
+| O10 | Approve the `.github/workflows/ci.yml` inventory gate before it runs on a PR | CI | owner | workflow file |
+| O11 | Delete the now-unused `Caddyfile` (ADR 015 replaced the edge) | tidiness | owner | repo root |
+| O12 | Decide the brand string across surfaces (D-018 covers the apex; channel footers still say System News) | consistency | owner | `.work.biz/decisions/` |
 
 ---
 
@@ -193,6 +138,10 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 
 | Date | Session | Artifacts |
 |------|---------|-----------|
+| 2026-11-07 | production edge | channel subdomains behind host nginx (ADR 015), `start.sh` domains/certs/preflight/hosts, dev→prd bundle backup+restore, `docs/domains.md`, `docs/guides/migrate-dev-to-prod.md` |
+| 2026-11-07 | apex site | lobby + services + network legal pages (ADR 016), `GET /v1/desks`, migration 016 (`surface`, `desk_enter`), 140 `lobby.*` keys, `e2e/lobby.spec.ts`, apex sitemap/robots |
+| 2026-11-07 | lobby review | four defects fixed from owner screenshots (anchor-colour specificity, page-relative section links, `{desks}` placeholder, form-field contrast), contact form added (D-020), "no ads" claims replaced (D-021) |
+| 2026-11-07 | operational gates | channel inventory made environment-free and CI-gated, outcome-based request logging, dev log rotation, Playwright libs baked into `Dockerfile.dev` |
 | 2026-11-05 | implementation | `apps/api` full service: platform, channels, sources, articles, publishing, editorial, worker, CLI; migrations 001-003; config scoring/seeds/prompts |
 | 2026-11-05 | implementation | `apps/web` full Next app: themes, EN/ES, SEO, public pages, admin console, lead/contact forms, proxy, middleware |
 | 2026-11-05 | verification | API 77 tests, web lint/type/build, Playwright public/axe, OpenAPI snapshot, AI smoke, backup/restore drill |
@@ -232,19 +181,16 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 
 ## Explicit unknowns (promoted from UNKNOWNS)
 
-| ID | Summary | Blocks |
-|----|---------|--------|
-| U1 | Final brand name | domain/branding |
-| U2 | URL shape (one domain vs per-industry) | SEO/canonical |
-| U4 | AI monthly budget cap | cost control |
-| ~~U5~~ | Closed (technical): 26 verified feeds, quality policy applied; terms under U11 | - |
-| ~~U6~~ | Closed: pilot = `legal` | - |
-| U9 | Analytics/consent posture | cookie banner/privacy |
-| U10 | Traffic expectation | sizing |
-| U8 | Closed: email delivery via `pilo-mail` (Brevo gateway); integration deferred | - |
-| U18 | Lead pricing/partner model | CTA routing |
-
----
+| # | Unknown | Blocks | Owner |
+|---|---|---|---|
+| U1 | Brand name across surfaces (apex ratified as Herald Fox by D-018; channels unchanged) | consistency | owner |
+| U8 / U20 | Email delivery (`pilo-mail`) — holds the weekly brief card out of the lobby | brief offer, G1 | owner |
+| D-005 / U19 | Named reviewers — holds the reviewer signature line in the services copy | content-generation claim, G2 | owner |
+| U9 | Analytics/consent vendor | lobby funnel depth beyond first-party | owner |
+| U10 | Traffic baseline | lobby keep/kill thresholds | owner |
+| U32 | Who takes the service scope call, and what reply is committed to | services band | owner |
+| U33 | Service pricing shape (per desk, per issue, per audience) | pilot SKU | owner |
+| U34 | Whether `www` should serve the lobby or 301 to the apex | edge config | owner |
 
 ## Cross-framework action (@x-director)
 
@@ -296,6 +242,13 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Known residual risks
 
+| Risk | Why it matters | Mitigation |
+|------|----------------|------------|
+| TLS path never exercised here | no public DNS or root on this machine, so certbot and the nginx 443 blocks are unproven until O9 runs | `certs --check` verifies SAN coverage per host; `docs/domains.md` is the runbook |
+| nginx config validated syntactically only | `nginx -t` passes but no request has gone through the real edge | `start.sh hosts` runs the same contract over HTTP once the host proxy is live |
+| CI inventory gate unapproved | the step would run on the next PR before the owner signs off | listed as O10 |
+| Brand string split | apex says Herald Fox, channel footers still say System News | D-018 with a 2026-12-15 outcome date |
+
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
 - Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
 - The UI has ten channels/skins, a verified editorial-conversion v2 build, an **Approved** direction with all ten SPECs **approved**, a passed a11y milestone audit, shipped S0 primitives, and photographic bands on all ten channels. Storybook, the P1 primitives (`Skeleton`, `Toc`) and the vision tier remain open.
@@ -318,9 +271,9 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Set the trusted `GEO_COUNTRY_HEADER` value, confirm contact consent for marketing, then publish one legal or cybersecurity issue with a named reviewer. The 7-Day Desk Brief is the next product build.
-
----
+Open `.work/plans/NEXT.md`. The one thing that unblocks production is O9: run the
+three certificate phases on the host, then `./bin/start.sh --env prd hosts` and
+`certs --check` to prove the edge before any traffic is pointed at it.
 
 ## Cross-framework action (@x-director)
 

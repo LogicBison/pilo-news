@@ -8,6 +8,7 @@ import { StoryCard } from "@/components/StoryCard";
 import { getIndustry, getNews, getTopics } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { offersOf } from "@/lib/offers";
 import { pageMetadata } from "@/lib/seo";
 
@@ -29,12 +30,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: t(resolved, "topic.intro"),
     path: `/${industry}/topic/${slug}`,
     locale: resolved,
+    industry,
   });
 }
 
 export default async function TopicPage({ params }: Params) {
   const { locale, industry, slug } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const [channelResult, topicResult, newsResult] = await Promise.all([
     getIndustry(industry, resolved),
     getTopics(industry, resolved),
@@ -47,7 +50,7 @@ export default async function TopicPage({ params }: Params) {
   if (topicResult.ok && !topic) notFound();
   const articles = newsResult.ok ? newsResult.data : [];
   const label = topic?.label ?? slug;
-  const sourcePage = localePath(resolved, `/${industry}/topic/${slug}`);
+  const sourcePage = localePath(resolved, `${base}/topic/${slug}`);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Industry } from "@/lib/api";
 import { localePath, t, type Locale } from "@/lib/i18n";
 import type { Skin } from "@/lib/skins";
+import { channelBase } from "@/lib/url";
 
 /**
  * Per-channel imagery. Photography is the primary surface (realistic colour,
@@ -14,7 +15,7 @@ import type { Skin } from "@/lib/skins";
  *  - `strip` article page: short crop with a quiet link back to the channel.
  * The photo is decorative — the caption carries the meaning.
  */
-export function SkinScene({
+export async function SkinScene({
   skin,
   channel,
   locale,
@@ -25,7 +26,8 @@ export function SkinScene({
   locale: Locale;
   variant?: "band" | "strip";
 }) {
-  const home = localePath(locale, `/${channel.slug}`);
+  const base = await channelBase(channel.slug);
+  const home = localePath(locale, base || "/");
   const compact = variant === "strip";
   const illustration = skin.photo.endsWith(".svg");
 

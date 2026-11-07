@@ -33,6 +33,12 @@ RESERVED_SLUGS = frozenset(
         "sitemap.xml",
         "robots.txt",
         "_next",
+        # Apex routes: a channel slug must never shadow the lobby, the services
+        # page or the network's legal pages (ADR 015 / lobby plan §7 R3).
+        "services",
+        "pricing",
+        "privacy",
+        "terms",
     }
 )
 

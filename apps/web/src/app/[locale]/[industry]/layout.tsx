@@ -7,6 +7,7 @@ import { DegradedNotice } from "@/components/Notices";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { isLocale, localePath, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { resolveSkin } from "@/lib/skins";
 import { themeStyle } from "@/lib/theme";
 
@@ -21,6 +22,9 @@ export default async function IndustryLayout({
   if (!isLocale(locale)) notFound();
   const result = await getIndustry(industry, locale);
   if (!result.ok && result.status === 404) notFound();
+  const base = await channelBase(industry);
+  const home = localePath(locale, base || "/");
+  const feedHref = home === "/" ? "/feed.xml" : `${home}/feed.xml`;
   const channel = result.ok ? result.data : fallbackIndustry(industry);
   const degraded = !result.ok;
   const skin = resolveSkin(channel.slug, channel.theme.layout);
@@ -44,7 +48,7 @@ export default async function IndustryLayout({
         rel="alternate"
         type="application/rss+xml"
         title={`${channel.name} — System News`}
-        href={`${localePath(locale, `/${industry}`)}/feed.xml`}
+        href={feedHref}
       />
       <a
         href="#main"
@@ -56,7 +60,7 @@ export default async function IndustryLayout({
       <main id="main" className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {degraded ? (
           <div className="mb-6">
-            <DegradedNotice locale={locale} retryHref={localePath(locale, `/${industry}`)} />
+            <DegradedNotice locale={locale} retryHref={home} />
           </div>
         ) : null}
         {children}

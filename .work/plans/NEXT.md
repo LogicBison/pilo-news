@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-06 (offer generation, public reference pages, lead/contact attribution; 143 API tests)
+**Updated:** 2026-11-07 (production edge, apex lobby, lobby review, operational gates; 152 API tests)
 
 ---
 
@@ -21,6 +21,15 @@
 | Any-industry template | `POST /v1/admin/industries`, admin Channels tab, `docs/adding-an-industry.md`, verification doc |
 | prd images | API + web production images build; API migrations/config verified |
 | Volume backups | `./bin/start.sh backup/restore` - `.tar.gz` volume snapshots, no `pg_dump`; drill pass |
+| Channel subdomains (ADR 015) | one host per desk, `start.sh hosts` 14/14, per-host canonical/sitemap/robots/RSS |
+| Host nginx edge | `ops/nginx/site.conf.template`, `start.sh domains [--write|--http-only]`, `certs [--check|--run]`, `docs/domains.md` |
+| Dev→prd bundle | `start.sh backup` (pg_dump + config + env + media + nginx + manifest) / `restore [--all]`; `docs/guides/migrate-dev-to-prod.md` |
+| Preflight | `start.sh preflight`: secrets, https base URL, cert, ports, DNS |
+| Apex lobby (ADR 016) | `/`, `/services`, `/privacy`, `/terms`, `GET /v1/desks`, migration 016, `e2e/lobby.spec.ts` |
+| Lobby copy | 140 `lobby.*` keys EN/ES, parity-gated; deck `.work.biz/strategy/20261107-lobby-copy.md` |
+| Lobby review | four defects from owner screenshots fixed; contact form added (D-020); "no ads" claims replaced (D-021) |
+| Channel inventory gate | environment-free block, live/profile fallback, CI check |
+| Log noise | outcome-based request logging, probes silent, uvicorn `--no-access-log`, dev rotation |
 | Isolation | random host ports, `*-net` + internal `*-data` networks, DB/Redis not published |
 | Verification | 77 API tests, ruff/mypy, web lint/type/build, 9/9 Playwright e2e + axe, OpenAPI snapshot |
 | Session close 2026-11-05 | HANDOFF/NEXT current; commit + push |
@@ -45,7 +54,13 @@
 | UI v2 verification | production build; 57 e2e passed / 1 skipped; 80 pages 200 + zero overflow; layout 40/40; `pnpm lint/typecheck/check` green; token-lint 0 raw |
 | UI direction + bind | `editorial-conversion` Approved 2026-11-05; composition tokens in `tokens.json` (84, schema-valid); 10 SPECs §13/§11 bound; `SCREEN_REFERENCE_MAP.md`; reference audit PASS |
 | Three additional channels | `manufacturing`, `energy`, `retail` profiles applied to dev; Forge/Grid/Market skins; original SVG bands; 45/45 sources pass |
-| Channel inventory | `docs/channel-inventory.md` generated from `/v1/industries`; `apps/web/scripts/channel-inventory.mjs` + `bin/channels.sh`; checked by `./bin/start.sh test` |
+| Promotion copy (D-021) | The absolute "no ads" promise is gone from four surfaces (`lobby.faq.a7`, `proof.independentValue`, `brief.value2`, `asset.note`); replaced with the house-first, one-slot, labelled ceiling |
+| Lobby contact form (D-020) | Same form and endpoint as every channel contact page, no industry attached; section 07, linked from masthead, spine and footer; e2e covers the submit |
+| Log noise control | Request logging is by outcome: 5xx error, 4xx warning, slow info, success debug; probes (`/v1/health`, `/metrics`) silent unless they fail; uvicorn `--no-access-log`; dev containers get 10m x 3 rotation. Idle stack: 0 lines per 30 s, down from ~137 lines/min |
+| Apex lobby review round 2 | Colour audit over every text node on six apex pages: 0 failures below 4.5:1 (dev + prod image). Fixed the "0 desks" copy when the API fails; disabled channels verified absent from `/v1/desks`, the lobby and the sitemap, with a contract test |
+| Apex lobby review round | Fixed: anchor-colour specificity (CTA/skip invisible), page-relative section links on `/services` and legal pages, literal `{desks}`, form-field contrast; regression tests in `e2e/lobby.spec.ts` |
+| Apex lobby (ADR 016) | `GET /v1/desks`, migration 016 (`surface`, `desk_enter`), apex `/` + `/services` + `/privacy` + `/terms`, `components/lobby/*` with the measured palette, 140 `lobby.*` keys in EN/ES, service inquiry via `/v1/contact`, `e2e/lobby.spec.ts` + 6 apex URLs in the axe sweep |
+| Channel inventory | `docs/channel-inventory.md`: subdomain addresses, environment-free so it checks anywhere; generated from `/v1/industries` with a deployment-profile fallback; gated by `./bin/start.sh migrate` (warn), `./bin/start.sh test` (fail) and CI (fail, no server needed) |
 | Channel SPECs | 10 × `.work.ui/screens/channel-home-<slug>/` (all `Review`) |
 | SPEC approval | Ten channel-home SPECs operator-approved 2026-11-05 (`Status: Approved`); unblocks component build |
 | A11y milestone audit | `@ui-accessibility-audit milestone`: **pass** - 30 URLs, 0 critical/serious, 2 moderate best-practice findings, no waivers; report in `.work.ui/reports/20261105-accessibility-audit-milestone.md` |
@@ -72,6 +87,26 @@
 | Free-offer controls (M12) | `industries.offers` for consultation/brief/question/asset; legacy-compatible defaults; brief/asset exclusivity enforced; public payload carries effective offers |
 | Offer rendering (M12) | every public page renders only active offers; CTA links no longer point at hidden sections |
 | M12 docs + tests | SPEC `.work/features/channel-automation/20261106-SPEC.md`, OpenAPI snapshot, API 124 tests, 87 Playwright green, admin save verified end to end |
+| Channel subdomains (prod) | ADR 015 · `apps/web/src/lib/hosts.ts` + `url.ts` + `middleware.ts` · one host per channel, clean links, per-host canonical/sitemap/robots/RSS, apex compat URLs |
+| Subdomains in dev | `SN_CHANNEL_DOMAIN=localhost` in `.env.dev`; `./bin/start.sh dev hosts` asserts 11 routing invariants over HTTP |
+| nginx edge (prod) | `ops/nginx/site.conf.template` + generated `ops/nginx/sites/`; compose publishes loopback ports only; `domains --write`, `certs` |
+| Dev->prd migration bundle | `./bin/start.sh backup` (pg_dump + config + env + media + nginx + manifest + checksums) and `restore` (`--all`); verified into a fresh postgres:16 and into the prd stack |
+| Production gates | `./bin/start.sh preflight` (secrets, https base URL, cert, ports, DNS), `hosts`; prd log rotation caps |
+| Playwright deps | `apps/web/Dockerfile.dev` runs `playwright install-deps chromium`, so a container recreate no longer breaks e2e |
+
+---
+
+## Recommended next
+
+| Priority | Item | Notes |
+|----------|------|-------|
+| **0** | Issue the production certificate and turn the edge on | `./bin/start.sh --env prd domains --write --http-only` → include `ops/nginx/sites` → reload → `certs --run` → `domains --write` → `certs --check` → `hosts`. Nothing is publicly reachable until this runs (O9) |
+| **1** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |
+| **2** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions |
+| **3** | Name the digest reviewer (D-005) | unblocks the content-generation signature line on `/services` (G2) |
+| **4** | Wire email delivery (D-002) | restores the weekly-brief card on the lobby (G1) |
+| **5** | Answer U32/U33 | who takes the scope call, and what a service is priced on |
+| **6** | Settle the brand string (D-018 outcome, 2026-12-15) | apex says Herald Fox; channel footers still say System News |
 
 ---
 
@@ -80,22 +115,15 @@
 | # | Item | Notes |
 |---|------|-------|
 | O5 | Answer U1-U12 | brand/domain, publisher portfolio, pilot, analytics, traffic |
+| O9 | Issue the production certificate | `docs/domains.md`, three phases; nothing is publicly reachable until it runs |
+| O10 | Approve the CI inventory gate | `.github/workflows/ci.yml` runs it on the next PR |
+| O11 | Delete the unused `Caddyfile` | ADR 015 replaced the edge |
+| U8 / D-002 | Email delivery (`pilo-mail`) | holds the lobby's brief card and every "weekly brief" promise |
+| D-005 / U19 | Named reviewers | holds the reviewer signature in the services copy |
+| U32 / U33 | Scope-call owner, pricing shape | gates the services band and the pilot SKU |
 
 ---
 
-## Recommended next
-
-| Priority | Item | Notes |
-|----------|------|-------|
-| **0** | Read the digital-technology window | closes **2026-11-27**; topic placements (`placement="topic"`) + channel inquiries against the rule in `.work.biz/plans/plan_digital-technology-channel.md` §11 (D-014 keep/kill) |
-| **1** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions per `plan_kev-digest.md` §11 |
-| **1b** | Name the digest reviewer (D-005) | the generator cannot publish an issue without a named signer |
-| **2** | Channel content refresh | coverage is real in both locales (lowest digital-technology ES 16); the stale "EN 10 / ES 1" notes are retired |
-| **3** | UI S4 SPECs + P1 primitives | `search`, `privacy`, `terms`; `Skeleton`, `Toc` |
-| **4** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
-| **5** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
-
----
 
 ## Completed iteration - M14: lead and contact attribution (2026-11-06)
 
@@ -373,7 +401,7 @@
 - [ ] `docker compose --env-file .env.dev -f docker-compose.dev.yml exec api bash -c "cd /app && python -m news_api.cli apply-profile --file config/deployments/cybersecurity.json --only-industry cybersecurity --dry-run"`
 - [ ] manual: the six topic URLs (3 topics × 2 locales) plus `/en/admin` funnel tab
 - [x] full Playwright on a production build → 59 passed, 1 skipped (probe confirmed `placement: "topic"` on impression + click)
-- [ ] playwright system libs: re-run `pnpm exec playwright install-deps chromium` after any container recreate — the Dockerfile.dev does not install them (found this session)
+- [x] playwright system libs: `apps/web/Dockerfile.dev` now runs `playwright install-deps chromium` (2026-11-07)
 
 ### Owner blockers
 - **U10 (traffic baseline):** without sessions, the rule falls back to CTA impressions as the denominator; mark the result `estimated`.

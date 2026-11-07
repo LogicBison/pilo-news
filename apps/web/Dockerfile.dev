@@ -7,6 +7,11 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --no-frozen-lockfile --config.strict-dep-builds=false
 
+# Playwright's browsers live in the `web_playwright_cache` volume, but their
+# shared libraries do not survive a container recreate. Install them here so
+# `pnpm test` works on a fresh container instead of failing at browser launch.
+RUN pnpm exec playwright install-deps chromium
+
 COPY . .
 
 EXPOSE 3000

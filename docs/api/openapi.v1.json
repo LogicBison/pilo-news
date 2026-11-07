@@ -171,16 +171,24 @@
               "lead_submit",
               "question_submit",
               "asset_interest",
-              "brief_confirm"
+              "brief_confirm",
+              "desk_enter"
             ],
             "title": "Event",
             "type": "string"
           },
           "industry": {
-            "maxLength": 40,
-            "minLength": 2,
-            "title": "Industry",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Industry"
           },
           "locale": {
             "default": "en",
@@ -217,10 +225,15 @@
               }
             ],
             "title": "Session Hash"
+          },
+          "surface": {
+            "default": "",
+            "maxLength": 40,
+            "title": "Surface",
+            "type": "string"
           }
         },
         "required": [
-          "industry",
           "event"
         ],
         "title": "CtaEventRequest",
@@ -3528,6 +3541,28 @@
         "summary": "Record Cta Event",
         "tags": [
           "leads"
+        ]
+      }
+    },
+    "/v1/desks": {
+      "get": {
+        "description": "One round trip for the apex lobby: every desk with its address, tagline,\nlive offers and the date of its newest published story.",
+        "operationId": "list_desks_v1_desks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response List Desks V1 Desks Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Desks",
+        "tags": [
+          "industries"
         ]
       }
     },

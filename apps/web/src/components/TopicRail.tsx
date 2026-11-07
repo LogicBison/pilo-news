@@ -1,9 +1,10 @@
 import type { Topic } from "@/lib/api";
 import { localePath } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 
 import { ChipLink } from "./ui/chip";
 
-export function TopicRail({
+export async function TopicRail({
   topics,
   industry,
   locale,
@@ -15,6 +16,7 @@ export function TopicRail({
   title: string;
 }) {
   if (topics.length === 0) return null;
+  const base = await channelBase(industry);
   return (
     <section aria-labelledby="topics-heading" className="sn-editorial-block">
       <h2 id="topics-heading" className="sn-eyebrow">
@@ -24,7 +26,7 @@ export function TopicRail({
         {topics.map((topic) => (
           <li key={topic.slug}>
             <ChipLink
-              href={localePath(locale as "en" | "es", `/${industry}/search?topic=${topic.slug}`)}
+              href={localePath(locale as "en" | "es", `${base}/search?topic=${topic.slug}`)}
               className="px-3 py-1.5"
             >
               {topic.label}

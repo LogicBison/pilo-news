@@ -32,4 +32,6 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/v1/health')"
 
-CMD ["uvicorn", "news_api.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]
+# --no-access-log: request logging is the middleware's job (failures, rejections,
+# slow calls), not a second line per request.
+CMD ["uvicorn", "news_api.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2", "--no-access-log"]

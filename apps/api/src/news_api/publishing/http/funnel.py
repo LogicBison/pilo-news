@@ -43,14 +43,16 @@ async def funnel(request: Request) -> Any:
         channel_filter = " AND i.slug = :industry"
         window["industry"] = industry
 
+    # LEFT JOIN: an apex-lobby event has no industry and is read by surface.
     events = await fetch_all(
         f"""
-        SELECT i.slug AS industry, e.event, e.placement, count(*)::int AS total
+        SELECT COALESCE(i.slug, '') AS industry, COALESCE(e.surface, '') AS surface,
+               e.event, e.placement, count(*)::int AS total
         FROM cta_events e
-        JOIN industries i ON i.id = e.industry_id
+        LEFT JOIN industries i ON i.id = e.industry_id
         WHERE e.created_at >= now() - make_interval(days => :days){channel_filter}
-        GROUP BY i.slug, e.event, e.placement
-        ORDER BY i.slug, e.event, e.placement
+        GROUP BY COALESCE(i.slug, ''), COALESCE(e.surface, ''), e.event, e.placement
+        ORDER BY COALESCE(i.slug, ''), COALESCE(e.surface, ''), e.event, e.placement
         """,
         window,
     )
@@ -68,7 +70,7 @@ async def funnel(request: Request) -> Any:
     totals = await fetch_one(
         f"""
         SELECT
-            (SELECT count(*)::int FROM cta_events e JOIN industries i ON i.id = e.industry_id
+            (SELECT count(*)::int FROM cta_events e LEFT JOIN industries i ON i.id = e.industry_id
              WHERE e.created_at >= now() - make_interval(days => :days){channel_filter}) AS events,
             (SELECT count(*)::int FROM leads l JOIN industries i ON i.id = l.industry_id
              WHERE l.created_at >= now() - make_interval(days => :days){channel_filter}) AS leads
@@ -78,14 +80,15 @@ async def funnel(request: Request) -> Any:
 
     channels: dict[str, dict[str, Any]] = {}
 
-    def bucket_for(slug: str) -> dict[str, Any]:
+    def bucket_for(slug: str, surface: str = "") -> dict[str, Any]:
+        key = f"{surface}|{slug}"
         return channels.setdefault(
-            slug,
-            {"industry": slug, "events": {}, "placements": {}, "leads": {}},
+            key,
+            {"industry": slug, "surface": surface, "events": {}, "placements": {}, "leads": {}},
         )
 
     for row in events:
-        bucket = bucket_for(row["industry"])
+        bucket = bucket_for(row["industry"], row["surface"])
         bucket["events"][row["event"]] = row["total"]
         bucket["placements"][row["placement"] or "-"] = (
             bucket["placements"].get(row["placement"] or "-", 0) + row["total"]
@@ -95,7 +98,7 @@ async def funnel(request: Request) -> Any:
         bucket["leads"][f"{row['kind']}:{row['status']}"] = row["total"]
 
     rows = []
-    for bucket in sorted(channels.values(), key=lambda item: item["industry"]):
+    for bucket in sorted(channels.values(), key=lambda item: (item["industry"], item["surface"])):
         impressions = bucket["events"].get("cta_impression", 0)
         clicks = bucket["events"].get("cta_click", 0)
         starts = bucket["events"].get("lead_form_start", 0)
@@ -105,6 +108,7 @@ async def funnel(request: Request) -> Any:
         rows.append(
             {
                 "industry": bucket["industry"],
+                "surface": bucket["surface"],
                 "events": bucket["events"],
                 "placements": bucket["placements"],
                 "leads_by_kind": bucket["leads"],

@@ -95,16 +95,18 @@ fetch and survive the retention window while pinned.
 
 ## 3b. Keep the channel inventory current
 
-The canonical list of live channels, slugs, EN/ES URLs, layout and the default
-channel is generated from the API:
+`docs/channel-inventory.md` lists every live channel with its subdomain address
+and layout. It is generated, and it is gated — it cannot go stale quietly:
 
 ```bash
-./bin/channels.sh --write    # regenerate docs/channel-inventory.md
+./bin/channels.sh --write    # regenerate (live API first, deployment profiles as fallback)
 ./bin/channels.sh --check    # fail when the file is stale
+./bin/channels.sh --urls     # concrete URLs for this machine, port included
 ```
 
-`./bin/start.sh test` runs the check after the web checks, so a channel change
-without a regenerated inventory fails the local gate. Commit the regenerated
+Three gates catch a stale file: `./bin/start.sh migrate` warns after the seeds
+land, `./bin/start.sh test` fails on the check, and CI fails on the check with no
+server and no env file (it reads the deployment profiles). Commit the regenerated
 file with the channel change.
 
 ## 4. Theme contract

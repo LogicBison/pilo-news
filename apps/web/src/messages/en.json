@@ -350,7 +350,7 @@
     "languagesValue": "English · Español",
     "updated": "Updated",
     "independentLabel": "Independent",
-    "independentValue": "No paywall · No ads",
+    "independentValue": "No paywall · No account",
     "sourceNote": "Facts from this channel's live bundle."
   },
   "trust": {
@@ -369,7 +369,7 @@
     "eyebrow": "The weekly brief",
     "received": "You are on the list",
     "value1": "One email a week, with the Monday refresh.",
-    "value2": "Stories only — no ads, no partner pitches.",
+    "value2": "Stories first — at most one labelled note, usually our own.",
     "body": "One email a week with the stories that moved this field, plus what to watch next.",
     "name": "First name",
     "email": "Email",
@@ -429,7 +429,7 @@
     "success": "You are on the list. We will send the next issue when delivery is live.",
     "error": "That did not save. Check the email address and try again.",
     "rateLimited": "Too many requests from this network. Try again later.",
-    "note": "Free. No ads, no partner pitches in the document.",
+    "note": "Free. No partner pitches in the document.",
     "latestIssue": "Latest issue: {date}",
     "readLatest": "Read the latest issue",
     "allIssues": "All issues"
@@ -473,5 +473,206 @@
     "empty": "No stories on this topic yet",
     "emptyBody": "The feed is monitored; this topic will fill as sources publish.",
     "listTitle": "Latest stories"
+  },
+  "lobby": {
+    "brand": {
+      "name": "Herald Fox",
+      "tagline": "Industry desks",
+      "deskCount": "{desks} desks"
+    },
+    "nav": {
+      "desks": "Desks",
+      "services": "Services",
+      "references": "Reference issues",
+      "contact": "Contact",
+      "cta": "Commission a desk"
+    },
+    "hero": {
+      "eyebrow": "{desks} desks · English and Spanish",
+      "title": "Know what changed in your field before it costs you.",
+      "lead": "Every desk reads the primary record — regulators, filings, standards bodies, recall notices, trial registries — and publishes only what a professional has to act on. Free to read. No account.",
+      "doorReader": "Follow a desk",
+      "doorBuyer": "Commission a desk",
+      "note": "No account. No paywall. RSS and JSON on every desk."
+    },
+    "board": {
+      "caption": "All {desks} desks, and how each one runs",
+      "summary": "Desk, update cadence, languages, and the date of the newest story.",
+      "headDesk": "Desk",
+      "headUpdates": "Updates",
+      "headLanguages": "Languages",
+      "headFiled": "Last filed",
+      "liveLabel": "updated on a schedule",
+      "empty": "The board is not loading right now. The desks below still work.",
+      "everyHours": "every {hours} h"
+    },
+    "dir": {
+      "eyebrow": "01 — The directory",
+      "title": "{desks} desks. Pick yours.",
+      "intro": "Every desk is written the same way: primary sources only, a daily or weekly pass, two languages where we have them. Each one carries the same free offers — a brief, a reference issue where we publish one, and a way to reach a specialist.",
+      "enter": "Enter the desk",
+      "offerBrief": "Brief",
+      "offerAsset": "Reference",
+      "offerQuestion": "Questions",
+      "offerConsultation": "Consultation",
+      "emptyTitle": "The directory is unavailable",
+      "emptyBody": "The news service is not answering. Try again in a moment.",
+      "retry": "Try again"
+    },
+    "offer": {
+      "eyebrow": "02 — What is free",
+      "title": "Three ways to use a desk. None of them cost money.",
+      "asset": {
+        "title": "Reference issues",
+        "body": "Dated documents built from the record — the KEV digest, the regulatory calendar. Each one lists its sources and the date it was filed.",
+        "cta": "Read the archive",
+        "ctaWaitlist": "Join the waitlist"
+      },
+      "question": {
+        "title": "Ask one question",
+        "body": "One question per desk, answered in writing. No call, no funnel.",
+        "cta": "Ask a desk"
+      },
+      "specialist": {
+        "title": "Talk to a specialist",
+        "body": "When the answer needs a person, we route your case to an independent, vetted specialist. No cost, no obligation, and nothing we publish is advice.",
+        "cta": "Talk to a specialist"
+      }
+    },
+    "how": {
+      "eyebrow": "03 — How a desk is built",
+      "title": "Three steps, and a person at the end of the second.",
+      "step1Title": "Sourced",
+      "step1Body": "Feeds from the bodies that matter in each field — regulators, filings, standards bodies — each one checked by a quality gate before it is allowed in.",
+      "step2Title": "Summarized",
+      "step2Body": "A model drafts the summary from the source text. A person signs the reference issues before they publish.",
+      "step3Title": "Routed",
+      "step3Body": "A reader who needs a person reaches an independent specialist. We do not charge the reader and we do not give advice."
+    },
+    "services": {
+      "eyebrow": "04 — For organizations",
+      "title": "When the desk has to carry your name.",
+      "intro": "The same pipeline that runs the {desks} desks can run one for you, or produce the document your team keeps rebuilding.",
+      "news": {
+        "title": "News service",
+        "body": "We run one or more desks for your association, firm, or portfolio.",
+        "point1": "Sourced from primary records, on a daily or weekly cadence.",
+        "point2": "Published under your brand, in English and Spanish.",
+        "point3": "Delivered as a page, an RSS feed, an email, or JSON.",
+        "point4": "Every item links to its source, so a reader can check it in one click.",
+        "for": "For associations, professional firms, funds, and agencies with an audience and no newsroom."
+      },
+      "content": {
+        "title": "Content generation",
+        "body": "We build and maintain the reference document your team keeps rebuilding by hand.",
+        "point1": "Regulatory calendars, rule-change logs, recall trackers, queue and trial digests.",
+        "point2": "Every row dated, cited, and traceable to a primary record.",
+        "signature": "Signed by the reviewer accountable for it.",
+        "point4": "Refreshed on the schedule the document needs.",
+        "for": "For teams that hand a client a document and get asked to prove it."
+      },
+      "cta": "Request a scope call",
+      "introFallback": "The same pipeline that runs the desks can run one for you, or produce the document your team keeps rebuilding."
+    },
+    "engage": {
+      "eyebrow": "05 — How an engagement runs",
+      "title": "Scope call, fixed pilot, then the cadence.",
+      "step1Title": "Scope call",
+      "step1Body": "Thirty minutes. Which desk, which audience, what has to be true for this to work. If we are the wrong fit, we say so on the call.",
+      "step2Title": "Fixed pilot",
+      "step2Body": "Four weeks, one desk, an agreed cadence, a fixed fee. You see the output before any retainer exists.",
+      "step3Title": "Review gate",
+      "step3Body": "Nothing publishes under your name until your reviewer or ours signs it.",
+      "step4Title": "Publish",
+      "step4Body": "Your domain or ours. Page, RSS, email, JSON — whatever your audience already reads."
+    },
+    "faq": {
+      "eyebrow": "06 — Questions",
+      "title": "The ones we get on the first call.",
+      "q1": "Who writes the desks?",
+      "a1": "A pipeline reads the primary sources and drafts. A person signs the reference issues. Every item links to the record it came from.",
+      "q2": "Is this AI-generated?",
+      "a2": "Summaries are drafted by a model from the source text and published with the source cited. Reference issues are reviewed and signed. We name the model and the reviewer on request.",
+      "q3": "Can I read only one industry?",
+      "a3": "Yes. Each desk has its own site and feed, and publishes a brief where we have one. None of them require an account.",
+      "q4": "Do you publish in Spanish?",
+      "a4": "Yes, where the desk has Spanish coverage. Depth varies by desk, and the Spanish side of a new desk is thinner for the first weeks.",
+      "q5": "Do you give advice?",
+      "a5": "No. We publish news and route you to independent specialists. Nothing on this site is legal, financial, or medical advice.",
+      "q6": "Can you run a desk under our brand?",
+      "a6": "That is the news service. It starts with a scope call and a four-week pilot.",
+      "q7": "What does it cost to read?",
+      "a7": "Nothing. No account, no paywall. A feed may carry a small, labelled promotion, usually for one of our own desks or services.",
+      "q8": "Can we take the data?",
+      "a8": "Every desk publishes RSS 2.0 and a documented JSON API. For commercial use, talk to us."
+    },
+    "final": {
+      "title": "Two ways in.",
+      "readerTitle": "I read the news",
+      "readerBody": "{desks} fields, free to read, in two languages.",
+      "readerCta": "Follow a desk",
+      "buyerTitle": "I need the news made",
+      "buyerBody": "A news service or a commissioned document. One call to scope it.",
+      "buyerCta": "Request a scope call"
+    },
+    "footer": {
+      "blurb": "{brand} runs {desks} industry desks from primary sources, in English and Spanish.",
+      "desksTitle": "Desks",
+      "companyTitle": "Company",
+      "followTitle": "Follow",
+      "legal": "News, not professional advice. Headlines link to the original publisher.",
+      "blurbFallback": "Herald Fox runs industry desks from primary sources, in English and Spanish."
+    },
+    "form": {
+      "title": "Request a scope call",
+      "intro": "Tell us the audience and what has to be true. We reply to the ones we can help with.",
+      "name": "Name",
+      "email": "Work email",
+      "phone": "Phone (optional)",
+      "message": "What do you need?",
+      "messageHint": "Which service, which industry, how often.",
+      "consent": "I agree to be contacted about this request and have read the privacy policy.",
+      "consentLink": "Privacy policy",
+      "submit": "Send request",
+      "sending": "Sending…",
+      "success": "Received. We read every message and reply to the ones we can help with.",
+      "error": "That did not send. Check the email address and try again.",
+      "limited": "Too many messages from this connection. Try again in an hour."
+    },
+    "spine": {
+      "directory": "Directory",
+      "offers": "Offers",
+      "method": "Method",
+      "services": "Services",
+      "process": "Process",
+      "questions": "Questions"
+    },
+    "a11y": {
+      "skipLink": "Skip to the desks",
+      "languageSwitch": "Switch language",
+      "plate": "{name} — {tagline} Enter the desk.",
+      "boardCaption": "All {desks} desks with update cadence, languages, and the date of the newest story."
+    },
+    "meta": {
+      "title": "Herald Fox — eleven industry desks for professionals",
+      "description": "Eleven industry desks read the primary record and publish what professionals actually have to act on. English and Spanish, free to read."
+    },
+    "servicesMeta": {
+      "title": "News services and content generation",
+      "description": "We run industry desks under your brand and build the reference documents your team keeps rebuilding. Scope call, four-week pilot, published when reviewed."
+    },
+    "legal": {
+      "updated": "Last updated 7 November 2026",
+      "privacyTitle": "Privacy",
+      "privacyBody": "Herald Fox stores only what it needs to run the desks and answer a service inquiry: feed metadata, headlines and links, aggregated usage counts, and the messages you choose to send. We do not sell personal data. We store a hashed network identifier, a hashed device identifier, campaign parameters, and a coarse country code when the network edge provides one, to prevent abuse and measure aggregate interest; we do not store raw IP addresses. An inquiry is read by us, and is not sold or shared with a partner unless you ask for an introduction.",
+      "termsTitle": "Terms",
+      "termsBody": "Herald Fox publishes headlines, excerpts, and original summaries with attribution and links to the publisher. Content remains the property of its publisher. Nothing on this site is legal, financial, medical, or professional advice. A service engagement is governed by the scope you sign, not by this page. Automated access must respect the published rate limits."
+    },
+    "contact": {
+      "eyebrow": "07 — Contact",
+      "title": "Write to us.",
+      "intro": "One message, read by a person. Say which desk, a service, or something else entirely. For a service inquiry the form on the services page asks the better questions.",
+      "submit": "Send message"
+    }
   }
 }

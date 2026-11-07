@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/Notices";
 import { getIndustry, getReferences } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { formatDay, localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ locale: string; industry: string }> };
@@ -20,12 +21,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: t(resolved, "reference.intro", { industry: name }),
     path: `/${industry}/references`,
     locale: resolved,
+    industry,
   });
 }
 
 export default async function ReferencesPage({ params }: Params) {
   const { locale, industry } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const [industryResult, references] = await Promise.all([
     getIndustry(industry, resolved),
     getReferences(industry, resolved),
@@ -36,7 +39,7 @@ export default async function ReferencesPage({ params }: Params) {
   return (
     <div className="mx-auto max-w-3xl">
       <Link
-        href={localePath(resolved, `/${industry}`)}
+        href={localePath(resolved, `${base}`)}
         className="text-sm font-semibold text-[var(--sn-muted)] hover:text-[var(--sn-accent)]"
       >
         ← {t(resolved, "reference.backToChannel", { industry: channel.name })}
@@ -69,7 +72,7 @@ export default async function ReferencesPage({ params }: Params) {
           {references.data.map((issue) => (
             <li key={issue.issue_date} className="border-b border-[var(--sn-border)] py-4">
               <Link
-                href={localePath(resolved, `/${industry}/references/${issue.issue_date}`)}
+                href={localePath(resolved, `${base}/references/${issue.issue_date}`)}
                 className="group flex flex-wrap items-baseline gap-3"
               >
                 <span className="text-sm font-semibold tabular-nums text-[var(--sn-text)]">

@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/Notices";
 import { getIndustry } from "@/lib/api";
 import { fallbackIndustry } from "@/lib/fallback";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { offersOf } from "@/lib/offers";
 import { pageMetadata } from "@/lib/seo";
 
@@ -21,16 +22,18 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: t(resolved, "briefs.intro"),
     path: `/${industry}/briefs`,
     locale: resolved,
+    industry,
   });
 }
 
 export default async function BriefsPage({ params }: Params) {
   const { locale, industry } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const result = await getIndustry(industry, resolved);
   if (!result.ok && result.status === 404) notFound();
   const channel = result.ok ? result.data : fallbackIndustry(industry);
-  const sourcePage = localePath(resolved, `/${industry}/briefs`);
+  const sourcePage = localePath(resolved, `${base}/briefs`);
   const offers = offersOf(channel);
 
   return (

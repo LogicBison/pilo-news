@@ -2,6 +2,13 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const pages = [
+  // The apex site (lobby + services + network legal pages).
+  "/",
+  "/es",
+  "/services",
+  "/es/services",
+  "/privacy",
+  "/terms",
   "/legal",
   "/legal/contact",
   "/es/legal/contact",

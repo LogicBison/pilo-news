@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { ArticleCard } from "@/lib/api";
 import { formatDate, localePath, t, type Locale } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 
 interface StoryCardProps {
   article: ArticleCard;
@@ -10,8 +11,9 @@ interface StoryCardProps {
   featured?: boolean;
 }
 
-export function StoryCard({ article, industry, locale, featured = false }: StoryCardProps) {
-  const href = localePath(locale, `/${industry}/article/${article.id}`);
+export async function StoryCard({ article, industry, locale, featured = false }: StoryCardProps) {
+  const base = await channelBase(industry);
+  const href = localePath(locale, `${base}/article/${article.id}`);
   const body = article.summary ?? article.excerpt;
   return (
     <article

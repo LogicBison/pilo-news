@@ -1,6 +1,6 @@
 import { getIndustry, getNews } from "@/lib/api";
 import { localePath, resolveLocale } from "@/lib/i18n";
-import { SITE_URL } from "@/lib/seo";
+import { channelBase, requestSite } from "@/lib/url";
 
 const ITEM_LIMIT = 40;
 
@@ -36,13 +36,18 @@ export async function GET(
 
   const news = await getNews(industry, resolved, { limit: ITEM_LIMIT });
   const items = news.ok ? news.data : [];
-  const home = `${SITE_URL}${localePath(resolved, `/${industry}`)}`;
+  // Feed links stay on the host that served the feed, exactly like the page
+  // links: a channel subdomain emits `/article/{id}`, the apex emits
+  // `/<slug>/article/{id}`. Readers never leave the origin they subscribed to.
+  const site = await requestSite();
+  const homePath = localePath(resolved, (await channelBase(industry)) || "/");
+  const home = `${site.origin}${homePath === "/" ? "" : homePath}`;
   const feed = `${home}/feed.xml`;
   const description = channel.data.tagline || channel.data.name;
 
   const entries = items
     .map((article) => {
-      const link = `${SITE_URL}${localePath(resolved, `/${industry}/article/${article.id}`)}`;
+      const link = `${home}/article/${article.id}`;
       const body = article.summary ?? article.excerpt ?? article.title;
       const categories = article.topics
         .slice(0, 4)

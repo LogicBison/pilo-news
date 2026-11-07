@@ -17,6 +17,7 @@ import { TopicRail } from "@/components/TopicRail";
 import { getBundle, getIndustry, getReferences } from "@/lib/api";
 import { assetFor } from "@/lib/assets";
 import { localePath, resolveLocale, t } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 import { offersOf } from "@/lib/offers";
 import { resolveSkin } from "@/lib/skins";
 import { itemListJsonLd, pageMetadata } from "@/lib/seo";
@@ -35,12 +36,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       : t(resolved, "meta.defaultDescription"),
     path: `/${industry}`,
     locale: resolved,
+    industry,
   });
 }
 
 export default async function ChannelHome({ params }: Params) {
   const { locale, industry } = await params;
   const resolved = resolveLocale(locale);
+  const base = await channelBase(industry);
   const [result, references] = await Promise.all([
     getBundle(industry, resolved),
     getReferences(industry, resolved),
@@ -57,7 +60,7 @@ export default async function ChannelHome({ params }: Params) {
   }
   const bundle = result.data;
   const channel = bundle.industry;
-  const homePath = localePath(resolved, `/${industry}`);
+  const homePath = localePath(resolved, `${base}`);
   const offers = offersOf(channel);
   const asset = offers.asset && channel.cta.asset ? assetFor(channel.cta.asset) : undefined;
   const latestReference =
@@ -68,7 +71,7 @@ export default async function ChannelHome({ params }: Params) {
       <JsonLd json={itemListJsonLd(channel, bundle.items)} />
       {bundle.fallback && resolved === "es" ? (
         <div className="mb-6">
-          <FallbackNotice locale={resolved} href={`/${industry}`} />
+          <FallbackNotice locale={resolved} href={localePath(resolved, base || "/")} />
         </div>
       ) : null}
       {bundle.items.length === 0 ? (
@@ -113,12 +116,12 @@ export default async function ChannelHome({ params }: Params) {
           asset={asset.slug}
           title={t(resolved, asset.titleKey)}
           body={t(resolved, asset.bodyKey)}
-          sourcePage={localePath(resolved, `/${industry}`)}
+          sourcePage={localePath(resolved, `${base}`)}
           latestReference={
             latestReference
               ? {
-                  href: localePath(resolved, `/${industry}/references/${latestReference.issue_date}`),
-                  archiveHref: localePath(resolved, `/${industry}/references`),
+                  href: localePath(resolved, `${base}/references/${latestReference.issue_date}`),
+                  archiveHref: localePath(resolved, `${base}/references`),
                   issueDate: latestReference.issue_date,
                 }
               : undefined
@@ -142,6 +145,7 @@ export default async function ChannelHome({ params }: Params) {
           <div className="sn-convert-grid">
             <TrustBlock locale={resolved} />
             <LeadForm
+              base={base}
               industry={industry}
               industryName={channel.name}
               locale={resolved}
@@ -163,7 +167,7 @@ export default async function ChannelHome({ params }: Params) {
       ) : null}
       {offers.consultation ? <StickyCta industry={industry} locale={resolved} /> : null}
       <p className="mt-6 text-center text-xs text-[var(--sn-muted)]">
-        <Link href={localePath(resolved, `/${industry}/about`)} className="hover:underline">
+        <Link href={localePath(resolved, `${base}/about`)} className="hover:underline">
           {t(resolved, "nav.about")}
         </Link>
       </p>

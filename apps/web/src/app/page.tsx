@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
-// Runtime: SN_DEFAULT_INDUSTRY is read per request so switching the industry
-// needs only an env change + container restart, never a rebuild.
+import { LobbyPage, lobbyMetadata } from "@/components/lobby/LobbyPage";
+
+// The apex lobby is the network's front door: it lists every desk and sells the
+// two services. Request-scoped (the desk links depend on the host), so it is
+// rendered per request with the API response cached for five minutes.
 export const dynamic = "force-dynamic";
 
-export default function RootPage() {
-  redirect(`/${process.env.SN_DEFAULT_INDUSTRY ?? "legal"}`);
+export function generateMetadata(): Promise<Metadata> {
+  return lobbyMetadata("en");
 }
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-};
+export default function RootPage() {
+  return <LobbyPage locale="en" />;
+}

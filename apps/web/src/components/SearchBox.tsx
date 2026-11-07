@@ -1,6 +1,7 @@
 import { localePath, t, type Locale } from "@/lib/i18n";
+import { channelBase } from "@/lib/url";
 
-export function SearchBox({
+export async function SearchBox({
   industry,
   locale,
   initialQuery = "",
@@ -9,9 +10,10 @@ export function SearchBox({
   locale: Locale;
   initialQuery?: string;
 }) {
+  const base = await channelBase(industry);
   return (
     <form
-      action={localePath(locale, `/${industry}/search`)}
+      action={localePath(locale, `${base}/search`)}
       method="get"
       role="search"
       className="flex flex-col gap-3 sm:flex-row"

@@ -330,28 +330,36 @@ async def insert_contact(
 
 async def insert_cta_event(
     *,
-    industry_id: str,
+    industry_id: str | None,
     event: str,
     placement: str,
     locale: str,
     article_id: str | None,
     session_hash: str,
     result: str | None,
+    surface: str = "",
 ) -> None:
+    """Record one funnel event.
+
+    `industry_id` is null for an event on the apex lobby, which belongs to no
+    single desk; `surface` then says where it happened (`lobby`).
+    """
     async with session_scope() as session:
         await session.execute(
             text(
                 """
                 INSERT INTO cta_events (
-                    industry_id, event, placement, locale, article_id, session_hash, result
+                    industry_id, surface, event, placement, locale, article_id,
+                    session_hash, result
                 ) VALUES (
-                    CAST(:industry_id AS uuid), :event, :placement, :locale,
+                    CAST(:industry_id AS uuid), :surface, :event, :placement, :locale,
                     CAST(:article_id AS uuid), :session_hash, :result
                 )
                 """
             ),
             {
                 "industry_id": industry_id,
+                "surface": surface,
                 "event": event,
                 "placement": placement,
                 "locale": locale,

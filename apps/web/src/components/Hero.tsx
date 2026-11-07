@@ -3,11 +3,12 @@ import Link from "next/link";
 import type { BundleData } from "@/lib/api";
 import { formatDate, localePath, t, type Locale } from "@/lib/i18n";
 import { offersOf } from "@/lib/offers";
+import { channelBase } from "@/lib/url";
 
 import { CtaCard } from "./CtaCard";
 import { StoryCard } from "./StoryCard";
 
-export function Hero({
+export async function Hero({
   bundle,
   locale,
   industry,
@@ -16,6 +17,7 @@ export function Hero({
   locale: Locale;
   industry: BundleData["industry"];
 }) {
+  const base = await channelBase(industry.slug);
   const lead = bundle.featured.lead;
   const favorites = bundle.featured.favorites;
   if (!lead && bundle.items.length === 0) {
@@ -38,7 +40,7 @@ export function Hero({
           className="sn-display mt-4 font-extrabold text-[var(--sn-text)]"
         >
           <Link
-            href={localePath(locale, `/${industry.slug}/article/${lead.id}`)}
+            href={localePath(locale, `${base}/article/${lead.id}`)}
             className="transition-colors hover:text-[var(--sn-primary)]"
           >
             {lead.title}
@@ -61,7 +63,7 @@ export function Hero({
             {favorites.map((item) => (
               <li key={item.id}>
                 <Link
-                  href={localePath(locale, `/${industry.slug}/article/${item.id}`)}
+                  href={localePath(locale, `${base}/article/${item.id}`)}
                   className="block rounded-[calc(var(--sn-radius)+2px)] p-3 transition-colors hover:bg-[color-mix(in_srgb,var(--sn-primary)_7%,var(--sn-bg))]"
                 >
                   <p className="text-sm font-semibold leading-snug text-[var(--sn-text)]">

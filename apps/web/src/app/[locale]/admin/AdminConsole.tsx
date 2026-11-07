@@ -43,6 +43,8 @@ const TABS: readonly Tab[] = [
 
 interface FunnelChannel {
   industry: string;
+  /** Set for cross-desk events (the apex lobby); empty for channel events. */
+  surface?: string;
   events: Record<string, number>;
   placements: Record<string, number>;
   leads_by_kind: Record<string, number>;
@@ -2482,8 +2484,13 @@ export function AdminConsole({
                   <EmptyRow columns={7} locale={locale} />
                 ) : (
                   funnel.channels.map((row) => (
-                    <tr key={row.industry} className="border-b border-[var(--sn-border)]">
-                      <td className="p-2 font-medium">{row.industry}</td>
+                    <tr
+                      key={`${row.surface ?? ""}|${row.industry}`}
+                      className="border-b border-[var(--sn-border)]"
+                    >
+                      <td className="p-2 font-medium">
+                        {row.surface ? `${row.surface}:${row.industry || "all"}` : row.industry}
+                      </td>
                       <td className="p-2 text-right tabular-nums">{row.events.cta_impression ?? 0}</td>
                       <td className="p-2 text-right tabular-nums">{row.events.cta_click ?? 0}</td>
                       <td className="p-2 text-right tabular-nums">

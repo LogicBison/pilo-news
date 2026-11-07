@@ -47,3 +47,5 @@ apps/web/blob-report/
 .work.ui/tmp/
 **/.next
 **/.next-keep
+# Generated per-channel nginx sites (rendered by ./bin/start.sh domains --write)
+ops/nginx/sites/

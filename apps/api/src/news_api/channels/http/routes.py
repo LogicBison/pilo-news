@@ -15,6 +15,22 @@ from news_api.publishing.application.read_models import base_meta, envelope
 router = APIRouter(prefix="/v1", tags=["industries"])
 
 
+def desk_summary(channel: Channel, latest_published_at: str | None) -> dict[str, Any]:
+    """The lobby's shape of a channel: everything the directory and the board
+    need in one row, and nothing that belongs to a single locale only."""
+    return {
+        "slug": channel.slug,
+        "name": channel.name,
+        "tagline": channel.tagline,
+        "locales": channel.locales,
+        "accent": channel.theme.get("primary"),
+        "layout": channel.theme.get("layout"),
+        "offers": channel.effective_offers,
+        "fetch_interval_minutes": channel.fetch_interval_minutes,
+        "latest_published_at": latest_published_at,
+    }
+
+
 def channel_summary(channel: Channel) -> dict[str, Any]:
     return {
         "slug": channel.slug,
@@ -40,6 +56,23 @@ def channel_detail(channel: Channel, locale: str) -> dict[str, Any]:
         "offers": channel.effective_offers,
         "timezone": channel.timezone,
     }
+
+
+@router.get("/desks", dependencies=[Depends(public_access)])
+async def list_desks(request: Request) -> Any:
+    """One round trip for the apex lobby: every desk with its address, tagline,
+    live offers and the date of its newest published story."""
+    reject_unknown_query(request, {"locale"})
+    locale = normalize_locale(request.query_params.get("locale"))
+    channels = await repo.list_channels(locale, enabled_only=True)
+    latest = await repo.latest_published_by_industry()
+    body = envelope(
+        [desk_summary(channel, latest.get(channel.slug)) for channel in channels],
+        base_meta(
+            request_id=request_id_of(request), locale=locale, language=locale, fallback=False
+        ),
+    )
+    return render_json(request, body)
 
 
 @router.get("/industries", dependencies=[Depends(public_access)])

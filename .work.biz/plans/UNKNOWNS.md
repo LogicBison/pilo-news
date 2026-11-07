@@ -19,7 +19,9 @@
 | U29 | Is the next adapter EU, a US recall source, or energy queue data? | one adapter, one reviewer, one scope | owner | open |
 | U30 | Is the 7-day brief its own email, or the first section of the reference issue? | affects the offer and the one-secondary rule | owner | open |
 | U31 | Is AI web search allowed for discovery? | if no, only feeds and configured APIs | owner | open |
+| U32 | Who takes the scope call for a news-service or content-generation inquiry, and what reply is committed to? | without an owner the lobby's buyer CTA is a dead end; the copy deliberately promises no reply time | owner | open |
+| U33 | Are service prices per desk, per issue, or per audience size? | blocks the pilot SKU and any quote the owner gives on a call | owner | open |
 
 ## Next action
 
-Answer U19 and U20; they unblock issue 1 and the delivery promise.
+Answer U19 and U20; they unblock issue 1 and the delivery promise. For the lobby, U32 and U33 unblock the services band, and U19/U20 again gate two claims in the copy.

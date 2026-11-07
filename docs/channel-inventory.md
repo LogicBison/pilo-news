@@ -1,41 +1,52 @@
 # Channel inventory
 
-**What this is:** the canonical list of live channels, slugs, localized URLs, layout and the default channel.
-**Status:** Generated 2026-11-05 · **Needs:** re-generate after any channel change; a stale file fails the local test gate.
-**Source:** `GET /v1/industries` + `APP_BASE_URL` + `SN_DEFAULT_INDUSTRY`. The committed file reflects the local dev base; regenerate with the production base for a production inventory.
+**What this is:** the canonical list of live channels: name, slug, address, layout. The address of a channel is its own subdomain, never a path on the apex.
+**Status:** Generated 2026-11-07 from live API (`GET /v1/industries`) · **Needs:** nothing manual — `./bin/start.sh test` and CI fail when this file is stale.
+**Source:** the live API when it answers (it knows channels created from the admin console), the deployment profiles otherwise. The generated block is deliberately environment-free: no port, no scheme, no default channel. Those are deployment settings, and baking one machine into this file is what made the previous inventory impossible to check anywhere but the machine that wrote it.
 
 ## Inventory
 
 <!-- CHANNEL_INVENTORY_BEGIN -->
-**Base URL:** http://localhost:43991 · **Default channel:** `/stem-cell` (root `/` redirects) · **Admin:** http://localhost:43991/admin · **API health:** http://localhost:46105/v1/health
-**Channels:** 11
+**Channels:** 11 · **Channel host:** `{slug}.<channel-domain>` (`SN_CHANNEL_DOMAIN`: `localhost` in dev, `APP_DOMAIN` in prd)
 
-| # | Channel | Slug | English | Spanish | Layout | Default |
-|---|---|---|---|---|---|---|
-| 1 | Legal Services & Corporate Governance | `legal` | http://localhost:43991/legal | http://localhost:43991/es/legal | editorial |  |
-| 2 | Financial Services & Banking | `financial` | http://localhost:43991/financial | http://localhost:43991/es/financial | professional |  |
-| 3 | Psychiatry & Clinical Psychology | `behavioral-health` | http://localhost:43991/behavioral-health | http://localhost:43991/es/behavioral-health | editorial |  |
-| 4 | Education & Higher Academics | `education` | http://localhost:43991/education | http://localhost:43991/es/education | academic |  |
-| 5 | Logistics & Supply Chain | `logistics` | http://localhost:43991/logistics | http://localhost:43991/es/logistics | professional |  |
-| 6 | Cybersecurity & Threat Intelligence | `cybersecurity` | http://localhost:43991/cybersecurity | http://localhost:43991/es/cybersecurity | professional |  |
-| 7 | Stem Cell Treatments | `stem-cell` | http://localhost:43991/stem-cell | http://localhost:43991/es/stem-cell | academic | root |
-| 8 | Manufacturing & Industrial Operations | `manufacturing` | http://localhost:43991/manufacturing | http://localhost:43991/es/manufacturing | professional |  |
-| 9 | Energy & Utilities | `energy` | http://localhost:43991/energy | http://localhost:43991/es/energy | professional |  |
-| 10 | Retail & E-commerce | `retail` | http://localhost:43991/retail | http://localhost:43991/es/retail | editorial |  |
-| 11 | Digital Technology | `digital-technology` | http://localhost:43991/digital-technology | http://localhost:43991/es/digital-technology | professional |  |
+| # | Channel | Slug | English | Spanish | Layout |
+|---|---|---|---|---|---|
+| 1 | Legal Services & Corporate Governance | `legal` | `legal.<channel-domain>/` | `legal.<channel-domain>/es` | editorial |
+| 2 | Financial Services & Banking | `financial` | `financial.<channel-domain>/` | `financial.<channel-domain>/es` | professional |
+| 3 | Psychiatry & Clinical Psychology | `behavioral-health` | `behavioral-health.<channel-domain>/` | `behavioral-health.<channel-domain>/es` | editorial |
+| 4 | Education & Higher Academics | `education` | `education.<channel-domain>/` | `education.<channel-domain>/es` | academic |
+| 5 | Logistics & Supply Chain | `logistics` | `logistics.<channel-domain>/` | `logistics.<channel-domain>/es` | professional |
+| 6 | Cybersecurity & Threat Intelligence | `cybersecurity` | `cybersecurity.<channel-domain>/` | `cybersecurity.<channel-domain>/es` | professional |
+| 7 | Stem Cell Treatments | `stem-cell` | `stem-cell.<channel-domain>/` | `stem-cell.<channel-domain>/es` | academic |
+| 8 | Manufacturing & Industrial Operations | `manufacturing` | `manufacturing.<channel-domain>/` | `manufacturing.<channel-domain>/es` | professional |
+| 9 | Energy & Utilities | `energy` | `energy.<channel-domain>/` | `energy.<channel-domain>/es` | professional |
+| 10 | Retail & E-commerce | `retail` | `retail.<channel-domain>/` | `retail.<channel-domain>/es` | editorial |
+| 11 | Digital Technology | `digital-technology` | `digital-technology.<channel-domain>/` | `digital-technology.<channel-domain>/es` | professional |
 
-**Patterns:** `/{slug}/search` · `/{slug}/about` · `/{slug}/contact` · `/{slug}/article/{id}` · `/es/{slug}/...`
+**Path form:** `/{about|contact|search|briefs|references}` · `/topic/{slug}` · `/article/{id}` · `/feed.xml` · `/es/...` for Spanish
+**Compatibility:** `{apex}/{slug}/...` still renders and canonicalises to the channel host. `/admin` is apex-only.
+**Root `/`** is the lobby (`/services`, `/privacy`, `/terms` beside it); `SN_DEFAULT_INDUSTRY` now only drives the 404 home link.
+**Concrete URLs for this machine:** `./bin/channels.sh --urls`
 <!-- CHANNEL_INVENTORY_END -->
 
 ## How to keep it updated
 
-1. Add or remove a channel (profile import or admin console).
-2. Run `./bin/channels.sh --write` with the stack up.
-3. Run `./bin/channels.sh --check` (or `./bin/start.sh test`); it fails when this file is stale.
-4. Commit the regenerated file with the channel change.
+It cannot drift silently. Three gates, cheapest first:
 
-The generated block is the only machine-owned part — edit the prose outside the markers by hand.
+1. `./bin/start.sh migrate` warns when the file no longer matches the channels in the database.
+2. `./bin/start.sh test` runs `./bin/channels.sh --check` after the API and UI checks.
+3. CI runs the same check with no server and no env file — from the deployment profiles — so a profile edit without a regenerated inventory fails the build.
+
+Regenerate, then commit:
+
+```bash
+./bin/channels.sh --write    # live API first, profiles as fallback
+./bin/channels.sh --check    # must print ok
+./bin/channels.sh --urls     # concrete URLs for this machine, including the port
+```
+
+The generated block between the markers is machine-owned. Edit the prose outside them by hand.
 
 ## Next action
 
-`./bin/channels.sh --write` after any channel change.
+Nothing while the check is green. On a channel change: `./bin/channels.sh --write` and commit.

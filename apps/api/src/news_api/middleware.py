@@ -16,6 +16,10 @@ from news_api.platform.settings import get_settings
 log = get_logger(__name__)
 REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{8,64}$")
 
+# Probe endpoints are counted in Prometheus and would otherwise be the loudest
+# lines in the log: two healthchecks a minute per container, forever.
+QUIET_ROUTES = frozenset({"/v1/health", "/v1/health/ready", "/metrics", "/metrics/"})
+
 Handler = Callable[[Request], Awaitable[Response]]
 
 
@@ -66,13 +70,25 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             route=route_path, method=request.method, status_class=status_class
         ).inc()
         HTTP_DURATION.labels(route=route_path, method=request.method).observe(duration_ms / 1000)
-        log.info(
-            "request.end",
-            route=route_path,
-            method=request.method,
-            status=response.status_code,
-            duration_ms=duration_ms,
-            industry=request.path_params.get("industry"),
-            locale=request.query_params.get("locale"),
-        )
+
+        # Log the outcome, not the traffic. Volume lives in Prometheus; the log
+        # keeps failures, rejections and anything slow. A healthy probe stays
+        # silent; a probe that fails is a main event.
+        if route_path not in QUIET_ROUTES or response.status_code >= 500:
+            fields = {
+                "route": route_path,
+                "method": request.method,
+                "status": response.status_code,
+                "duration_ms": duration_ms,
+                "industry": request.path_params.get("industry"),
+                "locale": request.query_params.get("locale"),
+            }
+            if response.status_code >= 500:
+                log.error("request.failed", **fields)
+            elif response.status_code >= 400:
+                log.warning("request.rejected", **fields)
+            elif duration_ms >= get_settings().log_slow_request_ms:
+                log.info("request.slow", **fields)
+            else:
+                log.debug("request.end", **fields)
         return response

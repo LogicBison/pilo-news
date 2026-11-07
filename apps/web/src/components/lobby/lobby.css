@@ -1,0 +1,1213 @@
+/* Lobby surface — the apex site.
+   Deliberately not a channel skin: ink and paper, wayfinding signage, no
+   photography. Every colour here is measured for contrast in the plan
+   (§8.1 of .work.biz/plans/20261107-plan-heraldfox-lobby.md); the palette is
+   scoped to `.lb-root` so nothing leaks into the channel skins. */
+
+.lb-root {
+  --lb-paper: #f3eee4;
+  --lb-paper-inset: #e8e1d3;
+  --lb-paper-raised: #fbf8f2;
+  --lb-ink: #12161c;
+  --lb-ink-muted: #4a4438;
+  --lb-ink-inverse: #f3eee4;
+  --lb-ink-inverse-muted: #b7ae9e;
+  --lb-signal: #b33a22;
+  --lb-brass: #c9a227;
+  --lb-live: #256b4f;
+  --lb-hairline: color-mix(in srgb, var(--lb-ink) 16%, transparent);
+  --lb-hairline-strong: color-mix(in srgb, var(--lb-ink) 30%, transparent);
+  --lb-hairline-inverse: color-mix(in srgb, var(--lb-ink-inverse) 22%, transparent);
+
+  /* System stack until a self-hosted display face is added; swapping this one
+     line is the whole font change. */
+  --lb-font-display: Georgia, "Times New Roman", serif;
+  --lb-font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --lb-max: 1240px;
+  --lb-rail: 88px;
+  --lb-radius: 3px;
+
+  min-height: 100vh;
+  background: var(--lb-paper);
+  color: var(--lb-ink);
+  font-family: var(--lb-font-body);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.lb-root *,
+.lb-root *::before,
+.lb-root *::after {
+  box-sizing: border-box;
+}
+
+.lb-root :focus-visible {
+  outline: 2px solid var(--lb-signal);
+  outline-offset: 2px;
+}
+
+/* `:where()` keeps this at zero specificity: a bare `.lb-root a` rule beat
+   `.lb-btn` and `.lb-skip` (same specificity, later in the file) and painted
+   their text the same colour as their background. */
+:where(.lb-root) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lb-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 40;
+  background: var(--lb-ink);
+  color: var(--lb-ink-inverse);
+  padding: 12px 18px;
+  border-radius: var(--lb-radius);
+}
+
+.lb-skip:focus {
+  left: 16px;
+  top: 16px;
+}
+
+/* --- masthead ------------------------------------------------------------- */
+
+.lb-mast {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--lb-paper) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--lb-hairline);
+}
+
+.lb-mast-inner {
+  max-width: var(--lb-max);
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.lb-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--lb-font-display);
+  font-size: 21px;
+  letter-spacing: -0.01em;
+}
+
+.lb-brand-mark {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: var(--lb-signal);
+  margin-right: 2px;
+}
+
+.lb-brand-small {
+  font-family: var(--lb-font-body);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lb-ink-muted);
+}
+
+.lb-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 14px;
+}
+
+.lb-nav a {
+  padding: 6px 0;
+  border-bottom: 1px solid transparent;
+}
+
+.lb-nav a:hover {
+  border-bottom-color: var(--lb-hairline-strong);
+}
+
+.lb-lang {
+  display: inline-flex;
+  border: 1px solid var(--lb-hairline-strong);
+  border-radius: var(--lb-radius);
+  overflow: hidden;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lb-lang a {
+  padding: 6px 10px;
+}
+
+.lb-lang a[aria-current="true"] {
+  background: var(--lb-ink);
+  color: var(--lb-ink-inverse);
+}
+
+/* --- shell + wayfinding spine -------------------------------------------- */
+
+.lb-shell {
+  max-width: var(--lb-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: var(--lb-rail) minmax(0, 1fr);
+  gap: 0;
+}
+
+.lb-main {
+  min-width: 0;
+  padding: 0 24px 96px;
+}
+
+.lb-rail {
+  position: sticky;
+  top: 64px;
+  align-self: start;
+  height: calc(100vh - 64px);
+  padding: 40px 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lb-ink-muted);
+}
+
+.lb-rail-line {
+  position: absolute;
+  left: 12px;
+  top: 40px;
+  bottom: 40px;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--lb-brass) 0,
+    var(--lb-brass) 40%,
+    var(--lb-hairline) 40%
+  );
+}
+
+.lb-rail a {
+  position: relative;
+  padding-left: 4px;
+}
+
+.lb-rail a[aria-current="true"] {
+  color: var(--lb-signal);
+}
+
+.lb-rail a[aria-current="true"]::before {
+  content: "";
+  position: absolute;
+  left: -13px;
+  top: 50%;
+  width: 6px;
+  height: 2px;
+  background: var(--lb-signal);
+  transform: translateY(-50%);
+}
+
+/* Mobile: the rail becomes a horizontal strip under the masthead. */
+@media (max-width: 1099px) {
+  .lb-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lb-rail {
+    position: sticky;
+    top: 55px;
+    z-index: 20;
+    height: auto;
+    flex-direction: row;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 10px 24px;
+    background: color-mix(in srgb, var(--lb-paper) 96%, transparent);
+    border-bottom: 1px solid var(--lb-hairline);
+    scrollbar-width: none;
+  }
+
+  .lb-rail-line {
+    display: none;
+  }
+
+  .lb-main {
+    padding: 0 20px 72px;
+  }
+}
+
+/* --- sections ------------------------------------------------------------- */
+
+.lb-section {
+  padding: 72px 0 0;
+  scroll-margin-top: 96px;
+}
+
+.lb-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.lb-numeral {
+  font-family: var(--lb-font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--lb-signal);
+  padding-top: 6px;
+}
+
+.lb-rule {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--lb-hairline-strong) 0,
+    var(--lb-hairline-strong) 12px,
+    transparent 12px,
+    transparent 24px
+  );
+}
+
+.lb-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lb-ink-muted);
+}
+
+.lb-h1 {
+  font-family: var(--lb-font-display);
+  font-size: clamp(38px, 5.4vw, 68px);
+  line-height: 1.03;
+  letter-spacing: -0.022em;
+  font-weight: 600;
+  margin: 18px 0 0;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+
+.lb-h2 {
+  font-family: var(--lb-font-display);
+  font-size: clamp(27px, 3vw, 38px);
+  line-height: 1.12;
+  letter-spacing: -0.014em;
+  font-weight: 600;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lb-h3 {
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.006em;
+  margin: 0;
+}
+
+.lb-lead {
+  font-size: 18px;
+  line-height: 1.62;
+  color: var(--lb-ink-muted);
+  max-width: 58ch;
+  margin: 20px 0 0;
+}
+
+.lb-body {
+  color: var(--lb-ink-muted);
+  margin: 10px 0 0;
+  max-width: 62ch;
+}
+
+/* --- hero ----------------------------------------------------------------- */
+
+.lb-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 56px;
+  padding-top: 64px;
+  align-items: start;
+}
+
+@media (max-width: 899px) {
+  .lb-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    padding-top: 40px;
+  }
+}
+
+.lb-doors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.lb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 22px;
+  border-radius: var(--lb-radius);
+  border: 1px solid var(--lb-ink);
+  background: var(--lb-ink);
+  color: var(--lb-ink-inverse);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  transition:
+    transform 150ms ease-out,
+    background-color 150ms ease-out;
+}
+
+.lb-btn:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--lb-ink) 88%, var(--lb-signal));
+}
+
+.lb-btn-ghost {
+  background: transparent;
+  color: var(--lb-ink);
+  border-color: var(--lb-hairline-strong);
+}
+
+.lb-btn-ghost:hover {
+  background: var(--lb-paper-raised);
+  border-color: var(--lb-ink);
+}
+
+.lb-btn-signal {
+  background: var(--lb-signal);
+  border-color: var(--lb-signal);
+  color: var(--lb-ink-inverse);
+}
+
+.lb-btn-signal:hover {
+  background: color-mix(in srgb, var(--lb-signal) 86%, var(--lb-ink));
+}
+
+.lb-note {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--lb-ink-muted);
+}
+
+/* --- live board ----------------------------------------------------------- */
+
+.lb-board {
+  border: 1px solid var(--lb-hairline-strong);
+  border-radius: var(--lb-radius);
+  background: var(--lb-paper-raised);
+  overflow: hidden;
+}
+
+.lb-board-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--lb-hairline);
+  background: var(--lb-paper-inset);
+}
+
+.lb-board-title {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lb-ink);
+}
+
+.lb-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lb-live);
+}
+
+.lb-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lb-live);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lb-live) 18%, transparent);
+}
+
+.lb-board table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.lb-board caption {
+  caption-side: top;
+  text-align: left;
+  padding: 12px 16px 0;
+  font-size: 12px;
+  color: var(--lb-ink-muted);
+}
+
+.lb-board th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lb-ink-muted);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--lb-hairline);
+}
+
+.lb-board td {
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--lb-hairline);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Only the desk name may wrap: names are long, the other three columns are
+   short facts and look broken when they break. */
+.lb-board td.lb-desk-name {
+  white-space: normal;
+}
+
+.lb-board th {
+  white-space: nowrap;
+}
+
+.lb-board tr:last-child td {
+  border-bottom: 0;
+}
+
+.lb-board .lb-desk-name {
+  font-weight: 600;
+  letter-spacing: -0.004em;
+}
+
+.lb-board a {
+  border-bottom: 1px solid transparent;
+}
+
+.lb-board a:hover {
+  border-bottom-color: var(--lb-signal);
+}
+
+.lb-board-foot {
+  padding: 12px 16px;
+  border-top: 1px solid var(--lb-hairline);
+  font-size: 12px;
+  color: var(--lb-ink-muted);
+  background: var(--lb-paper-inset);
+}
+
+/* --- directory ------------------------------------------------------------ */
+
+.lb-dir {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 1099px) {
+  .lb-dir {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .lb-dir {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lb-plate {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 148px;
+  padding: 18px 18px 14px 24px;
+  background: var(--lb-paper-raised);
+  border: 1px solid var(--lb-hairline);
+  border-radius: var(--lb-radius);
+  overflow: hidden;
+  transition:
+    transform 150ms ease-out,
+    border-color 150ms ease-out,
+    box-shadow 150ms ease-out;
+}
+
+.lb-plate::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--lb-plate-accent, var(--lb-ink));
+  transition: width 150ms ease-out;
+}
+
+.lb-plate:hover {
+  transform: translateY(-2px);
+  border-color: var(--lb-hairline-strong);
+  box-shadow: 0 10px 24px -18px color-mix(in srgb, var(--lb-ink) 70%, transparent);
+}
+
+.lb-plate:hover::before {
+  width: 10px;
+}
+
+.lb-plate-name {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  padding-right: 26px;
+}
+
+.lb-plate-tagline {
+  font-size: 14px;
+  color: var(--lb-ink-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lb-plate-chips {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.lb-chip {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border: 1px solid var(--lb-hairline);
+  border-radius: 2px;
+  color: var(--lb-ink-muted);
+  background: var(--lb-paper-inset);
+}
+
+.lb-chip-code {
+  font-variant-numeric: tabular-nums;
+  color: var(--lb-ink);
+}
+
+.lb-plate-arrow {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  font-size: 16px;
+  color: var(--lb-ink-muted);
+  transition:
+    transform 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.lb-plate:hover .lb-plate-arrow {
+  transform: translateX(4px);
+  color: var(--lb-signal);
+}
+
+/* --- offer cards ---------------------------------------------------------- */
+
+.lb-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 999px) {
+  .lb-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lb-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  background: var(--lb-paper-raised);
+  border: 1px solid var(--lb-hairline);
+  border-top: 3px solid var(--lb-ink);
+  border-radius: 0 0 var(--lb-radius) var(--lb-radius);
+}
+
+.lb-card p {
+  margin: 0;
+  color: var(--lb-ink-muted);
+  font-size: 15px;
+}
+
+.lb-card .lb-link {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.lb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lb-ink);
+  border-bottom: 1px solid var(--lb-signal);
+  padding-bottom: 2px;
+  width: fit-content;
+}
+
+.lb-link:hover {
+  color: var(--lb-signal);
+}
+
+/* --- method steps --------------------------------------------------------- */
+
+.lb-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  counter-reset: step;
+}
+
+@media (max-width: 899px) {
+  .lb-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+
+.lb-step {
+  counter-increment: step;
+  padding-top: 16px;
+  border-top: 1px solid var(--lb-hairline-strong);
+}
+
+.lb-step::before {
+  content: counter(step, decimal-leading-zero);
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--lb-brass);
+  margin-bottom: 8px;
+}
+
+/* --- services band (inverted) -------------------------------------------- */
+
+.lb-band {
+  margin-top: 72px;
+  background: var(--lb-ink);
+  color: var(--lb-ink-inverse);
+  border-radius: var(--lb-radius);
+  padding: 56px 44px;
+}
+
+@media (max-width: 760px) {
+  .lb-band {
+    padding: 36px 22px;
+  }
+}
+
+.lb-band .lb-lead,
+.lb-band .lb-body,
+.lb-band .lb-eyebrow {
+  color: var(--lb-ink-inverse-muted);
+}
+
+.lb-band .lb-numeral {
+  color: var(--lb-brass);
+}
+
+.lb-band .lb-rule {
+  background: repeating-linear-gradient(
+    to right,
+    var(--lb-brass) 0,
+    var(--lb-brass) 12px,
+    transparent 12px,
+    transparent 24px
+  );
+  opacity: 0.6;
+}
+
+.lb-service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 34px;
+}
+
+@media (max-width: 899px) {
+  .lb-service-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lb-service {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 26px;
+  border: 1px solid var(--lb-hairline-inverse);
+  border-radius: var(--lb-radius);
+  background: color-mix(in srgb, var(--lb-ink-inverse) 5%, transparent);
+}
+
+.lb-service-numeral {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--lb-brass);
+}
+
+.lb-service h3 {
+  font-family: var(--lb-font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.lb-service p {
+  margin: 0;
+  color: var(--lb-ink-inverse-muted);
+  font-size: 15px;
+}
+
+.lb-service ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: var(--lb-ink-inverse-muted);
+  font-size: 15px;
+  display: grid;
+  gap: 6px;
+}
+
+.lb-service li::marker {
+  color: var(--lb-brass);
+}
+
+.lb-service .lb-for {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--lb-hairline-inverse);
+  font-size: 13px;
+  color: var(--lb-ink-inverse-muted);
+}
+
+.lb-band .lb-btn {
+  background: var(--lb-ink-inverse);
+  color: var(--lb-ink);
+  border-color: var(--lb-ink-inverse);
+}
+
+.lb-band .lb-btn:hover {
+  background: var(--lb-brass);
+  border-color: var(--lb-brass);
+}
+
+.lb-band .lb-link {
+  color: var(--lb-ink-inverse);
+  border-bottom-color: var(--lb-brass);
+}
+
+/* --- engagement process --------------------------------------------------- */
+
+.lb-process {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 8px;
+}
+
+@media (max-width: 999px) {
+  .lb-process {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .lb-process {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- form ----------------------------------------------------------------- */
+/* The inquiry form sits on paper. A `.lb-band .lb-form` override keeps an
+   inverse placement working if the form ever moves into the dark band. */
+
+.lb-form-wrap {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 899px) {
+  .lb-form-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lb-form {
+  display: grid;
+  gap: 14px;
+  padding: 26px;
+  border: 1px solid var(--lb-hairline-strong);
+  border-radius: var(--lb-radius);
+  background: var(--lb-paper-raised);
+}
+
+.lb-field {
+  display: grid;
+  gap: 6px;
+}
+
+.lb-field label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lb-ink);
+  font-weight: 600;
+}
+
+.lb-field input,
+.lb-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border-radius: var(--lb-radius);
+  /* A field has to read as a field on a card that is almost the same colour:
+     brighter fill than the card, and an edge at ~45% ink rather than a hairline. */
+  border: 1px solid color-mix(in srgb, var(--lb-ink) 45%, transparent);
+  background: #fffdf8;
+  color: var(--lb-ink);
+  font: inherit;
+  font-size: 15px;
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--lb-ink) 6%, transparent);
+}
+
+.lb-field input:hover,
+.lb-field textarea:hover {
+  border-color: color-mix(in srgb, var(--lb-ink) 65%, transparent);
+}
+
+.lb-field input:focus-visible,
+.lb-field textarea:focus-visible {
+  border-color: var(--lb-signal);
+}
+
+.lb-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.lb-field-hint {
+  font-size: 12px;
+  color: var(--lb-ink-muted);
+}
+
+.lb-field-error {
+  font-size: 12px;
+  color: #8f2412;
+}
+
+.lb-check {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  font-size: 13px;
+  color: var(--lb-ink-muted);
+}
+
+.lb-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--lb-signal);
+}
+
+.lb-check a {
+  color: var(--lb-ink);
+  border-bottom: 1px solid var(--lb-signal);
+}
+
+.lb-status {
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: var(--lb-radius);
+  border: 1px solid var(--lb-hairline-strong);
+  color: var(--lb-ink);
+}
+
+.lb-status-ok {
+  border-color: var(--lb-live);
+  background: color-mix(in srgb, var(--lb-live) 8%, var(--lb-paper-raised));
+  color: #1d5a41;
+}
+
+.lb-status-error {
+  border-color: #8f2412;
+  background: color-mix(in srgb, #8f2412 6%, var(--lb-paper-raised));
+  color: #8f2412;
+}
+
+.lb-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Inverse placement, if the form is ever put inside the services band. */
+.lb-band .lb-form {
+  border-color: var(--lb-hairline-inverse);
+  background: color-mix(in srgb, var(--lb-ink-inverse) 4%, transparent);
+}
+
+.lb-band .lb-field label,
+.lb-band .lb-check,
+.lb-band .lb-field-hint {
+  color: var(--lb-ink-inverse-muted);
+}
+
+.lb-band .lb-field input,
+.lb-band .lb-field textarea {
+  border-color: var(--lb-hairline-inverse);
+  background: color-mix(in srgb, var(--lb-paper) 96%, transparent);
+}
+
+.lb-band .lb-check a {
+  color: var(--lb-ink-inverse);
+  border-bottom-color: var(--lb-brass);
+}
+
+/* --- faq ------------------------------------------------------------------ */
+
+.lb-faq {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 40px;
+}
+
+@media (max-width: 899px) {
+  .lb-faq {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lb-faq details {
+  border-bottom: 1px solid var(--lb-hairline);
+  padding: 14px 0;
+}
+
+.lb-faq summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.004em;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.lb-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.lb-faq summary::after {
+  content: "+";
+  color: var(--lb-signal);
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-faq details[open] summary::after {
+  content: "–";
+}
+
+.lb-faq p {
+  margin: 10px 0 0;
+  color: var(--lb-ink-muted);
+  font-size: 15px;
+}
+
+/* --- final doors ---------------------------------------------------------- */
+
+.lb-doors-final {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (max-width: 760px) {
+  .lb-doors-final {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lb-door {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 30px;
+  border-radius: var(--lb-radius);
+  border: 1px solid var(--lb-ink);
+  background: var(--lb-paper-raised);
+  min-height: 190px;
+  transition: transform 150ms ease-out;
+}
+
+.lb-door:hover {
+  transform: translateY(-2px);
+}
+
+.lb-door-inverse {
+  background: var(--lb-ink);
+  color: var(--lb-ink-inverse);
+  border-color: var(--lb-ink);
+}
+
+/* Two classes so this outranks the later `.lb-door p` rule: the inverse panel
+   sets muted-inverse, and a plain `.lb-door p` selector would win on order. */
+.lb-door.lb-door-inverse h3 {
+  color: var(--lb-ink-inverse);
+}
+
+.lb-door.lb-door-inverse p {
+  color: var(--lb-ink-inverse-muted);
+}
+
+.lb-door h3 {
+  font-family: var(--lb-font-display);
+  font-size: 30px;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.lb-door p {
+  margin: 0;
+  color: var(--lb-ink-muted);
+}
+
+.lb-door .lb-link {
+  margin-top: auto;
+}
+
+.lb-door-inverse .lb-link {
+  color: var(--lb-ink-inverse);
+  border-bottom-color: var(--lb-brass);
+}
+
+/* --- footer --------------------------------------------------------------- */
+
+.lb-foot {
+  margin-top: 96px;
+  border-top: 1px solid var(--lb-hairline-strong);
+  padding: 44px 0 64px;
+}
+
+.lb-foot-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+@media (max-width: 899px) {
+  .lb-foot-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.lb-foot h2 {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lb-ink-muted);
+  margin: 0 0 10px;
+}
+
+.lb-foot ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.lb-foot a:hover {
+  border-bottom: 1px solid var(--lb-signal);
+}
+
+.lb-foot-legal {
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--lb-hairline);
+  font-size: 13px;
+  color: var(--lb-ink-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  justify-content: space-between;
+}
+
+/* --- empty / error -------------------------------------------------------- */
+
+.lb-empty {
+  border: 1px dashed var(--lb-hairline-strong);
+  border-radius: var(--lb-radius);
+  padding: 36px;
+  text-align: center;
+  background: var(--lb-paper-raised);
+}
+
+.lb-empty p {
+  margin: 8px 0 0;
+  color: var(--lb-ink-muted);
+}
+
+/* --- motion --------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-root *,
+  .lb-root *::before,
+  .lb-root *::after {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* The board is tabular data; on a narrow screen it scrolls rather than wraps. */
+.lb-board-scroll {
+  overflow-x: auto;
+}
+
+.lb-board-scroll table {
+  min-width: 460px;
+}

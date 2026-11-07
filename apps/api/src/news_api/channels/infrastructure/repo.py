@@ -168,6 +168,32 @@ async def upsert_locales(slug: str, locales: dict[str, dict[str, str]]) -> None:
         )
 
 
+async def latest_published_by_industry() -> dict[str, str]:
+    """Newest published article per channel, ISO-8601, for the lobby board.
+
+    One indexed aggregate for the whole set: the lobby never fetches a channel's
+    articles just to print a date.
+    """
+    rows = await fetch_all(
+        """
+        SELECT i.slug AS slug, max(a.published_at) AS latest
+        FROM industries i
+        LEFT JOIN articles a
+               ON a.industry_id = i.id AND a.status = 'published'
+        GROUP BY i.slug
+        """
+    )
+    latest: dict[str, str] = {}
+    for row in rows:
+        value = row["latest"]
+        if value is None:
+            continue
+        latest[str(row["slug"])] = (
+            value.isoformat().replace("+00:00", "Z") if hasattr(value, "isoformat") else str(value)
+        )
+    return latest
+
+
 async def industry_settings(industry_id: str) -> dict[str, Any]:
     row = await fetch_one("SELECT * FROM industries WHERE id = :id", {"id": industry_id})
     if not row:
