@@ -410,3 +410,12 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Fix:** added a datacenter server-rack mark and a default diamond fallback so a future skin cannot leave the masthead blank. `apps/web/src/components/SkinEmblem.tsx`.
 **Coverage:** new `layout.spec.ts` test asserts a visible, at least 12px SVG emblem on all 11 channels. Result: **11/11 passed**.
 **Visual check:** header screenshot for `/digital-technology` shows the rack mark on the navy square.
+
+
+---
+
+## Contacts tab - 2026-11-06 (@x-director)
+
+**Scope:** `.work.ui/screens/admin-console/20261106-SCREEN-SPEC-amendment-03.md`.
+**Shipped:** Contacts tab after Leads: channel, name/email, country, source/UTM, status, date; expanded message, phone, campaign, session hash; two-step DSAR delete. No raw IP or UA shown.
+**Verification:** `pnpm typecheck`, `pnpm lint`, `pnpm check` (415 keys, 11/11 contrast), `pnpm build`; admin e2e 7/7.

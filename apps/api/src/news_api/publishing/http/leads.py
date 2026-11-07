@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, EmailStr, Field
 
 from news_api.channels.infrastructure import repo as channels_repo
-from news_api.dependencies import client_ip, public_access
+from news_api.dependencies import client_country, client_ip, public_access
 from news_api.platform.cache import rate_limit
 from news_api.platform.errors import NotFound, RateLimited
 from news_api.platform.metrics import LEADS_RATE_LIMITED
@@ -32,6 +32,7 @@ class LeadRequest(BaseModel):
     source_page: str | None = Field(default=None, max_length=300)
     article_id: str | None = Field(default=None, max_length=36)
     utm: dict[str, str] | None = None
+    session_hash: str | None = Field(default=None, max_length=120)
     website: str | None = Field(default=None, max_length=200)  # honeypot
 
 
@@ -74,6 +75,8 @@ async def create_lead(payload: LeadRequest, request: Request) -> Any:
         },
         ip_hash=ip_hash,
         ua_hash=ua_hash,
+        country=client_country(request),
+        session_hash=leads_app.session_hash_value(payload.session_hash),
     )
     body = leads_app.lead_public_response(lead_id, duplicate)
     if partner and not duplicate:

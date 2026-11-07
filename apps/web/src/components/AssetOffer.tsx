@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { track } from "@/lib/analytics";
+import { sessionHash, track } from "@/lib/analytics";
 import { t, type Locale } from "@/lib/i18n";
 import { captureUtm } from "@/lib/utm";
 
@@ -81,6 +81,7 @@ export function AssetOffer({
           consent: data.get("consent") === "on",
           source_page: sourcePage,
           utm: captureUtm(),
+          session_hash: sessionHash(),
         }),
       });
       if (response.status === 429) {

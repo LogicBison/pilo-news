@@ -14,6 +14,7 @@ from news_api.platform.errors import ValidationProblem
 from news_api.platform.metrics import LEAD_ROUTE_LATENCY, LEADS
 from news_api.platform.notify import notify_lead
 from news_api.platform.security import hash_personal
+from news_api.platform.utm import normalize_utm
 
 log = structlog.get_logger(__name__)
 
@@ -107,6 +108,8 @@ async def create_lead(
     *,
     ip_hash: str,
     ua_hash: str,
+    country: str = "",
+    session_hash: str | None = None,
 ) -> tuple[str, bool, str | None]:
     """Create or silently de-duplicate a lead. Returns (id, duplicate, partner_name)."""
     if not payload.get("consent"):
@@ -144,9 +147,7 @@ async def create_lead(
     partner_id = str(partner["id"]) if partner else None
     partner_name = str(partner["name"]) if partner else None
     status = "routed" if partner_id else "new"
-    utm = payload.get("utm") or {}
-    if not isinstance(utm, dict):
-        utm = {}
+    utm = normalize_utm(payload.get("utm"))
 
     async with session_scope() as session:
         row = await session.execute(
@@ -155,12 +156,12 @@ async def create_lead(
                 INSERT INTO leads (
                     industry_id, partner_id, kind, name, email, phone, company, message,
                     qualification, asset, locale, source_page, article_id, utm, consent_version,
-                    consent_at, ip_hash, ua_hash, status
+                    consent_at, ip_hash, ua_hash, country, session_hash, status
                 ) VALUES (
                     CAST(:industry_id AS uuid), CAST(:partner_id AS uuid), :kind, :name, :email,
                     :phone, :company, :message, :qualification, :asset, :locale, :source_page,
                     CAST(:article_id AS uuid), CAST(:utm AS jsonb), :consent_version,
-                    :consent_at, :ip_hash, :ua_hash, :status
+                    :consent_at, :ip_hash, :ua_hash, :country, :session_hash, :status
                 ) RETURNING id
                 """
             ),
@@ -183,6 +184,8 @@ async def create_lead(
                 "consent_at": now,
                 "ip_hash": ip_hash,
                 "ua_hash": ua_hash,
+                "country": country or None,
+                "session_hash": session_hash,
                 "status": status,
             },
         )
@@ -252,3 +255,7 @@ def lead_public_response(lead_id: str, duplicate: bool) -> dict[str, Any]:
 
 def ip_and_ua_hash(ip: str, user_agent: str) -> tuple[str, str]:
     return hash_personal(ip), hash_personal(user_agent[:400])
+
+
+def session_hash_value(value: str | None) -> str | None:
+    return hash_personal(value)[:32] if value else None

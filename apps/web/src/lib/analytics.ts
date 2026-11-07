@@ -17,7 +17,7 @@ interface TrackOptions {
   result?: string;
 }
 
-function sessionHash(): string {
+export function sessionHash(): string {
   if (typeof window === "undefined") return "";
   const key = "sn_session";
   let value = window.sessionStorage.getItem(key);

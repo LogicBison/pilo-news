@@ -47,16 +47,21 @@ test("lead form requires consent and never echoes PII in the URL", async ({ page
 });
 
 test("contact form shows success without navigating", async ({ page }) => {
+  let payload: Record<string, unknown> = {};
   await page.route("**/api/proxy/v1/contact", async (route) => {
+    payload = (route.request().postDataJSON() ?? {}) as Record<string, unknown>;
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: "test" }) });
   });
-  await page.goto("/legal/contact");
+  await page.goto("/legal/contact?utm_source=test");
   await page.waitForSelector('html[data-hydrated="true"]');
   await page.getByLabel("Name").fill("Test Reader");
   await page.getByLabel("Email").fill("reader@example.com");
   await page.getByLabel("Message").fill("This is a test correction request.");
   await page.getByRole("button", { name: /send message/i }).click();
   await expect(page.getByRole("status")).toContainText(/message received/i);
+  expect(payload.source_page).toBe("/legal/contact");
+  expect(payload.session_hash).toBeTruthy();
+  expect((payload.utm as Record<string, string>).utm_source).toBe("test");
 });
 
 test("contact blocks an invalid email before any request", async ({ page }) => {

@@ -56,8 +56,15 @@ stale-while-revalidate=300`; send `If-None-Match` to get an empty `304`.
 
 `POST /v1/leads` requires explicit `consent: true`, stores the consent version
 and timestamp, hashes IP/UA, routes to the channel partner, and returns no PII.
-`POST /v1/contact` is the desk inbox. Honeypot and duplicate suppression are
+`POST /v1/contact` is the desk inbox. Both store the source page, normalized UTM
+keys, a hashed session id, and a coarse country code when `GEO_COUNTRY_HEADER`
+is configured. Raw IP is never stored. Honeypot and duplicate suppression are
 handled server-side.
+
+Admin contact inbox: `GET /v1/admin/contacts?industry=&status=&limit=`,
+`PATCH /v1/admin/contacts/{id}` with `{status}`, and
+`DELETE /v1/admin/contacts/{id}` for a DSAR. The list exposes the message and
+attribution, not the IP or user-agent hash.
 
 ## Admin
 

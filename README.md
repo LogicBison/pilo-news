@@ -84,6 +84,10 @@ Until the scaffold lands, the commands above are **planned**, not verified.
 
 ---
 
+## Lead and contact attribution
+
+Every lead and contact message stores the channel, offer kind, locale, source page, UTM campaign keys, a peppered hash of the network address and user agent, a hashed session id, and consent metadata. Raw IP addresses are never stored. A coarse country code is stored only when `GEO_COUNTRY_HEADER` names a trusted edge header (for example `CF-IPCountry`); leave it empty if no edge overwrites the header.
+
 ## Offer issues
 
 The free reference offers are generated from public records, not hand-written. Two adapters ship today:

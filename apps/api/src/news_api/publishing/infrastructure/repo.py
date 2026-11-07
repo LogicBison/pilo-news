@@ -290,11 +290,22 @@ async def insert_contact(
     phone: str | None,
     message: str,
     locale: str,
+    source_page: str | None = None,
+    utm: dict[str, str] | None = None,
+    ip_hash: str | None = None,
+    ua_hash: str | None = None,
+    country: str | None = None,
+    session_hash: str | None = None,
 ) -> str:
     row = await fetch_one(
         """
-        INSERT INTO contact_messages (industry_id, name, email, phone, message, locale)
-        VALUES (CAST(:industry_id AS uuid), :name, :email, :phone, :message, :locale)
+        INSERT INTO contact_messages (
+            industry_id, name, email, phone, message, locale, source_page, utm,
+            ip_hash, ua_hash, country, session_hash
+        ) VALUES (
+            CAST(:industry_id AS uuid), :name, :email, :phone, :message, :locale,
+            :source_page, CAST(:utm AS jsonb), :ip_hash, :ua_hash, :country, :session_hash
+        )
         RETURNING id
         """,
         {
@@ -304,6 +315,12 @@ async def insert_contact(
             "phone": phone,
             "message": message,
             "locale": locale,
+            "source_page": source_page,
+            "utm": json.dumps(utm or {}),
+            "ip_hash": ip_hash,
+            "ua_hash": ua_hash,
+            "country": country or None,
+            "session_hash": session_hash,
         },
     )
     if not row:

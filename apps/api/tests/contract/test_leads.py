@@ -276,3 +276,110 @@ async def test_disposable_email_is_rejected(client) -> None:
         },
     )
     assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_contact_stores_attribution_without_raw_ip(client) -> None:
+    from news_api.platform.db import fetch_one
+    from news_api.platform.settings import get_settings
+
+    settings = get_settings()
+    original = settings.geo_country_header
+    settings.geo_country_header = "cf-ipcountry"
+    try:
+        response = await client.post(
+            "/v1/contact",
+            headers={"cf-ipcountry": "us"},
+            json={
+                "name": "Attribution Person",
+                "email": "attribution@example.com",
+                "message": "Please send the compliance briefing.",
+                "locale": "en",
+                "industry": "legal",
+                "source_page": "/legal/contact",
+                "utm": {"utm_source": "newsletter", "utm_unknown": "drop"},
+                "session_hash": "session-123",
+            },
+        )
+        assert response.status_code == 200, response.text
+        contact = await fetch_one(
+            "SELECT * FROM contact_messages WHERE id = CAST(:id AS uuid)",
+            {"id": response.json()["id"]},
+        )
+        assert contact is not None
+        assert contact["country"] == "US"
+        assert contact["source_page"] == "/legal/contact"
+        assert contact["utm"] == {"utm_source": "newsletter"}
+        assert contact["session_hash"] and contact["session_hash"] != "session-123"
+        assert contact["ip_hash"] and contact["ua_hash"]
+    finally:
+        settings.geo_country_header = original
+
+
+@pytest.mark.asyncio
+async def test_lead_stores_country_session_and_clean_utm(client, admin_client) -> None:
+    from news_api.platform.settings import get_settings
+
+    settings = get_settings()
+    original = settings.geo_country_header
+    settings.geo_country_header = "cf-ipcountry"
+    try:
+        response = await client.post(
+            "/v1/leads",
+            headers={"cf-ipcountry": "ca"},
+            json={
+                "industry": "legal",
+                "kind": "consultation",
+                "name": "Attribution Lead",
+                "email": "lead-attribution@example.com",
+                "message": "I need a compliance review.",
+                "locale": "en",
+                "consent": True,
+                "qualification": "corporate",
+                "source_page": "/legal",
+                "utm": {"utm_medium": "referral", "utm_unknown": "drop"},
+                "session_hash": "session-456",
+            },
+        )
+        assert response.status_code == 200, response.text
+        lead_id = response.json()["id"]
+        listed = await admin_client.get("/v1/admin/leads?industry=legal")
+        lead = next(item for item in listed.json()["data"] if item["id"] == lead_id)
+        assert lead["country"] == "CA"
+        assert lead["utm"] == {"utm_medium": "referral"}
+        assert lead["session_hash"] and lead["session_hash"] != "session-456"
+    finally:
+        settings.geo_country_header = original
+
+
+@pytest.mark.asyncio
+async def test_admin_contact_inbox_and_erase(client, admin_client) -> None:
+    created = await client.post(
+        "/v1/contact",
+        json={
+            "name": "Inbox Person",
+            "email": "inbox@example.com",
+            "message": "Please send this to the desk.",
+            "locale": "en",
+            "industry": "legal",
+            "source_page": "/legal/contact",
+        },
+    )
+    assert created.status_code == 200
+    contact_id = created.json()["id"]
+
+    listed = await admin_client.get("/v1/admin/contacts?industry=legal")
+    assert listed.status_code == 200
+    row = next(item for item in listed.json()["data"] if item["id"] == contact_id)
+    assert row["source_page"] == "/legal/contact"
+    assert row["status"] == "new"
+
+    updated = await admin_client.patch(f"/v1/admin/contacts/{contact_id}", json={"status": "read"})
+    assert updated.status_code == 200
+    assert updated.json()["data"]["status"] == "read"
+
+    deleted = await admin_client.delete(f"/v1/admin/contacts/{contact_id}")
+    assert deleted.status_code == 204
+    assert (
+        await admin_client.patch(f"/v1/admin/contacts/{contact_id}", json={"status": "closed"})
+    ).status_code == 404

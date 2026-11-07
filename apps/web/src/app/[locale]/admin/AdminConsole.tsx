@@ -20,6 +20,7 @@ type Tab =
   | "keys"
   | "audit"
   | "leads"
+  | "contacts"
   | "partners"
   | "funnel";
 
@@ -35,6 +36,7 @@ const TABS: readonly Tab[] = [
   "keys",
   "audit",
   "leads",
+  "contacts",
   "partners",
   "funnel",
 ];
@@ -176,6 +178,22 @@ interface Lead {
   status: string;
   created_at: string;
 }
+interface Contact {
+  id: string;
+  industry: string | null;
+  name: string;
+  email: string;
+  phone: string | null;
+  message: string;
+  locale: string;
+  status: string;
+  source_page: string | null;
+  utm: Record<string, string>;
+  country: string | null;
+  session_hash: string | null;
+  created_at: string;
+}
+
 interface Partner {
   id: string;
   industry: string;
@@ -194,6 +212,7 @@ interface ApiResult<T> {
 type Status = { kind: "ok" | "error"; text: string };
 
 const LEAD_STATUSES = ["new", "routed", "contacted", "qualified", "closed", "spam"] as const;
+const CONTACT_STATUSES = ["new", "read", "closed"] as const;
 
 const RUN_STATUS_KEY: Record<string, string> = {
   queued: "admin.queued",
@@ -330,6 +349,8 @@ export function AdminConsole({
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [audit, setAudit] = useState<AuditEvent[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [openContact, setOpenContact] = useState<string | null>(null);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [funnel, setFunnel] = useState<FunnelData | null>(null);
   const [offers, setOffers] = useState<OfferIssue[]>([]);
@@ -380,6 +401,8 @@ export function AdminConsole({
     setKeys([]);
     setAudit([]);
     setLeads([]);
+    setContacts([]);
+    setOpenContact(null);
     setPartners([]);
     setFunnel(null);
     setOffers([]);
@@ -505,6 +528,9 @@ export function AdminConsole({
       } else if (activeTab === "leads") {
         const data = await read<{ data: Lead[] }>("/api/proxy/v1/admin/leads");
         if (data) setLeads(data.data ?? []);
+      } else if (activeTab === "contacts") {
+        const data = await read<{ data: Contact[] }>("/api/proxy/v1/admin/contacts?limit=100");
+        if (data) setContacts(data.data ?? []);
       } else if (activeTab === "partners") {
         const data = await read<{ data: Partner[] }>("/api/proxy/v1/admin/partners");
         if (data) setPartners(data.data ?? []);
@@ -540,6 +566,7 @@ export function AdminConsole({
     setConfirming(null);
     setPublishTarget(null);
     setPublishReviewer("");
+    setOpenContact(null);
     focusPanel();
   }
 
@@ -878,6 +905,15 @@ export function AdminConsole({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [articleForm, confirming, cancelArticleForm, cancelConfirm]);
+
+  async function deleteContact(contactId: string) {
+    const ok = await mutate(
+      `contact:delete:${contactId}`,
+      `/api/proxy/v1/admin/contacts/${contactId}`,
+      "DELETE",
+    );
+    if (ok) setConfirming(null);
+  }
 
   async function deleteLead(leadId: string) {
     const ok = await mutate(`lead:delete:${leadId}`, `/api/proxy/v1/admin/leads/${leadId}`, "DELETE");
@@ -2228,6 +2264,143 @@ export function AdminConsole({
                             )}
                           </td>
                         </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : null}
+
+        {tab === "contacts" ? (
+          <section>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <Caption>{t(locale, "admin.tabs.contacts")}</Caption>
+                <thead>
+                  <tr className="border-b border-[var(--sn-border)]">
+                    <Th>{t(locale, "admin.industry")}</Th>
+                    <Th>{t(locale, "admin.name")}</Th>
+                    <Th>{t(locale, "admin.country")}</Th>
+                    <Th>{t(locale, "admin.source")}</Th>
+                    <Th>{t(locale, "admin.status")}</Th>
+                    <Th>{t(locale, "admin.createdAt")}</Th>
+                    <Th>{t(locale, "admin.action")}</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contacts.length === 0 ? (
+                    <EmptyRow columns={7} locale={locale} />
+                  ) : (
+                    contacts.map((contact) => {
+                      const rowKey = `contact-${contact.id}`;
+                      const confirmingRow = confirming === rowKey;
+                      const open = openContact === contact.id;
+                      const campaign = Object.entries(contact.utm)
+                        .map(([key, value]) => `${key.replace("utm_", "")}=${value}`)
+                        .join(" · ");
+                      return (
+                        <Fragment key={contact.id}>
+                          <tr className="border-b border-[var(--sn-border)] align-top">
+                            <td className="p-2">{contact.industry ?? "-"}</td>
+                            <td className="p-2">
+                              {contact.name}
+                              <br />
+                              <span className="text-xs text-[var(--sn-muted)]">{contact.email}</span>
+                            </td>
+                            <td className="p-2">{contact.country ?? "-"}</td>
+                            <td className="max-w-xs p-2 text-xs text-[var(--sn-muted)]">
+                              {contact.source_page ?? "-"}
+                              {campaign ? <span className="block">{campaign}</span> : null}
+                            </td>
+                            <td className="p-2">
+                              <select
+                                aria-label={t(locale, "admin.status")}
+                                value={contact.status}
+                                onChange={(event) =>
+                                  void mutate(
+                                    `contact:status:${contact.id}`,
+                                    `/api/proxy/v1/admin/contacts/${contact.id}`,
+                                    "PATCH",
+                                    { status: event.target.value },
+                                  )
+                                }
+                                disabled={busy === `contact:status:${contact.id}`}
+                                className="rounded border border-[var(--sn-border)] bg-[var(--sn-bg)] px-2 py-1 text-sm"
+                              >
+                                {CONTACT_STATUSES.map((status) => (
+                                  <option key={status} value={status}>
+                                    {status}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="whitespace-nowrap p-2">
+                              {new Date(contact.created_at).toLocaleString()}
+                            </td>
+                            <td className="whitespace-nowrap p-2 text-right">
+                              <button
+                                type="button"
+                                aria-expanded={open}
+                                onClick={() => setOpenContact(open ? null : contact.id)}
+                                className={QUIET_BUTTON}
+                              >
+                                {open ? t(locale, "admin.hide") : t(locale, "admin.view")}
+                              </button>
+                              {confirmingRow ? (
+                                <span className="ml-2 inline-flex flex-wrap items-center gap-2">
+                                  <button
+                                    type="button"
+                                    autoFocus
+                                    onClick={() => void deleteContact(contact.id)}
+                                    disabled={busy === `contact:delete:${contact.id}`}
+                                    className={DESTRUCTIVE_BUTTON}
+                                  >
+                                    {busy === `contact:delete:${contact.id}`
+                                      ? t(locale, "admin.saving")
+                                      : t(locale, "admin.confirmDelete")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => cancelConfirm(rowKey)}
+                                    className={QUIET_BUTTON}
+                                  >
+                                    {t(locale, "admin.cancel")}
+                                  </button>
+                                </span>
+                              ) : (
+                                <button
+                                  id={`confirm-trigger-${rowKey}`}
+                                  type="button"
+                                  onClick={() => setConfirming(rowKey)}
+                                  className={[DESTRUCTIVE_BUTTON, "ml-2"].join(" ")}
+                                >
+                                  {t(locale, "admin.delete")}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                          {open ? (
+                            <tr className="border-b border-[var(--sn-border)] bg-[var(--sn-surface)]">
+                              <td colSpan={7} className="p-3 text-sm">
+                                {contact.phone ? (
+                                  <p>
+                                    <span className="font-semibold">{t(locale, "admin.phone")}:</span>{" "}
+                                    {contact.phone}
+                                  </p>
+                                ) : null}
+                                <p className="mt-2 whitespace-pre-line">{contact.message}</p>
+                                <p className="mt-2 text-xs text-[var(--sn-muted)]">
+                                  {t(locale, "admin.campaign")}: {campaign || "-"}
+                                </p>
+                                <p className="mt-1 text-xs text-[var(--sn-muted)]">
+                                  {t(locale, "admin.session")}: {contact.session_hash ?? "-"}
+                                </p>
+                              </td>
+                            </tr>
+                          ) : null}
+                        </Fragment>
                       );
                     })
                   )}

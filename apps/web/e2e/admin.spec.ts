@@ -122,3 +122,13 @@ test("admin can publish and unpublish a reference issue", async ({ page }) => {
     await page.request.post(`/api/proxy/v1/admin/offers/${draft.id}/unpublish`, { headers });
   }
 });
+
+test("admin can inspect contact messages", async ({ page }) => {
+  test.skip(!password, "E2E_ADMIN_PASSWORD is not set");
+  await page.goto("/en/admin");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password ?? "");
+  await page.getByRole("button", { name: /sign in/i }).click();
+  await page.getByRole("tab", { name: /^contacts$/i }).click();
+  await expect(page.getByRole("table", { name: /contacts/i })).toBeVisible();
+});

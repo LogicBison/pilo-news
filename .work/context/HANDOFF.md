@@ -2,6 +2,9 @@
 
 ## Session status
 
+**Closed:** 2026-11-06 - offer generation, reviewer-gated public references, and lead/contact attribution.
+Per-channel cadence and offer switches shipped; legal/cyber drafts generate automatically; public reference pages and publish/unpublish shipped; contact and lead attribution now store source/UTM/session/country with hashed network identifiers. 143 API tests, admin e2e 7/7, production build green. Remaining: email delivery, named reviewers, `GEO_COUNTRY_HEADER` edge value, and marketing-consent confirmation.
+
 **2026-11-06 (channel automation):** the worker already fetched automatically on a
 12-hour deployment default. Added a per-channel cadence that overrides it (`NULL` =
 default), an automatic-fetch pause, and operator switches for the four free offers
@@ -157,6 +160,7 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | M13 2026-11-06 | migration 014 applied twice (`applied: 0` re-run); 139 API tests; legal + cybersecurity drafts; admin Offers tab; reviewer-gated publish and public reference pages |
 | M13 2026-11-06 | offer scheduler runs in the worker; admin API list/detail/build/publish/unpublish; public reference pages; email path not built |
 | — 2026-11-06 | masthead emblem fix: digital-technology had no `datacenter` case; added rack mark + default fallback; 11/11 channel emblem e2e |
+| M14 2026-11-06 | lead/contact attribution: country, session hash, contact UTM/source/hashes; admin Contacts tab; 143 API tests; 7/7 admin e2e |
 | S1 2026-11-06 | contact + about + admin-console shipped; e2e 78 pass; admin sign-in verified end to end |
 | Distinct palettes + layouts 2026-11-05 | migration 009: 7 schemes incl. a dark cybersecurity theme; 4 coverage rhythms (magazine/grid3/grid2/stack), centered app bars; `pnpm check` 7/7 contrast |
 | S1 screens 2026-11-06 | `pnpm build` + `pnpm test` on the production bundle: **78 passed, 0 failed** (admin spec ran with credentials) |
@@ -221,6 +225,7 @@ Before any further channel work: read the funnel, name the digest reviewer (D-00
 | 2026-11-06 | M10 topics | three digital-tech topics on the cybersecurity profile, `placement="topic"` attribution, migration 012 + unit test, D-010/D-014 |
 | 2026-11-06 | M11 channel | `digital-technology` profile, `datacenter` skin (motif/scene/CC BY-SA photo), 6 grade-A feeds, 26 EN + 1 ES items, inventory at 11 channels, e2e + docs |
 | 2026-11-06 | M12 channel automation | migration 013; per-channel fetch cadence + pause; four free-offer switches; admin Channels editor; public offer gating; 124 API tests, 87 Playwright |
+| 2026-11-06 | M14 lead attribution | migration 015; contact/lead country + session + UTM; Contacts tab; privacy copy; 143 API tests |
 | 2026-11-06 | M13 offer generation | migration 014; Federal Register + CISA KEV adapters; AI draft with fallback; automatic scheduling; CLI + admin API + Offers tab; reviewer-gated publish; public reference pages; 139 API tests; email remains |
 
 ---
@@ -313,7 +318,7 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Read the digital-technology window at 2026-11-27 and the asset test at 2026-11-20 against their pre-registered rules; name the digest reviewer (D-005); then `@ui-design-system plan` for the P1 primitives (`Skeleton`, `Toc`), or `@ui-screen-spec create - search` to open S4.
+Set the trusted `GEO_COUNTRY_HEADER` value, confirm contact consent for marketing, then publish one legal or cybersecurity issue with a named reviewer. The 7-Day Desk Brief is the next product build.
 
 ---
 

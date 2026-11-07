@@ -13,6 +13,17 @@ from news_api.platform.security import hash_api_key
 from news_api.platform.settings import get_settings
 
 
+def client_country(request: Request) -> str:
+    """Country from a trusted edge header; empty until the operator configures one."""
+    header = get_settings().geo_country_header.strip().lower()
+    if not header:
+        return ""
+    value = request.headers.get(header, "").strip().upper()
+    if len(value) == 2 and value.isalpha():
+        return value
+    return ""
+
+
 def request_id_of(request: Request) -> str:
     return str(getattr(request.state, "request_id", "-"))
 

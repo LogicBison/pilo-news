@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     metrics_enabled: bool = True
     ssrf_allow_private: bool = False
     trust_forwarded_for: bool = True
+    # Empty disables country capture. Set to the edge header that overwrites it,
+    # for example "cf-ipcountry". Never trust a client-supplied value.
+    geo_country_header: str = ""
 
     smtp_host: str = ""
     smtp_port: int = 587

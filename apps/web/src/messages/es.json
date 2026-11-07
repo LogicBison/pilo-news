@@ -204,6 +204,7 @@
       "keys": "Claves API",
       "audit": "Auditoría",
       "leads": "Prospectos",
+      "contacts": "Contactos",
       "partners": "Socios",
       "channels": "Canales",
       "offers": "Ofertas",
@@ -301,6 +302,9 @@
     "confirmUnpublish": "Confirmar despublicación",
     "publishReviewer": "Nombre del revisor",
     "publishHint": "El revisor nombrado firma la edición. Publicar la hace pública de inmediato.",
+    "country": "País",
+    "campaign": "Campaña",
+    "session": "Sesión",
     "newIndustry": "Nuevo canal",
     "propagationHint": "Las páginas públicas aplican el cambio en un máximo de cinco minutos.",
     "automation": "Automatización",
@@ -383,7 +387,7 @@
   },
   "legal": {
     "privacyTitle": "Privacidad",
-    "privacyBody": "System News almacena solo lo necesario para operar la mesa: metadatos de fuentes, titulares y enlaces, conteos de uso agregados y los mensajes o solicitudes que usted decida enviar. No vendemos datos personales. Las solicitudes se comparten únicamente con el socio del canal seleccionado. Escriba a la mesa para solicitar una exportación o eliminación.",
+    "privacyBody": "System News almacena solo lo necesario para operar la mesa: metadatos de fuentes, titulares y enlaces, conteos de uso agregados y los mensajes o solicitudes que usted decida enviar. No vendemos datos personales. Guardamos un identificador de red cifrado, un identificador de dispositivo cifrado, parámetros de campaña y un código de país aproximado cuando la red lo proporciona, para prevenir abusos y medir el interés agregado; no guardamos direcciones IP sin cifrar. Las solicitudes se comparten únicamente con el socio del canal seleccionado. Escriba a la mesa para solicitar una exportación o eliminación.",
     "termsTitle": "Términos",
     "termsBody": "System News publica titulares, extractos y resúmenes originales con atribución y enlaces al medio original. El contenido sigue siendo propiedad de su medio. Nada en este sitio constituye asesoría legal, financiera, médica o profesional. El uso del sitio es bajo su responsabilidad; el acceso automatizado debe respetar los límites de uso publicados.",
     "lastUpdated": "Última actualización: 5 de noviembre de 2026"

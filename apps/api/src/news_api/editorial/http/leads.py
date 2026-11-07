@@ -55,6 +55,8 @@ def lead_dto(row: dict[str, Any], *, include_pii: bool = True) -> dict[str, Any]
         "source_page": row.get("source_page"),
         "article_id": row.get("article_id"),
         "utm": row.get("utm"),
+        "country": row.get("country"),
+        "session_hash": row.get("session_hash"),
         "created_at": row["created_at"],
         "updated_at": row.get("updated_at"),
     }

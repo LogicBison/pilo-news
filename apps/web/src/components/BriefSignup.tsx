@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { track } from "@/lib/analytics";
+import { sessionHash, track } from "@/lib/analytics";
 import { t, type Locale } from "@/lib/i18n";
 import { captureUtm } from "@/lib/utm";
 
@@ -55,6 +55,7 @@ export function BriefSignup({ industry, locale, placement, articleId, sourcePage
           article_id: articleId ?? null,
           website: data.get("website") || null,
           utm: captureUtm(),
+          session_hash: sessionHash(),
         }),
       });
       if (response.status === 429) {

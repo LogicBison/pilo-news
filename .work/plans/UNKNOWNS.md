@@ -1,6 +1,6 @@
 # UNKNOWNS - planning registry
 
-**Updated:** 2026-11-05 · **Maintained by:** plan-foundation / plan-master
+**Updated:** 2026-11-06 · **Maintained by:** plan-foundation / plan-master
 
 | ID | Question / blocker | Blocks | Owner | Status |
 |----|-------------------|--------|-------|--------|
@@ -16,6 +16,9 @@
 | U10 | Expected traffic at launch (< 10k or > 100k daily sessions) and growth plan | Sizing, cache TTLs, scaling trigger | owner | Open |
 | U11 | Legal review of disclaimers for legal, financial, and health channels | Channel enablement gate | owner + advisor | Open |
 | U12 | Whether sponsored/paid placements are in v1 (affects labeling + disclosure rules) | Content model, disclosure UI | owner | Open |
+| U32 | Which trusted edge header supplies country, and what is its value? | `GEO_COUNTRY_HEADER`; country attribution | owner | Open |
+| U33 | Does the contact form consent cover marketing use, or is a separate opt-in needed? | marketing use of contact data | owner + counsel | Open |
+| U34 | Which reviewer signs the first legal/cybersecurity reference issue? | publish gate; D-005 | owner | Open |
 
 ## Deferred (recorded decisions the owner may revisit)
 
@@ -35,8 +38,6 @@
 | 2026-11-05 | plan-foundation | Seeded from doc 01, doc 04 §13 (deferrals), probe ledger |
 | 2026-11-05 | plan-foundation | U4 narrowed to budget; U16/U17 added after ADR 007/010 amendments |
 | 2026-11-05 | operator + agent | U5 closed to technical scope (ADR 014); U6 = legal |
-
----
 
 ## Next action
 

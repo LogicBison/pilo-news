@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { t, type Locale } from "@/lib/i18n";
+import { sessionHash } from "@/lib/analytics";
 import { captureUtm } from "@/lib/utm";
 
 import { Button } from "./ui/button";
@@ -92,7 +93,9 @@ export function ContactForm({
           locale,
           industry,
           website: new FormData(form).get("website") || null,
+          source_page: window.location.pathname,
           utm: captureUtm(),
+          session_hash: sessionHash(),
         }),
       });
       if (response.status === 429) {

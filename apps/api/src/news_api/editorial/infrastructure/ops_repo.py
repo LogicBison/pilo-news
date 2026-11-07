@@ -197,7 +197,7 @@ async def list_leads(
         f"""
         SELECT l.id, l.industry_id, l.partner_id, l.kind, l.name, l.email, l.phone, l.company,
                l.message, l.locale, l.source_page, l.article_id, l.utm, l.consent_version,
-               l.consent_at, l.status, l.created_at, l.updated_at,
+               l.consent_at, l.country, l.session_hash, l.status, l.created_at, l.updated_at,
                i.slug AS industry_slug, p.name AS partner_name
         FROM leads l
         JOIN industries i ON i.id = l.industry_id
@@ -339,3 +339,55 @@ async def partner_contact_for(industry_id: str) -> dict[str, Any] | None:
         """,
         {"industry_id": industry_id},
     )
+
+
+async def list_contacts(
+    *, industry_id: str | None = None, status: str | None = None, limit: int = 100
+) -> list[dict[str, Any]]:
+    clauses = ["1 = 1"]
+    params: dict[str, Any] = {"limit": min(max(limit, 1), 200)}
+    if industry_id:
+        clauses.append("c.industry_id = CAST(:industry_id AS uuid)")
+        params["industry_id"] = industry_id
+    if status:
+        clauses.append("c.status = :status")
+        params["status"] = status
+    return await fetch_all(
+        f"""
+        SELECT c.*, i.slug AS industry_slug
+        FROM contact_messages c
+        LEFT JOIN industries i ON i.id = c.industry_id
+        WHERE {' AND '.join(clauses)}
+        ORDER BY c.created_at DESC LIMIT :limit
+        """,
+        params,
+    )
+
+
+async def get_contact(contact_id: str) -> dict[str, Any] | None:
+    return await fetch_one(
+        """
+        SELECT c.*, i.slug AS industry_slug
+        FROM contact_messages c
+        LEFT JOIN industries i ON i.id = c.industry_id
+        WHERE c.id = CAST(:id AS uuid)
+        """,
+        {"id": contact_id},
+    )
+
+
+async def update_contact_status(contact_id: str, status: str) -> None:
+    async with session_scope() as session:
+        await session.execute(
+            text("UPDATE contact_messages SET status = :status WHERE id = CAST(:id AS uuid)"),
+            {"id": contact_id, "status": status},
+        )
+
+
+async def delete_contact(contact_id: str) -> bool:
+    async with session_scope() as session:
+        result = await session.execute(
+            text("DELETE FROM contact_messages WHERE id = CAST(:id AS uuid)"),
+            {"id": contact_id},
+        )
+        return int(getattr(result, "rowcount", 0) or 0) > 0

@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-06 (offer generation, reviewer-gated publish, public reference pages; 139 API tests)
+**Updated:** 2026-11-06 (offer generation, public reference pages, lead/contact attribution; 143 API tests)
 
 ---
 
@@ -94,6 +94,47 @@
 | **3** | UI S4 SPECs + P1 primitives | `search`, `privacy`, `terms`; `Skeleton`, `Toc` |
 | **4** | Verify pending implementations | k6, prd deploy/rollback, remote CI, production image smoke |
 | **5** | U9/U10 decisions | analytics/consent, traffic sizing (U8 closed: pilo-mail chosen, deferred) |
+
+---
+
+## Completed iteration - M14: lead and contact attribution (2026-11-06)
+
+**Milestone ref:** `.work/features/lead-attribution/20261106-SPEC.md`
+**Status:** complete 2026-11-06 - 5/5 tasks
+**Started:** 2026-11-06
+
+### In scope
+- contact attribution parity: source page, UTM, hashed IP/UA, country, session hash
+- leads: country and session hash, normalized UTM
+- country only from a configured trusted edge header
+- admin Contacts tab with list, status, and DSAR erase
+- privacy copy updated; raw IP still never stored
+
+### Out of scope
+- raw IP storage or IP geolocation
+- marketing consent change; contact consent remains an owner/legal decision
+- cross-device identity
+- paid data enrichment
+
+### Tasks
+| ID | Description | Status |
+|----|-------------|--------|
+| M14-T1 | Migration 015 + UTM normalizer + country helper | done |
+| M14-T2 | Lead and contact writers accept attribution | done |
+| M14-T3 | Admin contacts API + Contacts tab | done |
+| M14-T4 | Forms send session hash; contact sends source/UTM | done |
+| M14-T5 | Privacy copy + tests/docs | done |
+
+### Verification
+- `./bin/start.sh --env dev test` -> api **143 passed**, web checks green (415 keys, 11/11 contrast)
+- admin e2e **7/7**, including Contacts
+- migration 015 applied; contact/lead attribution tests assert country, normalized UTM, hashed session
+- production build passes
+
+### Residual
+- `GEO_COUNTRY_HEADER` is empty by default; country stays blank until the edge overwrites a configured header.
+- Contact consent for marketing is not changed; that remains an owner/legal decision.
+- No raw IP is stored, by design.
 
 ---
 
