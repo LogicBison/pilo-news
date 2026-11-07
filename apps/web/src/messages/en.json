@@ -450,6 +450,9 @@
     "tableDate": "Date",
     "tableChange": "What changed",
     "tableAction": "Action",
+    "filterLabel": "Jurisdiction",
+    "allJurisdictions": "All jurisdictions",
+    "showing": "Showing {n} rows",
     "tableSource": "Source"
   },
   "briefs": {

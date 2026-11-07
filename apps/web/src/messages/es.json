@@ -450,6 +450,9 @@
     "tableDate": "Fecha",
     "tableChange": "Qué cambió",
     "tableAction": "Acción",
+    "filterLabel": "Jurisdicción",
+    "allJurisdictions": "Todas las jurisdicciones",
+    "showing": "Mostrando {n} filas",
     "tableSource": "Fuente"
   },
   "briefs": {

@@ -102,6 +102,7 @@ test("admin can publish and unpublish a reference issue", async ({ page }) => {
     await page.goto(`/legal/references/${draft.issue_date}`);
     await expect(page.getByRole("heading", { name: /US Regulatory Calendar/i })).toBeVisible();
     await expect(page.getByText(/E2E Reviewer/)).toBeVisible();
+    await expect(page.getByLabel(/jurisdiction/i)).toBeVisible();
     await expect(
       page.getByRole("link", { name: /Securities and Exchange Commission/i }).first(),
     ).toBeVisible();

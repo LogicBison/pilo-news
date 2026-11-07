@@ -91,7 +91,7 @@ The free reference offers are generated from public records, not hand-written. T
 - `legal`: US Federal Register rules from a legal-relevant agency set, monthly.
 - `cybersecurity`: CISA KEV additions, weekly on Wednesday.
 
-The worker checks due offers every five minutes and queues a draft. Publishing is a separate, reviewer-gated action: a draft becomes a public page at `/{locale}/{industry}/references/{date}` only after a named reviewer signs it. The issue scope is explicit: `US` for Federal Register, `global` for CISA KEV. The command is `./bin/offers.sh build --industry <slug> [--dry-run]`; publish with `./bin/offers.sh publish <id> --reviewer "Name"`. The admin API is `GET /v1/admin/offers`, `POST /v1/admin/offers/build`, and `POST /v1/admin/offers/{id}/publish`.
+The worker checks due offers every five minutes and queues a draft. Publishing is a separate, reviewer-gated action: a draft becomes a public page at `/{locale}/{industry}/references/{date}` only after a named reviewer signs it. The public table can be filtered by jurisdiction. The issue scope is explicit: `US` for Federal Register, `global` for CISA KEV. The command is `./bin/offers.sh build --industry <slug> [--dry-run]`; publish with `./bin/offers.sh publish <id> --reviewer "Name"`. The admin API is `GET /v1/admin/offers`, `POST /v1/admin/offers/build`, and `POST /v1/admin/offers/{id}/publish`.
 
 ## Industries
 

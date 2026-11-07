@@ -25,6 +25,7 @@ A reader-facing archive for dated reference issues and the issue page itself. A 
 - Archive: max-width 3xl, back link to channel, h1, one-line intro, list.
 - Detail: max-width 4xl, back link, eyebrow, h1, standfirst, metadata chips, optional ES notice, table, sources, provenance footer.
 - Table columns: date, what changed (headline + change + jurisdiction), action, source link.
+- A jurisdiction select filters the rows in place; the default is all jurisdictions. The visible count updates.
 - One action only: the source link in each row; no lead form on the issue page.
 
 ## 4. Content
@@ -53,9 +54,9 @@ All strings live in `messages/{en,es}.json` under `reference.*`. The issue title
 
 ## 8. Verification
 
-- `pnpm lint`, `pnpm typecheck`, `pnpm check` (408 keys, 11/11 contrast).
+- `pnpm lint`, `pnpm typecheck`, `pnpm check` (411 keys, 11/11 contrast).
 - `pnpm build` includes both reference routes.
-- Playwright: archive empty state, published detail, ES notice, channel asset link, admin publish/unpublish.
+- Playwright: archive empty state, published detail, jurisdiction filter, ES notice, channel asset link, admin publish/unpublish.
 - Axe: 23 public URLs + reference archive; published detail checked in the admin e2e.
 
 ## 9. Out of scope
