@@ -65,6 +65,10 @@ async def _check(source: Source, semaphore: asyncio.Semaphore) -> dict[str, Any]
     payload["permission_state"] = state
     payload["robots_checked_at"] = datetime.now(UTC).isoformat()
     payload["robots_crawl_delay"] = int(crawl_delay) if crawl_delay else None
+    # A changed robots file is the one permission event an operator must see:
+    # the verdict may have flipped, or the wording may now allow a path it
+    # refused last week.
+    payload["robots_changed"] = bool(source.robots_hash and digest and source.robots_hash != digest)
     return payload
 
 
@@ -129,4 +133,9 @@ async def verify_sources(
             report["summary"]["unavailable"] += 1
         for warning in entry["coverage"]:
             report["warnings"].append(f"{channel.slug}: {warning}")
+        for item in results:
+            if item.get("robots_changed"):
+                report["warnings"].append(
+                    f"{channel.slug}: {item['name']}: robots.txt changed since the last check"
+                )
     return report

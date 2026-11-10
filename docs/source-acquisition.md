@@ -32,12 +32,27 @@ desk's `config/deployments/<slug>.json` under `sources`, then
 `apply-profile`. Discovery never edits a profile for you, because the profile
 is the reviewable record of what the desk publishes.
 
+`--save` keeps the findings in a candidate queue instead of losing them with
+the terminal:
+
+```bash
+./bin/sources.sh discover --file feeds.opml --industry legal --save
+./bin/sources.sh candidates list --status new
+./bin/sources.sh candidates decide --id <id> --status accepted --note "editorial review"
+```
+
+`accepted` prints the profile snippet; `shortlisted` and `dismissed` keep the
+reason. A dismissed feed that shows up again in a later export is updated but
+keeps its decision — discovery never silently reopens a closed call.
+
 ## 2. Overlap
 
 `overlap` is the share of a candidate's current titles the desk already carries
-(a normalised exact-title match over the last 30 days). Above 50 % the feed adds
-work, not coverage: a fourth wire on the same twenty stories. It is a cheap
-upper bound, not a similarity model — a reworded headline counts as new.
+over the last 30 days. Matching is token-based (Jaccard, plus the overlap
+coefficient so a reworded headline still counts). Above 50 % the feed adds work,
+not coverage: a fourth wire on the same twenty stories. It remains an
+approximation — a rewritten headline with different words will slip through,
+which is why a `review` verdict exists.
 
 ## 3. Licence and outreach
 
@@ -67,10 +82,23 @@ articles 404.
 ```
 
 `clicks_30d` per source is the number to quote when a publisher asks what they
-get out of it. `items_30d`, `items_7d` and `consecutive_failures` are the other
-half: a source with clicks but no fresh items is coasting on old coverage.
+get out of it. `attempts_30d`, `ok_30d`, `success_rate_30d`, `avg_ms_30d` and
+`items_30d` are the other half: a source with clicks but no fresh items is
+coasting on old coverage, and one with attempts but no successes is failing
+quietly. Those counters come from `source_fetch_stats`, written by every ingest
+fetch.
 
-## 5. The pitch, honestly
+## 5. Portability
+
+```bash
+./bin/sources.sh export > portfolio.opml
+```
+
+Exports the enabled portfolio as OPML grouped by desk; the same format
+`discover` accepts, so it round-trips. Useful for backups, for handing the list
+to a colleague, and for diffing dev against prd.
+
+## 6. The pitch, honestly
 
 "We send you readers" is true and measurable here, and it opens doors with
 regulators, exchanges and trade presses. It is not a licence. Where a publisher

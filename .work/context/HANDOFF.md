@@ -2,6 +2,8 @@
 
 ## Session status
 
+**Open (2026-11-10, M19 shipped):** the acquisition funnel gained its trail: `discover --save` fills a candidate queue, `candidates list/decide` records the call (never reopened by a later discovery), `source_fetch_stats` records attempts/successes/refusals/items/latency per source per day from the ingest path, `sources health` derives `success_rate_30d` and `avg_ms_30d` from it, `verify-sources` warns when a source's robots text changed since the last check, `sources export` prints OPML that `discover` reads back, and `sources report` names any desk missing a configured locale. Uncommitted.
+
 **Open (2026-11-10, M18 shipped):** source acquisition built per the owner's "build the whole thing": `sources discover` grades a URL list or OPML (permission → quality → overlap → fit) without writing anything; `licence_type` and outreach are recorded per source and shown in admin; every outbound story link now goes through `/go/{id}` → `/v1/outbound/{id}`, which counts one click and 302s to the publisher (aggregate only, no reader identifier); `sources report`/`health` show the portfolio and return traffic. The two added primary feeds are kept (O17 answered). Uncommitted.
 
 **Open (2026-11-10, M17 shipped):** source availability implemented per the owner's "implement all" instruction: `401`/`403` now produce `denied` with a seven-day cooldown, a `403` WAF body is classified `challenge`, robots redirects are followed and validated per hop, a permission ledger records state/hash/date/delay for every source, licensed feeds can carry credentials from the environment (never in the database), `verify-sources` gates the four-healthy-source availability floor, CISA News and SEC Press Releases were added, and `/bot` now explains allowlisting. The honest crawler UA is unchanged by design; a publisher-requested UA is a per-source header, not browser impersonation. Caddy keys were commented in all three env files at the owner's request and `env-sync verify` passes. Uncommitted.
@@ -118,6 +120,7 @@ and a browser save/restore check against the dev API. SPEC:
 | fetch safety (M16) | done | politeness 18 tests, fetcher outcome tests, `verify-sources` 50/50, `hosts` 14/14, bots page live in EN/ES |
 | source availability (M17) | done | permission ledger, denied/challenge outcomes, licensed-feed auth, availability gate 52/52, `/bot` allowlist block |
 | source acquisition (M18) | done | discovery + overlap, licence/outreach register, outbound click counting, portfolio health |
+| acquisition pipeline (M19) | done | candidate queue, per-source fetch history, robots-change warning, OPML round-trip, language gaps |
 
 **Integrity:** no known waivers. Dev stack running (`system-news-dev`).
 
@@ -174,6 +177,10 @@ and a browser save/restore check against the dev API. SPEC:
 | M18 discovery (2026-11-10) | `sources discover` on three real feeds | BBC business **accept** (47 items, overlap 0.0); CISA + The Register **reject** (configured); robots + quality paths exercised |
 | M18 outbound (2026-11-10) | `GET /v1/outbound/{id}` | **302** + publisher URL + `no-store`; unknown id **404**; `outbound_clicks` 0 → 1 |
 | M18 health/report (2026-11-10) | `sources health --industry legal`, `sources report` | rows with `items_7d`/`items_30d`/`clicks_30d`; portfolio by desk |
+| M19 gates (2026-11-10) | api `ruff`/`format`/`mypy`/`pytest` | clean · **224 passed** |
+| M19 queue (2026-11-10) | discover `--save` → `candidates list` → `decide` | saved 1, decided `accepted` with note, snippet returned |
+| M19 export (2026-11-10) | `sources export` → `parse_candidates` | OPML round-trip test; 52 enabled sources exported |
+| M19 migration (2026-11-10) | migrations twice | `applied: 0, total: 19` on re-run |
 
 Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, reload, `certs --check`); the footer credit on the live hosts; R10's seeded-cooldown render (no cooldown seeded in dev — lint/tsc/build only); D1–D5 on live output (waits for the next natural refresh, decision 3); the prd shadow week for pacing.
 
@@ -636,3 +643,25 @@ and run one week of `FETCH_PACING=shadow` on prd.
 **Coordination notes:** the UI half (admin licence row, `/go` link) was executed natively in the same pass. `/go` is the only place the product sends readers off-site; the redirect target comes from the stored canonical URL, never from a query parameter.
 **Blockers:** none. Owner lane is O9 (TLS) and O15 (`SMTP_FROM`).
 **Next recommended:** `@code-verify uncommitted`, then commit + push M17 + M18.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-10
+**Request:** "continue to implement all improvements on source acquisition"
+**Frameworks involved:** .ai
+**Classified bucket(s):** engineering
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes (untouched) | .ai.biz yes | .ai.soc source-only | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. M19 schema: `source_candidates` (unique feed URL, status, note, decision date) and `source_fetch_stats` (per source per day: attempts/ok/blocked/denied/items/duration).
+2. Candidate flow: `discover --save`, `candidates list/decide`, profile snippet for an accepted row; a decided row is never reopened by re-discovery.
+3. Similarity overlap: token Jaccard plus overlap coefficient, so a reworded headline counts; exact matches still land at 1.0.
+4. Health: ingest writes the daily stat (wrapped so a stat failure cannot fail a fetch); `sources health` derives `success_rate_30d`/`avg_ms_30d` and reports `None` when there were no attempts.
+5. `verify-sources` reports `robots_changed` when the stored hash differs; `sources export` prints OPML accepted by `discover`; `sources report` lists `missing_languages` per desk.
+6. Verified: api **224 passed**, queue round-trip against dev, OPML round-trip test, migration re-run `applied: 0`.
+**User correction:** none
+**Coordination notes:** API-only iteration; no web build needed. The candidate queue is deliberately non-authoritative — the deployment profile remains the publishing record.
+**Blockers:** none.
+**Next recommended:** `@code-verify uncommitted`, then commit + push M19.

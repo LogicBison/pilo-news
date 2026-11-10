@@ -154,7 +154,7 @@ async def _sources(args: argparse.Namespace) -> int:
             print("nothing to discover: pass --file or --url", file=sys.stderr)
             return 2
         try:
-            report = await discover(urls, industry=args.industry, limit=args.limit)
+            report = await discover(urls, industry=args.industry, limit=args.limit, save=args.save)
         except ValueError as exc:
             print(str(exc), file=sys.stderr)
             return 2
@@ -187,6 +187,9 @@ async def _sources(args: argparse.Namespace) -> int:
                     "licences": licences,
                     "languages": languages,
                     "permission": permission,
+                    "missing_languages": [
+                        code for code in channel.locales if code not in languages
+                    ],
                 }
             )
         print(json.dumps({"industries": rows}, indent=2))
@@ -209,6 +212,38 @@ async def _sources(args: argparse.Namespace) -> int:
             if int(row.get("items_30d") or 0) < 10 or int(row.get("consecutive_failures") or 0) >= 5
         ]
         print(json.dumps({"sources": health_rows, "needs_attention": stale}, indent=2, default=str))
+        return 0
+
+    if command == "candidates":
+        if args.candidates_command == "list":
+            rows = await sources_repo.list_candidates(args.status, limit=args.limit)
+            print(json.dumps({"candidates": rows}, indent=2, default=str))
+            return 0
+        decided = await sources_repo.decide_candidate(args.id, status=args.status, note=args.note)
+        if decided is None:
+            print(f"unknown candidate: {args.id}", file=sys.stderr)
+            return 2
+        snippet = await sources_repo.candidate_snippet(args.id)
+        print(json.dumps({"candidate": decided, "profile_snippet": snippet}, indent=2, default=str))
+        return 0
+
+    if command == "export":
+        from news_api.channels.infrastructure import repo as channels_repo
+        from news_api.sources.application.portfolio import to_opml
+
+        channels = await channels_repo.list_channels(enabled_only=False)
+        export_rows: list[dict[str, object]] = []
+        for channel in channels:
+            for source in await sources_repo.list_sources(channel.id, include_disabled=False):
+                export_rows.append(
+                    {
+                        "industry": channel.slug,
+                        "name": source.name,
+                        "feed_url": source.feed_url,
+                        "language": source.language,
+                    }
+                )
+        print(to_opml(export_rows), end="")
         return 0
 
     if command == "outreach":
@@ -398,6 +433,11 @@ def build_parser() -> argparse.ArgumentParser:
     discover.add_argument("--url", action="append", default=[], help="candidate feed URL")
     discover.add_argument("--industry", default=None)
     discover.add_argument("--limit", type=int, default=40)
+    discover.add_argument(
+        "--save",
+        action="store_true",
+        help="keep the findings in the candidate queue (never adds a source)",
+    )
     discover.set_defaults(func=_sources)
     report = sources_sub.add_parser("report", help="portfolio by desk: languages, licences")
     report.add_argument("--industry", default=None)
@@ -405,6 +445,21 @@ def build_parser() -> argparse.ArgumentParser:
     health = sources_sub.add_parser("health", help="per-source output and return traffic")
     health.add_argument("--industry", default=None)
     health.set_defaults(func=_sources)
+    candidates = sources_sub.add_parser("candidates", help="the discovery queue")
+    candidates_sub = candidates.add_subparsers(dest="candidates_command", required=True)
+    cand_list = candidates_sub.add_parser("list", help="candidates by status")
+    cand_list.add_argument("--status", default=None)
+    cand_list.add_argument("--limit", type=int, default=100)
+    cand_list.set_defaults(func=_sources)
+    cand_decide = candidates_sub.add_parser("decide", help="shortlist, accept or dismiss")
+    cand_decide.add_argument("--id", required=True)
+    cand_decide.add_argument(
+        "--status", required=True, choices=["shortlisted", "accepted", "dismissed"]
+    )
+    cand_decide.add_argument("--note", default="")
+    cand_decide.set_defaults(func=_sources)
+    export = sources_sub.add_parser("export", help="print the portfolio as OPML")
+    export.set_defaults(func=_sources)
     outreach = sources_sub.add_parser("outreach", help="record that a publisher was contacted")
     outreach.add_argument("--source", required=True, help="source id")
     outreach.add_argument("--note", default="")

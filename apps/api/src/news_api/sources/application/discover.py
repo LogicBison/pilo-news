@@ -40,6 +40,9 @@ MAX_OVERLAP = 0.5
 SUGGESTED_TRUST = 0.8
 
 TITLE_NOISE_RE = re.compile(r"[^a-z0-9]+")
+#: Two headlines count as the same story above this token overlap. Exact match
+#: is 1.0; a reworded headline usually lands near 0.6-0.8.
+SIMILARITY_THRESHOLD = 0.6
 
 
 def normalize_title(title: str) -> str:
@@ -85,10 +88,42 @@ def _dedupe(urls: list[str]) -> list[str]:
     return out
 
 
-def overlap_ratio(titles: list[str], existing: set[str]) -> float:
+def title_tokens(title: str) -> frozenset[str]:
+    return frozenset(normalize_title(title).split())
+
+
+def similarity(left: frozenset[str], right: frozenset[str]) -> float:
+    """Token overlap, tolerant of a reworded headline.
+
+    Jaccard alone under-counts a paraphrase ("regulator fines three banks" vs
+    "three banks fined by regulator"); the overlap coefficient catches it. The
+    max of the two is the usual near-duplicate compromise and is explainable
+    to a reviewer.
+    """
+    if not left or not right:
+        return 0.0
+    shared = len(left & right)
+    if not shared:
+        return 0.0
+    jaccard = shared / len(left | right)
+    containment = shared / min(len(left), len(right))
+    return max(jaccard, containment)
+
+
+def overlap_ratio(
+    titles: list[str],
+    existing: list[frozenset[str]],
+    *,
+    threshold: float = SIMILARITY_THRESHOLD,
+) -> float:
+    """Share of titles the desk already carries, allowing reworded headlines."""
     if not titles:
         return 0.0
-    hits = sum(1 for title in titles if normalize_title(title) in existing)
+    hits = 0
+    for title in titles:
+        tokens = title_tokens(title)
+        if any(similarity(tokens, other) >= threshold for other in existing):
+            hits += 1
     return round(hits / len(titles), 3)
 
 
@@ -139,6 +174,7 @@ async def discover(
     *,
     industry: str | None = None,
     limit: int = 40,
+    save: bool = False,
 ) -> dict[str, Any]:
     """Grade each candidate against permission, quality, novelty and fit."""
     industry_id: str | None = None
@@ -151,7 +187,7 @@ async def discover(
     existing_sources = await sources_repo.list_sources(include_disabled=True)
     configured = {normalize_feed_url(item.feed_url): item for item in existing_sources}
     titles = await articles_repo.recent_titles(industry_id)
-    existing_titles = {normalize_title(title) for title in titles if title}
+    existing_titles = [title_tokens(title) for title in titles if title]
 
     rows: list[Candidate] = []
     for url in candidates[:limit]:
@@ -164,6 +200,23 @@ async def discover(
         )
 
     accepted = [row for row in rows if row.verdict == "accept"]
+    saved = 0
+    if save:
+        saved = await sources_repo.upsert_candidates(
+            [
+                {
+                    "feed_url": row.url,
+                    "name": urlsplit(row.url).hostname or row.url,
+                    "industry_id": industry_id,
+                    "language": row.language or "",
+                    "grade": row.grade,
+                    "overlap": row.overlap,
+                    "verdict": row.verdict,
+                }
+                for row in rows
+                if row.verdict != "reject" or row.duplicate_of is None
+            ]
+        )
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "industry": industry,
@@ -173,6 +226,7 @@ async def discover(
             "accept": len(accepted),
             "review": sum(1 for row in rows if row.verdict == "review"),
             "reject": sum(1 for row in rows if row.verdict == "reject"),
+            "saved": saved,
         },
         "profile_snippet": [
             {
@@ -195,7 +249,7 @@ async def _evaluate(
     url: str,
     *,
     configured: dict[str, Source],
-    existing_titles: set[str],
+    existing_titles: list[frozenset[str]],
 ) -> Candidate:
     key = normalize_feed_url(url)
     duplicate = configured.get(key)

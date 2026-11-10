@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-10 (M18 source acquisition complete — discovery, overlap, licence/outreach, return-traffic counting, health)
+**Updated:** 2026-11-10 (M19 acquisition pipeline — candidate queue, fetch history, robots-change alerts, OPML round-trip)
 
 ---
 
@@ -110,6 +110,62 @@ merge_with_conditions — reason: gates are green (209 api tests, lint/tsc/check
 ### Cross-LLM verification
 
 Not run in this session; `@code-verify uncommitted` before any commit.
+
+---
+
+## Completed iteration - M19: acquisition pipeline (2026-11-10)
+
+**Milestone ref:** full plan §19 **M19** · spec `.work/features/source-acquisition/20261110-SPEC.md` (extended, R7–R10)
+**Status:** complete 2026-11-10 · 5/5 tasks
+
+### In scope
+
+- **R7** candidate queue: `discover --save`, `candidates list/decide`, decisions never reopened by re-discovery.
+- **R8** `source_fetch_stats` per source per day, written by ingest, feeding `success_rate_30d` / `avg_ms_30d`.
+- **R9** `robots_changed` warning when a source's robots text differs from the stored hash.
+- **R10** `sources export` OPML (round-trips through `discover`); `missing_languages` per desk.
+
+### Tasks
+
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| M19-T1 | Migration 019: candidate queue + per-source daily stats | `migrations/019_acquisition_pipeline.sql` | done 2026-11-10 |
+| M19-T2 | Candidate repo + decide/snippet; discovery `--save` | `sources/infrastructure/repo.py`, `sources/application/discover.py` | done 2026-11-10 |
+| M19-T3 | Similarity overlap (Jaccard + containment) | `sources/application/discover.py` | done 2026-11-10 |
+| M19-T4 | Ingest writes fetch stats; health derives rates | `articles/application/ingest.py`, `sources/infrastructure/repo.py` | done 2026-11-10 |
+| M19-T5 | Robots-change warning, OPML export, language gaps | `sources/application/verify.py`, `sources/application/portfolio.py`, `cli.py` | done 2026-11-10 |
+
+### Verification (2026-11-10)
+
+| Gate | Result |
+|------|--------|
+| api gates | clean · **224 passed** (6 discovery tests) |
+| queue round-trip | save → list → decide → snippet against dev |
+| export | OPML printed; `discover` reads it back (unit test) |
+| health | `attempts_30d` 0 → `success_rate_30d` `None`, no fake number |
+| migrations | 019 applied; re-run `applied: 0, total: 19` |
+
+Web untouched this iteration (no rebuild needed).
+
+### MOD-06 output (2026-11-10, acquisition pipeline)
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 2 — sources schema/repo → CLI; ingest → stats table.
+- New cross-boundary deps: `ingest._one` → `record_fetch_stat`; `sources health` → `source_fetch_stats`. No new service.
+- Test isolation: ok — parsing/overlap/OPML: `tests/unit/test_discover.py`; queue and stats exercised against dev with rollback-free rows.
+- Human architectural review: optional — reason: additive tables, no public surface, no credential path.
+- Blast radius: a wrong stat write cannot stop a fetch (wrapped and logged); a wrong queue update only affects the candidate list.
+
+## Recommendation
+merge_ok — reason: additive schema, no public route change, gates green.
+
+## Conditions if merge_with_conditions
+- none — merge_ok.
+
+### Cross-LLM verification
+
+Not run in this session.
 
 ---
 

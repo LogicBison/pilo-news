@@ -42,7 +42,11 @@ from news_api.platform.metrics import (
     REFRESH_RUNS,
 )
 from news_api.platform.settings import get_settings
-from news_api.sources.infrastructure.repo import list_fetchable, set_fetch_state
+from news_api.sources.infrastructure.repo import (
+    list_fetchable,
+    record_fetch_stat,
+    set_fetch_state,
+)
 
 log = structlog.get_logger(__name__)
 
@@ -188,6 +192,15 @@ async def run_ingest(
                             "blocked": outcome.blocked,
                         },
                     )
+                    try:
+                        await record_fetch_stat(
+                            source.id,
+                            status=outcome.status,
+                            items=len(outcome.items),
+                            duration_ms=int((time.perf_counter() - fetch_started) * 1000),
+                        )
+                    except Exception:  # a stat is never worth failing a fetch
+                        log.warning("ingest.stat_failed", source=source.name)
                     return outcome
 
             outcomes = await asyncio.gather(*(_one(source) for source in sources))

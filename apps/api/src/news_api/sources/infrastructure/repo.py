@@ -278,11 +278,10 @@ async def set_outreach(source_id: str, *, note: str | None) -> Source | None:
 
 
 async def source_health(industry_id: str | None = None) -> list[dict[str, Any]]:
-    """Per-source output and return traffic over the last 30 days.
+    """Per-source output, attempts and return traffic over the last 30 days.
 
-    Counts articles by when they were ingested, so a feed that publishes old
-    items still shows up as producing nothing new. Clicks are article-level
-    integers, never reader identifiers.
+    Articles show what a feed produced; fetch stats show whether it answered.
+    A source with attempts and no items is not "quiet", it is failing.
     """
     where = "WHERE s.industry_id = :industry_id" if industry_id else ""
     rows = await fetch_all(
@@ -295,9 +294,18 @@ async def source_health(industry_id: str | None = None) -> list[dict[str, Any]]:
                    sum(a.outbound_clicks) FILTER (
                        WHERE a.created_at > now() - interval '30 days'
                    ), 0
-               ) AS clicks_30d
+               ) AS clicks_30d,
+               coalesce(sum(f.attempts), 0) AS attempts_30d,
+               coalesce(sum(f.ok), 0) AS ok_30d,
+               coalesce(sum(f.blocked), 0) AS blocked_30d,
+               coalesce(sum(f.denied), 0) AS denied_30d,
+               coalesce(
+                   sum(f.duration_ms) FILTER (WHERE f.ok > 0), 0
+               ) AS ok_duration_ms_30d
         FROM sources s
         LEFT JOIN articles a ON a.source_id = s.id
+        LEFT JOIN source_fetch_stats f
+            ON f.source_id = s.id AND f.day > CURRENT_DATE - 30
         {where}
         GROUP BY s.id
         ORDER BY items_30d DESC, s.name
@@ -307,8 +315,19 @@ async def source_health(industry_id: str | None = None) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for row in rows:
         record = dict(row)
-        for key in ("items_7d", "items_30d", "clicks_30d"):
+        for key in ("items_7d", "items_30d", "clicks_30d", "attempts_30d", "ok_30d"):
             record[key] = int(record.get(key) or 0)
+        for key in ("blocked_30d", "denied_30d", "ok_duration_ms_30d"):
+            record[key] = int(record.get(key) or 0)
+        attempts = int(record["attempts_30d"])
+        record["success_rate_30d"] = (
+            round(int(record["ok_30d"]) / attempts, 3) if attempts else None
+        )
+        record["avg_ms_30d"] = (
+            round(int(record["ok_duration_ms_30d"]) / int(record["ok_30d"]))
+            if record["ok_30d"]
+            else None
+        )
         out.append(record)
     return out
 
@@ -368,3 +387,135 @@ def source_dto(source: Source, *, admin: bool = False) -> dict[str, Any]:
 
 def jsonb(value: Any) -> str:
     return json.dumps(value, default=str)
+
+
+async def record_fetch_stat(
+    source_id: str,
+    *,
+    status: str,
+    items: int,
+    duration_ms: int,
+) -> None:
+    """One day-level row per source, folded in after every fetch.
+
+    A failed fetch has no articles, so article counts alone cannot separate a
+    refused feed from a quiet one. This is the missing half of source health.
+    """
+    ok = 1 if status in ("ok", "http_304") else 0
+    blocked = 1 if status in ("blocked", "rate_limited", "robots_disallowed", "challenge") else 0
+    denied = 1 if status == "denied" else 0
+    async with session_scope() as session:
+        await session.execute(
+            text(
+                """
+                INSERT INTO source_fetch_stats
+                    (source_id, day, attempts, ok, blocked, denied, items, duration_ms)
+                VALUES (:source_id, CURRENT_DATE, 1, :ok, :blocked, :denied, :items, :duration_ms)
+                ON CONFLICT (source_id, day) DO UPDATE SET
+                    attempts = source_fetch_stats.attempts + 1,
+                    ok = source_fetch_stats.ok + EXCLUDED.ok,
+                    blocked = source_fetch_stats.blocked + EXCLUDED.blocked,
+                    denied = source_fetch_stats.denied + EXCLUDED.denied,
+                    items = source_fetch_stats.items + EXCLUDED.items,
+                    duration_ms = source_fetch_stats.duration_ms + EXCLUDED.duration_ms
+                """
+            ),
+            {
+                "source_id": source_id,
+                "ok": ok,
+                "blocked": blocked,
+                "denied": denied,
+                "items": max(items, 0),
+                "duration_ms": max(duration_ms, 0),
+            },
+        )
+
+
+async def upsert_candidates(rows: list[dict[str, Any]]) -> int:
+    """Persist discovery findings without overwriting an operator decision."""
+    saved = 0
+    async with session_scope() as session:
+        for row in rows:
+            result = await session.execute(
+                text(
+                    """
+                    INSERT INTO source_candidates
+                        (feed_url, name, industry_id, language, grade, overlap, verdict)
+                    VALUES
+                        (:feed_url, :name, :industry_id, :language, :grade, :overlap, :verdict)
+                    ON CONFLICT (feed_url) DO UPDATE SET
+                        name = EXCLUDED.name,
+                        industry_id = COALESCE(EXCLUDED.industry_id, source_candidates.industry_id),
+                        language = EXCLUDED.language,
+                        grade = EXCLUDED.grade,
+                        overlap = EXCLUDED.overlap,
+                        verdict = EXCLUDED.verdict,
+                        discovered_at = now()
+                    WHERE source_candidates.status IN ('new', 'shortlisted')
+                    RETURNING id
+                    """
+                ),
+                row,
+            )
+            saved += 1 if result.first() else 0
+    return saved
+
+
+async def list_candidates(status: str | None = None, *, limit: int = 100) -> list[dict[str, Any]]:
+    where = "WHERE status = :status" if status else ""
+    rows = await fetch_all(
+        f"""
+        SELECT id, feed_url, name, language, grade, overlap, verdict, status, note,
+               discovered_at, decided_at
+        FROM source_candidates
+        {where}
+        ORDER BY discovered_at DESC
+        LIMIT :limit
+        """,
+        {"status": status, "limit": limit} if status else {"limit": limit},
+    )
+    return [dict(row) for row in rows]
+
+
+async def decide_candidate(
+    candidate_id: str, *, status: str, note: str = ""
+) -> dict[str, Any] | None:
+    if status not in ("new", "shortlisted", "accepted", "dismissed"):
+        raise ValueError(f"unknown candidate status: {status}")
+    row = await fetch_one(
+        """
+        UPDATE source_candidates SET
+            status = :status,
+            note = CASE WHEN :note = '' THEN note ELSE :note END,
+            decided_at = now()
+        WHERE id = :id
+        RETURNING id, feed_url, name, language, grade, overlap, verdict, status, note
+        """,
+        {"id": candidate_id, "status": status, "note": note},
+    )
+    return dict(row) if row else None
+
+
+async def candidate_snippet(candidate_id: str) -> dict[str, Any] | None:
+    """The profile row for an accepted candidate."""
+    row = await fetch_one(
+        """
+        SELECT feed_url, name, language
+        FROM source_candidates
+        WHERE id = :id AND status = 'accepted'
+        """,
+        {"id": candidate_id},
+    )
+    if not row:
+        return None
+    return {
+        "name": row["name"] or str(row["feed_url"]),
+        "feed_url": str(row["feed_url"]),
+        "language": str(row["language"] or "en"),
+        "trust": 0.8,
+        "enabled": True,
+        "allow_http": False,
+        "poll_interval_min": 720,
+        "terms_url": None,
+        "licence_type": "unknown",
+    }
