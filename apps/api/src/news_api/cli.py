@@ -205,16 +205,40 @@ async def _sources(args: argparse.Namespace) -> int:
                 print(f"unknown industry: {args.industry}", file=sys.stderr)
                 return 2
             industry_id = desk.id
+        from news_api.sources.application.value import retirement_reason, value_score
+
         health_rows = await sources_repo.source_health(industry_id)
+        for row in health_rows:
+            row["value_score"] = value_score(
+                int(row.get("items_30d") or 0), int(row.get("clicks_30d") or 0)
+            )
+            row["retirement_reason"] = retirement_reason(row)
+        proposals = [row["name"] for row in health_rows if row["retirement_reason"]]
         stale = [
             row["name"]
             for row in health_rows
             if int(row.get("items_30d") or 0) < 10 or int(row.get("consecutive_failures") or 0) >= 5
         ]
-        print(json.dumps({"sources": health_rows, "needs_attention": stale}, indent=2, default=str))
+        print(
+            json.dumps(
+                {
+                    "sources": health_rows,
+                    "needs_attention": stale,
+                    "retirement_proposals": proposals,
+                },
+                indent=2,
+                default=str,
+            )
+        )
         return 0
 
     if command == "candidates":
+        if args.candidates_command == "refresh":
+            from news_api.sources.application.discover import refresh_candidates
+
+            report = await refresh_candidates(older_than_days=args.older_than, limit=args.limit)
+            print(json.dumps(report, indent=2))
+            return 0
         if args.candidates_command == "list":
             rows = await sources_repo.list_candidates(args.status, limit=args.limit)
             print(json.dumps({"candidates": rows}, indent=2, default=str))
@@ -225,6 +249,17 @@ async def _sources(args: argparse.Namespace) -> int:
             return 2
         snippet = await sources_repo.candidate_snippet(args.id)
         print(json.dumps({"candidate": decided, "profile_snippet": snippet}, indent=2, default=str))
+        return 0
+
+    if command == "traffic":
+        from news_api.platform.settings import get_settings
+
+        token = await sources_repo.ensure_traffic_token(args.source)
+        if token is None:
+            print(f"unknown source: {args.source}", file=sys.stderr)
+            return 2
+        base = get_settings().app_base_url.rstrip("/")
+        print(json.dumps({"url": f"{base}/traffic/{token}", "token": token}, indent=2))
         return 0
 
     if command == "export":
@@ -458,6 +493,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     cand_decide.add_argument("--note", default="")
     cand_decide.set_defaults(func=_sources)
+    cand_refresh = candidates_sub.add_parser(
+        "refresh", help="re-grade queued candidates older than N days"
+    )
+    cand_refresh.add_argument("--older-than", type=int, default=7)
+    cand_refresh.add_argument("--limit", type=int, default=10)
+    cand_refresh.set_defaults(func=_sources)
+    traffic = sources_sub.add_parser("traffic", help="publisher traffic page URL for a source")
+    traffic.add_argument("--source", required=True, help="source id")
+    traffic.set_defaults(func=_sources)
     export = sources_sub.add_parser("export", help="print the portfolio as OPML")
     export.set_defaults(func=_sources)
     outreach = sources_sub.add_parser("outreach", help="record that a publisher was contacted")

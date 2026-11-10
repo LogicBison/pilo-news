@@ -43,6 +43,9 @@ class Candidate:
     corroboration: int = 1
     corroborating_sources: list[str] = field(default_factory=list)
     verification: str = "trusted-source"
+    # A proprietary source may only be shown as headline + link: no excerpt, no
+    # generated summary. Enforced at ingestion so every surface is consistent.
+    headline_only: bool = False
 
 
 @dataclass(frozen=True)

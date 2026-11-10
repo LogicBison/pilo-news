@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import html.entities
+import json
 import re
 import unicodedata
 import uuid
@@ -234,8 +235,42 @@ def _first_text(entry: object, names: tuple[str, ...]) -> str:
     return ""
 
 
+def _parse_json_feed(content: bytes, *, source_name: str, language: str) -> list[FeedItem]:
+    """JSON Feed 1.x (https://jsonfeed.org) — the same shape, different syntax."""
+    try:
+        payload = json.loads(content.decode("utf-8", "replace"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("not a JSON feed") from exc
+    if not isinstance(payload, dict) or not isinstance(payload.get("items"), list):
+        raise ValueError("not a JSON feed")
+    items: list[FeedItem] = []
+    for entry in payload["items"][:200]:
+        if not isinstance(entry, dict):
+            continue
+        title = clean_text(str(entry.get("title") or ""))[:300]
+        link = str(entry.get("url") or entry.get("external_url") or "").strip()
+        if not title or not link:
+            continue
+        body = entry.get("summary") or entry.get("content_text") or entry.get("content_html") or ""
+        published = entry.get("date_published") or entry.get("date_modified")
+        published_at = parse_datetime(str(published)) if published else None
+        items.append(
+            FeedItem(
+                title=title,
+                link=link,
+                published_at=published_at or datetime.now(UTC),
+                excerpt=clean_text(str(body))[:280],
+                publisher=clean_text(str(payload.get("title") or source_name))[:120] or source_name,
+            )
+        )
+    return items
+
+
 def parse_feed(content: bytes, *, source_name: str, language: str) -> list[FeedItem]:
     """Parse RSS 2.0 / Atom safely. Returns normalized candidates (no persistence)."""
+    stripped = content.lstrip()
+    if stripped.startswith(b"{"):
+        return _parse_json_feed(stripped, source_name=source_name, language=language)
     head = content[:4096].lower()
     if b"<!doctype" in head or b"<!entity" in head:
         raise ValueError("DTD/entity declarations are not allowed")

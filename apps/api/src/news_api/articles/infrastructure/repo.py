@@ -402,3 +402,46 @@ async def recent_titles(industry_id: str | None = None, *, days: int = 30) -> li
         params,
     )
     return [str(row["title"]) for row in rows]
+
+
+async def overlap_share(
+    titles: list[str],
+    industry_id: str | None = None,
+    *,
+    threshold: float = 0.45,
+    days: int = 30,
+) -> float:
+    """Share of ``titles`` already carried by the desk, via pg_trgm.
+
+    Trigram similarity is the database's own near-duplicate measure: it catches
+    a reworded headline without loading every recent title into the process.
+    The 0.45 default is looser than the in-process token threshold because the
+    two scores are not comparable.
+    """
+    if not titles:
+        return 0.0
+    params: dict[str, Any] = {"titles": titles, "threshold": threshold, "days": days}
+    clause = ""
+    if industry_id:
+        clause = "AND a.industry_id = CAST(:industry_id AS uuid)"
+        params["industry_id"] = industry_id
+    row = await fetch_one(
+        f"""
+        WITH candidate AS (SELECT unnest(CAST(:titles AS text[])) AS title)
+        SELECT coalesce(
+            count(*) FILTER (
+                WHERE EXISTS (
+                    SELECT 1 FROM articles a
+                    WHERE a.status = 'published'
+                      AND a.created_at > now() - (CAST(:days AS integer) * interval '1 day')
+                      {clause}
+                      AND similarity(a.title, candidate.title) > :threshold
+                )
+            )::float / NULLIF(count(*), 0),
+            0
+        ) AS share
+        FROM candidate
+        """,
+        params,
+    )
+    return round(float(row["share"]), 3) if row else 0.0

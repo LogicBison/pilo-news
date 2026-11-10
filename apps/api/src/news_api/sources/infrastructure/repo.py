@@ -519,3 +519,111 @@ async def candidate_snippet(candidate_id: str) -> dict[str, Any] | None:
         "terms_url": None,
         "licence_type": "unknown",
     }
+
+
+async def ensure_traffic_token(source_id: str) -> str | None:
+    """The unguessable handle for a publisher's own traffic page.
+
+    Generated on demand from the database's UUID function, never derived from
+    the source id, and reused once issued so a link stays valid.
+    """
+    row = await fetch_one(
+        """
+        UPDATE sources SET
+            traffic_token = coalesce(
+                traffic_token, replace(gen_random_uuid()::text, '-', '')
+            )
+        WHERE id = :id
+        RETURNING traffic_token
+        """,
+        {"id": source_id},
+    )
+    return str(row["traffic_token"]) if row else None
+
+
+async def traffic_summary(token: str) -> dict[str, Any] | None:
+    """What one publisher gets: items we linked and clicks we sent, 30 days.
+
+    Subqueries rather than joins: joining articles and stats in one grouped
+    query multiplies both counts.
+    """
+    row = await fetch_one(
+        """
+        SELECT s.name, i.slug AS industry,
+               (SELECT count(*) FROM articles a
+                 WHERE a.source_id = s.id
+                   AND a.created_at > now() - interval '30 days') AS items_30d,
+               (SELECT coalesce(sum(a.outbound_clicks), 0) FROM articles a
+                 WHERE a.source_id = s.id
+                   AND a.created_at > now() - interval '30 days') AS clicks_30d,
+               (SELECT coalesce(sum(f.attempts), 0) FROM source_fetch_stats f
+                 WHERE f.source_id = s.id
+                   AND f.day > CURRENT_DATE - 30) AS attempts_30d,
+               (SELECT coalesce(sum(f.ok), 0) FROM source_fetch_stats f
+                 WHERE f.source_id = s.id
+                   AND f.day > CURRENT_DATE - 30) AS ok_30d
+        FROM sources s
+        JOIN industries i ON i.id = s.industry_id
+        WHERE s.traffic_token = :token
+        """,
+        {"token": token},
+    )
+    if not row:
+        return None
+    record = dict(row)
+    attempts = int(record.get("attempts_30d") or 0)
+    record["items_30d"] = int(record.get("items_30d") or 0)
+    record["clicks_30d"] = int(record.get("clicks_30d") or 0)
+    record["attempts_30d"] = attempts
+    record["success_rate_30d"] = (
+        round(int(record.get("ok_30d") or 0) / attempts, 3) if attempts else None
+    )
+    record.pop("ok_30d", None)
+    record["period_days"] = 30
+    return record
+
+
+async def stale_candidates(days: int, *, limit: int = 10) -> list[dict[str, Any]]:
+    rows = await fetch_all(
+        """
+        SELECT id, feed_url, industry_id
+        FROM source_candidates
+        WHERE status IN ('new', 'shortlisted')
+          AND discovered_at < now() - (CAST(:days AS integer) * interval '1 day')
+        ORDER BY discovered_at
+        LIMIT :limit
+        """,
+        {"days": days, "limit": limit},
+    )
+    return [dict(row) for row in rows]
+
+
+async def update_candidate_metrics(
+    candidate_id: str,
+    *,
+    grade: str | None,
+    overlap: float,
+    verdict: str,
+    language: str,
+) -> None:
+    async with session_scope() as session:
+        await session.execute(
+            text(
+                """
+                UPDATE source_candidates SET
+                    grade = :grade,
+                    overlap = :overlap,
+                    verdict = :verdict,
+                    language = :language,
+                    discovered_at = now()
+                WHERE id = :id AND status IN ('new', 'shortlisted')
+                """
+            ),
+            {
+                "id": candidate_id,
+                "grade": grade,
+                "overlap": overlap,
+                "verdict": verdict,
+                "language": language,
+            },
+        )

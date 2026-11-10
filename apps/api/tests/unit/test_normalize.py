@@ -151,3 +151,34 @@ def test_repair_escapes_bare_ampersands_only_outside_cdata() -> None:
     # Inside CDATA the ampersand is already literal text: escaping it would
     # print "&amp;" to the reader.
     assert repair_html_entities(b"<![CDATA[AT&T]]>") == b"<![CDATA[AT&T]]>"
+
+
+# --- JSON Feed 1.x ---------------------------------------------------------
+
+JSON_FEED = b"""{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Example Desk",
+  "items": [
+    {"id": "1", "url": "https://example.com/a",
+     "title": "Regulator opens consultation",
+     "summary": "The regulator opened a consultation on fees.",
+     "date_published": "2026-11-09T10:00:00Z"},
+    {"id": "2", "external_url": "https://example.com/b",
+     "title": "Second story", "content_text": "Body text.",
+     "date_modified": "2026-11-08T09:00:00Z"}
+  ]
+}"""
+
+
+def test_parse_json_feed_maps_the_same_shape() -> None:
+    items = parse_feed(JSON_FEED, source_name="fallback", language="en")
+    assert [item.title for item in items] == ["Regulator opens consultation", "Second story"]
+    assert items[0].link == "https://example.com/a"
+    assert items[1].link == "https://example.com/b"
+    assert items[0].publisher == "Example Desk"
+    assert items[0].published_at.year == 2026
+
+
+def test_parse_json_feed_rejects_a_json_object_that_is_not_a_feed() -> None:
+    with pytest.raises(ValueError):
+        parse_feed(b'{"hello": "world"}', source_name="x", language="en")

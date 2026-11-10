@@ -88,7 +88,44 @@ coasting on old coverage, and one with attempts but no successes is failing
 quietly. Those counters come from `source_fetch_stats`, written by every ingest
 fetch.
 
-## 5. Portability
+## 5. Publisher traffic page
+
+```bash
+./bin/sources.sh traffic --source <id>
+# http://localhost:43991/traffic/<token>
+```
+
+An unguessable, per-source link that shows that publisher their own numbers:
+stories we linked, clicks we sent, requests to their feed, and the success rate
+over 30 days. No other source, no reader data, `noindex`. Send it with an
+outreach note; it is what turns the traffic argument into a document.
+
+## 6. Keeping the queue honest
+
+```bash
+./bin/sources.sh candidates refresh --older-than 7 --limit 10
+```
+
+Re-grades `new` and `shortlisted` candidates that have been sitting: grade,
+overlap, language and verdict are refreshed, status is untouched. Run it
+weekly (or from a cron) so a shortlist is never approved on last month's
+evidence.
+
+## 7. Value and retirement
+
+`sources health` adds `value_score` (`items + 5 × clicks`) and
+`retirement_reason`. A source is proposed for retirement when it produced no
+items from at least three attempts, or fewer than five items with no return
+clicks. Disabled sources are never proposed, and a thin source that sends
+readers is left alone.
+
+## 8. Formats
+
+RSS 2.0, Atom and **JSON Feed 1.x** all parse into the same shape
+(`parse_feed`). JSON Feed's `summary` / `content_text` becomes the excerpt,
+`url` / `external_url` the link, `date_published` / `date_modified` the date.
+
+## 9. Portability
 
 ```bash
 ./bin/sources.sh export > portfolio.opml
@@ -98,7 +135,7 @@ Exports the enabled portfolio as OPML grouped by desk; the same format
 `discover` accepts, so it round-trips. Useful for backups, for handing the list
 to a colleague, and for diffing dev against prd.
 
-## 6. The pitch, honestly
+## 10. The pitch, honestly
 
 "We send you readers" is true and measurable here, and it opens doors with
 regulators, exchanges and trade presses. It is not a licence. Where a publisher

@@ -186,8 +186,8 @@ async def discover(
 
     existing_sources = await sources_repo.list_sources(include_disabled=True)
     configured = {normalize_feed_url(item.feed_url): item for item in existing_sources}
-    titles = await articles_repo.recent_titles(industry_id)
-    existing_titles = [title_tokens(title) for title in titles if title]
+    recent = await articles_repo.recent_titles(industry_id)
+    existing_titles = [title_tokens(title) for title in recent if title]
 
     rows: list[Candidate] = []
     for url in candidates[:limit]:
@@ -196,6 +196,7 @@ async def discover(
                 url,
                 configured=configured,
                 existing_titles=existing_titles,
+                industry_id=industry_id,
             )
         )
 
@@ -245,11 +246,25 @@ async def discover(
     }
 
 
+async def _overlap(
+    titles: list[str],
+    existing_titles: list[frozenset[str]],
+    industry_id: str | None,
+) -> float:
+    """pg_trgm first (the database's near-duplicate measure), token match if the
+    extension is not available."""
+    try:
+        return await articles_repo.overlap_share(titles, industry_id)
+    except Exception:  # extension missing or query error: stay useful
+        return overlap_ratio(titles, existing_titles)
+
+
 async def _evaluate(
     url: str,
     *,
     configured: dict[str, Source],
     existing_titles: list[frozenset[str]],
+    industry_id: str | None = None,
 ) -> Candidate:
     key = normalize_feed_url(url)
     duplicate = configured.get(key)
@@ -299,7 +314,7 @@ async def _evaluate(
         items=list(outcome.items),
     )
     metrics = report.metrics
-    overlap = overlap_ratio(titles, existing_titles)
+    overlap = await _overlap(titles, existing_titles, industry_id)
 
     reasons = list(report.issues)
     if overlap > MAX_OVERLAP:
@@ -324,3 +339,45 @@ async def _evaluate(
         robots_allowed=True,
         crawl_delay=int(crawl_delay) if crawl_delay else None,
     )
+
+
+async def refresh_candidates(*, older_than_days: int = 7, limit: int = 10) -> dict[str, Any]:
+    """Re-grade queued candidates that have been sitting for a while.
+
+    Status is never touched: a shortlisted feed stays shortlisted even if its
+    grade moved. Only the numbers behind the decision are refreshed, so a stale
+    queue cannot be approved on last month's evidence.
+    """
+    rows = await sources_repo.stale_candidates(older_than_days, limit=limit)
+    existing_sources = await sources_repo.list_sources(include_disabled=True)
+    configured = {normalize_feed_url(item.feed_url): item for item in existing_sources}
+    recent = await articles_repo.recent_titles(None)
+    existing = [title_tokens(title) for title in recent if title]
+
+    updated: list[dict[str, Any]] = []
+    for row in rows:
+        industry_id = str(row["industry_id"]) if row.get("industry_id") else None
+        candidate = await _evaluate(
+            str(row["feed_url"]),
+            configured=configured,
+            existing_titles=existing,
+            industry_id=industry_id,
+        )
+        await sources_repo.update_candidate_metrics(
+            str(row["id"]),
+            grade=candidate.grade,
+            overlap=candidate.overlap,
+            verdict=candidate.verdict,
+            language=candidate.language or "",
+        )
+        updated.append(
+            {
+                "id": str(row["id"]),
+                "feed_url": candidate.url,
+                "verdict": candidate.verdict,
+                "grade": candidate.grade,
+                "overlap": candidate.overlap,
+                "reasons": candidate.reasons,
+            }
+        )
+    return {"checked": len(rows), "candidates": updated}

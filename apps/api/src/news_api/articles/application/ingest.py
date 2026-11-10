@@ -90,6 +90,8 @@ def _seed_candidates(industry_slug: str, industry_id: str, topics: list[Topic]) 
 def _feed_candidates(
     source: Any, outcome: Any, industry_id: str, topics: list[Topic]
 ) -> list[Candidate]:
+    # Licence first: a proprietary feed contributes headlines and links only.
+    headline_only = getattr(source, "licence_type", "unknown") == "proprietary"
     candidates: list[Candidate] = []
     for item in outcome.items:
         assert isinstance(item, FeedItem)
@@ -105,7 +107,7 @@ def _feed_candidates(
                 title=item.title[:300],
                 url=canonical,
                 canonical_url=canonical,
-                excerpt=item.excerpt[:280],
+                excerpt="" if headline_only else item.excerpt[:280],
                 publisher=item.publisher or source.name,
                 language=source.language,
                 published_at=item.published_at,
@@ -113,6 +115,7 @@ def _feed_candidates(
                 is_seed=False,
                 article_id=article_uuid(source.id, canonical, item.title),
                 topics=topics,
+                headline_only=headline_only,
             )
         )
     return candidates
@@ -264,6 +267,11 @@ async def run_ingest(
                     has_summary = bool(
                         state and state.get("summary") and state.get("summary_language") == language
                     )
+                    if candidate.headline_only:
+                        # Writing our own summary of a proprietary excerpt is
+                        # the same republication problem with extra steps.
+                        kept += 1
+                        continue
                     if has_summary and not full_reset:
                         stats["summaries_reused"] += 1
                         kept += 1

@@ -116,6 +116,12 @@ still lets us read. They are reported separately and only the second one gates.
   preferred replacement when a desk loses a source: explicit terms, stable
   URLs, no WAF. Added 2026-11-10: CISA News (cybersecurity), SEC Press Releases
   (financial), alongside the Federal Reserve Board (financial).
+- **Licence is enforced, not just recorded.** A `proprietary` source is stored
+  as headline + link only: the excerpt is dropped at ingestion and no summary
+  is generated, so every surface (channel, article, search, bundle) is
+  consistent without per-page checks. `unknown` keeps the current
+  headline + excerpt + summary practice; set the licence when you check the
+  terms.
 
 ## 7. Editorial judgment that stays human
 

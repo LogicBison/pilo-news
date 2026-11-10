@@ -51,6 +51,9 @@ FEED_CONTENT_TYPES = frozenset(
         "application/xml",
         "text/xml",
         "application/rdf+xml",
+        # JSON Feed 1.x. Some servers send application/json.
+        "application/feed+json",
+        "application/json",
     }
 )
 

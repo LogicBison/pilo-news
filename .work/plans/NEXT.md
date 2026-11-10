@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-10 (M19 acquisition pipeline — candidate queue, fetch history, robots-change alerts, OPML round-trip)
+**Updated:** 2026-11-10 (session closed — M15–M20 delivered; deploy is the next move)
 
 ---
 
@@ -110,6 +110,66 @@ merge_with_conditions — reason: gates are green (209 api tests, lint/tsc/check
 ### Cross-LLM verification
 
 Not run in this session; `@code-verify uncommitted` before any commit.
+
+---
+
+## Completed iteration - M20: acquisition quality (2026-11-10)
+
+**Milestone ref:** full plan §19 **M20** · spec `.work/features/source-acquisition/20261110-SPEC.md` (extended, R11–R16)
+**Status:** complete 2026-11-10 · 6/6 tasks
+
+### In scope
+
+- **R11** proprietary sources are headline + link only (excerpt dropped, no summary) at ingestion.
+- **R12** overlap via `pg_trgm` with the token matcher as fallback.
+- **R13** publisher traffic page: token per source, `GET /v1/traffic/{token}`, `/traffic/<token>`.
+- **R14** `candidates refresh` re-grades the queue without touching decisions.
+- **R15** `value_score` and `retirement_reason` in `sources health`.
+- **R16** JSON Feed 1.x parsing and content types.
+
+### Tasks
+
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| M20-T1 | Licence enforcement (`headline_only`) | `articles/domain/models.py`, `articles/application/ingest.py` | done 2026-11-10 |
+| M20-T2 | pg_trgm overlap + fallback | `migrations/020_acquisition_quality.sql`, `articles/infrastructure/repo.py`, `discover.py` | done 2026-11-10 |
+| M20-T3 | Traffic token, summary, API, page, CLI | `sources/infrastructure/repo.py`, `publishing/http/traffic.py`, `app/traffic/[token]/page.tsx`, `cli.py` | done 2026-11-10 |
+| M20-T4 | Candidate refresh | `discover.py`, `cli.py` | done 2026-11-10 |
+| M20-T5 | Value score + retirement proposals | `sources/application/value.py`, `cli.py` | done 2026-11-10 |
+| M20-T6 | JSON Feed + tests + OpenAPI | `normalize.py`, `politeness.py`, `tests/unit/*` | done 2026-11-10 |
+
+### Verification (2026-11-10)
+
+| Gate | Result |
+|------|--------|
+| api gates | clean · **233 passed** |
+| web gates / build | 584 keys · RC=0 |
+| pg_trgm | existing legal title `1.0`, unrelated `0.0` |
+| traffic | token issued, `GET /v1/traffic/<token>` 200, page renders on the production build (`Reading record`, source name, clicks) |
+| refresh | NIST candidate saved, re-graded `accept`, status untouched |
+| health | `value_score` present; no retirement proposals on the current portfolio |
+| JSON Feed | fixture parses; non-feed object rejected |
+
+### MOD-06 output (2026-11-10, acquisition quality)
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 3 — ingestion (licence) → every reader surface; discovery → Postgres (`pg_trgm`); sources repo → a new public route and page.
+- New cross-boundary deps: `ingest` → `Candidate.headline_only`; `discover` → `overlap_share`; `traffic` → `sources.traffic_token`. The `pg_trgm` extension is a database capability, not a service.
+- Test isolation: ok — licence: `test_licence.py`; JSON Feed: `test_normalize.py`; value rules: `test_value.py`; overlap: live SQL check plus token fallback tests.
+- Human architectural review: required — reason: a public tokenised page and a licence rule that changes stored content. Read `traffic_summary` (only own numbers, no ids) and `_feed_candidates` before deploy.
+- Blast radius: if the licence rule is wrong, a proprietary source loses its excerpt or keeps one it should not; if the token page leaks, it exposes one source's aggregate counts; if pg_trgm is missing, discovery falls back and stays correct.
+
+## Recommendation
+merge_with_conditions — reason: gates green, but the licence rule changes what is stored and the traffic page is public by design.
+
+## Conditions if merge_with_conditions
+- Confirm no source is currently `proprietary` that depends on its excerpt (the portfolio sets `public-domain` for three and `unknown` for the rest).
+- The traffic page is English-only by design; localise it if publishers ask.
+
+### Cross-LLM verification
+
+Not run in this session.
 
 ---
 
@@ -429,6 +489,10 @@ merge_with_conditions — reason: gates green (lint, tsc, check, build RC=0, Pla
 
 | Item | Artifact |
 |------|----------|
+| Source availability (M17) | permission ledger, `denied`/`challenge` outcomes, licensed-feed auth, availability gate, `/bot` allowlist block |
+| Source acquisition (M18) | `sources discover` + overlap, licence/outreach register, `/go` click counting, portfolio health |
+| Acquisition pipeline (M19) | candidate queue, per-source fetch history, robots-change warning, OPML round-trip, language gaps |
+| Acquisition quality (M20) | licence enforcement, pg_trgm overlap, publisher traffic page, queue refresh, value/retirement, JSON Feed |
 | Fetch safety (M16) | `politeness.py`, fetcher rewiring, bot page, profile repairs; `verify-sources` 50/50, `hosts` 14/14, 18 ledger tests |
 | Content fixes (D1–D5, D7–D10) | prompt + validator rules, offer standfirst, one summary block, 30-day 404 copy; e2e + unit coverage |
 | M15 plan-drift fixes | full plan v1.6 (`M15-T8` row + G1 `M15-T1..T8`); brand-assets plan header/tracked-art/derivation corrected and smoke-tested; MOD-06 → merge_ok |
@@ -527,28 +591,20 @@ merge_with_conditions — reason: gates green (lint, tsc, check, build RC=0, Pla
 
 ## Recommended next
 
-**M15 and M16 complete** (2026-11-10, C+D verified) — no agent plan work is open. The next
-iteration starts on owner input: **O9** (production TLS) is the only item that unblocks a
-shipped half, and **D-trial** is the only read that can still change a code decision.
+**M15–M20 complete** (2026-11-10). No agent plan work is open; the next move is the deploy,
+then the owner lane.
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Finish production TLS on `169.58.4.85` | pull the template fix, `domains --write`, `nginx -t`, reload, `certs --check`, `hosts` (O9) — also closes the **prd half of M15-T6** |
-| **1** | Run one week of `FETCH_PACING=shadow` on prd | before trusting the pacing numbers; dev runs `enforce` |
-| **2** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |
-| **3** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions |
-| **4** | D-trial: read the next natural refresh | 20 new summaries against D1–D5; decision 3, no forced reset |
-| **5** | ~~Make `verify-sources` exit non-zero~~ done 2026-11-10 | it already did; the availability floor is now part of the gate |
-| **6** | Name the digest reviewer (D-005) | unblocks the content-generation signature line on `/services` (G2) |
-| **7** | Approve the `SMTP_FROM` spelling change (O15) | `.env.example` region still says "Herald Fox"; protected surface, needs same-message approval |
-| **8** | ~~Approve the `BOT_*`/`FETCH_*` keys~~ done 2026-11-10 | `.env.example` documents the six keys; the rest stay in `settings.py` |
-| **9** | Answer U32/U33, settle the brand string (D-018, 2026-12-15) | pricing shape; channel headers still say "System News" |
-
-**Commit state:** the M15 + M16 tree (52 files) was approved, committed and pushed on 2026-11-10
-after `@code-verify uncommitted` (verdict *pass with conditions*: blast radius high, acknowledged
-by the owner in the same message).
-
----
+| **0** | Deploy to prd and finish TLS | `git pull`, `preflight`, `up`, `domains --write`, `nginx -t`, reload, `certs --check`, `hosts` (O9) |
+| **1** | Run `FETCH_PACING=shadow` for one week | then flip to `enforce`; dev already enforces |
+| **2** | Decide the queued NIST candidate | `sources candidates list`; `decide --status accepted` prints the profile row |
+| **3** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |
+| **4** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions |
+| **5** | D-trial: read the next natural refresh | 20 new summaries against D1–D5; no forced reset |
+| **6** | Confirm CISA/SEC stay (O17) | answered 2026-11-10: keep both |
+| **7** | Approve `SMTP_FROM` spelling (O15) | protected surface, needs same-message approval |
+| **8** | Answer U32/U33, settle the brand string (D-018, 2026-12-15) | pricing shape; channel headers still say "System News" |
 
 ## Blocked on owner
 

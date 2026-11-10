@@ -35,6 +35,7 @@ from news_api.publishing.http.leads import router as leads_router
 from news_api.publishing.http.news import router as news_router
 from news_api.publishing.http.outbound import router as outbound_router
 from news_api.publishing.http.taxonomy import router as taxonomy_router
+from news_api.publishing.http.traffic import router as traffic_router
 
 settings = get_settings()
 configure_logging(settings.log_level, settings.log_json)
@@ -140,6 +141,7 @@ async def root() -> Any:
 app.include_router(industries_router)
 app.include_router(news_router)
 app.include_router(outbound_router)
+app.include_router(traffic_router)
 app.include_router(taxonomy_router)
 app.include_router(contact_router)
 app.include_router(leads_router)
