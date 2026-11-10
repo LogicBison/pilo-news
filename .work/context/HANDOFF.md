@@ -2,7 +2,7 @@
 
 ## Session status
 
-**Open (2026-11-10, C+D verified):** the interrupted 2026-11-09 C+D session was resumed, verified and finished. Fetch safety (full plan **M16**) and the content fixes pass every gate: api **209 tests**, web lint/tsc/check **579 keys**, build **RC=0**, Playwright **124 passed / 0 failed / 5 skipped** on the production build, `hosts` all 14 invariants, `verify-sources` **50/50, 0 warnings**. Six defects were found while verifying and fixed: retail parser (bare `&`), financial below the 4-source minimum (Federal Reserve feed added), cooldown gauge not reset, admin Sources not rendering the new cooldown/last-error fields, the article-404 home link empty on channel hosts, and plan drift (NEXT said `pending`; the full plan had no M16). Commit approved by the owner in the same message and verified with `@code-verify uncommitted` (2026-11-10); the SHA is recorded in the cross-framework record below.
+**Open (2026-11-10, C+D verified):** the interrupted 2026-11-09 C+D session was resumed, verified and finished. Fetch safety (full plan **M16**) and the content fixes pass every gate: api **209 tests**, web lint/tsc/check **579 keys**, build **RC=0**, Playwright **124 passed / 0 failed / 5 skipped** on the production build, `hosts` all 14 invariants, `verify-sources` **50/50, 0 warnings**. Six defects were found while verifying and fixed: retail parser (bare `&`), financial below the 4-source minimum (Federal Reserve feed added), cooldown gauge not reset, admin Sources not rendering the new cooldown/last-error fields, the article-404 home link empty on channel hosts, and plan drift (NEXT said `pending`; the full plan had no M16). **Committed 2026-11-10 as `c6ce202`** (53 files: M15 brand surfaces + M16 fetch safety/content) and pushed to `origin/main`, with owner approval in the same message, after `@code-verify uncommitted` returned *pass with conditions* (blast radius high, acknowledged by the owner).
 
 **Open:** 2026-11-09 - goal: proceed to implement all plans until all is full and complete (`@x-director`)
 
@@ -396,4 +396,5 @@ and run one week of `FETCH_PACING=shadow` on prd.
 **User correction:** none
 **Coordination notes:** UI portion (brand surfaces, admin Sources row, reader copy) was executed natively under the same single-model pass; `.work.ui/plans/20261109-brand-assets.md` and `HANDOFF_UI` were updated to match what shipped. No protected file was edited; `.env*` changes stay with the owner (O15, O16).
 **Blockers:** O9 (production TLS), O15 (`SMTP_FROM`), O16 (`BOT_*`/`FETCH_*` in `.env.example`); agent follow-ups are the D-trial read, a real `verify-sources` exit code, and a prd shadow week for pacing.
-**Next recommended:** `@code-verify uncommitted`, then commit the C+D + M15 tree.
+**Next recommended:** `@code-verify last` on `c6ce202` after the push.
+**Delivered:** `c6ce202` — 53 files, M15 + M16, pushed 2026-11-10 with owner approval.
