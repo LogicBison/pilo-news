@@ -72,6 +72,17 @@ Not run in this session; `@code-verify uncommitted` before any commit.
 |----|-------------|-----------|
 | M15-T8 | Board keeps its table, loses the languages column, no clipped cells 320-1440 px; masthead wraps under 720 px | 2026-11-09 |
 
+### Plan verification (2026-11-09, @x-director)
+
+Four drifts found and fixed before implementation:
+
+1. Full plan §19 M15 had no `M15-T8` row although NEXT marks T8 done → row added, G1 traceability now `M15-T1..T8`, plan version 1.5 → 1.6.
+2. `.work.ui/plans/20261109-brand-assets.md:3` still asked for the wordmark pick → decision 1 recorded as answered (2026-11-09, emblem + live text); §5 decision 2 (tile colour) stays owner-open.
+3. The same file claimed the source art was untracked → it is tracked (`.work.ui/references/heraldfox-final.png`, `f71bfd3`).
+4. The derivation block used `magick` (absent on this host) and a plain `-trim` (leaves the full 1510 × 1024 canvas) → `convert` + `-fuzz 2%`; all six commands smoke-tested in `tmp/`: emblem 700 × 700 transparent, lockup 1265 × 921, tile 512 × 512, favicon 48/32/16, icon 512, apple 180 opaque.
+
+Gates: `touch-scope-verify` pass · `blast-radius` medium (docs only, 2 areas) · `traceability-verify` 17/17 FR · **MOD-06 → merge_ok** (boundaries 0, deps none, test isolation n/a for docs).
+
 ### Concept / NFR registry (this iteration)
 
 | Concept | Applies | Reason |
@@ -85,12 +96,29 @@ Not run in this session; `@code-verify uncommitted` before any commit.
 | MOD-07 prompt-architecture | no | no prompt change in this iteration (that is the content track) |
 | MOD-08 declarative-infra | no | no infrastructure change |
 
+### MOD-06 output (2026-11-09, plan-drift fixes)
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 0 — planning and session artifacts only (`.work/`, `.work.ui/` memory trees; no code module touched)
+- New cross-boundary deps: none
+- Test isolation: n/a (no code) — command: `bash $AGENT_OS_SOURCE/scripts/traceability-verify.sh` → `17/17 FR ids map to a task`; `touch-scope-verify.sh` → pass
+- Human architectural review: optional — reason: documentation-only diff, no module or service boundary moves
+- Blast radius: if wrong, the master plan's M15 task table and the G1 traceability row mislead the next iteration, and the brand-asset derivation commands fail at M15-T1 (caught now by the smoke test); no runtime, data or user-facing surface is touched.
+
+## Recommendation
+merge_ok — reason: five planning/session files, all inside `.work/touch-scope`; gates green (touch-scope pass, traceability 17/17, blast medium = docs only, all six derivation commands smoke-tested).
+
+## Conditions if merge_with_conditions
+- none — the recommendation is `merge_ok`.
+
 ---
 
 ## Done
 
 | Item | Artifact |
 |------|----------|
+| M15 plan-drift fixes | full plan v1.6 (`M15-T8` row + G1 `M15-T1..T8`); brand-assets plan header/tracked-art/derivation corrected and smoke-tested; MOD-06 → merge_ok |
 | Apex responsive fix | Board keeps its table at 3 columns (languages dropped) and stops clipping the last column at 1024-1440 px; masthead wraps under 720 px; regression test in `e2e/lobby.spec.ts` |
 | Email transport | `start.sh`/settings gateway lane, `info@links.heraldfox.com`, delivered with DKIM/DMARC pass |
 | Restore hardening | `init-env` DB/Redis passwords + URL sync, preflight email lane, menu restore `--all`, bundle drill |
@@ -188,6 +216,8 @@ Not run in this session; `@code-verify uncommitted` before any commit.
 
 **New 2026-11-09:** `.work/plans/20261109-next-improvement.md` — logo + favicons, ten content
 fixes, fetch safety. A+B and D1–D5/D7–D10 need no owner input; C waits on the crawler contact URL.
+
+**Plans verified 2026-11-09:** the M15 drift found at session start is fixed (full plan v1.6, brand-asset plan corrected) — `## Current iteration` is cleared to start.
 
 | Priority | Item | Notes |
 |----------|------|-------|

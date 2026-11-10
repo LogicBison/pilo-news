@@ -2,6 +2,8 @@
 
 ## Session status
 
+**Closed:** 2026-11-09 — `@x-director` plan-drift pass: M15 plans verified and corrected (full plan v1.6 gains the M15-T8 row and G1 `M15-T1..T8`; brand-assets plan header, tracked-art claim and derivation block fixed), derivation smoke-tested, MOD-06 → merge_ok. M15 implementation itself is still pending.
+
 **Closed:** 2026-11-09 — four-request analysis, M15 planned and approved, apex responsive fix, READY TO IMPLEMENT.
 Analysed the logo, the missing favicons, the fetcher's access posture and the generated content against the 2026-11-07 bundle (676 articles, 52 sources, 78 runs). Produced `.work/plans/20261109-next-improvement.md` (four tracks), `.work/features/fetch-safety/20261109-SPEC.md`, `.work.ui/plans/20261109-brand-assets.md`. Added **M15 brand surfaces** to the approved plan (v1.5, owner-approved 2026-11-09) and wrote the `## Current iteration` block. Fixed the owner-reported apex defects: the desk board kept three columns (languages dropped) and stopped clipping its last column at 1024-1440 px, and the masthead wraps under 720 px so a 390 px document no longer scrolls sideways. Verified: lobby e2e 13/13, layout 58 passed (1 flaky, green on retry), axe 29/29, lint/tsc/check/build clean.
 
@@ -105,6 +107,8 @@ and a browser save/restore check against the dev API. SPEC:
 
 | Gate | Command | Result |
 |---|---|---|
+| Plan drift (2026-11-09) | `touch-scope-verify.sh` / `traceability-verify.sh` / `mod06-output-check.sh` / `blast-radius-check.sh` | pass · 17/17 FR · pass · medium = docs only, MOD-06 merge_ok |
+| Derivation smoke test (2026-11-09) | six `convert` commands in `tmp/` (removed after) | emblem 700×700 transparent, lockup 1265×921, tile 512×512, favicon 48/32/16, icon 512, apple 180 opaque |
 | Lobby e2e (2026-11-09) | `pnpm exec playwright test e2e/lobby.spec.ts` | 13 passed |
 | Layout e2e (2026-11-09) | `pnpm exec playwright test e2e/layout.spec.ts` | 58 passed, 1 flaky (green on retry) |
 | Accessibility (2026-11-09) | `pnpm exec playwright test e2e/accessibility.spec.ts` | 29 passed |
@@ -155,6 +159,7 @@ Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, re
 
 | Date | Session | Artifacts |
 |------|---------|-----------|
+| 2026-11-09 | plan-drift fixes (@x-director) | full plan **v1.6** (missing `M15-T8` row added, G1 → `M15-T1..T8`); brand-assets plan corrected (decision-1 header, tracked-art claim, `convert` + `-fuzz 2%` derivation, lockup 1265×921); NEXT gained the plan-verification block and the MOD-06 output; HANDOFF + HANDOFF_UI x-director records |
 | 2026-11-09 | responsive fix (M15-T8) | lobby desk board kept three columns (languages column dropped by the owner) and stopped clipping its last column at 1024-1440 px; masthead wraps under 720 px so a 390 px document no longer scrolls sideways; regression test in `e2e/lobby.spec.ts` |
 | 2026-11-09 | improvement planning | `.work/plans/20261109-next-improvement.md` (4 tracks), `.work/features/fetch-safety/20261109-SPEC.md`, `.work.ui/plans/20261109-brand-assets.md`; content audit of 676 articles from the 2026-11-07 bundle; M15 planned in the full plan + `## Current iteration` in NEXT |
 | 2026-11-07 | email | pilo-mail gateway transport lanes, `info@links.heraldfox.com`, DKIM/DMARC pass, real delivery |
@@ -313,3 +318,22 @@ per-host check, gates. Then the content track, then fetch safety. O9 (production
 **Coordination notes:** the Offers tab consumes the admin API; publish is reviewer-gated and public pages only show published issues; no email path was added.
 **Blockers:** named reviewers and email remain; EU/recall/energy adapters are not built.
 **Next recommended:** review the drafts in the Offers tab, then choose the 7-Day Desk Brief or the public reference page as the next build.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-09
+**Request:** "fix everything" → acked as "proceed as recommended, fix everything"
+**Frameworks involved:** .ai, .ai.ui
+**Classified framework bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc yes (framework source only — no `.work.soc/`) | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. `@ai-director - "fix everything"` → full plan §19 M15 gained the missing `M15-T8` row (it was done 2026-11-09 but absent from the plan), G1 traceability moved to `M15-T1..T8`, plan version 1.5 → 1.6 with a changelog line.
+2. `@ui-director - "fix everything"` → `.work.ui/plans/20261109-brand-assets.md`: status header records the wordmark decision as answered, the "not tracked by git yet" claim corrected, derivation block ported from `magick` (IM7, not installed) to `convert` (IM6 6.9.11) with `-fuzz 2%` on the lockup trim, §2 lockup size corrected to 1265 × 921.
+3. Verified by execution: all six derivation commands ran clean in `tmp/` (removed after use) — emblem 700 × 700 transparent, tile 512 × 512, favicon 48/32/16, icon 512, apple 180 opaque. `touch-scope-verify` pass · `traceability-verify` 17/17 FR · `blast-radius` medium (docs only) → MOD-06 run → **merge_ok**.
+**User correction:** none
+**Coordination notes:** both directors' domains were executed natively in one model pass (single-model, as on 2026-11-06) after the operator acked the routing plan; no application code touched — three planning files only, all inside `.work/touch-scope`.
+**Blockers:** §5 decision 2 (tile colour, assumed `#0b1220`) still owner-open; O9 still blocks the prd half of M15-T6.
+**Next recommended:** `@code-implementation start` (M15-T1..T7)

@@ -1,6 +1,6 @@
 # Brand assets — logo on the root site, favicons everywhere
 
-**Status:** Draft (2026-11-09) · **Needs:** owner pick between the two wordmark treatments (§5, decision 1); asset slate below assumes emblem + live text.
+**Status:** Draft (2026-11-09), decision 1 answered · **Needs:** §5 decision 2 (tile colour) still owner-open — assumed `#0b1220`; the wordmark treatment is settled: emblem + live text (`.work/plans/20261109-next-improvement.md` § Decisions, 2026-11-09); asset slate below assumes emblem + live text.
 **Source art:** `.work.ui/references/heraldfox-final.png` — 1536 × 1024 RGBA, transparent background (797,734 fully transparent pixels, alpha max 254), art bbox `x 140–1401, y 4–922`. Baked palette: fur `#f87000`, banner gold `#f8a800`, banner `#000000`.
 **Scope:** root site (apex lobby) gets the logo; every host gets a favicon derived from it. Channel headers keep their per-skin emblem.
 
@@ -16,7 +16,7 @@
 | Favicon | none — no `app/icon.*`, no `metadata.icons` | `src/app/` listing; `app/layout.tsx:13-27` |
 | `/favicon.ico` | 404, correctly excluded from middleware | `middleware.ts:188` |
 
-The logo file arrived 2026-11-09 and is not tracked by git yet.
+The logo file arrived 2026-11-09 and is tracked: `.work.ui/references/heraldfox-final.png` (committed in `f71bfd3`).
 
 ## 2. Asset slate
 
@@ -26,7 +26,7 @@ All derivatives are generated from the one source; nothing is hand-painted.
 |-------|------|------|-----|
 | Emblem, transparent | `apps/web/public/brand/heraldfox-emblem.png` | 700 × 700 (head square, see derivation) | masthead, footer, light surfaces |
 | Emblem, flattened | on the tile, below | — | dark surfaces, favicon source |
-| Lockup | `apps/web/public/brand/heraldfox-lockup.png` | 1261 × 918 trimmed | OG image, large placements only |
+| Lockup | `apps/web/public/brand/heraldfox-lockup.png` | 1265 × 921 trimmed (`-fuzz 2%`; art bbox ≈ 1262 × 919) | OG image, large placements only |
 | Icon tile | `apps/web/public/brand/icon-tile.png` | 512 × 512 | favicon/apple source |
 | Favicon | `apps/web/src/app/favicon.ico` | 16 / 32 / 48 | browser tab |
 | Icon | `apps/web/src/app/icon.png` | 512 × 512 | manifest, high-DPI tab |
@@ -34,24 +34,26 @@ All derivatives are generated from the one source; nothing is hand-painted.
 
 ### Derivation
 
+**Tooling:** the block uses ImageMagick 6 `convert` (this host: 6.9.11 — `magick` is not installed). On ImageMagick 7 substitute `magick`; the arguments are identical. The lockup trim needs `-fuzz 2%`: without it the semi-transparent edge pixels (alpha max 254) stop the trim and leave the full 1510 × 1024 canvas.
+
 ```
 # emblem: the head, square. the banner starts at y≈610, so the crop stops above it;
 # the 700x610 box keeps ears, eyes and muzzle, then pads to square.
-magick heraldfox-final.png -crop 700x610+410+0 +repage \
+convert heraldfox-final.png -crop 700x610+410+0 +repage \
   -background none -gravity center -extent 700x700 brand/heraldfox-emblem.png
 
 # lockup: everything, trimmed
-magick heraldfox-final.png -trim +repage brand/heraldfox-lockup.png
+convert heraldfox-final.png -fuzz 2% -trim +repage brand/heraldfox-lockup.png
 
 # icon tile: dark field, emblem at 80 %, flattened (no alpha on dark = no white halo)
-magick -size 512x512 xc:'#0b1220' \
+convert -size 512x512 xc:'#0b1220' \
   \( brand/heraldfox-emblem.png -resize 410x410 \) -gravity center -composite \
   -alpha remove -alpha off brand/icon-tile.png
 
 # favicons
-magick brand/icon-tile.png -define icon:auto-resize=48,32,16 src/app/favicon.ico
-magick brand/icon-tile.png -resize 512x512 src/app/icon.png
-magick -size 180x180 xc:'#0b1220' \( brand/icon-tile.png -resize 164x164 \) \
+convert brand/icon-tile.png -define icon:auto-resize=48,32,16 src/app/favicon.ico
+convert brand/icon-tile.png -resize 512x512 src/app/icon.png
+convert -size 180x180 xc:'#0b1220' \( brand/icon-tile.png -resize 164x164 \) \
   -gravity center -composite -alpha remove src/app/apple-icon.png
 ```
 

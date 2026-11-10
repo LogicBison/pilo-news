@@ -422,3 +422,16 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Scope:** `.work.ui/screens/admin-console/20261106-SCREEN-SPEC-amendment-03.md`.
 **Shipped:** Contacts tab after Leads: channel, name/email, country, source/UTM, status, date; expanded message, phone, campaign, session hash; two-step DSAR delete. No raw IP or UA shown.
 **Verification:** `pnpm typecheck`, `pnpm lint`, `pnpm check` (415 keys, 11/11 contrast), `pnpm build`; admin e2e 7/7.
+
+---
+
+## Brand-asset plan drift fixes - 2026-11-09 (@x-director)
+
+**Request:** "proceed as recommended, fix everything" — corrections to `.work.ui/plans/20261109-brand-assets.md` before M15 starts.
+**Fixed:**
+- Status header: the wordmark decision (§5 decision 1) is recorded as answered — emblem + live text; §5 decision 2 (tile colour `#0b1220`) stays owner-open.
+- The source art is tracked (`.work.ui/references/heraldfox-final.png`, `f71bfd3`), not "not tracked by git yet".
+- Derivation block ported from `magick` (ImageMagick 7, absent on this host) to `convert` (IM6 6.9.11), with `-fuzz 2%` on the lockup trim — a plain `-trim` leaves the full 1510 × 1024 canvas because of the semi-transparent edge pixels. §2 lockup size corrected to 1265 × 921.
+**Verified:** all six commands smoke-tested in `tmp/` (removed after use): emblem 700 × 700 transparent, lockup 1265 × 921, tile 512 × 512, favicon 48/32/16, icon 512, apple 180 opaque; emblem and tile inspected visually. `touch-scope-verify` pass; MOD-06 → merge_ok.
+**Still open:** decision 2 (tile colour); M15-T1..T7 not started.
+**Next:** `@code-implementation start` (M15-T1).
