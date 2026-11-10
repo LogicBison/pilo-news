@@ -9,9 +9,10 @@ import httpx
 import structlog
 
 from news_api.platform.cache import get_float, increment
-from news_api.platform.clock import monthly_bucket
+from news_api.platform.clock import monthly_bucket, utcnow
 from news_api.platform.config import prompt_table, scoring_config
 from news_api.platform.metrics import AI_COST, AI_TOKENS, SUMMARIES, SUMMARY_LATENCY
+from news_api.platform.offpeak import in_window
 from news_api.platform.settings import get_settings
 
 log = structlog.get_logger(__name__)
@@ -183,15 +184,31 @@ class AIClient:
         self.settings = get_settings()
         self._client = client
         self.model = self.settings.ai_model
+        self._offpeak_logged = False
         if self.model in LEGACY_MODEL_IDS:
             raise AIError(f"legacy model id rejected: {self.model}")
 
     def available(self) -> bool:
-        return bool(
+        if not (
             self.settings.ai_enabled
             and self.settings.ai_api_key
             and self.model not in LEGACY_MODEL_IDS
-        )
+        ):
+            return False
+        if self.settings.ai_offpeak_only and not self._inside_offpeak():
+            if not self._offpeak_logged:
+                # Once per process, not once per item.
+                log.info(
+                    "ai.offpeak_skip",
+                    window=f"{self.settings.ai_offpeak_start}-{self.settings.ai_offpeak_end}",
+                    utc=utcnow().isoformat(timespec="minutes"),
+                )
+                self._offpeak_logged = True
+            return False
+        return True
+
+    def _inside_offpeak(self) -> bool:
+        return in_window(utcnow(), self.settings.ai_offpeak_start, self.settings.ai_offpeak_end)
 
     async def _chat(
         self,

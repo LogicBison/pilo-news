@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     ai_enabled: bool = True
     ai_monthly_budget_usd: float = 20.0
     ai_max_items_per_run: int = 60
+    # DeepSeek is cheapest outside 08:30-16:30 UTC. With this on, no provider
+    # call happens in the peak window; a run there publishes without summaries
+    # and the next off-peak run backfills them.
+    ai_offpeak_only: bool = False
+    ai_offpeak_start: str = "16:30"
+    ai_offpeak_end: str = "08:30"
     ai_item_timeout_seconds: float = 120.0
     ai_desk_timeout_seconds: float = 45.0
     ai_picks_timeout_seconds: float = 60.0
@@ -63,6 +69,14 @@ class Settings(BaseSettings):
     # A publisher that says no stays refused for a week: long enough not to
     # pester, short enough that a licence or a robots change is picked up.
     fetch_denied_cooldown_s: int = 7 * 24 * 60 * 60
+
+    @field_validator("ai_offpeak_start", "ai_offpeak_end")
+    @classmethod
+    def _offpeak_is_hhmm(cls, value: str) -> str:
+        from news_api.platform.offpeak import parse_hhmm
+
+        parse_hhmm(value)
+        return value
 
     @field_validator("*", mode="before")
     @classmethod
