@@ -11,7 +11,7 @@ from news_api.platform.logging import get_logger
 
 log = get_logger(__name__)
 
-PROBLEM_BASE = "https://system-news.example/problems"
+PROBLEM_BASE = "https://heraldfox.com/problems"
 
 
 class DomainError(Exception):

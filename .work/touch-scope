@@ -17,7 +17,10 @@
     ".work/touch-scope",
     "apps/web/src/components/CtaCard.tsx",
     "apps/web/e2e/accessibility.spec.ts",
-    "apps/web/src/components/Hero.tsx"
+    "apps/web/src/components/Hero.tsx",
+    "apps/api/tests/unit/test_channel_portfolios.py",
+    "apps/api/src/news_api/platform/errors.py",
+    "apps/web/src/app/api/proxy/[...path]/route.ts"
   ],
   "allowed_patterns": [],
   "notes": [
@@ -40,6 +43,7 @@
     "M20 2026-11-10 (acquisition quality): pg_trgm extension/index + traffic_token migration, licence enforcement in the Candidate model and ingest, traffic API + page + CLI, candidate refresh, value/retirement rules, JSON Feed parsing and content types.",
     "health-medicine 2026-11-10: the slug is health-medicine, not health - channels/domain/theme.py RESERVED_SLUGS owns \"health\" because the API probe is /v1/health. Profile-only provisioning (apply-profile, 15 created, 0 updated): no route, component or schema change. New skin key \"clinic\" in skins.ts + its two SVGs + one CC BY-SA 2.0 band (credits.json) are the only code-adjacent surfaces; lobby.spec.ts gained a DESK_COUNT constant because four of its assertions hardcoded eleven desks. Not touched: messages/*.json (the desk name comes from the profile locales), .env*, docker-compose*, the OpenAPI snapshot (no routes).",
     "CtaCard eyebrow 2026-11-10: the channel CTA card always printed \"Request a consultation\" as its eyebrow, even for a desk whose CTA is the weekly brief (education and now health-medicine). It now follows cta.kind and reuses the existing brief.eyebrow key, so no catalog change. accessibility.spec.ts gained /health-medicine so the new skin is inside the axe sweep.",
-    "Hero gating 2026-11-10: Hero.tsx rendered the CTA panel only when offers.consultation was on, so a brief-only desk lost its hero rung entirely. It now renders when consultation OR brief is on; CtaCard already renders the brief variant. Offers for health-medicine set to consultation=false/brief=true via PATCH /v1/admin/industries, so the desk carries no partner-routing copy it cannot back."
+    "Hero gating 2026-11-10: Hero.tsx rendered the CTA panel only when offers.consultation was on, so a brief-only desk lost its hero rung entirely. It now renders when consultation OR brief is on; CtaCard already renders the brief variant. Offers for health-medicine set to consultation=false/brief=true via PATCH /v1/admin/industries, so the desk carries no partner-routing copy it cannot back.",
+    "Channel isolation 2026-11-10 (owner: the three health desks must not overlap): a feed URL is canonical_url-unique in the DB, so two channels sharing a feed means the loser silently publishes nothing. STAT News moved out of health-medicine (it stays on stem-cell), EFEsalud likewise, replaced by MedCity News and Diario M\u00e9dico. The two leftover rows are disabled per channel rather than deleted (apply-profile never deletes operator data). test_channel_portfolios.py locks the invariant across every profile. PROBLEM_BASE now points at heraldfox.com/problems so third-party integrators get a real problem type URL instead of the system-news.example placeholder."
   ]
 }

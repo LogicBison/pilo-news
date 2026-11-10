@@ -185,10 +185,10 @@
           "trust": 0.9
         },
         {
-          "name": "STAT News",
-          "feed_url": "https://www.statnews.com/feed/",
+          "name": "MedCity News",
+          "feed_url": "https://medcitynews.com/feed/",
           "language": "en",
-          "trust": 0.9
+          "trust": 0.84
         },
         {
           "name": "MedPage Today",
@@ -209,8 +209,8 @@
           "trust": 0.9
         },
         {
-          "name": "EFEsalud",
-          "feed_url": "https://efesalud.com/feed/",
+          "name": "Diario Médico",
+          "feed_url": "https://www.diariomedico.com/rss.xml",
           "language": "es",
           "trust": 0.82
         },

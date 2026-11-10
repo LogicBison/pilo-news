@@ -48,7 +48,7 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   } catch {
     return NextResponse.json(
       {
-        type: "https://system-news.example/problems/dependency-unavailable",
+        type: "https://heraldfox.com/problems/dependency-unavailable",
         title: "Dependency Unavailable",
         status: 503,
         detail: "The news API is temporarily unavailable.",
