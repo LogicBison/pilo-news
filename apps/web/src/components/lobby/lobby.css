@@ -123,6 +123,29 @@
   font-size: 14px;
 }
 
+/* Brand + language switch on the first line, the four links on their own row.
+   Without this the nav (265 px) pushes the document wider than a phone. */
+@media (max-width: 719px) {
+  .lb-mast-inner {
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    padding: 12px 16px;
+  }
+
+  .lb-nav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    gap: 8px 18px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+
+  .lb-lang {
+    margin-left: auto;
+  }
+}
+
 .lb-nav a {
   padding: 6px 0;
   border-bottom: 1px solid transparent;
@@ -1207,11 +1230,16 @@
   }
 }
 
-/* The board is tabular data; on a narrow screen it scrolls rather than wraps. */
+/* Three short columns; the desk name wraps, the other two never do. */
 .lb-board-scroll {
   overflow-x: auto;
 }
 
-.lb-board-scroll table {
-  min-width: 460px;
+/* 320 px phones: tighter gutters rather than a sideways scroll nobody sees. */
+@media (max-width: 379px) {
+  .lb-board th,
+  .lb-board td {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }

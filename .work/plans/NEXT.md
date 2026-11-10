@@ -1,6 +1,89 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-07 (email through the gateway, restore drill, production stack, footer credit; 164 API tests)
+**Updated:** 2026-11-09 (M15 approved; apex responsive fix shipped)
+
+---
+
+## Current iteration - M15: brand surfaces (2026-11-09)
+
+**Milestone ref:** `.work/plans/full/20261105-full-plan.md` §19 M15 · spec `.work.ui/plans/20261109-brand-assets.md`
+**Status:** approved 2026-11-09 · ready to start · **Started:** - · **Target:** M15-T1..T7 (logo on the apex, favicons on every host)
+
+### In scope
+
+- derive emblem, lockup and icon tile from `.work.ui/references/heraldfox-final.png` (one-off, assets committed).
+- apex masthead and footer use the emblem plus the live wordmark; the 10 px CSS square retires.
+- `favicon.ico`, `icon.png`, `apple-icon.png` under `apps/web/src/app/`, discovered by the App Router.
+- accessible names: decorative marks `aria-hidden`, brand link keeps one label; axe assertion at the apex.
+- per-host verification on dev, and on prd once O9 unblocks the https path.
+
+### Out of scope (explicit)
+
+- channel headers (they keep `SkinEmblem`), per-desk favicons, a PWA manifest.
+- the brand string itself (D-018: "HeraldFox" on the logo, "Herald Fox" in the lobby copy, "System News" in channel headers). This iteration renders the existing copy, it does not rename anything.
+- the OG image, the fetch-safety work, and the ten content fixes (separate tracks).
+
+### Tasks
+
+| ID | Description | Files | Status | Notes |
+|----|-------------|-------|--------|-------|
+| M15-T1 | Derive emblem (700x700 head square), lockup (trimmed) and icon tile (512, flattened on `#0b1220`) | `apps/web/public/brand/` | pending | one-off ImageMagick run per the UI plan §2 |
+| M15-T2 | Masthead: emblem 32 px + live wordmark in `--lb-font-display`; remove `.lb-brand-mark` | `apps/web/src/components/lobby/shell.tsx`, `apps/web/src/components/lobby/lobby.css` | pending | mobile 28 px emblem, tagline hidden < 480 px |
+| M15-T3 | Footer: emblem 24 px in `LobbyFooter`, same link target | `apps/web/src/components/lobby/shell.tsx` | pending | no second landmark |
+| M15-T4 | Accessible names + axe coverage for `/`, `/es`, `/services` | `shell.tsx`, `apps/web/e2e/accessibility.spec.ts` | pending | marks `alt=""`/`aria-hidden` |
+| M15-T5 | `favicon.ico` (16/32/48), `icon.png` (512), `apple-icon.png` (180, opaque) | `apps/web/src/app/` | pending | file-based metadata; no `metadata.icons` |
+| M15-T6 | Per-host check: 200 + one icon link per document on apex and two subdomains | dev `./bin/start.sh dev hosts`; prd `--env prd hosts` | pending | prd half blocks on O9 |
+| M15-T7 | Gates: lint, type, check, build, Playwright (incl. layout) on the production build | `apps/web` | pending | axe 0 critical/serious |
+| M15-T8 | Responsive fix (owner-reported, 2026-11-09): board clipped its last column at 1024-1440 px; masthead pushed a 390 px document sideways. Board is three columns (languages dropped by the owner), table kept, masthead wraps under 720 px | `apps/web/src/components/lobby/sections.tsx`, `lobby.css`, `apps/web/e2e/lobby.spec.ts`, `apps/web/src/messages/{en,es}.json` | done | verified 320-1440 px, 13/13 lobby e2e |
+
+### Acceptance criteria
+
+- logo renders on `/`, `/es`, `/services` at 360 px and 1440 px; no horizontal overflow, CLS 0 on `/`.
+- `/favicon.ico` returns 200 `image/x-icon`; exactly one `<link rel="icon">` per document.
+- apple icon is opaque; the 16 px tab icon still reads as the fox.
+- axe 0 critical/serious on the three apex URLs; the brand link has one accessible name.
+- two subdomains serve the same icon (dev; prd after O9).
+
+### Validation steps
+
+```bash
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "cd /app && pnpm lint && pnpm exec tsc --noEmit && pnpm check"
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "cd /app && pnpm build && pnpm test"
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "cd /app && pnpm exec playwright test e2e/accessibility.spec.ts"
+docker compose --env-file .env.dev -f docker-compose.dev.yml exec web sh -c "wget -S -qO /dev/null http://127.0.0.1:3000/favicon.ico 2>&1 | head -3"
+```
+
+### Owner blockers
+
+- **O9** — production TLS is unfinished, so the prd half of M15-T6 cannot run yet. The dev half is unblocked.
+
+### Cadence check (owner instruction 2026-11-09)
+
+All 11 channels refresh twice a day as configured: `refresh_interval_minutes = 720` (`platform/settings.py:43`), no per-channel override (`fetch_interval_minutes` NULL on every row, 2026-11-07 bundle), `auto_fetch_enabled` true on every row, and `scheduler_tick` runs every 30 s (`worker.py:53-56`) with a 0-10 min per-slug stagger (`queue.py:145-147`).
+Residual risk, not fixed here: `active_run` treats `queued` and `running` as active (`articles/infrastructure/repo.py:285-293`) and orphan recovery runs only at worker start (`queue.py:42-63`), so a run stuck in either state parks that channel until the worker restarts. Proposed one-liner: sweep runs older than `2 × interval` inside `scheduler_tick` and mark them failed. Not in this iteration — needs a decision.
+
+### Cross-LLM verification
+
+Not run in this session; `@code-verify uncommitted` before any commit.
+
+### Done this iteration
+
+| ID | Description | Completed |
+|----|-------------|-----------|
+| M15-T8 | Board keeps its table, loses the languages column, no clipped cells 320-1440 px; masthead wraps under 720 px | 2026-11-09 |
+
+### Concept / NFR registry (this iteration)
+
+| Concept | Applies | Reason |
+|---------|---------|--------|
+| MOD-01 coupling-audit | no | all changes stay inside `apps/web` presentation; no module boundary crossed |
+| MOD-02 network-cost | no | no new network hop; static assets only |
+| MOD-03 cost-model | no | no new billable unit |
+| MOD-04 ops-headcount | no | no new deployable or on-call surface |
+| MOD-05 modularity-vs-distribution | no | no service boundary change |
+| MOD-06 ai-amplification | **yes** | agent-authored code; reviewable, small diff, assets are static and reproducible from the documented command |
+| MOD-07 prompt-architecture | no | no prompt change in this iteration (that is the content track) |
+| MOD-08 declarative-infra | no | no infrastructure change |
 
 ---
 
@@ -8,6 +91,7 @@
 
 | Item | Artifact |
 |------|----------|
+| Apex responsive fix | Board keeps its table at 3 columns (languages dropped) and stops clipping the last column at 1024-1440 px; masthead wraps under 720 px; regression test in `e2e/lobby.spec.ts` |
 | Email transport | `start.sh`/settings gateway lane, `info@links.heraldfox.com`, delivered with DKIM/DMARC pass |
 | Restore hardening | `init-env` DB/Redis passwords + URL sync, preflight email lane, menu restore `--all`, bundle drill |
 | Production stack | `vmi3435240` (169.58.4.85): stack up, data restored, HTTP-only nginx; TLS template fix |
@@ -101,6 +185,9 @@
 ---
 
 ## Recommended next
+
+**New 2026-11-09:** `.work/plans/20261109-next-improvement.md` — logo + favicons, ten content
+fixes, fetch safety. A+B and D1–D5/D7–D10 need no owner input; C waits on the crawler contact URL.
 
 | Priority | Item | Notes |
 |----------|------|-------|

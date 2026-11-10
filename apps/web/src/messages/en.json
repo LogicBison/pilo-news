@@ -498,7 +498,7 @@
     },
     "board": {
       "caption": "All {desks} desks, and how each one runs",
-      "summary": "Desk, update cadence, languages, and the date of the newest story.",
+      "summary": "Desk, update cadence, and the date of the newest story.",
       "headDesk": "Desk",
       "headUpdates": "Updates",
       "headLanguages": "Languages",

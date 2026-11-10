@@ -14,6 +14,9 @@
 
 **Recommended pick-up:** `.work.ui/plans/NEXT_UI.md`
 
+**New 2026-11-09:** `.work.ui/plans/20261109-brand-assets.md` — logo on the apex masthead and
+favicons on all 11 hosts, derived from `.work.ui/references/heraldfox-final.png`.
+
 **Lost or new?** Read `.ai.ui/START_HERE.md`
 
 ---

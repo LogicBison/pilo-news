@@ -2,6 +2,9 @@
 
 ## Session status
 
+**Closed:** 2026-11-09 — four-request analysis, M15 planned and approved, apex responsive fix, READY TO IMPLEMENT.
+Analysed the logo, the missing favicons, the fetcher's access posture and the generated content against the 2026-11-07 bundle (676 articles, 52 sources, 78 runs). Produced `.work/plans/20261109-next-improvement.md` (four tracks), `.work/features/fetch-safety/20261109-SPEC.md`, `.work.ui/plans/20261109-brand-assets.md`. Added **M15 brand surfaces** to the approved plan (v1.5, owner-approved 2026-11-09) and wrote the `## Current iteration` block. Fixed the owner-reported apex defects: the desk board kept three columns (languages dropped) and stopped clipping its last column at 1024-1440 px, and the masthead wraps under 720 px so a 390 px document no longer scrolls sideways. Verified: lobby e2e 13/13, layout 58 passed (1 flaky, green on retry), axe 29/29, lint/tsc/check/build clean.
+
 **Closed:** 2026-11-07 — email through the pilo-mail gateway, a drilled dev→prd restore, the production stack on `169.58.4.85`, and the LogicBison credit.
 Email leaves through `smtp.iterwire.com:2525` as `info@links.heraldfox.com`; a real message reached the owner's gmail with DKIM/DMARC pass. `init-env` now generates Postgres/Redis passwords, `preflight` resolves the email lane, the menu restore can apply config/media/nginx, and the bundle restored 11 channels / 676 articles / 52 sources into a clean Postgres 16. Production is up on `vmi3435240` with the data restored; HTTPS is the remaining step (the TLS template's duplicate session directives were found and fixed). Every public footer now carries the LogicBison mark and wordmark.
 
@@ -19,7 +22,7 @@ and a browser save/restore check against the dev API. SPEC:
 
 **Closed:** 2026-11-06 - S1 screens shipped: contact, about and admin-console implemented from approved SPECs. 80 Playwright tests pass on a production build (admin sign-in included); axe 0 critical/serious on 21 URLs; 329 catalog keys; 11/11 contrast. Every channel now publishes an RSS 2.0 feed in both locales. Along the way: the funnel proxy no longer returns a false 503 on 204, and the about page stopped claiming a seven-day window while every channel runs 30 days.
 
-**Updated:** 2026-11-07
+**Updated:** 2026-11-09
 
 **Prior session (closed 2026-11-06):** eleven channels. M9 shipped config-driven asset cards and one secondary rung; M10 added the digital-technology demand test (three topics, `placement="topic"`, migration 012); M11 built the eleventh channel (`digital-technology`): its own `datacenter` skin with a CC BY-SA photo, six grade-A feeds, 26 EN + 1 ES items, and the channel inventory regenerated. 113 api tests; web checks; 64 Playwright passed / 1 skipped; 11/11 contrast.
 
@@ -31,10 +34,10 @@ and a browser save/restore check against the dev API. SPEC:
 
 1. Run **`@session-control start`**.
 2. Read `.cursorrules`, this file, `.work/plans/NEXT.md`.
-3. **Finish production TLS (O9):** on `169.58.4.85` the stack is up and the data is restored.
-   Pull the TLS template fix, run `./bin/start.sh --env prd domains --write`, `sudo nginx -t`,
-   reload, `sudo ./bin/start.sh --env prd certs --check`, then `curl -fsS https://heraldfox.com/v1/health`
-   and `./bin/start.sh --env prd hosts`. Until that passes, the public TLS path is unverified.
+3. **Implement M15** (`.work/plans/NEXT.md` `## Current iteration`): assets, masthead, footer,
+   icons, per-host check. Approved, scoped (`.work/touch-scope`), and ready — start with
+   `@code-implementation start`. The prd half of M15-T6 waits on O9 (production TLS:
+   `./bin/start.sh --env prd domains --write`, `nginx -t`, reload, `certs --check`).
 4. **Apex:** the lobby lives in `apps/web/src/components/lobby/`; its copy is
    `.work.biz/strategy/20261107-lobby-copy.md` (140 keys, EN/ES). Change copy there
    first, then in `apps/web/src/messages/`.
@@ -102,6 +105,11 @@ and a browser save/restore check against the dev API. SPEC:
 
 | Gate | Command | Result |
 |---|---|---|
+| Lobby e2e (2026-11-09) | `pnpm exec playwright test e2e/lobby.spec.ts` | 13 passed |
+| Layout e2e (2026-11-09) | `pnpm exec playwright test e2e/layout.spec.ts` | 58 passed, 1 flaky (green on retry) |
+| Accessibility (2026-11-09) | `pnpm exec playwright test e2e/accessibility.spec.ts` | 29 passed |
+| Web gates (2026-11-09) | `pnpm lint`, `tsc --noEmit`, `pnpm check`, `pnpm build` | clean, 567 keys, 11/11 contrast |
+| Board fit (2026-11-09) | rendered sweep 320-1440 px | 33 cells, 0 clipped, 0 page overflow |
 | API (2026-11-07) | `pytest -q` in the dev api | 164 passed |
 | Web (2026-11-07) | `pnpm lint`, `tsc --noEmit`, `pnpm check` | clean, 567 keys |
 | Email (2026-11-07) | live send through the gateway | delivered; `dkim=pass d=links.heraldfox.com`, `dmarc=pass` |
@@ -147,6 +155,8 @@ Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, re
 
 | Date | Session | Artifacts |
 |------|---------|-----------|
+| 2026-11-09 | responsive fix (M15-T8) | lobby desk board kept three columns (languages column dropped by the owner) and stopped clipping its last column at 1024-1440 px; masthead wraps under 720 px so a 390 px document no longer scrolls sideways; regression test in `e2e/lobby.spec.ts` |
+| 2026-11-09 | improvement planning | `.work/plans/20261109-next-improvement.md` (4 tracks), `.work/features/fetch-safety/20261109-SPEC.md`, `.work.ui/plans/20261109-brand-assets.md`; content audit of 676 articles from the 2026-11-07 bundle; M15 planned in the full plan + `## Current iteration` in NEXT |
 | 2026-11-07 | email | pilo-mail gateway transport lanes, `info@links.heraldfox.com`, DKIM/DMARC pass, real delivery |
 | 2026-11-07 | restore hardening | `init-env` DB/Redis passwords + URL sync, preflight email lane, menu restore `--all`, bundle drill |
 | 2026-11-07 | production deploy | `vmi3435240` (169.58.4.85): stack up, data restored, HTTP-only nginx; TLS template fix |
@@ -261,6 +271,7 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 | nginx config validated syntactically only | `nginx -t` passes but no request has gone through the real edge | `start.sh hosts` runs the same contract over HTTP once the host proxy is live |
 | CI inventory gate unapproved | the step would run on the next PR before the owner signs off | listed as O10 |
 | Brand string split | apex says Herald Fox, channel footers still say System News | D-018 with a 2026-12-15 outcome date |
+| Scheduler can park a channel | a run stuck in `queued`/`running` blocks that channel until a worker restart; orphan recovery runs only at start (`queue.py:42-63`, `repo.py:285-293`) | cadence verified 2026-11-09 (720 min, all 11 channels); sweep proposed in the M15 block |
 
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
 - Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
@@ -284,9 +295,9 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Open `.work/plans/NEXT.md`. First finish O9 on `169.58.4.85` (pull the template fix,
-`domains --write`, `nginx -t`, reload, `certs --check`, `hosts`), then deploy the footer
-credit with `./bin/start.sh --env prd up`.
+Implement M15 (`.work/plans/NEXT.md` `## Current iteration`): assets, masthead, footer, icons,
+per-host check, gates. Then the content track, then fetch safety. O9 (production TLS on
+`169.58.4.85`) still blocks the prd half of M15-T6.
 
 ## Cross-framework action (@x-director)
 

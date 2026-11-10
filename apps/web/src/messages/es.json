@@ -498,7 +498,7 @@
     },
     "board": {
       "caption": "Las {desks} mesas y cómo funciona cada una",
-      "summary": "Mesa, frecuencia de actualización, idiomas y la fecha de la historia más reciente.",
+      "summary": "Mesa, frecuencia de actualización y la fecha de la historia más reciente.",
       "headDesk": "Mesa",
       "headUpdates": "Actualiza",
       "headLanguages": "Idiomas",

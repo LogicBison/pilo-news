@@ -42,6 +42,13 @@ export function Hero({ desks, locale }: { desks: DeskView[]; locale: Locale }) {
 }
 
 export function LiveBoard({ desks, locale }: { desks: DeskView[]; locale: Locale }) {
+  // The board carries three facts per desk. Languages were dropped: every
+  // desk publishes in EN and ES, so the column repeated one value eleven times.
+  const heads = [
+    t(locale, "lobby.board.headDesk"),
+    t(locale, "lobby.board.headUpdates"),
+    t(locale, "lobby.board.headFiled"),
+  ];
   return (
     <div className="lb-board">
       <div className="lb-board-head">
@@ -58,10 +65,11 @@ export function LiveBoard({ desks, locale }: { desks: DeskView[]; locale: Locale
           </caption>
           <thead>
             <tr>
-              <th scope="col">{t(locale, "lobby.board.headDesk")}</th>
-              <th scope="col">{t(locale, "lobby.board.headUpdates")}</th>
-              <th scope="col">{t(locale, "lobby.board.headLanguages")}</th>
-              <th scope="col">{t(locale, "lobby.board.headFiled")}</th>
+              {heads.map((head) => (
+                <th key={head} scope="col">
+                  {head}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -71,7 +79,6 @@ export function LiveBoard({ desks, locale }: { desks: DeskView[]; locale: Locale
                   <a href={desk.href}>{desk.name}</a>
                 </td>
                 <td>{t(locale, "lobby.board.everyHours", { hours: String(desk.hours) })}</td>
-                <td>{desk.locales.map((code) => code.toUpperCase()).join(" · ")}</td>
                 <td>{desk.latest ? formatDay(desk.latest, locale) : "—"}</td>
               </tr>
             ))}

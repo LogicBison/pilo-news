@@ -26,13 +26,15 @@ test("the lobby lists every desk and links each to its own host", async ({ page 
   expect(new Set(hrefs).size).toBe(11);
 });
 
-test("the board shows a cadence and a language for every desk", async ({ page }) => {
+test("the board shows a cadence and a filed date for every desk", async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector('html[data-hydrated="true"]');
   const rows = page.locator(".lb-board tbody tr");
   await expect(rows).toHaveCount(11);
   await expect(rows.first()).toContainText(/every \d+ h/i);
-  await expect(rows.first()).toContainText(/EN/i);
+  // Languages were deliberately dropped from the board (one value, eleven times).
+  await expect(page.locator(".lb-board thead th")).toHaveCount(3);
+  await expect(rows.first().locator("td").last()).not.toBeEmpty();
 });
 
 test("the lobby has one form: contact, and no reader capture", async ({ page }) => {
@@ -187,4 +189,44 @@ test("the primary CTA is readable and the form fields are findable", async ({ pa
   // A field that is the same colour as its card is not a field.
   expect(field.field).not.toBe(field.card);
   expect(field.border).toBe("1px");
+});
+
+/**
+ * The apex has one layout that must survive every width: the masthead wraps,
+ * and the desk board either keeps its four columns or folds into labelled rows.
+ * A board cell that ends outside the board is a fact nobody can read.
+ */
+test("the masthead and the desk board fit the viewport at every width", async ({ page }) => {
+  for (const width of [1440, 1309, 1024, 768, 430, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.waitForSelector('html[data-hydrated="true"]');
+    // The board only renders when /v1/desks answers; a cold API is not a layout bug.
+    await page.waitForSelector(".lb-board", { timeout: 20_000 });
+
+    const pageOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(pageOverflow, `document overflows at ${width}px`).toBeLessThanOrEqual(1);
+
+    const board = await page.evaluate(() => {
+      const box = document.querySelector(".lb-board")?.getBoundingClientRect();
+      if (!box) return null;
+      const cells = [...document.querySelectorAll(".lb-board tbody td")];
+      const clipped = cells.filter((cell) => {
+        const rect = cell.getBoundingClientRect();
+        return rect.right > box.right + 1 || rect.left < box.left - 1;
+      }).length;
+      const dates = [...document.querySelectorAll(".lb-board tbody td:last-child")].map(
+        (cell) => cell.textContent?.trim() ?? "",
+      );
+      return { cells: cells.length, clipped, dates };
+    });
+
+    expect(board, `no board at ${width}px`).not.toBeNull();
+    expect(board!.cells, `board lost cells at ${width}px`).toBe(33);
+    expect(board!.clipped, `board cells clipped at ${width}px`).toBe(0);
+    // Every desk keeps a filed date; an empty cell would mean the fold dropped it.
+    expect(board!.dates.filter((date) => date.length > 0), `dates missing at ${width}px`).toHaveLength(11);
+  }
 });
