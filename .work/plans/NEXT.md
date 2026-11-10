@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-10 (session closed — M15–M20 delivered; deploy is the next move)
+**Updated:** 2026-11-10 (production deployed at e322788 — M15–M20 live)
 
 ---
 
@@ -596,7 +596,7 @@ then the owner lane.
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Deploy to prd and finish TLS | `git pull`, `preflight`, `up`, `domains --write`, `nginx -t`, reload, `certs --check`, `hosts` (O9) |
+| **0** | ~~Deploy to prd and finish TLS~~ done 2026-11-10 at `e322788` | https live, certs cover every host, migrations 017–020 applied, `hosts` pass |
 | **1** | Run `FETCH_PACING=shadow` for one week | then flip to `enforce`; dev already enforces |
 | **2** | Decide the queued NIST candidate | `sources candidates list`; `decide --status accepted` prints the profile row |
 | **3** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |

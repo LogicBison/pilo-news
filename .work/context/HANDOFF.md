@@ -2,7 +2,7 @@
 
 ## Session status
 
-**Post-close — production deploy (2026-11-10):** prd runs `8af2a83` (the close commit) and is **live** on https. The first `up` failed: `LOG_SLOW_REQUEST_MS=` (empty, materialised by env-sync) is not a valid int, so the API could not import and the stack never started. Fixed on the host (`.env.prd` now `LOG_SLOW_REQUEST_MS=1000`; backup at `/tmp/env.prd.bak.*`) and `api`/`worker`/`web` restarted. A durable guard now treats a blank non-string setting as unset (pending commit + rebuild). Worker applied migrations **017–020** at 17:20; `certs --check` covers every host; `hosts` all pass.
+**Post-close — production deployed (2026-11-10):** prd runs **`e322788`** and is live on https. The first `up` failed because `LOG_SLOW_REQUEST_MS=` (empty, materialised by env-sync) is not a valid int: the API could not import and the stack never started. The host was patched, and the durable guard (blank non-string setting = default) is now deployed — proved in the running container with `LOG_SLOW_REQUEST_MS=` and `METRICS_ENABLED=` empty: `slow_ms 1000 metrics True`. The worker's inherited `:8080` healthcheck is disabled. Migrations **017–020** applied (20 total), `certs --check` covers every host, `hosts` all pass, apex/channel/bot/favicon 200, `/v1/outbound` 302.
 
 **Closed:** 2026-11-10 — M15–M20 delivered and verified: brand surfaces, polite fetching, content fixes, source availability, acquisition, pipeline and quality. Gates at close: api **233 passed**, web **584 keys**, build **RC=0**, Playwright **124 passed / 0 failed / 5 skipped**, `verify-sources` **52/52**, migrations **017–020** applied. `3a2a8b2` (M19) was already on origin; M20 is in the close commit. Open owner lane: **O9** production TLS, **O15** `SMTP_FROM`, and the prd deploy itself.
 
@@ -347,8 +347,100 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 | Emblem source PNG is 599 KB | `public/brand/heraldfox-emblem.png` is served raw wherever `next/image` is not used (footer/OG-less paths) | masthead + footer both use `next/image`; measured `naturalWidth=32` at render, so a resized variant is what ships |
 | Favicon caching per origin | browsers cache `favicon.ico` per origin, so a re-derived icon needs a hard refresh on each of 11 subdomains | accept; re-check with a cache-busting query during verification |
 | Tile colour `#0b1220` assumed | the derived `icon.png`/`apple-icon.png` are flattened on it; UI plan §5 decision 2 is still owner-open | measured corner is `srgb(11,18,32)`; re-derive if the owner picks another colour |
-| Worker inherits the API healthcheck | `apps/api/Dockerfile.prd` defines a healthcheck on :8080 and the worker uses the same image without serving HTTP, so `docker compose ps` reports the worker `unhealthy` even when it is fine | disable the inherited check for the worker service (`healthcheck: {disable: true}`) — compose is a protected file, needs same-message approval |
-| Empty env values | env-sync materialises `KEY=` for every unset key; an empty int broke the prd API import on 2026-11-10 | code guard added (blank non-string = default), **pending commit and rebuild**; the host is patched |
+| Worker inherits the API healthcheck | fixed 2026-11-10: `healthcheck: {disable: true}` on the worker service in `docker-compose.prd.yml`; `ps` now reports it plain `Up` | — |
+| Empty env values | env-sync materialises `KEY=` for every unset key; an empty int broke the prd API import on 2026-11-10 | guard deployed in `e322788` (blank non-string = default), proved in the container; the host's `.env.prd` keeps `LOG_SLOW_REQUEST_MS=1000` |
+| Playwright output recompiles dev | `apps/web/test-results/` sits inside the bind-mounted `/app`; one write triggers a Next compile + "Fast Refresh had to perform a full reload", which can knock out a running test (pre-existing, gitignored) | clean `test-results/` before a suite run; run the gate suite against a **production** build in a throwaway container |
+| `pnpm build` clobbers the dev `.next` | `.next` is the named volume `system-news-dev_web_next_v2` and the dev container's entrypoint is `pnpm dev`; a build inside it overwrites the running build (this happened 2026-11-09 and 404'd every asset until wiped) | never run `pnpm build` in the dev container — use `docker compose run --rm --no-deps -v system-news-dev_web_next_prod_v2:/app/.next web` |
+
+- Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
+- Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
+- The UI has ten channels/skins, a verified editorial-conversion v2 build, an **Approved** direction with all ten SPECs **approved**, a passed a11y milestone audit, shipped S0 primitives, and photographic bands on all ten channels. Storybook, the P1 primitives (`Skeleton`, `Toc`) and the vision tier remain open.
+- Channel coverage is uneven at the edges, not empty: the thinnest locale is digital-technology ES (16 items), then retail ES (24). All eleven channels use licensed photos; profiles are applied to dev, not prd; legal/terms review (U11) still applies.
+- The cybersecurity channel uses a dark scheme; fill/border contrast of the new conversion fields was checked visually, but the matrix is not yet in `check-themes.mjs`.
+- Photo licences are recorded per file (`apps/web/public/photos/credits.json`); four channels are CC BY/BY-SA and depend on the in-caption credit staying rendered (financial, cybersecurity, stem-cell, plus retail, energy, manufacturing).
+- AI summaries are fail-open; some items are intentionally left without a
+  summary when validation rejects output.
+- CI is written but has not run on GitHub yet.
+- prd stack is up on 169.58.4.85 with the data restored; TLS and a rollback drill remain.
+- `k6` and Lighthouse budgets are scripts only; no prd measurement yet.
+- E2E runs against a production build; run `pnpm build` before `pnpm test`.
+- AI validation intentionally rejects some provider output; those items publish
+  without a summary.
+- **Brief promise ahead of the system:** the weekly brief copy promises a Monday email; delivery lands before production (owner-owned). Until it exists, capture is ahead of fulfilment.
+- **Asset scope is US + EU only.** No Asia source coverage, no JP/KR/ZH translation, and the logistics rate index is not buildable (licensed data) - replaced by a port/customs digest per the feasibility doc.
+- **Empty archive on purpose:** `/{industry}/briefs` renders an honest empty state until the first issue publishes.
+
+---
+
+## Next action
+
+Production is deployed at **`e322788`**: https, TLS covering every host, migrations 017–020,
+the blank-env guard proved live, worker check disabled, `hosts` all pass. No agent work is
+open. Operator lane: `FETCH_PACING=shadow` for one week (already set on prd), **O15**
+`SMTP_FROM`, and the D-trial read of the next natural refresh.
+
+## Cross-framework action (@x-director)
+
+Lead generation remains integrated (ADR 013, FR-17): one primary CTA per page,
+consent-first lead form, partner routing, DSAR export/erase, funnel events, and
+lead dashboards/alerts. UI foundation and biz strategy docs remain in
+`.work.ui/` and `.work.biz/`.
+
+### 2026-11-05 — UI v2 via lead-generation reference intake
+
+**Request:** "use x-director to improve the UI with the recently updated UI Agent OS Framework, using the lead-generation references/skills now available in 'ui' os" → "too many boxes, too many rounded corners... forms confusing... unbalanced columns".
+**Frameworks involved:** `.ai`, `.ai.ui`
+**Classified bucket(s):** cross-framework (ui primary; engineering for build/verify)
+**Executed:**
+1. `@ui-reference-intake scan/dna/synthesize` — `ellevest`, `hubspot`, `leadpages` → DNA docs + direction `editorial-conversion` (Approved 2026-11-05).
+2. `@ui-component-build` (applied under operator's continue instruction) — open editorial layout, full-bleed bands, sharp corners, balanced CSS columns, per-channel CTA placement, filled forms.
+3. Verification — production build; Playwright 57 passed / 1 skipped; `e2e/layout.spec.ts` 30 checks; 80 pages 200 + zero overflow; `pnpm lint/typecheck/check` green; token-lint 0 raw.
+4. Operator approved the direction + bind package; composition tokens added to `tokens.json` (84, schema-valid); ten SPECs §13/§11 bound with `exampleIds: N/A` waiver; `SCREEN_REFERENCE_MAP.md` created; reference audit PASS.
+5. `@ui-screen-spec review` run across all ten channels; 7 SPEC-vs-build mismatches amended in each §3/§4/§5/§8/§11/§12/§13; re-check PASS 10/10; all statuses `Review` (approval still operator’s).
+6. Added `manufacturing`, `energy`, `retail`: profiles applied to dev, 45/45 sources verified, Forge/Grid/Market skins, three bound/reviewed SPECs; 57 e2e / 1 skipped; 80 pages 200 + no overflow.
+7. Channel inventory is generated from the API (`docs/channel-inventory.md`, `bin/channels.sh`); `./bin/start.sh test` runs `--check` and fails on a stale list.
+8. Visual fix after review: Sanctuary CTA opened (transparent, accent rule), skin-level hero/story radius+shadow removed, proof/conversion borders removed, health coverage moved to 2 balanced columns, Sentinel dark-scheme link/eyebrow contrast fixed; axe 11/11.
+9. Visual verify milestone: pass with gaps; UIS-07 (ship_with_notes) + UIS-10 (ship) done; 40 layout checks, 11 axe pages; square-surface + no-motif regressions enforced.
+**Coordination notes:** UI + channel data; no API/schema code changes. `.work.ui/` artifacts + `apps/web` code + `apps/api/config/deployments/*.json`; no protected files edited.
+**Blockers:** none for the build; all ten SPECs are in `Review` pending operator approval.
+**Next recommended:** approve the ten `Review` SPECs; close the new channels' content gaps; then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-06
+**Request:** "resolve all gaps"
+**Frameworks involved:** .ai, .ai.ui (delegated to .ai; no ui-director run — the design rule was an operator decision, D-008)
+**Classified framework bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc yes (unused) | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. `@ai-director` — R16 literal: `industries.cta.asset` (channel config) seeded by `apps/api/migrations/011_seed_asset_offers.sql`, profiles updated, `/v1/news/bundle` passthrough asserted in `test_bundle.py`; web resolves the card from `channel.cta.asset`. Decision D-009 supersedes D-007.
+2. `@ai-director` (ui rule by operator decision D-008) — one secondary rung: the brief signup no longer renders where `cta.asset` is set; SPEC R16 amended; e2e asserts the rule on four channels.
+3. `@ai-director` — plan traceability: M9 added to `.work/plans/full/20261105-full-plan.md` §19 (v1.2) with a traceability row; the waiver is now retired.
+4. Re-verified: api 111 passed, web lint/type/check clean, migration 011 `applied: 1` then `applied: 0`, full Playwright 58 passed / 1 skipped / 1 failed.
+**User correction:** none
+**Coordination notes:** the design rule was taken natively (single-model) rather than routed to `@ui-director`; recorded so the routing is auditable.
+**Blockers:** `layout.spec.ts:31` energy coverage balance fails on new content (330px vs 260) — not caused by M9 (ingestion at 16:03, after the 15:58 green run; energy renders neither card nor asset). Needs a separate layout decision.
+**Next recommended:** `@code-implementation complete`, then `@session-control close commit` split in two (apps/, then `.work*`).
+
+---
+
+## Known residual risks
+
+| Risk | Why it matters | Mitigation |
+|------|----------------|------------|
+| TLS reload not re-verified | the host rejected the first 443 config on duplicate session directives; the template is fixed, but `nginx -t`, reload and `certs --check` still need to pass | O9 is the first step next session |
+| nginx config validated syntactically only | `nginx -t` passes but no request has gone through the real edge | `start.sh hosts` runs the same contract over HTTP once the host proxy is live |
+| CI inventory gate unapproved | the step would run on the next PR before the owner signs off | listed as O10 |
+| Brand string split | apex says **HeraldFox** (one word, owner 2026-11-09), channel footers still say System News | D-018 with a 2026-12-15 outcome date |
+| Scheduler can park a channel | a run stuck in `queued`/`running` blocks that channel until a worker restart; orphan recovery runs only at start (`queue.py:42-63`, `repo.py:285-293`) | cadence verified 2026-11-09 (720 min, all 11 channels); sweep proposed in the M15 block |
+| Emblem source PNG is 599 KB | `public/brand/heraldfox-emblem.png` is served raw wherever `next/image` is not used (footer/OG-less paths) | masthead + footer both use `next/image`; measured `naturalWidth=32` at render, so a resized variant is what ships |
+| Favicon caching per origin | browsers cache `favicon.ico` per origin, so a re-derived icon needs a hard refresh on each of 11 subdomains | accept; re-check with a cache-busting query during verification |
+| Tile colour `#0b1220` assumed | the derived `icon.png`/`apple-icon.png` are flattened on it; UI plan §5 decision 2 is still owner-open | measured corner is `srgb(11,18,32)`; re-derive if the owner picks another colour |
+| Worker inherits the API healthcheck | fixed 2026-11-10: `healthcheck: {disable: true}` on the worker service in `docker-compose.prd.yml`; `ps` now reports it plain `Up` | — |
+| Empty env values | env-sync materialises `KEY=` for every unset key; an empty int broke the prd API import on 2026-11-10 | guard deployed in `e322788` (blank non-string = default), proved in the container; the host's `.env.prd` keeps `LOG_SLOW_REQUEST_MS=1000` |
 | Playwright output recompiles dev | `apps/web/test-results/` sits inside the bind-mounted `/app`; one write triggers a Next compile + "Fast Refresh had to perform a full reload", which can knock out a running test (pre-existing, gitignored) | clean `test-results/` before a suite run; run the gate suite against a **production** build in a throwaway container |
 | `pnpm build` clobbers the dev `.next` | `.next` is the named volume `system-news-dev_web_next_v2` and the dev container's entrypoint is `pnpm dev`; a build inside it overwrites the running build (this happened 2026-11-09 and 404'd every asset until wiped) | never run `pnpm build` in the dev container — use `docker compose run --rm --no-deps -v system-news-dev_web_next_prod_v2:/app/.next web` |
 
