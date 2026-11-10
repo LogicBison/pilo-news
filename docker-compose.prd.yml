@@ -79,6 +79,10 @@ services:
     restart: unless-stopped
     env_file: .env.prd
     command: ["python", "-m", "news_api.worker"]
+    # The image's healthcheck probes :8080, which only the API serves; without
+    # this the worker is reported unhealthy while doing its job normally.
+    healthcheck:
+      disable: true
     depends_on:
       postgres:
         condition: service_healthy

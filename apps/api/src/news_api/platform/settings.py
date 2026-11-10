@@ -64,6 +64,23 @@ class Settings(BaseSettings):
     # pester, short enough that a licence or a robots change is picked up.
     fetch_denied_cooldown_s: int = 7 * 24 * 60 * 60
 
+    @field_validator("*", mode="before")
+    @classmethod
+    def _empty_non_string_uses_default(cls, value, info):
+        """Blank env line means "unset" for every non-string setting.
+
+        The canonical env layout writes ``KEY=`` for a key an operator has not
+        filled in yet. Empty is a valid string, but it is not a valid int,
+        float, bool or literal: ``LOG_SLOW_REQUEST_MS=`` stopped the production
+        API from importing. String fields keep their empty value, because some
+        of them (``SMTP_TRANSPORT``) use empty as a real setting.
+        """
+        if isinstance(value, str) and not value.strip():
+            field = cls.model_fields.get(info.field_name)
+            if field is not None and field.annotation is not str:
+                return field.default
+        return value
+
     @field_validator(
         "bot_name",
         "bot_version",
