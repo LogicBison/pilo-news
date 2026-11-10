@@ -22,9 +22,29 @@ QUIET_ROUTES = frozenset({"/v1/health", "/v1/health/ready", "/metrics", "/metric
 
 Handler = Callable[[Request], Awaitable[Response]]
 
+# Reads are public and embeddable: any origin may fetch them. Admin routes keep
+# no CORS grant, so a page cannot drive the console even with a stolen cookie.
+PUBLIC_CORS_EXPOSE = (
+    "ETag, X-Request-Id, RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset, Retry-After"
+)
+
+
+def _is_public(path: str) -> bool:
+    return not path.startswith("/v1/admin")
+
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Handler) -> Response:
+        if request.method == "OPTIONS" and _is_public(request.url.path):
+            preflight = Response(status_code=204)
+            preflight.headers["Access-Control-Allow-Origin"] = "*"
+            preflight.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+            preflight.headers["Access-Control-Allow-Headers"] = (
+                "Content-Type, If-None-Match, X-API-Key"
+            )
+            preflight.headers["Access-Control-Max-Age"] = "600"
+            preflight.headers["Access-Control-Expose-Headers"] = PUBLIC_CORS_EXPOSE
+            return preflight
         incoming = request.headers.get("x-request-id")
         request_id = incoming if incoming and REQUEST_ID_RE.match(incoming) else uuid.uuid4().hex
         request.state.request_id = request_id
@@ -40,6 +60,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
 
         duration_ms = round((time.perf_counter() - started) * 1000, 2)
         response.headers["X-Request-Id"] = request_id
+        if _is_public(request.url.path):
+            response.headers.setdefault("Access-Control-Allow-Origin", "*")
+            response.headers.setdefault("Access-Control-Expose-Headers", PUBLIC_CORS_EXPOSE)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")

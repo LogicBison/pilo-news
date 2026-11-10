@@ -23,7 +23,7 @@ Every channel carries one professional CTA that routes consented inquiries to a 
 | Looking for the architecture | `.work/plans/foundation/20261105-04-foundation-architecture.md` |
 | Making a decision | `.work/decisions/README.md` (ADRs 001-012) |
 | Writing code | `.work/standards/20261105-CONVENTIONS.md`, `20261105-DIRECTORY_MAP.md` |
-| Integrating a client | `docs/api/README.md`, `docs/api/openapi.v1.json` |
+| Integrating a client | `docs/integration/README.md` (tutorial), `docs/api/README.md`, `docs/api/openapi.v1.json` |
 | Adding an industry | `docs/adding-an-industry.md` |
 | Live channels | twelve: legal, financial, behavioral-health, education, logistics, cybersecurity, stem-cell, manufacturing, energy, retail, digital-technology, health-medicine |
 | Channel inventory (EN/ES URLs) | `docs/channel-inventory.md` |

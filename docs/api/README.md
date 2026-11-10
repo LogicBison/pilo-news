@@ -1,5 +1,7 @@
 # System News API v1
 
+**Integrating from another site?** Start with [../integration/README.md](../integration/README.md) — endpoint choices, CORS, caching, and an agent-ready contract.
+
 **Status:** implemented · **Contract:** `openapi.v1.json` (generated) · **Base URL:** `https://{host}/v1`
 
 Public reads need no key. `X-API-Key: sn_live_...` raises the rate limit. Admin routes use an httpOnly JWT cookie plus `X-CSRF-Token`.
