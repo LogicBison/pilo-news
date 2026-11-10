@@ -31,7 +31,15 @@ export async function CtaCard({
     placement === "topic"
       ? `${localePath(locale, base || "/")}#lead-form`
       : "#lead-form";
-  const promises = [t(locale, "cta.promise1"), t(locale, "cta.promise2"), t(locale, "cta.promise3")];
+  // A desk whose CTA is the weekly brief gets the brief rung, not the
+  // consultation framing: its own eyebrow, its own promises, and a button that
+  // lands on the signup instead of the lead form.
+  const briefPrimary = industry.cta.kind === "brief" && offers.brief;
+  const eyebrowKey = briefPrimary ? "brief.eyebrow" : "cta.primary";
+  const href = briefPrimary ? "#brief-signup" : leadHref;
+  const promises = briefPrimary
+    ? [t(locale, "brief.value1"), t(locale, "brief.value2")]
+    : [t(locale, "cta.promise1"), t(locale, "cta.promise2"), t(locale, "cta.promise3")];
 
   return (
     <section
@@ -42,7 +50,7 @@ export async function CtaCard({
         <div>
           <div className="flex items-center gap-2">
             <span className="sn-kicker" aria-hidden="true" />
-            <p className="sn-eyebrow">{t(locale, "cta.primary")}</p>
+            <p className="sn-eyebrow">{t(locale, eyebrowKey)}</p>
           </div>
           <h2
             className={`mt-2 font-bold tracking-tight text-[var(--sn-text)] ${
@@ -69,9 +77,9 @@ export async function CtaCard({
             placement={placement}
             articleId={articleId}
             label={label}
-            href={leadHref}
+            href={href}
           />
-          {offers.brief || (offers.asset && assetOnPage) ? (
+          {!briefPrimary && (offers.brief || (offers.asset && assetOnPage)) ? (
             <p className="mt-3">
               {offers.brief ? (
                 <a href="#brief-signup" className="sn-action-link">

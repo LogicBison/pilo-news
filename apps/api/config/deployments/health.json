@@ -1,0 +1,226 @@
+{
+  "brand": "System News",
+  "site_url": "http://localhost:43991",
+  "default_locale": "en",
+  "default_industry": "health-medicine",
+  "refresh_interval_minutes": 720,
+  "industries": [
+    {
+      "slug": "health-medicine",
+      "code": "HEALTH_MEDICINE",
+      "name": "Health & Medicine",
+      "theme": {
+        "primary": "#155e63",
+        "accent": "#b91c1c",
+        "bg": "#ffffff",
+        "surface": "#f2f7f8",
+        "text": "#0f172a",
+        "muted": "#4b5563",
+        "border": "#d5e4e2",
+        "radius": "10px",
+        "font_heading": "Georgia, Times New Roman, serif",
+        "font_body": "system-ui, -apple-system, Segoe UI, sans-serif",
+        "layout": "professional"
+      },
+      "locales": {
+        "en": {
+          "name": "Health & Medicine",
+          "tagline": "Medicine, public health, and the business of care - without the jargon."
+        },
+        "es": {
+          "name": "Salud y Medicina",
+          "tagline": "Medicina, salud pública y el negocio del cuidado, sin jerga."
+        }
+      },
+      "disclaimers": {
+        "en": "News, not medical advice. Nothing here is a diagnosis, a treatment recommendation, or a substitute for a licensed clinician.",
+        "es": "Noticias, no asesoría médica. Nada aquí es un diagnóstico, una recomendación de tratamiento ni un sustituto de un clínico autorizado."
+      },
+      "cta": {
+        "kind": "brief",
+        "headline": {
+          "en": "Get the weekly health brief",
+          "es": "Reciba el resumen semanal de salud"
+        },
+        "body": {
+          "en": "One email a week: the clinical, policy and industry stories that moved medicine, with the source links.",
+          "es": "Un correo por semana: las historias clínicas, de política y de industria que movieron la medicina, con los enlaces a la fuente."
+        },
+        "label": {
+          "en": "Subscribe to the brief",
+          "es": "Suscribirse al resumen"
+        }
+      },
+      "sort_order": 75,
+      "retention_days": 30,
+      "topics": [
+        {
+          "slug": "clinical-practice",
+          "label": {
+            "en": "Clinical Practice",
+            "es": "Práctica Clínica"
+          },
+          "weight": 1.4,
+          "keywords": {
+            "en": [
+              "clinical",
+              "diagnosis",
+              "treatment",
+              "guideline",
+              "trial",
+              "patients"
+            ],
+            "es": [
+              "clínica",
+              "diagnóstico",
+              "tratamiento",
+              "guía",
+              "ensayo",
+              "pacientes"
+            ]
+          }
+        },
+        {
+          "slug": "public-health",
+          "label": {
+            "en": "Public Health",
+            "es": "Salud Pública"
+          },
+          "weight": 1.35,
+          "keywords": {
+            "en": [
+              "public health",
+              "outbreak",
+              "vaccination",
+              "epidemiology",
+              "prevention",
+              "WHO"
+            ],
+            "es": [
+              "salud pública",
+              "brote",
+              "vacunación",
+              "epidemiología",
+              "prevención"
+            ]
+          }
+        },
+        {
+          "slug": "pharma-biotech",
+          "label": {
+            "en": "Pharma & Biotech",
+            "es": "Farmacéutica y Biotecnología"
+          },
+          "weight": 1.3,
+          "keywords": {
+            "en": [
+              "drug",
+              "approval",
+              "FDA",
+              "biotech",
+              "pipeline",
+              "therapy"
+            ],
+            "es": [
+              "fármaco",
+              "aprobación",
+              "biotecnología",
+              "terapia"
+            ]
+          }
+        },
+        {
+          "slug": "health-policy",
+          "label": {
+            "en": "Health Policy",
+            "es": "Política Sanitaria"
+          },
+          "weight": 1.25,
+          "keywords": {
+            "en": [
+              "Medicare",
+              "Medicaid",
+              "insurance",
+              "reimbursement",
+              "regulation",
+              "coverage"
+            ],
+            "es": [
+              "seguro",
+              "reembolso",
+              "regulación",
+              "cobertura"
+            ]
+          }
+        },
+        {
+          "slug": "hospitals-systems",
+          "label": {
+            "en": "Hospitals & Systems",
+            "es": "Hospitales y Sistemas"
+          },
+          "weight": 1.1,
+          "keywords": {
+            "en": [
+              "hospital",
+              "health system",
+              "staffing",
+              "emergency department",
+              "capacity"
+            ],
+            "es": [
+              "hospital",
+              "sistema de salud",
+              "personal",
+              "urgencias"
+            ]
+          }
+        }
+      ],
+      "sources": [
+        {
+          "name": "KFF Health News",
+          "feed_url": "https://kffhealthnews.org/feed/",
+          "language": "en",
+          "trust": 0.9
+        },
+        {
+          "name": "STAT News",
+          "feed_url": "https://www.statnews.com/feed/",
+          "language": "en",
+          "trust": 0.9
+        },
+        {
+          "name": "MedPage Today",
+          "feed_url": "https://www.medpagetoday.com/rss/headlines.xml",
+          "language": "en",
+          "trust": 0.86
+        },
+        {
+          "name": "Fierce Healthcare",
+          "feed_url": "https://www.fiercehealthcare.com/rss/xml",
+          "language": "en",
+          "trust": 0.84
+        },
+        {
+          "name": "WHO News",
+          "feed_url": "https://www.who.int/rss-feeds/news-english.xml",
+          "language": "en",
+          "trust": 0.9
+        },
+        {
+          "name": "EFEsalud",
+          "feed_url": "https://efesalud.com/feed/",
+          "language": "es",
+          "trust": 0.82
+        },
+        {
+          "name": "Redacción Médica",
+          "feed_url": "https://www.redaccionmedica.com/rss",
+          "language": "es",
+          "trust": 0.78
+        }
+      ]
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 # Channel inventory
 
 **What this is:** the canonical list of live channels: name, slug, address, layout. The address of a channel is its own subdomain, never a path on the apex.
-**Status:** Generated 2026-11-07 from live API (`GET /v1/industries`) · **Needs:** nothing manual — `./bin/start.sh test` and CI fail when this file is stale.
+**Status:** Generated 2026-11-10 from live API (`GET /v1/industries`) · **Needs:** nothing manual — `./bin/start.sh test` and CI fail when this file is stale.
 **Source:** the live API when it answers (it knows channels created from the admin console), the deployment profiles otherwise. The generated block is deliberately environment-free: no port, no scheme, no default channel. Those are deployment settings, and baking one machine into this file is what made the previous inventory impossible to check anywhere but the machine that wrote it.
 
 ## Inventory
 
 <!-- CHANNEL_INVENTORY_BEGIN -->
-**Channels:** 11 · **Channel host:** `{slug}.<channel-domain>` (`SN_CHANNEL_DOMAIN`: `localhost` in dev, `APP_DOMAIN` in prd)
+**Channels:** 12 · **Channel host:** `{slug}.<channel-domain>` (`SN_CHANNEL_DOMAIN`: `localhost` in dev, `APP_DOMAIN` in prd)
 
 | # | Channel | Slug | English | Spanish | Layout |
 |---|---|---|---|---|---|
@@ -18,10 +18,11 @@
 | 5 | Logistics & Supply Chain | `logistics` | `logistics.<channel-domain>/` | `logistics.<channel-domain>/es` | professional |
 | 6 | Cybersecurity & Threat Intelligence | `cybersecurity` | `cybersecurity.<channel-domain>/` | `cybersecurity.<channel-domain>/es` | professional |
 | 7 | Stem Cell Treatments | `stem-cell` | `stem-cell.<channel-domain>/` | `stem-cell.<channel-domain>/es` | academic |
-| 8 | Manufacturing & Industrial Operations | `manufacturing` | `manufacturing.<channel-domain>/` | `manufacturing.<channel-domain>/es` | professional |
-| 9 | Energy & Utilities | `energy` | `energy.<channel-domain>/` | `energy.<channel-domain>/es` | professional |
-| 10 | Retail & E-commerce | `retail` | `retail.<channel-domain>/` | `retail.<channel-domain>/es` | editorial |
-| 11 | Digital Technology | `digital-technology` | `digital-technology.<channel-domain>/` | `digital-technology.<channel-domain>/es` | professional |
+| 8 | Health & Medicine | `health-medicine` | `health-medicine.<channel-domain>/` | `health-medicine.<channel-domain>/es` | professional |
+| 9 | Manufacturing & Industrial Operations | `manufacturing` | `manufacturing.<channel-domain>/` | `manufacturing.<channel-domain>/es` | professional |
+| 10 | Energy & Utilities | `energy` | `energy.<channel-domain>/` | `energy.<channel-domain>/es` | professional |
+| 11 | Retail & E-commerce | `retail` | `retail.<channel-domain>/` | `retail.<channel-domain>/es` | editorial |
+| 12 | Digital Technology | `digital-technology` | `digital-technology.<channel-domain>/` | `digital-technology.<channel-domain>/es` | professional |
 
 **Path form:** `/{about|contact|search|briefs|references}` · `/topic/{slug}` · `/article/{id}` · `/feed.xml` · `/es/...` for Spanish
 **Compatibility:** `{apex}/{slug}/...` still renders and canonicalises to the channel host. `/admin` is apex-only.

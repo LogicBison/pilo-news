@@ -9,7 +9,8 @@ export type SkinKey =
   | "forge"
   | "grid"
   | "market"
-  | "datacenter";
+  | "datacenter"
+  | "clinic";
 
 export type HeroVariant = "split" | "ledger" | "poster" | "ribbon";
 export type RuleStyle = "double" | "hairline" | "dotted" | "dashed" | "none" | "accent";
@@ -266,6 +267,28 @@ const DATACENTER: Skin = {
   references: ["semianalysis", "thedatacenter"],
 };
 
+const CLINIC: Skin = {
+  key: "clinic",
+  label: "Clinic",
+  hero: "poster",
+  motif: "/skins/health-medicine/motif.svg",
+  scene: "/skins/health-medicine/scene.svg",
+  photo: "/photos/health-medicine/band.jpg",
+  photoSmall: "/photos/health-medicine/band-800.jpg",
+  credit: {
+    label: "Photo: Bryn Holmes · CC BY-SA 2.0",
+    href: "https://commons.wikimedia.org/wiki/File:Corridor,_Amersham_Hospital_-_geograph.org.uk_-_7628891.jpg",
+  },
+  radius: "10px",
+  rule: "accent",
+  eyebrow: "serif",
+  cta: "corner",
+  rail: "static",
+  list: "grid3",
+  bar: "center",
+  references: ["kffhealthnews", "statnews"],
+};
+
 export const SKINS: Record<string, Skin> = {
   legal: CHAMBERS,
   financial: TERMINAL,
@@ -278,6 +301,7 @@ export const SKINS: Record<string, Skin> = {
   energy: GRID,
   retail: MARKET,
   "digital-technology": DATACENTER,
+  "health-medicine": CLINIC,
 };
 
 const LAYOUT_FALLBACK: Record<string, Skin> = {

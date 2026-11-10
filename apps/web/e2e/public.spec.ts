@@ -243,6 +243,7 @@ test("a story without a summary never claims an AI wrote one", async ({ page }) 
     "energy",
     "retail",
     "digital-technology",
+    "health-medicine",
   ];
   let target: string | null = null;
   let hasExcerpt = false;

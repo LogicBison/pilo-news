@@ -108,5 +108,15 @@
     "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
     "source": "https://commons.wikimedia.org/wiki/File:Wikimedia_Foundation_Servers-8055_13.jpg",
     "file": "apps/web/public/photos/digital-technology/band.jpg"
+  },
+  {
+    "channel": "health-medicine",
+    "title": "Corridor, Amersham Hospital - geograph.org.uk - 7628891.jpg",
+    "creator": "Bryn Holmes",
+    "creator_url": "",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Corridor,_Amersham_Hospital_-_geograph.org.uk_-_7628891.jpg",
+    "file": "apps/web/public/photos/health-medicine/band.jpg"
   }
 ]

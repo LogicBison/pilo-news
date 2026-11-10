@@ -35,7 +35,7 @@ The channel domain comes from `channelDomain()` in `apps/web/src/lib/hosts.ts`:
 `*.localhost` resolves to `127.0.0.1` in every browser.
 
 ```
-http://localhost:43991/              -> the lobby (all eleven desks)
+http://localhost:43991/              -> the lobby (all twelve desks)
 http://stem-cell.localhost:43991/    -> channel home
 http://stem-cell.localhost:43991/es
 http://legal.localhost:43991/about
@@ -170,7 +170,7 @@ cannot cover the new name yet, the channel keeps its path URL
 `./bin/start.sh --env <env> hosts` asserts the contract over real HTTP with the
 `Host` header the edge sends:
 
-- apex `/` renders the lobby and lists all eleven desks
+- apex `/` renders the lobby and lists all twelve desks
 - channel `/`, `/es`, `/about` render
 - `/<slug>/about` redirects to `/about`
 - `/admin` redirects to the apex

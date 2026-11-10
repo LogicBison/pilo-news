@@ -18,6 +18,9 @@ export async function Hero({
   industry: BundleData["industry"];
 }) {
   const base = await channelBase(industry.slug);
+  // The hero panel is the desk's primary rung: consultation or the weekly brief.
+  // A brief-only desk keeps the panel, rendered as the brief card.
+  const offers = offersOf(industry);
   const lead = bundle.featured.lead;
   const favorites = bundle.featured.favorites;
   if (!lead && bundle.items.length === 0) {
@@ -76,7 +79,7 @@ export async function Hero({
           </ul>
         ) : null}
       </div>
-      {offersOf(industry).consultation ? (
+      {offers.consultation || offers.brief ? (
         <CtaCard industry={industry} locale={locale} placement="hero" />
       ) : null}
     </section>

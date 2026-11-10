@@ -32,6 +32,7 @@ const pages = [
   "/manufacturing",
   "/energy",
   "/retail",
+  "/health-medicine",
 ];
 
 for (const path of pages) {

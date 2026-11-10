@@ -1,8 +1,11 @@
 import { expect, test } from "@playwright/test";
 
+/** Desks the lobby must show. Add a channel? Bump this and the inventory. */
+const DESK_COUNT = 12;
+
 /**
  * The apex site: the lobby directory and the services page. These assertions are
- * about the promises the page makes — eleven desks, no capture on the lobby,
+ * about the promises the page makes — every desk, no capture on the lobby,
  * one scope-call form — not about layout pixels (see layout.spec.ts).
  */
 
@@ -13,7 +16,7 @@ test("the lobby lists every desk and links each to its own host", async ({ page 
   // Always one h1: the hero, or the honest degraded state if the API did not
   // answer in time (the page must not ship an h1-less document).
   await expect(page.locator("h1")).toContainText(/know what changed|directory is unavailable/i);
-  await expect(page.locator(".lb-plate")).toHaveCount(11);
+  await expect(page.locator(".lb-plate")).toHaveCount(DESK_COUNT);
 
   const hrefs = await page.locator(".lb-plate").evaluateAll((nodes) =>
     nodes.map((node) => node.getAttribute("href") ?? ""),
@@ -23,16 +26,16 @@ test("the lobby lists every desk and links each to its own host", async ({ page 
     // deployment without a channel domain.
     expect(href).toMatch(/(https?:\/\/[a-z-]+\.localhost:\d+\/?$)|(\/[a-z-]+\/?$)/);
   }
-  expect(new Set(hrefs).size).toBe(11);
+  expect(new Set(hrefs).size).toBe(DESK_COUNT);
 });
 
 test("the board shows a cadence and a filed date for every desk", async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector('html[data-hydrated="true"]');
   const rows = page.locator(".lb-board tbody tr");
-  await expect(rows).toHaveCount(11);
+  await expect(rows).toHaveCount(DESK_COUNT);
   await expect(rows.first()).toContainText(/every \d+ h/i);
-  // Languages were deliberately dropped from the board (one value, eleven times).
+  // Languages were deliberately dropped from the board (one value, once per desk).
   await expect(page.locator(".lb-board thead th")).toHaveCount(3);
   await expect(rows.first().locator("td").last()).not.toBeEmpty();
 });
@@ -67,7 +70,7 @@ test("the Spanish lobby renders as Spanish and keeps the switch on-page", async 
   await page.waitForSelector('html[data-hydrated="true"]');
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
   await expect(page.locator("h1")).toContainText(/sepa qué cambió/i);
-  await expect(page.locator(".lb-plate")).toHaveCount(11);
+  await expect(page.locator(".lb-plate")).toHaveCount(DESK_COUNT);
   await expect(page.locator('a[hreflang], .lb-lang a[aria-current="true"]').first()).toBeVisible();
 });
 
@@ -224,9 +227,9 @@ test("the masthead and the desk board fit the viewport at every width", async ({
     });
 
     expect(board, `no board at ${width}px`).not.toBeNull();
-    expect(board!.cells, `board lost cells at ${width}px`).toBe(33);
+    expect(board!.cells, `board lost cells at ${width}px`).toBe(DESK_COUNT * 3);
     expect(board!.clipped, `board cells clipped at ${width}px`).toBe(0);
     // Every desk keeps a filed date; an empty cell would mean the fold dropped it.
-    expect(board!.dates.filter((date) => date.length > 0), `dates missing at ${width}px`).toHaveLength(11);
+    expect(board!.dates.filter((date) => date.length > 0), `dates missing at ${width}px`).toHaveLength(DESK_COUNT);
   }
 });
