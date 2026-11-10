@@ -62,7 +62,9 @@ exist yet, and certbot needs port 80 answering for every host first.
 ./bin/start.sh --env prd preflight
 ./bin/start.sh --env prd domains --write --http-only   # no 443 blocks yet
 sudo mkdir -p /var/www/certbot
-sudo ln -sfn /srv/system-news/ops/nginx/sites /etc/nginx/sites-enabled/system-news
+# one include file, not a directory symlink: nginx's `include sites-enabled/*`
+# tries to read every entry, and a directory entry fails `nginx -t`
+sudo sh -c 'printf "include /srv/system-news/ops/nginx/sites/*.conf;\n" > /etc/nginx/sites-enabled/system-news.conf'
 sudo nginx -t && sudo systemctl reload nginx
 ```
 

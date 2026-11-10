@@ -461,7 +461,7 @@ cmd_domains() {
 
 Next on the production host (phase 1 - get port 80 answering):
   sudo mkdir -p /var/www/certbot
-  sudo ln -sfn "$ROOT_DIR/ops/nginx/sites" /etc/nginx/sites-enabled/system-news
+  sudo sh -c 'printf "include $ROOT_DIR/ops/nginx/sites/*.conf;\n" > /etc/nginx/sites-enabled/system-news.conf'
   sudo nginx -t && sudo systemctl reload nginx
   curl -fsS -o /dev/null -w '%{http_code}\n' "http://${domain}/.well-known/acme-challenge/probe" || true
 
@@ -477,7 +477,7 @@ EOF
 	cat <<EOF
 
 Next on the production host:
-  sudo ln -sfn "$ROOT_DIR/ops/nginx/sites" /etc/nginx/sites-enabled/system-news
+  sudo sh -c 'printf "include $ROOT_DIR/ops/nginx/sites/*.conf;\n" > /etc/nginx/sites-enabled/system-news.conf'
   sudo nginx -t && sudo systemctl reload nginx
 
 EOF
@@ -535,7 +535,7 @@ certs_print() {
 	echo "443 block whose certificate does not exist yet):"
 	echo "  ./bin/start.sh --env $ENV domains --write --http-only"
 	echo "  sudo mkdir -p /var/www/certbot"
-	echo "  sudo ln -sfn \"$ROOT_DIR/ops/nginx/sites\" /etc/nginx/sites-enabled/system-news"
+	echo "  sudo sh -c 'printf \"include $ROOT_DIR/ops/nginx/sites/*.conf;\\n\" > /etc/nginx/sites-enabled/system-news.conf'"
 	echo "  sudo nginx -t && sudo systemctl reload nginx"
 	echo
 	echo "Phase 2 - issue one certificate for ${domain}, www and every channel:"
