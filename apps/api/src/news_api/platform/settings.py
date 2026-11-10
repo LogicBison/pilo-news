@@ -61,6 +61,35 @@ class Settings(BaseSettings):
     fetch_cooldown_cap_s: int = 6 * 60 * 60
     fetch_challenge_cooldown_s: int = 60 * 60
 
+    @field_validator(
+        "bot_name",
+        "bot_version",
+        "bot_url",
+        "fetch_pacing",
+        "fetch_host_floor_s",
+        "fetch_host_hourly_cap",
+        "fetch_robots_ttl_s",
+        "fetch_breaker_failures",
+        "fetch_breaker_seconds",
+        "fetch_retry_base_s",
+        "fetch_cooldown_cap_s",
+        "fetch_challenge_cooldown_s",
+        mode="before",
+    )
+    @classmethod
+    def _empty_crawler_value_uses_default(cls, value, info):
+        """Treat an empty crawler key as unset.
+
+        The canonical env layout gives every reference key a line in every
+        file, materialised as ``KEY=`` until an operator fills it (env-sync).
+        An empty string would otherwise override the default and, for
+        ``FETCH_PACING``, fail validation at startup. Blank means "unset" for
+        these keys only; other empty values keep their existing meaning.
+        """
+        if isinstance(value, str) and not value.strip():
+            return cls.model_fields[info.field_name].default
+        return value
+
     rate_limit_keyless: int = 120
     rate_limit_keyed: int = 600
     contact_rate_limit_per_hour: int = 3
