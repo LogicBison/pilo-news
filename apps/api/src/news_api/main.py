@@ -33,6 +33,7 @@ from news_api.publishing.http.cta import router as cta_router
 from news_api.publishing.http.funnel import router as funnel_router
 from news_api.publishing.http.leads import router as leads_router
 from news_api.publishing.http.news import router as news_router
+from news_api.publishing.http.outbound import router as outbound_router
 from news_api.publishing.http.taxonomy import router as taxonomy_router
 
 settings = get_settings()
@@ -138,6 +139,7 @@ async def root() -> Any:
 
 app.include_router(industries_router)
 app.include_router(news_router)
+app.include_router(outbound_router)
 app.include_router(taxonomy_router)
 app.include_router(contact_router)
 app.include_router(leads_router)

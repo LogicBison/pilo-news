@@ -56,7 +56,30 @@
     "apps/web/src/app/[locale]/bot/",
     "docs/source-quality.md",
     "apps/web/src/app/[locale]/admin/AdminConsole.tsx",
-    ".env.example"
+    ".env.example",
+    ".work/features/source-availability/20261110-SPEC.md",
+    "apps/api/migrations/017_source_permissions.sql",
+    "apps/api/src/news_api/provisioning/domain/profile.py",
+    "apps/api/src/news_api/provisioning/application/apply.py",
+    "apps/api/src/news_api/provisioning/ports.py",
+    "apps/api/src/news_api/sources/application/verify.py",
+    "apps/api/src/news_api/sources/domain/models.py",
+    "apps/api/config/deployments/cybersecurity.json",
+    "docs/deployment-profile.md",
+    ".env.dev",
+    "apps/api/src/news_api/cli.py",
+    ".work/features/source-acquisition/20261110-SPEC.md",
+    "apps/api/migrations/018_source_acquisition.sql",
+    "apps/api/src/news_api/sources/application/discover.py",
+    "apps/api/src/news_api/publishing/http/outbound.py",
+    "apps/api/tests/unit/test_discover.py",
+    "apps/api/src/news_api/main.py",
+    "apps/api/src/news_api/publishing/http/news.py",
+    "apps/api/src/news_api/articles/infrastructure/repo.py",
+    "apps/web/src/app/go/",
+    "bin/sources.sh",
+    "docs/source-acquisition.md",
+    "docs/api/openapi.v1.json"
   ],
   "allowed_patterns": [],
   "notes": [
@@ -72,6 +95,8 @@
     "D7 references: the KEV digest source link renders from the offer/reference page - only forbid 'see URL/notes' in generation (ai_client.py) unless a render change proves necessary.",
     "Track C plumbing 2026-11-09 (declared after the fact): metrics.py carries INGEST_FETCH_BLOCKED / INGEST_HOST_COOLDOWN, editorial/http/sources.py carries R10 cooldown_until/cooldown_reason into the admin source view, sources/infrastructure/repo.py carries them back out - all additive counters, no schema change. articles/infrastructure/normalize.py + its test are C7: one HTML entity in a publisher's XML (Inside Higher Ed) made Expat raise 'undefined entity' and cost the whole feed, so parse_feed repairs HTML-only entities and retries.",
     "R10 admin render 2026-11-10: AdminConsole.tsx shows the source fail streak, last_error and cooldown reason that editorial/http/sources.py already returned; the Sources tab is the operator surface the SPEC names, so the file is declared here rather than left out of scope. Two catalog keys (admin.cooldown, admin.lastError) added in messages/{en,es}.json.",
-    "O16 2026-11-10 (owner approved in the same message): the six crawler keys BOT_NAME/BOT_VERSION/BOT_URL/FETCH_PACING/FETCH_HOST_FLOOR_S/FETCH_HOST_HOURLY_CAP are now documented in .env.example under \"crawler identity and pacing\". Protected surface, so the approval is recorded in this note and the HANDOFF O16 row."
+    "O16 2026-11-10 (owner approved in the same message): the six crawler keys BOT_NAME/BOT_VERSION/BOT_URL/FETCH_PACING/FETCH_HOST_FLOOR_S/FETCH_HOST_HOURLY_CAP are now documented in .env.example under \"crawler identity and pacing\". Protected surface, so the approval is recorded in this note and the HANDOFF O16 row.",
+    "M17 2026-11-10 (source availability): the migration 017, the permission/auth fields in sources domain+repo, provisioning profile/apply/ports, verify+cli availability gate, the two primary feeds (CISA, SEC), the admin Sources row, the /bot allowlist block, and the policy docs. .env.example already carried the crawler keys; .env.dev joins this scope because the owner asked for the retired Caddy keys to stay commented in every env file (they are now commented in example+dev+prd, and env-sync verify passes).",
+    "M18 2026-11-10 (source acquisition): migration 018 (licence/outreach/outbound_clicks + index), discovery service + CLI + bin wrapper, outbound endpoint and /go route, OpenAPI snapshot, docs guide, licence in profiles/admin. The article link and one e2e assertion changed with /go."
   ]
 }

@@ -8,9 +8,9 @@ in `.env.<env>`.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class LocaleProfile(BaseModel):
@@ -34,6 +34,33 @@ class SourceProfile(BaseModel):
     allow_http: bool = False
     poll_interval_min: int = Field(default=720, ge=5, le=1440)
     terms_url: str | None = Field(default=None, max_length=2048)
+    # Licensed feeds: the credential lives in the environment, and the profile
+    # carries only the variable's name. `header` may also set a publisher-
+    # requested User-Agent (auth_header_name=User-Agent).
+    licence_type: Literal[
+        "unknown",
+        "public-domain",
+        "cc-by",
+        "cc-by-sa",
+        "syndication",
+        "licensed",
+        "proprietary",
+    ] = "unknown"
+    auth_type: Literal["none", "header", "basic"] = "none"
+    auth_header_name: str | None = Field(default=None, max_length=120)
+    auth_secret_ref: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{2,63}$")
+
+    @model_validator(mode="after")
+    def _auth_is_coherent(self) -> SourceProfile:
+        if self.auth_type == "none":
+            if self.auth_header_name or self.auth_secret_ref:
+                raise ValueError("auth_type=none cannot carry a header or secret reference")
+        else:
+            if not self.auth_secret_ref:
+                raise ValueError("auth_type requires auth_secret_ref")
+            if self.auth_type == "basic" and self.auth_header_name:
+                raise ValueError("basic auth does not take a header name")
+        return self
 
 
 class PartnerProfile(BaseModel):

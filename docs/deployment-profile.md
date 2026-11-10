@@ -49,7 +49,13 @@ tokens; missing tokens are filled from the layout preset. Every theme is
 validated for required tokens and WCAG AA contrast before anything is written.
 
 Source defaults: `language` `en`, `trust` 0.7, `poll_interval_min` 720,
-`allow_http` false. Feed URLs must be public HTTPS (HTTP requires
+`allow_http` false, `auth_type` `none`.
+
+Licensed or publisher-gated feeds add `auth_type` (`header` or `basic`) and
+`auth_secret_ref`, the **name** of an environment variable holding the secret —
+never the secret itself. `auth_header_name` names the header for `header` auth
+(default `Authorization`). Setting `auth_header_name: User-Agent` sends a
+publisher-requested identity for that one feed; there is no global UA override. Feed URLs must be public HTTPS (HTTP requires
 `allow_http: true`); test each feed with `POST /v1/admin/sources/{id}/test`
 before relying on it.
 

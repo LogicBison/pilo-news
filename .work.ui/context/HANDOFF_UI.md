@@ -445,3 +445,12 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Verified:** axe 0 critical/serious on `/`, `/es`, `/services`; CLS 0.0000 at 360/1440 px; `favicon.ico` 200 `image/x-icon` on 4 hosts, byte-identical; Playwright **124 passed / 0 failed / 5 skipped** on a fresh production build; `pnpm check` 579 keys, 11/11 contrast.
 **Settled 2026-11-10:** §5 decision 2 — keep `#0b1220` (owner applied the recommendation; no re-derivation). Still open: §5 decision 3 (per-desk favicons, phase 2) and the channel strings (D6/U1).
 **Next:** owner tile-colour call; no UI plan work is open.
+
+---
+
+## Source availability surfaces - 2026-11-10 (@x-director)
+
+**Scope:** M17 (`.work/features/source-availability/20261110-SPEC.md`).
+**Shipped:** the admin Sources row now shows the permission state with the robots check time and the per-source auth kind/header (never the secret); the `/bot` page gained an "allowlisted" block in EN and ES that names the UA, the opt-out and the allowlist path.
+**Verification:** `pnpm lint`, `tsc --noEmit`, `pnpm check` (583 keys, 11/11 contrast), `pnpm build` RC=0, full Playwright 124 passed / 0 failed / 5 skipped.
+**Open:** owner confirmation of the two added primary feeds (O17); no UI decisions.

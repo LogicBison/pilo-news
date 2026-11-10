@@ -256,3 +256,70 @@ async def test_fetch_one_retry_on_a_dead_socket() -> None:
         )
     assert outcome.status == "ok"
     assert attempts["n"] == 2  # exactly one retry, then success
+
+
+# --- source availability: refusals, credentials, identity ------------------
+
+CHALLENGE = b"<html><title>Just a moment</title>cloudflare checking your browser</html>"
+
+
+@pytest.mark.asyncio
+async def test_401_is_a_denial_with_a_cooldown() -> None:
+    redis = FakeRedis()
+    ledger = HostLedger(redis_factory=lambda: _as_redis(redis))
+    client = httpx.AsyncClient(
+        transport=httpx.MockTransport(lambda _r: httpx.Response(401, content=b"no"))
+    )
+    outcome = await fetch_source(make_source(), client=client, ledger=ledger, check_robots=False)
+    assert outcome.status == "denied"
+    state = await ledger.cooldowns(["example.com"])
+    assert state["example.com"]["cooldown_reason"] == "denied"
+
+
+@pytest.mark.asyncio
+async def test_403_challenge_body_is_classified_as_a_challenge() -> None:
+    client = httpx.AsyncClient(
+        transport=httpx.MockTransport(lambda _r: httpx.Response(403, content=CHALLENGE))
+    )
+    outcome = await fetch_source(
+        make_source(), client=client, ledger=HostLedger(mode="off"), check_robots=False
+    )
+    assert outcome.status == "challenge"
+
+
+@pytest.mark.asyncio
+async def test_publisher_credentials_come_from_the_environment(monkeypatch) -> None:
+    monkeypatch.setenv("FEED_TOKEN_TEST", "s3cr3t-value")
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["key"] = request.headers.get("x-api-key")
+        seen["ua"] = request.headers.get("user-agent")
+        return httpx.Response(200, content=RSS, headers={"content-type": "application/rss+xml"})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    source = make_source(
+        auth_type="header", auth_header_name="X-Api-Key", auth_secret_ref="FEED_TOKEN_TEST"
+    )
+    outcome = await fetch_source(source, client=client, **HERMETIC)
+    assert outcome.status == "ok"
+    assert seen["key"] == "s3cr3t-value"
+    # Default identity unchanged: credentials never imply impersonation.
+    assert "HeraldFoxBot" in (seen["ua"] or "")
+
+
+@pytest.mark.asyncio
+async def test_a_publisher_may_choose_the_user_agent_for_its_feed(monkeypatch) -> None:
+    monkeypatch.setenv("FEED_TOKEN_TEST", "PublisherBot/2.0")
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["ua"] = request.headers.get("user-agent")
+        return httpx.Response(200, content=RSS, headers={"content-type": "application/rss+xml"})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    source = make_source(
+        auth_type="header", auth_header_name="User-Agent", auth_secret_ref="FEED_TOKEN_TEST"
+    )
+    await fetch_source(source, client=client, **HERMETIC)
+    assert seen["ua"] == "PublisherBot/2.0"

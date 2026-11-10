@@ -363,3 +363,47 @@ class FakeRedis:
 
 async def _returning(value):
     return value
+
+
+# --- source availability: refusals and robots redirects ---------------------
+
+from news_api.articles.infrastructure.politeness import robots_snapshot  # noqa: E402
+
+
+@pytest.mark.asyncio
+async def test_robots_redirect_is_followed_and_still_denies() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/robots.txt":
+            return httpx.Response(301, headers={"location": "https://example.com/robots-final.txt"})
+        return httpx.Response(200, content=ROBOTS_DISALLOW)
+
+    client, seen = _robots_client(handler)
+    async with client:
+        allowed, _delay = await robots_allowed(
+            "https://example.com/feed.xml",
+            client=client,
+            redis_factory=lambda: _returning(FakeRedis()),
+        )
+    assert allowed is False
+    assert seen == ["/robots.txt", "/robots-final.txt"]
+
+
+@pytest.mark.asyncio
+async def test_robots_snapshot_hashes_the_document_it_read() -> None:
+    client, _seen = _robots_client(lambda _r: httpx.Response(200, content=ROBOTS_DISALLOW))
+    async with client:
+        allowed, _delay, digest = await robots_snapshot(
+            "https://example.com/feed.xml",
+            client=client,
+            redis_factory=lambda: _returning(FakeRedis()),
+        )
+    assert allowed is False
+    assert len(digest) == 64
+
+
+def test_denied_opens_a_week_long_cooldown_without_touching_the_streak() -> None:
+    state = empty_state()
+    record(state, outcome="denied", now=NOW)
+    assert state["cooldown_reason"] == "denied"
+    assert float(state["cooldown_until"]) == NOW + 7 * 24 * 3600
+    assert state["fail_streak"] == "0"

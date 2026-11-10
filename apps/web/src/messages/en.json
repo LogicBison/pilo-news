@@ -233,6 +233,9 @@
     "reason": "Reason",
     "cooldown": "Paused until {when} · {reason}",
     "lastError": "Last error: {error}",
+    "permission": "Permission: {state} (robots {when})",
+    "auth": "Auth: {kind} · {name}",
+    "licence": "Licence: {kind}",
     "status": "Status",
     "action": "Action",
     "label": "Label",
@@ -687,7 +690,9 @@
       "pacingTitle": "How often",
       "pacingBody": "We follow robots.txt and its Crawl-delay, leave a few seconds between two requests to the same host, make no more than twenty requests to one host in an hour, and wait as long as a server asks us to through Retry-After.",
       "blockTitle": "How to block us",
-      "blockBody": "Add a rule for HeraldFoxBot to your robots.txt - Disallow: / is enough - or write to {email} and we will stop reading the feed."
+      "blockBody": "Add a rule for HeraldFoxBot to your robots.txt - Disallow: / is enough - or write to {email} and we will stop reading the feed.",
+      "allowlistTitle": "Getting allowlisted",
+      "allowlistBody": "If your robots.txt refuses us we stop, and we do not retry for a week. Write to {email} if that is a mistake. If you want us to keep reading, allow HeraldFoxBot or our host's address in robots.txt, or send us the user agent or token to use for your feed. We do not pretend to be a browser."
     }
   }
 }

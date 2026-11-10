@@ -125,7 +125,111 @@ async def _verify_sources(args: argparse.Namespace) -> int:
         print(str(exc), file=sys.stderr)
         return 2
     print(json.dumps(report, indent=2))
-    return 0 if report["summary"]["failed"] == 0 else 1
+    summary = report["summary"]
+    # Both are failures: a source that cannot be read, and a channel that has
+    # fallen below the availability floor even if every remaining source is
+    # healthy.
+    return 0 if summary["failed"] == 0 and summary.get("unavailable", 0) == 0 else 1
+
+
+async def _sources(args: argparse.Namespace) -> int:
+    import json
+    from pathlib import Path
+
+    from news_api.sources.infrastructure import repo as sources_repo
+
+    command = args.sources_command
+
+    if command == "discover":
+        from news_api.sources.application.discover import discover, parse_candidates
+
+        urls: list[str] = list(args.url)
+        if args.file:
+            path = Path(args.file)
+            if not path.is_file():
+                print(f"no such file: {path}", file=sys.stderr)
+                return 2
+            urls.extend(parse_candidates(path.read_text(encoding="utf-8")))
+        if not urls:
+            print("nothing to discover: pass --file or --url", file=sys.stderr)
+            return 2
+        try:
+            report = await discover(urls, industry=args.industry, limit=args.limit)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        print(json.dumps(report, indent=2))
+        return 0 if report["summary"]["accept"] else 3
+
+    if command == "report":
+        from news_api.channels.infrastructure import repo as channels_repo
+
+        channels = await channels_repo.list_channels(enabled_only=False)
+        rows: list[dict[str, object]] = []
+        for channel in channels:
+            if args.industry and channel.slug != args.industry:
+                continue
+            sources = await sources_repo.list_sources(channel.id, include_disabled=True)
+            licences: dict[str, int] = {}
+            languages: dict[str, int] = {}
+            permission: dict[str, int] = {}
+            for source in sources:
+                if not source.enabled:
+                    continue
+                licences[source.licence_type] = licences.get(source.licence_type, 0) + 1
+                languages[source.language] = languages.get(source.language, 0) + 1
+                permission[source.permission_state] = permission.get(source.permission_state, 0) + 1
+            rows.append(
+                {
+                    "slug": channel.slug,
+                    "name": channel.name,
+                    "enabled": sum(1 for source in sources if source.enabled),
+                    "licences": licences,
+                    "languages": languages,
+                    "permission": permission,
+                }
+            )
+        print(json.dumps({"industries": rows}, indent=2))
+        return 0
+
+    if command == "health":
+        industry_id = None
+        if args.industry:
+            from news_api.channels.infrastructure import repo as channels_repo
+
+            desk = await channels_repo.get_channel(args.industry, enabled_only=False)
+            if not desk:
+                print(f"unknown industry: {args.industry}", file=sys.stderr)
+                return 2
+            industry_id = desk.id
+        health_rows = await sources_repo.source_health(industry_id)
+        stale = [
+            row["name"]
+            for row in health_rows
+            if int(row.get("items_30d") or 0) < 10 or int(row.get("consecutive_failures") or 0) >= 5
+        ]
+        print(json.dumps({"sources": health_rows, "needs_attention": stale}, indent=2, default=str))
+        return 0
+
+    if command == "outreach":
+        updated = await sources_repo.set_outreach(args.source, note=args.note)
+        if updated is None:
+            print(f"unknown source: {args.source}", file=sys.stderr)
+            return 2
+        print(
+            json.dumps(
+                {
+                    "id": updated.id,
+                    "name": updated.name,
+                    "contacted_at": updated.contacted_at,
+                    "outreach_note": updated.outreach_note,
+                },
+                indent=2,
+            )
+        )
+        return 0
+
+    return 2
 
 
 async def _offer(args: argparse.Namespace) -> int:
@@ -231,6 +335,8 @@ async def _run(args: argparse.Namespace) -> int:
         return await _apply_profile(args)
     if args.command == "verify-sources":
         return await _verify_sources(args)
+    if args.command == "sources":
+        return await _sources(args)
     if args.command == "offer":
         return await _offer(args)
     return 2
@@ -284,6 +390,25 @@ def build_parser() -> argparse.ArgumentParser:
     )
     verify.add_argument("--industry", default="all")
     verify.set_defaults(func=_verify_sources)
+
+    sources = sub.add_parser("sources", help="discover, inspect and record source acquisitions")
+    sources_sub = sources.add_subparsers(dest="sources_command", required=True)
+    discover = sources_sub.add_parser("discover", help="grade candidate feeds before adding them")
+    discover.add_argument("--file", default=None, help="URL list or OPML export")
+    discover.add_argument("--url", action="append", default=[], help="candidate feed URL")
+    discover.add_argument("--industry", default=None)
+    discover.add_argument("--limit", type=int, default=40)
+    discover.set_defaults(func=_sources)
+    report = sources_sub.add_parser("report", help="portfolio by desk: languages, licences")
+    report.add_argument("--industry", default=None)
+    report.set_defaults(func=_sources)
+    health = sources_sub.add_parser("health", help="per-source output and return traffic")
+    health.add_argument("--industry", default=None)
+    health.set_defaults(func=_sources)
+    outreach = sources_sub.add_parser("outreach", help="record that a publisher was contacted")
+    outreach.add_argument("--source", required=True, help="source id")
+    outreach.add_argument("--note", default="")
+    outreach.set_defaults(func=_sources)
 
     offer = sub.add_parser("offer", help="build and inspect dated offer issues")
     offer_sub = offer.add_subparsers(dest="offer_command", required=True)

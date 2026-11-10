@@ -26,7 +26,15 @@ test("article detail links out to the publisher", async ({ page }) => {
   await firstStory.click();
   await expect(page).toHaveURL(/\/legal\/article\//);
   await expect(page.locator("h1")).toBeVisible();
-  await expect(page.getByRole("link", { name: /read the full story/i })).toBeVisible();
+  const outbound = page.getByRole("link", { name: /read the full story/i });
+  await expect(outbound).toBeVisible();
+  // Every outbound link goes through /go so the click can be counted. The
+  // route must answer 302 with the publisher URL, not render a page.
+  await expect(outbound).toHaveAttribute("href", /^\/go\//);
+  const href = (await outbound.getAttribute("href")) ?? "";
+  const redirect = await page.request.get(href, { maxRedirects: 0 });
+  expect(redirect.status()).toBe(302);
+  expect(redirect.headers()["location"]).toMatch(/^https?:\/\//);
 });
 
 test("lead form requires consent and never echoes PII in the URL", async ({ page }) => {

@@ -250,7 +250,19 @@
           "enabled": true,
           "allow_http": false,
           "poll_interval_min": 720,
-          "terms_url": null
+          "terms_url": null,
+          "licence_type": "public-domain"
+        },
+        {
+          "name": "SEC Press Releases",
+          "feed_url": "https://www.sec.gov/news/pressreleases.rss",
+          "language": "en",
+          "trust": 0.95,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": "https://www.sec.gov/about/privacy-information",
+          "licence_type": "public-domain"
         }
       ],
       "partner": {

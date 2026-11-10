@@ -277,6 +277,11 @@ async def _apply_industry(
                     poll_interval_min=source.poll_interval_min,
                     terms_checked_at=None,
                     terms_url=source.terms_url,
+                    permission_state="licensed" if source.auth_type != "none" else "unknown",
+                    auth_type=source.auth_type,
+                    auth_header_name=source.auth_header_name,
+                    auth_secret_ref=source.auth_secret_ref,
+                    licence_type=source.licence_type,
                 )
         else:
             changes = _source_changes(found, source, url)
@@ -403,6 +408,14 @@ def _source_changes(found: Any, source: SourceProfile, url: str) -> dict[str, An
         changes["poll_interval_min"] = source.poll_interval_min
     if (found.terms_url or None) != (source.terms_url or None):
         changes["terms_url"] = source.terms_url
+    if found.auth_type != source.auth_type:
+        changes["auth_type"] = source.auth_type
+    if (found.auth_header_name or None) != (source.auth_header_name or None):
+        changes["auth_header_name"] = source.auth_header_name
+    if (found.auth_secret_ref or None) != (source.auth_secret_ref or None):
+        changes["auth_secret_ref"] = source.auth_secret_ref
+    if found.licence_type != source.licence_type:
+        changes["licence_type"] = source.licence_type
     return changes
 
 

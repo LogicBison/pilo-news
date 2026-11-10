@@ -96,7 +96,7 @@ What is worth porting, by source:
 | C4 | Retry budget: one retry for a dead socket only; no retry loops | test asserts one attempt on 429 |
 | C5 | Response hygiene: `Content-Type` must be xml/rss/atom, reject `text/html` challenge bodies | test: 200 + HTML → `blocked` |
 | C6 | Pin the validated IP: connect to the address `_resolve_is_public` approved (closes the rebinding window at `fetcher.py:51-55`) | test: host resolving twice to different IPs uses the first |
-| C7 | Retire the two broken sources or fix them | `verify-sources` exit 0, 0 stale > 45 days (see the outcome below: this accepted a broken source, because the CLI exits 0 on failure) |
+| C7 | Retire the two broken sources or fix them | `verify-sources` exit 0, 0 stale > 45 days (see the outcome: the CLI does exit 1 on a failed source — the earlier "exit 0" reading came from a piped command) |
 
 Detail and test matrix: `.work/features/fetch-safety/20261109-SPEC.md`.
 
@@ -181,8 +181,8 @@ docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "c
 - The Register (`digital-technology`) — default-deny policy, licence required; disabled.
 - Inside Higher Ed + Distribución Actualidad — parser corners (HTML entities, bare `&`), repaired in `normalize.py` so the feeds keep working.
 
-Finextra's retirement left financial at 3 enabled sources against the policy minimum of 4; a Federal Reserve press-release feed was added to restore 4. `verify-sources` still exits 0 when a source fails — the acceptance in the C7 row was too weak, and that is now a follow-up rather than a passed gate.
+Finextra's retirement left financial at 3 enabled sources against the policy minimum of 4; a Federal Reserve press-release feed was added to restore 4. Gate note — corrected 2026-11-10: `verify-sources` always returned 1 when a source failed (`cli.py`: `return 0 if summary["failed"] == 0 else 1`); the earlier reading came from a piped command, whose exit status was the pipe's last stage. It now also returns 1 when a channel drops below the availability floor. C7 itself now reports 52/52.
 
 ## Next action
 
-None for the tracks. Open items live in `.work/plans/NEXT.md`: O9 (production TLS), O15 (`SMTP_FROM` spelling), O16 (`BOT_*`/`FETCH_*` in `.env.example`), the D-trial read of the next natural refresh, and the `verify-sources` exit-code gate.
+None for the tracks. Open items live in `.work/plans/NEXT.md`: O9 (production TLS), O15 (`SMTP_FROM` spelling), the D-trial read of the next natural refresh. Source availability continued as `.work/features/source-availability/20261110-SPEC.md`.

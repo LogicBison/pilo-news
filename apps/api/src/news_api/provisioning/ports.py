@@ -98,6 +98,11 @@ class SourceRepository(Protocol):
         poll_interval_min: int,
         terms_checked_at: str | None,
         terms_url: str | None,
+        permission_state: str = "unknown",
+        auth_type: str = "none",
+        auth_header_name: str | None = None,
+        auth_secret_ref: str | None = None,
+        licence_type: str = "unknown",
     ) -> Source | None: ...
 
     async def update_source(self, source_id: str, fields: dict[str, Any]) -> Source | None: ...

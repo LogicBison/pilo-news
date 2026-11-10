@@ -128,7 +128,7 @@ export default async function ArticlePage({ params }: Params) {
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <a
-            href={article.url}
+            href={`/go/${article.id}`}
             target="_blank"
             rel="noopener noreferrer"
             className="sn-btn"

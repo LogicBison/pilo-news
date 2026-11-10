@@ -31,7 +31,7 @@ export default async function BotPage({ params }: Params) {
   if (!isLocale(locale)) notFound();
   const resolved = resolveLocale(locale);
   const { desks } = await deskViews(resolved);
-  const blocks = ["identity", "reading", "pacing", "block"] as const;
+  const blocks = ["identity", "reading", "pacing", "block", "allowlist"] as const;
 
   return (
     <LobbyShell locale={resolved} path="/bot" desks={desks}>

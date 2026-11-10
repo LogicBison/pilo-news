@@ -149,6 +149,7 @@ async def run_ingest(
         "blocked": 0,
         "rate_limited": 0,
         "robots_disallowed": 0,
+        "denied": 0,
         "blocked_hosts": [],
         "per_language": {},
     }
@@ -202,6 +203,12 @@ async def run_ingest(
                         stats["rate_limited"] += 1
                     elif outcome.status == "robots_disallowed":
                         stats["robots_disallowed"] += 1
+                    elif outcome.status == "denied":
+                        # A permanent refusal is not "blocked by load": it is
+                        # a decision to retire or license the source, so it
+                        # stays out of the blocked share that flips a run to
+                        # partial.
+                        stats["denied"] += 1
                     else:
                         stats["blocked"] += 1
                     stats["blocked_hosts"].append(urlsplit(source.feed_url).hostname or "")

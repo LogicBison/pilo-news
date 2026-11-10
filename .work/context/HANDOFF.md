@@ -2,6 +2,10 @@
 
 ## Session status
 
+**Open (2026-11-10, M18 shipped):** source acquisition built per the owner's "build the whole thing": `sources discover` grades a URL list or OPML (permission → quality → overlap → fit) without writing anything; `licence_type` and outreach are recorded per source and shown in admin; every outbound story link now goes through `/go/{id}` → `/v1/outbound/{id}`, which counts one click and 302s to the publisher (aggregate only, no reader identifier); `sources report`/`health` show the portfolio and return traffic. The two added primary feeds are kept (O17 answered). Uncommitted.
+
+**Open (2026-11-10, M17 shipped):** source availability implemented per the owner's "implement all" instruction: `401`/`403` now produce `denied` with a seven-day cooldown, a `403` WAF body is classified `challenge`, robots redirects are followed and validated per hop, a permission ledger records state/hash/date/delay for every source, licensed feeds can carry credentials from the environment (never in the database), `verify-sources` gates the four-healthy-source availability floor, CISA News and SEC Press Releases were added, and `/bot` now explains allowlisting. The honest crawler UA is unchanged by design; a publisher-requested UA is a per-source header, not browser impersonation. Caddy keys were commented in all three env files at the owner's request and `env-sync verify` passes. Uncommitted.
+
 **Open (2026-11-10, C+D verified):** the interrupted 2026-11-09 C+D session was resumed, verified and finished. Fetch safety (full plan **M16**) and the content fixes pass every gate: api **209 tests**, web lint/tsc/check **579 keys**, build **RC=0**, Playwright **124 passed / 0 failed / 5 skipped** on the production build, `hosts` all 14 invariants, `verify-sources` **50/50, 0 warnings**. Six defects were found while verifying and fixed: retail parser (bare `&`), financial below the 4-source minimum (Federal Reserve feed added), cooldown gauge not reset, admin Sources not rendering the new cooldown/last-error fields, the article-404 home link empty on channel hosts, and plan drift (NEXT said `pending`; the full plan had no M16). **Committed 2026-11-10 as `c6ce202`** (53 files: M15 brand surfaces + M16 fetch safety/content) and pushed to `origin/main`, with owner approval in the same message, after `@code-verify uncommitted` returned *pass with conditions* (blast radius high, acknowledged by the owner).
 
 **Open:** 2026-11-09 - goal: proceed to implement all plans until all is full and complete (`@x-director`)
@@ -52,7 +56,7 @@ and a browser save/restore check against the dev API. SPEC:
 3. ~~**Implement M15**~~ done 2026-11-09. ~~**Track C+D**~~ **done and verified 2026-11-10**
    (full plan **M16**): no plan work is open. Next is the owner lane — **O9** production TLS
    (`./bin/start.sh --env prd domains --write`, `nginx -t`, reload, `certs --check`, `hosts`),
-   then the D-trial read of the next natural refresh and the `verify-sources` exit-code gate.
+   then the D-trial read of the next natural refresh.
 4. **Apex:** the lobby lives in `apps/web/src/components/lobby/`; its copy is
    `.work.biz/strategy/20261107-lobby-copy.md` (140 keys, EN/ES). Change copy there
    first, then in `apps/web/src/messages/`.
@@ -112,6 +116,8 @@ and a browser save/restore check against the dev API. SPEC:
 | channel inventory | gated | environment-free block, live/profile fallback, CI check |
 | request logging | outcome-based | probes silent, 0 lines per 30 s idle |
 | fetch safety (M16) | done | politeness 18 tests, fetcher outcome tests, `verify-sources` 50/50, `hosts` 14/14, bots page live in EN/ES |
+| source availability (M17) | done | permission ledger, denied/challenge outcomes, licensed-feed auth, availability gate 52/52, `/bot` allowlist block |
+| source acquisition (M18) | done | discovery + overlap, licence/outreach register, outbound click counting, portfolio health |
 
 **Integrity:** no known waivers. Dev stack running (`system-news-dev`).
 
@@ -160,6 +166,14 @@ and a browser save/restore check against the dev API. SPEC:
 | Hosts (2026-11-10) | `./bin/start.sh --env dev hosts` | **all checks passed** (14 invariants) |
 | Parser repairs (2026-11-10) | `test_normalize.py` (bare `&`, CDATA untouched) | 2 new tests pass |
 | Politeness (2026-11-10) | `test_politeness.py` (fake clock, no network) | 18 passed |
+| M17 gates (2026-11-10) | api `ruff`/`format`/`mypy`/`pytest`; web `lint`/`tsc`/`check`; `pnpm build` | **218 passed** · **583 keys**, 11/11 · **RC=0** |
+| M17 Playwright (2026-11-10) | full suite on the rebuilt production bundle | **124 passed / 0 failed / 5 skipped** |
+| M17 sources (2026-11-10) | `verify-sources --industry all` | **52/52, unavailable 0, rc=0**; all 52 recorded `allowed` |
+| M17 migration (2026-11-10) | migrations run twice | `applied: 0, total: 17` on re-run |
+| M18 gates (2026-11-10) | api `ruff`/`format`/`mypy`/`pytest`; web `lint`/`tsc`/`check`; `pnpm build` | **222 passed** · **584 keys**, 11/11 · **RC=0** |
+| M18 discovery (2026-11-10) | `sources discover` on three real feeds | BBC business **accept** (47 items, overlap 0.0); CISA + The Register **reject** (configured); robots + quality paths exercised |
+| M18 outbound (2026-11-10) | `GET /v1/outbound/{id}` | **302** + publisher URL + `no-store`; unknown id **404**; `outbound_clicks` 0 → 1 |
+| M18 health/report (2026-11-10) | `sources health --industry legal`, `sources report` | rows with `items_7d`/`items_30d`/`clicks_30d`; portfolio by desk |
 
 Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, reload, `certs --check`); the footer credit on the live hosts; R10's seeded-cooldown render (no cooldown seeded in dev — lint/tsc/build only); D1–D5 on live output (waits for the next natural refresh, decision 3); the prd shadow week for pacing.
 
@@ -183,6 +197,7 @@ Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, re
 | O14 | Reconcile the host's local TLS template edit before pulling; the repo now carries the fix | clean pull | owner | `ops/nginx/site.conf.template` |
 | O15 | Approve the `SMTP_FROM` spelling change to **HeraldFox** in `.env.example` / `.env.dev` / `.env.prd` (protected surfaces — needs same-message approval) | brand consistency in outgoing mail | owner | `.env.example` (`SMTP_FROM` block) |
 | O16 | ~~Approve the `BOT_*`/`FETCH_*` keys in `.env.example`~~ approved 2026-11-10, keys added under "crawler identity and pacing" | - | owner | `.env.example` |
+| O17 | ~~Confirm CISA News and SEC Press Releases~~ answered 2026-11-10: keep both | - | owner | `apps/api/config/deployments/` |
 
 ---
 
@@ -337,11 +352,193 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
+M15–M18 are **complete**; the tree is verified but **uncommitted**. Run
+`@code-verify uncommitted` before any commit. Owner lane: **O9** (production TLS on
+`169.58.4.85`, also the prd half of M15-T6) and **O15** (`SMTP_FROM` spelling).
+Agent follow-ups: read the next natural refresh for D1–D5 (no forced reset, decision 3)
+and run one week of `FETCH_PACING=shadow` on prd.
+
+## Cross-framework action (@x-director)
+
+Lead generation remains integrated (ADR 013, FR-17): one primary CTA per page,
+consent-first lead form, partner routing, DSAR export/erase, funnel events, and
+lead dashboards/alerts. UI foundation and biz strategy docs remain in
+`.work.ui/` and `.work.biz/`.
+
+### 2026-11-05 — UI v2 via lead-generation reference intake
+
+**Request:** "use x-director to improve the UI with the recently updated UI Agent OS Framework, using the lead-generation references/skills now available in 'ui' os" → "too many boxes, too many rounded corners... forms confusing... unbalanced columns".
+**Frameworks involved:** `.ai`, `.ai.ui`
+**Classified bucket(s):** cross-framework (ui primary; engineering for build/verify)
+**Executed:**
+1. `@ui-reference-intake scan/dna/synthesize` — `ellevest`, `hubspot`, `leadpages` → DNA docs + direction `editorial-conversion` (Approved 2026-11-05).
+2. `@ui-component-build` (applied under operator's continue instruction) — open editorial layout, full-bleed bands, sharp corners, balanced CSS columns, per-channel CTA placement, filled forms.
+3. Verification — production build; Playwright 57 passed / 1 skipped; `e2e/layout.spec.ts` 30 checks; 80 pages 200 + zero overflow; `pnpm lint/typecheck/check` green; token-lint 0 raw.
+4. Operator approved the direction + bind package; composition tokens added to `tokens.json` (84, schema-valid); ten SPECs §13/§11 bound with `exampleIds: N/A` waiver; `SCREEN_REFERENCE_MAP.md` created; reference audit PASS.
+5. `@ui-screen-spec review` run across all ten channels; 7 SPEC-vs-build mismatches amended in each §3/§4/§5/§8/§11/§12/§13; re-check PASS 10/10; all statuses `Review` (approval still operator’s).
+6. Added `manufacturing`, `energy`, `retail`: profiles applied to dev, 45/45 sources verified, Forge/Grid/Market skins, three bound/reviewed SPECs; 57 e2e / 1 skipped; 80 pages 200 + no overflow.
+7. Channel inventory is generated from the API (`docs/channel-inventory.md`, `bin/channels.sh`); `./bin/start.sh test` runs `--check` and fails on a stale list.
+8. Visual fix after review: Sanctuary CTA opened (transparent, accent rule), skin-level hero/story radius+shadow removed, proof/conversion borders removed, health coverage moved to 2 balanced columns, Sentinel dark-scheme link/eyebrow contrast fixed; axe 11/11.
+9. Visual verify milestone: pass with gaps; UIS-07 (ship_with_notes) + UIS-10 (ship) done; 40 layout checks, 11 axe pages; square-surface + no-motif regressions enforced.
+**Coordination notes:** UI + channel data; no API/schema code changes. `.work.ui/` artifacts + `apps/web` code + `apps/api/config/deployments/*.json`; no protected files edited.
+**Blockers:** none for the build; all ten SPECs are in `Review` pending operator approval.
+**Next recommended:** approve the ten `Review` SPECs; close the new channels' content gaps; then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-06
+**Request:** "resolve all gaps"
+**Frameworks involved:** .ai, .ai.ui (delegated to .ai; no ui-director run — the design rule was an operator decision, D-008)
+**Classified framework bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc yes (unused) | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. `@ai-director` — R16 literal: `industries.cta.asset` (channel config) seeded by `apps/api/migrations/011_seed_asset_offers.sql`, profiles updated, `/v1/news/bundle` passthrough asserted in `test_bundle.py`; web resolves the card from `channel.cta.asset`. Decision D-009 supersedes D-007.
+2. `@ai-director` (ui rule by operator decision D-008) — one secondary rung: the brief signup no longer renders where `cta.asset` is set; SPEC R16 amended; e2e asserts the rule on four channels.
+3. `@ai-director` — plan traceability: M9 added to `.work/plans/full/20261105-full-plan.md` §19 (v1.2) with a traceability row; the waiver is now retired.
+4. Re-verified: api 111 passed, web lint/type/check clean, migration 011 `applied: 1` then `applied: 0`, full Playwright 58 passed / 1 skipped / 1 failed.
+**User correction:** none
+**Coordination notes:** the design rule was taken natively (single-model) rather than routed to `@ui-director`; recorded so the routing is auditable.
+**Blockers:** `layout.spec.ts:31` energy coverage balance fails on new content (330px vs 260) — not caused by M9 (ingestion at 16:03, after the 15:58 green run; energy renders neither card nor asset). Needs a separate layout decision.
+**Next recommended:** `@code-implementation complete`, then `@session-control close commit` split in two (apps/, then `.work*`).
+
+---
+
+## Known residual risks
+
+| Risk | Why it matters | Mitigation |
+|------|----------------|------------|
+| TLS reload not re-verified | the host rejected the first 443 config on duplicate session directives; the template is fixed, but `nginx -t`, reload and `certs --check` still need to pass | O9 is the first step next session |
+| nginx config validated syntactically only | `nginx -t` passes but no request has gone through the real edge | `start.sh hosts` runs the same contract over HTTP once the host proxy is live |
+| CI inventory gate unapproved | the step would run on the next PR before the owner signs off | listed as O10 |
+| Brand string split | apex says **HeraldFox** (one word, owner 2026-11-09), channel footers still say System News | D-018 with a 2026-12-15 outcome date |
+| Scheduler can park a channel | a run stuck in `queued`/`running` blocks that channel until a worker restart; orphan recovery runs only at start (`queue.py:42-63`, `repo.py:285-293`) | cadence verified 2026-11-09 (720 min, all 11 channels); sweep proposed in the M15 block |
+| Emblem source PNG is 599 KB | `public/brand/heraldfox-emblem.png` is served raw wherever `next/image` is not used (footer/OG-less paths) | masthead + footer both use `next/image`; measured `naturalWidth=32` at render, so a resized variant is what ships |
+| Favicon caching per origin | browsers cache `favicon.ico` per origin, so a re-derived icon needs a hard refresh on each of 11 subdomains | accept; re-check with a cache-busting query during verification |
+| Tile colour `#0b1220` assumed | the derived `icon.png`/`apple-icon.png` are flattened on it; UI plan §5 decision 2 is still owner-open | measured corner is `srgb(11,18,32)`; re-derive if the owner picks another colour |
+| Playwright output recompiles dev | `apps/web/test-results/` sits inside the bind-mounted `/app`; one write triggers a Next compile + "Fast Refresh had to perform a full reload", which can knock out a running test (pre-existing, gitignored) | clean `test-results/` before a suite run; run the gate suite against a **production** build in a throwaway container |
+| `pnpm build` clobbers the dev `.next` | `.next` is the named volume `system-news-dev_web_next_v2` and the dev container's entrypoint is `pnpm dev`; a build inside it overwrites the running build (this happened 2026-11-09 and 404'd every asset until wiped) | never run `pnpm build` in the dev container — use `docker compose run --rm --no-deps -v system-news-dev_web_next_prod_v2:/app/.next web` |
+
+- Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
+- Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
+- The UI has ten channels/skins, a verified editorial-conversion v2 build, an **Approved** direction with all ten SPECs **approved**, a passed a11y milestone audit, shipped S0 primitives, and photographic bands on all ten channels. Storybook, the P1 primitives (`Skeleton`, `Toc`) and the vision tier remain open.
+- Channel coverage is uneven at the edges, not empty: the thinnest locale is digital-technology ES (16 items), then retail ES (24). All eleven channels use licensed photos; profiles are applied to dev, not prd; legal/terms review (U11) still applies.
+- The cybersecurity channel uses a dark scheme; fill/border contrast of the new conversion fields was checked visually, but the matrix is not yet in `check-themes.mjs`.
+- Photo licences are recorded per file (`apps/web/public/photos/credits.json`); four channels are CC BY/BY-SA and depend on the in-caption credit staying rendered (financial, cybersecurity, stem-cell, plus retail, energy, manufacturing).
+- AI summaries are fail-open; some items are intentionally left without a
+  summary when validation rejects output.
+- CI is written but has not run on GitHub yet.
+- prd stack is up on 169.58.4.85 with the data restored; TLS and a rollback drill remain.
+- `k6` and Lighthouse budgets are scripts only; no prd measurement yet.
+- E2E runs against a production build; run `pnpm build` before `pnpm test`.
+- AI validation intentionally rejects some provider output; those items publish
+  without a summary.
+- **Brief promise ahead of the system:** the weekly brief copy promises a Monday email; delivery lands before production (owner-owned). Until it exists, capture is ahead of fulfilment.
+- **Asset scope is US + EU only.** No Asia source coverage, no JP/KR/ZH translation, and the logistics rate index is not buildable (licensed data) - replaced by a port/customs digest per the feasibility doc.
+- **Empty archive on purpose:** `/{industry}/briefs` renders an honest empty state until the first issue publishes.
+
+---
+
+## Next action
+
+M15, M16 and M17 are **complete**; the tree is verified but **uncommitted**. Run
+`@code-verify uncommitted` before any commit. Owner lane: **O9** (production TLS on
+`169.58.4.85`, also the prd half of M15-T6), **O15** (`SMTP_FROM` spelling), **O17**
+(confirm the two added primary feeds). Agent follow-ups: read the next natural refresh for
+D1–D5 (no forced reset, decision 3) and run one week of `FETCH_PACING=shadow` on prd.
+
+## Cross-framework action (@x-director)
+
+Lead generation remains integrated (ADR 013, FR-17): one primary CTA per page,
+consent-first lead form, partner routing, DSAR export/erase, funnel events, and
+lead dashboards/alerts. UI foundation and biz strategy docs remain in
+`.work.ui/` and `.work.biz/`.
+
+### 2026-11-05 — UI v2 via lead-generation reference intake
+
+**Request:** "use x-director to improve the UI with the recently updated UI Agent OS Framework, using the lead-generation references/skills now available in 'ui' os" → "too many boxes, too many rounded corners... forms confusing... unbalanced columns".
+**Frameworks involved:** `.ai`, `.ai.ui`
+**Classified bucket(s):** cross-framework (ui primary; engineering for build/verify)
+**Executed:**
+1. `@ui-reference-intake scan/dna/synthesize` — `ellevest`, `hubspot`, `leadpages` → DNA docs + direction `editorial-conversion` (Approved 2026-11-05).
+2. `@ui-component-build` (applied under operator's continue instruction) — open editorial layout, full-bleed bands, sharp corners, balanced CSS columns, per-channel CTA placement, filled forms.
+3. Verification — production build; Playwright 57 passed / 1 skipped; `e2e/layout.spec.ts` 30 checks; 80 pages 200 + zero overflow; `pnpm lint/typecheck/check` green; token-lint 0 raw.
+4. Operator approved the direction + bind package; composition tokens added to `tokens.json` (84, schema-valid); ten SPECs §13/§11 bound with `exampleIds: N/A` waiver; `SCREEN_REFERENCE_MAP.md` created; reference audit PASS.
+5. `@ui-screen-spec review` run across all ten channels; 7 SPEC-vs-build mismatches amended in each §3/§4/§5/§8/§11/§12/§13; re-check PASS 10/10; all statuses `Review` (approval still operator’s).
+6. Added `manufacturing`, `energy`, `retail`: profiles applied to dev, 45/45 sources verified, Forge/Grid/Market skins, three bound/reviewed SPECs; 57 e2e / 1 skipped; 80 pages 200 + no overflow.
+7. Channel inventory is generated from the API (`docs/channel-inventory.md`, `bin/channels.sh`); `./bin/start.sh test` runs `--check` and fails on a stale list.
+8. Visual fix after review: Sanctuary CTA opened (transparent, accent rule), skin-level hero/story radius+shadow removed, proof/conversion borders removed, health coverage moved to 2 balanced columns, Sentinel dark-scheme link/eyebrow contrast fixed; axe 11/11.
+9. Visual verify milestone: pass with gaps; UIS-07 (ship_with_notes) + UIS-10 (ship) done; 40 layout checks, 11 axe pages; square-surface + no-motif regressions enforced.
+**Coordination notes:** UI + channel data; no API/schema code changes. `.work.ui/` artifacts + `apps/web` code + `apps/api/config/deployments/*.json`; no protected files edited.
+**Blockers:** none for the build; all ten SPECs are in `Review` pending operator approval.
+**Next recommended:** approve the ten `Review` SPECs; close the new channels' content gaps; then `@ui-visual-verify milestone` + `@ui-accessibility-audit milestone`.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-06
+**Request:** "resolve all gaps"
+**Frameworks involved:** .ai, .ai.ui (delegated to .ai; no ui-director run — the design rule was an operator decision, D-008)
+**Classified framework bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc yes (unused) | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. `@ai-director` — R16 literal: `industries.cta.asset` (channel config) seeded by `apps/api/migrations/011_seed_asset_offers.sql`, profiles updated, `/v1/news/bundle` passthrough asserted in `test_bundle.py`; web resolves the card from `channel.cta.asset`. Decision D-009 supersedes D-007.
+2. `@ai-director` (ui rule by operator decision D-008) — one secondary rung: the brief signup no longer renders where `cta.asset` is set; SPEC R16 amended; e2e asserts the rule on four channels.
+3. `@ai-director` — plan traceability: M9 added to `.work/plans/full/20261105-full-plan.md` §19 (v1.2) with a traceability row; the waiver is now retired.
+4. Re-verified: api 111 passed, web lint/type/check clean, migration 011 `applied: 1` then `applied: 0`, full Playwright 58 passed / 1 skipped / 1 failed.
+**User correction:** none
+**Coordination notes:** the design rule was taken natively (single-model) rather than routed to `@ui-director`; recorded so the routing is auditable.
+**Blockers:** `layout.spec.ts:31` energy coverage balance fails on new content (330px vs 260) — not caused by M9 (ingestion at 16:03, after the 15:58 green run; energy renders neither card nor asset). Needs a separate layout decision.
+**Next recommended:** `@code-implementation complete`, then `@session-control close commit` split in two (apps/, then `.work*`).
+
+---
+
+## Known residual risks
+
+| Risk | Why it matters | Mitigation |
+|------|----------------|------------|
+| TLS reload not re-verified | the host rejected the first 443 config on duplicate session directives; the template is fixed, but `nginx -t`, reload and `certs --check` still need to pass | O9 is the first step next session |
+| nginx config validated syntactically only | `nginx -t` passes but no request has gone through the real edge | `start.sh hosts` runs the same contract over HTTP once the host proxy is live |
+| CI inventory gate unapproved | the step would run on the next PR before the owner signs off | listed as O10 |
+| Brand string split | apex says **HeraldFox** (one word, owner 2026-11-09), channel footers still say System News | D-018 with a 2026-12-15 outcome date |
+| Scheduler can park a channel | a run stuck in `queued`/`running` blocks that channel until a worker restart; orphan recovery runs only at start (`queue.py:42-63`, `repo.py:285-293`) | cadence verified 2026-11-09 (720 min, all 11 channels); sweep proposed in the M15 block |
+| Emblem source PNG is 599 KB | `public/brand/heraldfox-emblem.png` is served raw wherever `next/image` is not used (footer/OG-less paths) | masthead + footer both use `next/image`; measured `naturalWidth=32` at render, so a resized variant is what ships |
+| Favicon caching per origin | browsers cache `favicon.ico` per origin, so a re-derived icon needs a hard refresh on each of 11 subdomains | accept; re-check with a cache-busting query during verification |
+| Tile colour `#0b1220` assumed | the derived `icon.png`/`apple-icon.png` are flattened on it; UI plan §5 decision 2 is still owner-open | measured corner is `srgb(11,18,32)`; re-derive if the owner picks another colour |
+| Playwright output recompiles dev | `apps/web/test-results/` sits inside the bind-mounted `/app`; one write triggers a Next compile + "Fast Refresh had to perform a full reload", which can knock out a running test (pre-existing, gitignored) | clean `test-results/` before a suite run; run the gate suite against a **production** build in a throwaway container |
+| `pnpm build` clobbers the dev `.next` | `.next` is the named volume `system-news-dev_web_next_v2` and the dev container's entrypoint is `pnpm dev`; a build inside it overwrites the running build (this happened 2026-11-09 and 404'd every asset until wiped) | never run `pnpm build` in the dev container — use `docker compose run --rm --no-deps -v system-news-dev_web_next_prod_v2:/app/.next web` |
+
+- Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
+- Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
+- The UI has ten channels/skins, a verified editorial-conversion v2 build, an **Approved** direction with all ten SPECs **approved**, a passed a11y milestone audit, shipped S0 primitives, and photographic bands on all ten channels. Storybook, the P1 primitives (`Skeleton`, `Toc`) and the vision tier remain open.
+- Channel coverage is uneven at the edges, not empty: the thinnest locale is digital-technology ES (16 items), then retail ES (24). All eleven channels use licensed photos; profiles are applied to dev, not prd; legal/terms review (U11) still applies.
+- The cybersecurity channel uses a dark scheme; fill/border contrast of the new conversion fields was checked visually, but the matrix is not yet in `check-themes.mjs`.
+- Photo licences are recorded per file (`apps/web/public/photos/credits.json`); four channels are CC BY/BY-SA and depend on the in-caption credit staying rendered (financial, cybersecurity, stem-cell, plus retail, energy, manufacturing).
+- AI summaries are fail-open; some items are intentionally left without a
+  summary when validation rejects output.
+- CI is written but has not run on GitHub yet.
+- prd stack is up on 169.58.4.85 with the data restored; TLS and a rollback drill remain.
+- `k6` and Lighthouse budgets are scripts only; no prd measurement yet.
+- E2E runs against a production build; run `pnpm build` before `pnpm test`.
+- AI validation intentionally rejects some provider output; those items publish
+  without a summary.
+- **Brief promise ahead of the system:** the weekly brief copy promises a Monday email; delivery lands before production (owner-owned). Until it exists, capture is ahead of fulfilment.
+- **Asset scope is US + EU only.** No Asia source coverage, no JP/KR/ZH translation, and the logistics rate index is not buildable (licensed data) - replaced by a port/customs digest per the feasibility doc.
+- **Empty archive on purpose:** `/{industry}/briefs` renders an honest empty state until the first issue publishes.
+
+---
+
+## Next action
+
 M15 and M16 are **complete**; the C+D tree is verified but **uncommitted**. Run
 `@code-verify uncommitted` before any commit. Then the owner lane: **O9** (production TLS on
 `169.58.4.85`, also the prd half of M15-T6), **O15** (`SMTP_FROM` spelling), **O16**
 (`BOT_*`/`FETCH_*` in `.env.example`). Agent follow-ups: read the next natural refresh for
-D1–D5 (no forced reset, decision 3), make `verify-sources` exit non-zero on a failed source,
+D1–D5 (no forced reset, decision 3), the availability gate (done 2026-11-10),
 and run one week of `FETCH_PACING=shadow` on prd.
 
 ## Cross-framework action (@x-director)
@@ -398,3 +595,44 @@ and run one week of `FETCH_PACING=shadow` on prd.
 **Blockers:** O9 (production TLS), O15 (`SMTP_FROM`), O16 (`BOT_*`/`FETCH_*` in `.env.example`); agent follow-ups are the D-trial read, a real `verify-sources` exit code, and a prd shadow week for pacing.
 **Next recommended:** `@code-verify last` on `c6ce202` after the push.
 **Delivered:** `c6ce202` — 53 files, M15 + M16, pushed 2026-11-10 with owner approval.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-10
+**Request:** "forget about the Caddy-key drift, those keys must remain commented. IMPLEMENT ALL YOUR RECOMMENDATIONS TO INCREASE AVAILABILITY/ACCESSABIILTY/CONTENT-ACQUISITION FROM SOURCES, SHOULD YOU MAKE REQUESTS AS IF THE SYSTEM WAS A BROWSER OPERATED BY A HUMAN AS WELL?"
+**Frameworks involved:** .ai, .ai.ui
+**Classified bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc source-only | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. Caddy keys commented in `.env.example`, `.env.dev` and `.env.prd`; `env-sync verify` passes (the two lines were the only drift).
+2. M17 built: migration 017 (permission + auth columns), `denied` outcome with a seven-day cooldown, 403-challenge detection, robots redirects validated per hop, permission snapshot (state/hash/date/delay) written by verify, per-source credentials and publisher-requested UA from env refs, availability floor in `verify-sources` (exits 1 below four healthy sources), admin Sources row, `/bot` allowlist block, CISA + SEC primary feeds.
+3. Gates: api **218 passed**, web **583 keys**, build RC=0, Playwright **124/0/5**, `verify-sources` **52/52 rc=0**, migration re-run `applied: 0`.
+4. Corrected a false claim carried since the C+D session: `verify-sources` always exited 1 on a failed source; the "exit 0" reading came from a piped command whose status was the pipe's. Fixed in five documents.
+**User correction:** the owner asked whether the system should also present as a human-operated browser. Answer: no — implemented the legitimate alternative instead (per-source `User-Agent`/token from an env ref, publisher allowlisting on `/bot`). Reasoning recorded in the SPEC decisions.
+**Coordination notes:** the UI half (admin permission/auth row, `/bot` allowlist copy) was executed natively in the same pass; `HANDOFF_UI` carries the note. `.env*` edits were explicitly requested in the same message.
+**Blockers:** O17 (owner confirms the two added feeds); deploy needs the migration (automatic on start).
+**Next recommended:** `@code-verify uncommitted`, then commit + push.
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-10
+**Request:** "Build the whole thing, let's make this awesome!" (the acquisition funnel proposed after "how can we improve the ability to acquire better and more sources")
+**Frameworks involved:** .ai, .ai.ui
+**Classified bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc source-only | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. M18: migration 018 (licence, outreach, outbound counter + index), discovery service (`discover.py`) and `sources discover`/`report`/`health`/`outreach` with `bin/sources.sh`.
+2. Outbound traffic: `GET /v1/outbound/{id}` counts one click and 302s; web `/go/{id}` proxies it; the article link and the e2e assertion moved with it; OpenAPI snapshot regenerated.
+3. Licence register: profile field + admin row; Federal Reserve, CISA and SEC set to `public-domain`, the rest stay `unknown`.
+4. Gates: api **222 passed**, web **584 keys**, build RC=0, full Playwright on the rebuilt bundle, real discovery on three feeds, 302/404/counter check against Postgres.
+5. Docs: `docs/source-acquisition.md`, `docs/source-quality.md`, `docs/deployment-profile.md`, SPEC `.work/features/source-acquisition/20261110-SPEC.md`.
+**User correction:** none. O17 answered (keep both primary feeds) and recorded.
+**Coordination notes:** the UI half (admin licence row, `/go` link) was executed natively in the same pass. `/go` is the only place the product sends readers off-site; the redirect target comes from the stored canonical URL, never from a query parameter.
+**Blockers:** none. Owner lane is O9 (TLS) and O15 (`SMTP_FROM`).
+**Next recommended:** `@code-verify uncommitted`, then commit + push M17 + M18.

@@ -233,6 +233,9 @@
     "reason": "Motivo",
     "cooldown": "En pausa hasta {when} · {reason}",
     "lastError": "Último error: {error}",
+    "permission": "Permiso: {state} (robots {when})",
+    "auth": "Auth: {kind} · {name}",
+    "licence": "Licencia: {kind}",
     "status": "Estado",
     "action": "Acción",
     "label": "Etiqueta",
@@ -687,7 +690,9 @@
       "pacingTitle": "Con qué frecuencia",
       "pacingBody": "Seguimos robots.txt y su Crawl-delay, dejamos unos segundos entre dos peticiones al mismo host, hacemos como máximo veinte peticiones a un host por hora y esperamos lo que el servidor pida mediante Retry-After.",
       "blockTitle": "Cómo bloquearnos",
-      "blockBody": "Añade una regla para HeraldFoxBot en tu robots.txt - Disallow: / basta - o escribe a {email} y dejaremos de leer la fuente."
+      "blockBody": "Añade una regla para HeraldFoxBot en tu robots.txt - Disallow: / basta - o escribe a {email} y dejaremos de leer la fuente.",
+      "allowlistTitle": "Cómo permitirnos el acceso",
+      "allowlistBody": "Si tu robots.txt nos rechaza, paramos y no lo reintentamos durante una semana. Escribe a {email} si es un error. Si prefieres que sigamos leyendo, permite HeraldFoxBot o la dirección de nuestro servidor en robots.txt, o envíanos el user agent o el token que debemos usar para tu feed. No nos hacemos pasar por un navegador."
     }
   }
 }

@@ -17,13 +17,14 @@ The three decisions kept deliberately separate:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import random
 import time
 from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urljoin, urlsplit, urlunsplit
 from urllib.robotparser import RobotFileParser
 
 import httpx
@@ -72,6 +73,7 @@ BLOCK_REASONS: dict[str, str] = {
     "challenge": "challenge",
     "blocked": "ssrf",
     "too_large": "size",
+    "denied": "denied",
 }
 
 STATE_FIELDS = (
@@ -216,6 +218,17 @@ def record(
         # Not the host's fault and not ours to escalate: a permanent 404 is a
         # feed problem, so it resets the streak instead of tripping anything.
         state.update({"fail_streak": "0", "cooldown_until": "0", "cooldown_reason": ""})
+        return
+
+    if outcome == "denied":
+        # A publisher said no (401/403, robots, licence). Retrying every cycle
+        # is how a polite crawler becomes a pest, so park the host for a week.
+        state.update(
+            {
+                "cooldown_until": f"{now + settings.fetch_denied_cooldown_s}",
+                "cooldown_reason": "denied",
+            }
+        )
         return
 
     streak += 1
@@ -393,6 +406,98 @@ class HostLedger:
         return out
 
 
+async def _load_robots(
+    url: str,
+    *,
+    user_agent: str,
+    client: httpx.AsyncClient | None,
+    validator: Callable[[str], Awaitable[str]] | None,
+    now: float,
+    ttl_s: int,
+    redis_factory: Callable[[], Awaitable[Any]] | None,
+) -> str:
+    """The robots body for ``url``'s host, from Redis or the network.
+
+    Redirects are followed by hand (max 3) so every hop is validated: the
+    earlier version reused a non-following client, read a ``301`` as "no
+    rules", and quietly fetched hosts whose canonical robots.txt says no.
+    """
+    parts = urlsplit(url)
+    host = parts.hostname or ""
+    if not host:
+        return ""
+    key = f"fetch:robots:{host}"
+    redis: Any | None = None
+    try:
+        if redis_factory is not None:
+            redis = await redis_factory()
+        else:
+            from news_api.platform.cache import get_redis
+
+            redis = await get_redis()
+    except Exception:  # pragma: no cover - dependency failure path
+        redis = None
+
+    if redis is not None:
+        try:
+            cached = await redis.get(key)
+            if cached is not None:
+                payload = json.loads(cached)
+                return str(payload.get("body") or "")
+        except Exception:  # pragma: no cover - cache read failure
+            pass
+
+    robots_url = urlunsplit((parts.scheme, parts.netloc, "/robots.txt", "", ""))
+    owns_client = client is None
+    http = client or httpx.AsyncClient(timeout=httpx.Timeout(6.0, connect=4.0))
+    body = ""
+    try:
+        for _ in range(4):
+            async with http.stream(
+                "GET", robots_url, headers={"User-Agent": user_agent, "Accept": "text/plain,*/*"}
+            ) as response:
+                if response.status_code in (301, 302, 303, 307, 308):
+                    location = response.headers.get("location")
+                    if not location:
+                        return ""
+                    robots_url = urljoin(robots_url, location)
+                    if validator is not None:
+                        robots_url = await validator(robots_url)
+                    continue
+                if response.status_code == 200:
+                    chunks: list[bytes] = []
+                    total = 0
+                    async for chunk in response.aiter_bytes():
+                        total += len(chunk)
+                        if total > 64 * 1024:
+                            break
+                        chunks.append(chunk)
+                    body = b"".join(chunks).decode("utf-8", "replace")
+                break
+    except (httpx.HTTPError, TimeoutError):
+        # Unreadable robots.txt means allow; failures are not cached.
+        return ""
+    finally:
+        if owns_client:
+            await http.aclose()
+
+    if redis is not None:
+        try:
+            await redis.set(key, json.dumps({"at": now, "body": body}), ex=ttl_s)
+        except Exception:  # pragma: no cover - cache write failure
+            pass
+    return body
+
+
+def _verdict(body: str, url: str, user_agent: str) -> tuple[bool, float]:
+    parser = RobotFileParser()
+    parser.parse((body or "").splitlines())
+    if not parser.can_fetch(user_agent, url):
+        return False, 0.0
+    crawl_delay = parser.crawl_delay(user_agent)
+    return True, float(crawl_delay or 0.0)
+
+
 async def robots_allowed(
     url: str,
     *,
@@ -411,82 +516,58 @@ async def robots_allowed(
     to the feed itself.
     """
     settings = get_settings()
-    parts = urlsplit(url)
-    host = parts.hostname or ""
-    if not host:
-        return True, 0.0
-    ttl = ttl_s if ttl_s is not None else settings.fetch_robots_ttl_s
     stamp = now if now is not None else time.time()
-    key = f"fetch:robots:{host}"
-    netloc = parts.netloc
-    robots_url = urlunsplit((parts.scheme, netloc, "/robots.txt", "", ""))
-
-    body: str | None = None
-    redis: Any | None = None
+    ttl = ttl_s if ttl_s is not None else settings.fetch_robots_ttl_s
     try:
-        if redis_factory is not None:
-            redis = await redis_factory()
-        else:
-            from news_api.platform.cache import get_redis
-
-            redis = await get_redis()
-    except Exception:  # pragma: no cover - dependency failure path
-        redis = None
-
-    if redis is not None:
-        try:
-            cached = await redis.get(key)
-            if cached is not None:
-                payload = json.loads(cached)
-                body = str(payload.get("body") or "")
-        except Exception:  # pragma: no cover - cache read failure
-            body = None
-
-    if body is None:
-        if validator is not None:
-            try:
-                robots_url = await validator(robots_url)
-            except ValueError:
-                # robots.txt host is not publishable -> we cannot read it, and
-                # we certainly cannot fetch the feed from it either.
-                return False, 0.0
-        owns_client = client is None
-        http = client or httpx.AsyncClient(timeout=httpx.Timeout(6.0, connect=4.0))
-        try:
-            async with http.stream(
-                "GET", robots_url, headers={"User-Agent": user_agent, "Accept": "text/plain,*/*"}
-            ) as response:
-                if response.status_code == 200:
-                    chunks: list[bytes] = []
-                    total = 0
-                    async for chunk in response.aiter_bytes():
-                        total += len(chunk)
-                        if total > 64 * 1024:
-                            break
-                        chunks.append(chunk)
-                    body = b"".join(chunks).decode("utf-8", "replace")
-                else:
-                    # 404 and friends: no rules. Cache it so a missing file does
-                    # not cost a request per fetch.
-                    body = ""
-        except (httpx.HTTPError, TimeoutError, ValueError):
-            # Unreadable robots.txt means allow, and we do not cache failures.
-            return True, 0.0
-        finally:
-            if owns_client:
-                await http.aclose()
-        if redis is not None:
-            try:
-                await redis.set(key, json.dumps({"at": stamp, "body": body}), ex=ttl)
-            except Exception:  # pragma: no cover - cache write failure
-                pass
-
-    parser = RobotFileParser()
-    parser.parse((body or "").splitlines())
-    if not parser.can_fetch(user_agent, url):
+        body = await _load_robots(
+            url,
+            user_agent=user_agent,
+            client=client,
+            validator=validator,
+            now=stamp,
+            ttl_s=ttl,
+            redis_factory=redis_factory,
+        )
+    except ValueError:
+        # The robots host is not publishable: neither is the feed.
         return False, 0.0
-    crawl_delay = parser.crawl_delay(user_agent)
-    return True, float(crawl_delay or 0.0)
+    return _verdict(body, url, user_agent)
+
+
+async def robots_snapshot(
+    url: str,
+    *,
+    user_agent: str = USER_AGENT,
+    client: httpx.AsyncClient | None = None,
+    validator: Callable[[str], Awaitable[str]] | None = None,
+    now: float | None = None,
+    ttl_s: int | None = None,
+    redis_factory: Callable[[], Awaitable[Any]] | None = None,
+) -> tuple[bool, float, str]:
+    """``(allowed, crawl_delay, sha256)`` — the permission record for verify.
+
+    The hash is what makes the ledger auditable: it names the exact robots text
+    the verdict came from, so a later change is visible without storing the
+    document itself.
+    """
+    settings = get_settings()
+    stamp = now if now is not None else time.time()
+    ttl = ttl_s if ttl_s is not None else settings.fetch_robots_ttl_s
+    try:
+        body = await _load_robots(
+            url,
+            user_agent=user_agent,
+            client=client,
+            validator=validator,
+            now=stamp,
+            ttl_s=ttl,
+            redis_factory=redis_factory,
+        )
+    except ValueError:
+        return False, 0.0, ""
+    allowed, delay = _verdict(body, url, user_agent)
+    digest = hashlib.sha256(body.encode("utf-8")).hexdigest() if body else ""
+    return allowed, delay, digest
 
 
 __all__ = [
@@ -503,4 +584,5 @@ __all__ = [
     "pace",
     "record",
     "robots_allowed",
+    "robots_snapshot",
 ]

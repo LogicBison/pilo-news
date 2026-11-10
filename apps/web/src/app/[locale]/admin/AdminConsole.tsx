@@ -126,6 +126,11 @@ interface Source {
   last_error: string | null;
   cooldown_until?: string | null;
   cooldown_reason?: string;
+  permission_state?: string;
+  robots_checked_at?: string | null;
+  auth_type?: string;
+  auth_header_name?: string | null;
+  licence_type?: string;
 }
 interface Topic {
   id: string;
@@ -1653,6 +1658,29 @@ export function AdminConsole({
                           {source.last_error ? (
                             <span className="mt-1 block break-all text-xs text-[var(--sn-muted)]">
                               {t(locale, "admin.lastError", { error: source.last_error })}
+                            </span>
+                          ) : null}
+                          {source.permission_state && source.permission_state !== "unknown" ? (
+                            <span className="mt-1 block text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.permission", {
+                                state: source.permission_state,
+                                when: source.robots_checked_at
+                                  ? source.robots_checked_at.slice(0, 16).replace("T", " ")
+                                  : "-",
+                              })}
+                            </span>
+                          ) : null}
+                          {source.licence_type && source.licence_type !== "unknown" ? (
+                            <span className="mt-1 block text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.licence", { kind: source.licence_type })}
+                            </span>
+                          ) : null}
+                          {source.auth_type && source.auth_type !== "none" ? (
+                            <span className="mt-1 block text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.auth", {
+                                kind: source.auth_type,
+                                name: source.auth_header_name || "basic",
+                              })}
                             </span>
                           ) : null}
                         </td>

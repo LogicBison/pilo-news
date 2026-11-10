@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import ipaddress
+import os
 import socket
 from datetime import UTC
 from email.utils import parsedate_to_datetime
@@ -161,6 +163,30 @@ async def _pin_to_address(
     return pinned, {"Host": host_header}, extensions
 
 
+def _auth_headers(source: Source) -> dict[str, str]:
+    """Per-source credentials, read from the environment at request time.
+
+    The database stores only the *name* of the variable, so a leaked dump
+    carries no credential. ``auth_type="header"`` sends the secret as the named
+    header value — which is also how a publisher that asks for a specific
+    ``User-Agent`` or a subscription token is honoured, without a global
+    browser impersonation. ``basic`` sends ``user:password``.
+    """
+    if source.auth_type == "none":
+        return {}
+    reference = (source.auth_secret_ref or "").strip()
+    if not reference:
+        return {}
+    secret = os.environ.get(reference, "").strip()
+    if not secret:
+        log.warning("ingest.auth_missing", source=source.name, secret_ref=reference)
+        return {}
+    if source.auth_type == "basic":
+        token = base64.b64encode(secret.encode("utf-8")).decode("ascii")
+        return {"Authorization": f"Basic {token}"}
+    return {(source.auth_header_name or "Authorization").strip(): secret}
+
+
 async def _read_capped(response: httpx.Response) -> bytes:
     chunks: list[bytes] = []
     total = 0
@@ -208,6 +234,9 @@ async def fetch_source(
         headers["If-None-Match"] = source.etag
     if source.last_modified:
         headers["If-Modified-Since"] = source.last_modified
+    # A per-source header may replace the default identity when a publisher
+    # asked for one; nothing here impersonates a browser by default.
+    headers.update(_auth_headers(source))
 
     owns_client = client is None
     http = client or httpx.AsyncClient(timeout=TIMEOUT, follow_redirects=False)
@@ -298,6 +327,38 @@ async def fetch_source(
                             "rate_limited",
                             error=f"http {response.status_code}"
                             + (f", retry after {wait}s" if wait else ""),
+                        )
+                    if response.status_code in (401, 403):
+                        # A refusal is either a WAF challenge wearing a 403 or
+                        # a real "no". Both stop here; only one is worth
+                        # retrying in an hour.
+                        body = await _read_capped(response)
+                        if is_challenge(body):
+                            await active.record(host, "challenge")
+                            log.warning(
+                                "ingest.challenge",
+                                source=source.name,
+                                host=host,
+                                status=response.status_code,
+                            )
+                            return _outcome(
+                                source,
+                                "challenge",
+                                error="anti-bot challenge page",
+                                blocked=True,
+                            )
+                        await active.record(host, "denied")
+                        log.warning(
+                            "ingest.denied",
+                            source=source.name,
+                            host=host,
+                            status=response.status_code,
+                        )
+                        return _outcome(
+                            source,
+                            "denied",
+                            error=f"http {response.status_code}: publisher refused access",
+                            blocked=True,
                         )
                     if response.status_code >= 400:
                         if 400 <= response.status_code < 500 and response.status_code != 408:

@@ -362,3 +362,43 @@ def iso(value: datetime | None) -> str | None:
 
 def now_iso() -> str:
     return iso(utcnow()) or ""
+
+
+async def record_outbound_click(article_id: str) -> str | None:
+    """Count one reader leaving for the publisher, and return where they go.
+
+    Aggregate only: no reader identifier, no IP, no user agent. A hidden or
+    archived article is not a redirect target even if its id leaks.
+    """
+    row = await fetch_one(
+        """
+        UPDATE articles SET
+            outbound_clicks = outbound_clicks + 1,
+            updated_at = now()
+        WHERE id = :id AND status = 'published'
+        RETURNING canonical_url
+        """,
+        {"id": article_id},
+    )
+    return str(row["canonical_url"]) if row else None
+
+
+async def recent_titles(industry_id: str | None = None, *, days: int = 30) -> list[str]:
+    """Titles this desk already carries, for overlap scoring in discovery.
+
+    Deliberately title-only: the question is "would this feed add stories we
+    do not have", and a title match is a cheap upper bound on that.
+    """
+    where = [
+        "status = 'published'",
+        "created_at > now() - (CAST(:days AS integer) * interval '1 day')",
+    ]
+    params: dict[str, Any] = {"days": days}
+    if industry_id:
+        where.append("industry_id = :industry_id")
+        params["industry_id"] = industry_id
+    rows = await fetch_all(
+        f"SELECT title FROM articles WHERE {' AND '.join(where)}",
+        params,
+    )
+    return [str(row["title"]) for row in rows]

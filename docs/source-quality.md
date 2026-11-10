@@ -89,10 +89,35 @@ minimum of 4, so `Federal Reserve Board` press releases
 added and the profile re-applied. `verify-sources --industry all` is 50/50 with
 no coverage warnings.
 
-Note: `verify-sources` exits 0 even when a source fails — read
-`summary.failed`, not the exit code, until that gate is tightened.
+`verify-sources` exits 1 on any failed source and on any channel below the
+availability floor; read `summary.failed` and `availability` when it does.
 
-## 6. Editorial judgment that stays human
+## 6. Availability and permission
+
+Coverage counts configured sources; **availability** counts the ones a publisher
+still lets us read. They are reported separately and only the second one gates.
+
+- **Permission ledger.** `verify-sources` writes `permission_state`
+  (`allowed` / `denied` / `licensed`), `robots_checked_at`, `robots_hash` and
+  `robots_crawl_delay` per source. The hash names the exact robots text the
+  verdict came from, so a publisher editing their file is visible as a changed
+  record rather than a mystery regression.
+- **A refusal is a state.** `401`/`403` → outcome `denied`, seven-day host
+  cooldown, no fail-streak escalation (it is not a host outage). A `403` whose
+  body is a WAF challenge is classified `challenge` instead.
+- **Licensed feeds.** `auth_type` (`header`/`basic`) with `auth_secret_ref`
+  naming an environment variable. The database stores the variable name, never
+  the secret. A publisher-requested `User-Agent` is `auth_type: header` +
+  `auth_header_name: User-Agent` — the supported alternative to browser
+  impersonation.
+- **Availability floor.** A channel needs four healthy sources; below that the
+  CLI exits 1 with `availability.healthy` in the report.
+- **Primary sources first.** Government, regulator and exchange feeds are the
+  preferred replacement when a desk loses a source: explicit terms, stable
+  URLs, no WAF. Added 2026-11-10: CISA News (cybersecurity), SEC Press Releases
+  (financial), alongside the Federal Reserve Board (financial).
+
+## 7. Editorial judgment that stays human
 
 Automation covers liveness, freshness, structure, and language. It cannot judge
 licensing, editorial balance, or whether an outlet is appropriate for a
@@ -101,4 +126,5 @@ profile and `.work/plans/UNKNOWNS.md`.
 
 ## Next action
 
-Re-run `verify-sources` after any portfolio change; it must exit 0.
+Re-run `verify-sources` after any portfolio change; it must exit 0 and report
+`unavailable: 0`.

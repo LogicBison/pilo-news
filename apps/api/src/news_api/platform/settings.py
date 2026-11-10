@@ -60,6 +60,9 @@ class Settings(BaseSettings):
     fetch_retry_base_s: float = 60.0
     fetch_cooldown_cap_s: int = 6 * 60 * 60
     fetch_challenge_cooldown_s: int = 60 * 60
+    # A publisher that says no stays refused for a week: long enough not to
+    # pester, short enough that a licence or a robots change is picked up.
+    fetch_denied_cooldown_s: int = 7 * 24 * 60 * 60
 
     @field_validator(
         "bot_name",
@@ -74,6 +77,7 @@ class Settings(BaseSettings):
         "fetch_retry_base_s",
         "fetch_cooldown_cap_s",
         "fetch_challenge_cooldown_s",
+        "fetch_denied_cooldown_s",
         mode="before",
     )
     @classmethod

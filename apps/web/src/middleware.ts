@@ -189,6 +189,6 @@ export const config = {
   // /en/<path> 404: `brand/` carries the apex logo, `icon.png` and
   // `apple-icon.png` are App Router metadata routes.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon\\.png|apple-icon\\.png|robots.txt|sitemap.xml|skins/|photos/|brand/|api/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon\\.png|apple-icon\\.png|robots.txt|sitemap.xml|skins/|photos/|brand/|go/|api/).*)",
   ],
 };

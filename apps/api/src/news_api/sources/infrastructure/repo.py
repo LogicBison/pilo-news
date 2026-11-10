@@ -11,7 +11,9 @@ from news_api.sources.domain.models import Source, source_from_row
 COLUMNS = """
 id, industry_id, name, feed_url, language, trust, enabled, allow_http, poll_interval_min,
 terms_checked_at, terms_url, etag, last_modified, last_fetched_at, last_success_at,
-status, consecutive_failures, last_error
+status, consecutive_failures, last_error, permission_state, robots_checked_at,
+robots_hash, robots_crawl_delay, auth_type, auth_header_name, auth_secret_ref,
+licence_type, contacted_at, outreach_note
 """
 
 
@@ -65,15 +67,22 @@ async def create_source(
     poll_interval_min: int,
     terms_checked_at: str | None,
     terms_url: str | None,
+    permission_state: str = "unknown",
+    auth_type: str = "none",
+    auth_header_name: str | None = None,
+    auth_secret_ref: str | None = None,
+    licence_type: str = "unknown",
 ) -> Source | None:
     row = await fetch_one(
         f"""
         INSERT INTO sources (
             industry_id, name, feed_url, language, trust, enabled, allow_http,
-            poll_interval_min, terms_checked_at, terms_url
+            poll_interval_min, terms_checked_at, terms_url, permission_state,
+            auth_type, auth_header_name, auth_secret_ref, licence_type
         ) VALUES (
             :industry_id, :name, :feed_url, :language, :trust, :enabled, :allow_http,
-            :poll_interval_min, :terms_checked_at, :terms_url
+            :poll_interval_min, :terms_checked_at, :terms_url, :permission_state,
+            :auth_type, :auth_header_name, :auth_secret_ref, :licence_type
         )
         ON CONFLICT (industry_id, feed_url) DO NOTHING
         RETURNING {COLUMNS}
@@ -89,6 +98,11 @@ async def create_source(
             "poll_interval_min": poll_interval_min,
             "terms_checked_at": terms_checked_at,
             "terms_url": terms_url,
+            "permission_state": permission_state,
+            "auth_type": auth_type,
+            "auth_header_name": auth_header_name,
+            "auth_secret_ref": auth_secret_ref,
+            "licence_type": licence_type,
         },
     )
     return source_from_row(row) if row else None
@@ -106,6 +120,11 @@ async def update_source(source_id: str, fields: dict[str, Any]) -> Source | None
         "terms_checked_at",
         "terms_url",
         "status",
+        "auth_type",
+        "auth_header_name",
+        "auth_secret_ref",
+        "licence_type",
+        "outreach_note",
     }
     assignments = [f"{key} = :{key}" for key in fields if key in allowed]
     if not assignments:
@@ -205,6 +224,95 @@ async def set_fetch_state(source_id: str, state: dict[str, Any]) -> None:
         )
 
 
+async def set_permission(
+    source_id: str,
+    *,
+    state: str,
+    checked_at: Any,
+    robots_hash: str | None,
+    crawl_delay: int | None,
+) -> None:
+    """Record the robots verdict that let (or stopped) the last check.
+
+    Written by `verify-sources`, not by the fetch path: the runner is where an
+    operator asks "may we still read this", and it costs one write per run
+    instead of one per fetch.
+    """
+    async with session_scope() as session:
+        await session.execute(
+            text(
+                """
+                UPDATE sources SET
+                    permission_state = :state,
+                    robots_checked_at = :checked_at,
+                    robots_hash = :robots_hash,
+                    robots_crawl_delay = :crawl_delay,
+                    updated_at = now()
+                WHERE id = :id
+                """
+            ),
+            {
+                "id": source_id,
+                "state": state,
+                "checked_at": checked_at,
+                "robots_hash": robots_hash,
+                "crawl_delay": crawl_delay,
+            },
+        )
+
+
+async def set_outreach(source_id: str, *, note: str | None) -> Source | None:
+    """Record that a publisher was contacted, and what came of it."""
+    row = await fetch_one(
+        f"""
+        UPDATE sources SET
+            contacted_at = now(),
+            outreach_note = :note,
+            updated_at = now()
+        WHERE id = :id
+        RETURNING {COLUMNS}
+        """,
+        {"id": source_id, "note": (note or "")[:2000]},
+    )
+    return source_from_row(row) if row else None
+
+
+async def source_health(industry_id: str | None = None) -> list[dict[str, Any]]:
+    """Per-source output and return traffic over the last 30 days.
+
+    Counts articles by when they were ingested, so a feed that publishes old
+    items still shows up as producing nothing new. Clicks are article-level
+    integers, never reader identifiers.
+    """
+    where = "WHERE s.industry_id = :industry_id" if industry_id else ""
+    rows = await fetch_all(
+        f"""
+        SELECT s.id, s.name, s.language, s.licence_type, s.enabled, s.status,
+               s.last_success_at, s.consecutive_failures, s.permission_state,
+               count(a.id) FILTER (WHERE a.created_at > now() - interval '7 days') AS items_7d,
+               count(a.id) FILTER (WHERE a.created_at > now() - interval '30 days') AS items_30d,
+               coalesce(
+                   sum(a.outbound_clicks) FILTER (
+                       WHERE a.created_at > now() - interval '30 days'
+                   ), 0
+               ) AS clicks_30d
+        FROM sources s
+        LEFT JOIN articles a ON a.source_id = s.id
+        {where}
+        GROUP BY s.id
+        ORDER BY items_30d DESC, s.name
+        """,
+        {"industry_id": industry_id} if industry_id else {},
+    )
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        record = dict(row)
+        for key in ("items_7d", "items_30d", "clicks_30d"):
+            record[key] = int(record.get(key) or 0)
+        out.append(record)
+    return out
+
+
 async def count_sources_by_language(industry_id: str) -> dict[str, int]:
     rows = await fetch_all(
         """
@@ -241,6 +349,18 @@ def source_dto(source: Source, *, admin: bool = False) -> dict[str, Any]:
                 "last_error": source.last_error,
                 "last_fetched_at": source.last_fetched_at,
                 "last_success_at": source.last_success_at,
+                "permission_state": source.permission_state,
+                "robots_checked_at": source.robots_checked_at,
+                "robots_hash": source.robots_hash,
+                "robots_crawl_delay": source.robots_crawl_delay,
+                "auth_type": source.auth_type,
+                "auth_header_name": source.auth_header_name,
+                # The reference, not the secret: an env var name an operator
+                # can check exists, with no credential in the API response.
+                "auth_secret_ref": source.auth_secret_ref,
+                "licence_type": source.licence_type,
+                "contacted_at": source.contacted_at,
+                "outreach_note": source.outreach_note,
             }
         )
     return payload

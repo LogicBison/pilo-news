@@ -1,6 +1,6 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-10 (Track C+D complete and verified — M16 in the full plan)
+**Updated:** 2026-11-10 (M18 source acquisition complete — discovery, overlap, licence/outreach, return-traffic counting, health)
 
 ---
 
@@ -85,7 +85,7 @@ Not verified: R10's seeded-cooldown acceptance (no cooldown seeded in dev; the r
 ### Follow-ups
 
 - **D-trial** — read the first natural refresh batch after D1–D5 (decision 3: no forced reset).
-- **`verify-sources` exit code** — it exits 0 with `summary.failed > 0`, which made C7's acceptance meaningless. Make it a real gate.
+- ~~`verify-sources` exit code~~ corrected 2026-11-10: it always returned 1 on a failed source; the "exit 0" reading came from a piped command. It now also fails below the availability floor.
 - **prd shadow week** — `FETCH_PACING=shadow` for one week before trusting the pacing numbers.
 
 ### MOD-06 output (2026-11-10, Track C+D code)
@@ -110,6 +110,134 @@ merge_with_conditions — reason: gates are green (209 api tests, lint/tsc/check
 ### Cross-LLM verification
 
 Not run in this session; `@code-verify uncommitted` before any commit.
+
+---
+
+## Completed iteration - M18: source acquisition (2026-11-10)
+
+**Milestone ref:** full plan §19 **M18** · spec `.work/features/source-acquisition/20261110-SPEC.md` (**Implemented**) · guide `docs/source-acquisition.md`
+**Status:** complete 2026-11-10 · 6/6 tasks
+
+### In scope
+
+- **R1** `sources discover`: URL list or OPML, permission → quality → novelty → fit, read-only, prints a profile snippet.
+- **R2** overlap: exact-title ratio against the desk's last 30 days; `> 50 %` → `review`.
+- **R3** `licence_type` per source, settable from the profile, shown in admin; government feeds set to `public-domain`.
+- **R4** outreach: `contacted_at` + `outreach_note` via `sources outreach`, shown in admin.
+- **R5** return traffic: `GET /v1/outbound/{article_id}` counts one click and 302s; web `/go/{id}` proxies it.
+- **R6** `sources report` (portfolio) and `sources health` (per-source items/clicks/failures, `needs_attention`).
+
+### Tasks
+
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| M18-T1 | Migration 018: licence, outreach, outbound counter, source index | `migrations/018_source_acquisition.sql` | done 2026-11-10 |
+| M18-T2 | Discovery service: parsing, robots, quality, overlap, verdict | `sources/application/discover.py` | done 2026-11-10 |
+| M18-T3 | `sources` CLI: discover/report/health/outreach + `bin/sources.sh` | `cli.py`, `bin/sources.sh` | done 2026-11-10 |
+| M18-T4 | Outbound endpoint + `/go` route + article link | `publishing/http/outbound.py`, `app/go/[id]/route.ts`, article page | done 2026-11-10 |
+| M18-T5 | Licence in profiles + admin row | `provisioning/**`, `AdminConsole.tsx`, catalogs | done 2026-11-10 |
+| M18-T6 | Tests, OpenAPI snapshot, docs, `docs/source-acquisition.md` | `tests/unit/test_discover.py`, `docs/api/openapi.v1.json` | done 2026-11-10 |
+
+### Verification (2026-11-10)
+
+| Gate | Result |
+|------|--------|
+| api gates | clean · **222 passed** |
+| web gates | clean · 584 keys |
+| `pnpm build` / Playwright | RC=0 · **124 passed / 0 failed / 5 skipped** (outbound assertion added) |
+| `sources discover` (real) | BBC business accepted; CISA and The Register rejected as configured; robots/quality paths exercised |
+| outbound | 302 to the publisher, `Cache-Control: no-store`, unknown id 404, `outbound_clicks` 0 → 1 |
+| OpenAPI | snapshot regenerated; one new path |
+
+### MOD-06 output (2026-11-10, source acquisition)
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 3 — sources schema/repo → CLI and admin; publishing HTTP → every outbound link; web route → API.
+- New cross-boundary deps: article page → `/go`; `/go` → `/v1/outbound`; discovery → articles repo (`recent_titles`).
+- Test isolation: ok — parsing/overlap: `tests/unit/test_discover.py`; outbound: e2e 302 assertion; API route: manual 302/404/counter check.
+- Human architectural review: required — reason: a public redirect endpoint and a click counter. Read `record_outbound_click` (status gate, no PII) before deploy.
+- Blast radius: if the redirect is wrong, every outbound story link leaves the site to the wrong place; if the counter is wrong, publisher conversations quote a wrong number. No write path to content.
+
+## Recommendation
+merge_with_conditions — reason: gates green and the new surfaces are small, but the outbound route is the only place the product sends readers off-site.
+
+## Conditions if merge_with_conditions
+- Human read of `publishing/http/outbound.py` and `app/go/[id]/route.ts` (open-redirect surface: only DB-stored canonical URLs are returned).
+- Owner confirms the counter wording when quoting traffic to a publisher ("clicks we counted", not "visitors").
+
+### Cross-LLM verification
+
+Not run in this session.
+
+---
+
+## Completed iteration - M17: source availability and permission (2026-11-10)
+
+**Milestone ref:** full plan §19 **M17** · spec `.work/features/source-availability/20261110-SPEC.md` (**Implemented**)
+**Status:** complete 2026-11-10 · 7/7 tasks · `verify-sources --industry all` **52/52, unavailable 0**
+
+### In scope
+
+- **R1** `401`/`403` → `denied`, seven-day host cooldown, no fail-streak escalation.
+- **R2** a `403` challenge body → `challenge` (one-hour cooldown), not a generic error.
+- **R3** permission ledger: `permission_state`, `robots_checked_at`, `robots_hash`, `robots_crawl_delay`.
+- **R4** licensed feeds: `auth_type`/`auth_header_name`/`auth_secret_ref` (env name, never the secret); per-source UA when a publisher asks.
+- **R5** availability floor: four healthy sources per channel, CLI exits 1 below it.
+- **R6** primary sources first: CISA News, SEC Press Releases added.
+- **R7** publisher kit on `/bot`: allowlisting and opt-out paths.
+
+### Tasks
+
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| M17-T1 | Migration 017 + domain + repo permission/auth fields | `migrations/017_source_permissions.sql`, `sources/domain/models.py`, `sources/infrastructure/repo.py` | done 2026-11-10 |
+| M17-T2 | Denial outcomes and the 403 challenge check | `fetcher.py`, `politeness.py`, `settings.py` | done 2026-11-10 |
+| M17-T3 | Robots redirects validated hop by hop + snapshot hash | `politeness.py` | done 2026-11-10 |
+| M17-T4 | Credentials and per-source UA from the environment | `fetcher.py` | done 2026-11-10 |
+| M17-T5 | Verify run writes the ledger and gates availability | `sources/application/verify.py`, `cli.py` | done 2026-11-10 |
+| M17-T6 | Profiles carry auth; CISA + SEC added; admin shows permission/auth | `provisioning/**`, `config/deployments/{cybersecurity,financial}.json`, `AdminConsole.tsx` | done 2026-11-10 |
+| M17-T7 | Publisher allowlist block on `/bot`, EN + ES | `app/[locale]/bot/page.tsx`, catalogs | done 2026-11-10 |
+
+### Verification (2026-11-10)
+
+| Gate | Result |
+|------|--------|
+| api `ruff`/`format`/`mypy`/`pytest` | clean · **218 passed** |
+| web `lint`/`tsc`/`check` | clean · 583 keys · 11/11 contrast |
+| `pnpm build` | RC=0 |
+| `verify-sources --industry all` | **52 sources, 52 passed, unavailable 0, 0 warnings** |
+| migration 017 | applied on start; re-run `applied: 0, total: 17` |
+| profiles | both applied; second apply 0 created |
+| admin payload | permission/auth fields present (no secret, only the env reference) |
+
+### Gaps found and fixed
+
+1. **The "verify-sources exits 0 on failure" claim was false.** `cli.py` always returned 1 on a failed source; the earlier reading came from a piped command whose exit status was the pipe's last stage. Corrected in the fetch-safety SPEC, the improvement plan, HANDOFF, NEXT and `docs/source-quality.md`. The gate now also fails below the availability floor.
+2. **Robots redirects were read as "no rules"** (non-following client). Now followed by hand, max 3 hops, every hop re-validated.
+3. **`FETCH_DENIED_COOLDOWN_S`** joins the empty→default guard, so an empty env line cannot break startup.
+
+### MOD-06 output (2026-11-10, source availability)
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 4 — sources schema/domain/repo → provisioning and admin; fetcher/ingest → every channel's content; verify CLI → CI gate; web copy → publisher-facing page.
+- New cross-boundary deps: `verify.py` → `politeness.robots_snapshot`; `fetcher.py` → `os.environ` by `auth_secret_ref`; `AdminConsole` → the new admin fields. No new service, no new secret store.
+- Test isolation: ok — denials/credentials/UA: `tests/unit/test_fetcher.py`; robots redirect + snapshot + denied cooldown: `tests/unit/test_politeness.py`; empty env guard: `tests/unit/test_settings.py`.
+- Human architectural review: required — reason: a schema migration plus a credential path. Read `_auth_headers` (env ref handling, no logging of values) and migration 017 before deploy.
+- Blast radius: if the migration is wrong, the API cannot start; if `auth_secret_ref` resolution is wrong, licensed feeds break and log the variable name (not the value); if the availability floor is too strict, CI fails while the site is fine.
+
+## Recommendation
+merge_with_conditions — reason: gates green and the risky paths are small and tested, but the migration and the credential path deserve a human read before deploy.
+
+## Conditions if merge_with_conditions
+- Human review of migration 017 and `_auth_headers` before deploy.
+- Owner confirms CISA News and SEC Press Releases as acceptable desks' sources.
+- prd needs the migration applied on restart (automatic) and `BOT_*`/`FETCH_*` keys present or empty (defaults now apply).
+
+### Cross-LLM verification
+
+Not run in this session.
 
 ---
 
@@ -354,7 +482,7 @@ shipped half, and **D-trial** is the only read that can still change a code deci
 | **2** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |
 | **3** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions |
 | **4** | D-trial: read the next natural refresh | 20 new summaries against D1–D5; decision 3, no forced reset |
-| **5** | Make `verify-sources` exit non-zero on a failed source | the C7 acceptance proved nothing without it |
+| **5** | ~~Make `verify-sources` exit non-zero~~ done 2026-11-10 | it already did; the availability floor is now part of the gate |
 | **6** | Name the digest reviewer (D-005) | unblocks the content-generation signature line on `/services` (G2) |
 | **7** | Approve the `SMTP_FROM` spelling change (O15) | `.env.example` region still says "Herald Fox"; protected surface, needs same-message approval |
 | **8** | ~~Approve the `BOT_*`/`FETCH_*` keys~~ done 2026-11-10 | `.env.example` documents the six keys; the rest stay in `settings.py` |

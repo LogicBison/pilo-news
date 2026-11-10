@@ -325,6 +325,17 @@
           "allow_http": false,
           "poll_interval_min": 720,
           "terms_url": null
+        },
+        {
+          "name": "CISA News",
+          "feed_url": "https://www.cisa.gov/news.xml",
+          "language": "en",
+          "trust": 0.95,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": "https://www.cisa.gov/about/terms-use",
+          "licence_type": "public-domain"
         }
       ],
       "partner": {

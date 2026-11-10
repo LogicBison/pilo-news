@@ -26,6 +26,22 @@ class Source:
     status: str
     consecutive_failures: int
     last_error: str | None
+    # Permission record (source-availability SPEC). `permission_state` is the
+    # robots verdict at the last check; the hash proves which robots text the
+    # verdict came from. Credentials are never stored here: only the name of
+    # the environment variable that holds them.
+    permission_state: str = "unknown"
+    robots_checked_at: str | None = None
+    robots_hash: str | None = None
+    robots_crawl_delay: int | None = None
+    auth_type: str = "none"
+    auth_header_name: str | None = None
+    auth_secret_ref: str | None = None
+    # Why we may republish a headline and an excerpt, and where the outreach
+    # stands. `contacted_at` is set by the operator, not by a fetch.
+    licence_type: str = "unknown"
+    contacted_at: str | None = None
+    outreach_note: str | None = None
 
 
 def source_from_row(row: dict[str, Any]) -> Source:
@@ -48,4 +64,16 @@ def source_from_row(row: dict[str, Any]) -> Source:
         status=str(row.get("status") or "active"),
         consecutive_failures=int(row.get("consecutive_failures") or 0),
         last_error=row.get("last_error"),
+        permission_state=str(row.get("permission_state") or "unknown"),
+        robots_checked_at=str(row["robots_checked_at"]) if row.get("robots_checked_at") else None,
+        robots_hash=row.get("robots_hash"),
+        robots_crawl_delay=(
+            int(row["robots_crawl_delay"]) if row.get("robots_crawl_delay") is not None else None
+        ),
+        auth_type=str(row.get("auth_type") or "none"),
+        auth_header_name=row.get("auth_header_name"),
+        auth_secret_ref=row.get("auth_secret_ref"),
+        licence_type=str(row.get("licence_type") or "unknown"),
+        contacted_at=str(row["contacted_at"]) if row.get("contacted_at") else None,
+        outreach_note=row.get("outreach_note"),
     )
