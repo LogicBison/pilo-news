@@ -10,7 +10,7 @@ from news_api.platform.settings import Settings
 
 GATEWAY = {
     "smtp_transport": "gateway",
-    "smtp_from": "Herald Fox <info@em.heraldfox.com>",
+    "smtp_from": "HeraldFox <info@em.heraldfox.com>",
     "smtp_gateway_host": "smtp.iterwire.com",
     "smtp_gateway_port": 2525,
     "smtp_gateway_user": "heraldfox@relay.iterwire.com",
@@ -30,7 +30,7 @@ def test_gateway_lane_resolves_its_endpoint_and_sender() -> None:
     assert config.port == 2525
     assert config.user == "heraldfox@relay.iterwire.com"
     assert config.password == "secret"
-    assert config.sender == "Herald Fox <info@em.heraldfox.com>"
+    assert config.sender == "HeraldFox <info@em.heraldfox.com>"
     assert config.use_ssl is False
     assert config.starttls is True
     assert config.transport == "gateway"
@@ -73,7 +73,7 @@ def test_smtp_from_wins_over_the_login() -> None:
     config = _config(smtp_gateway_user="relay@relay.iterwire.com")
 
     assert config.user == "relay@relay.iterwire.com"
-    assert config.sender == "Herald Fox <info@em.heraldfox.com>"
+    assert config.sender == "HeraldFox <info@em.heraldfox.com>"
 
 
 def test_transport_is_normalised() -> None:
@@ -97,7 +97,7 @@ def test_compose_sets_the_configured_sender_and_recipient() -> None:
         config, "news@heraldfox.com", "subject", "body", reply_to="lead@example.com"
     )
 
-    assert message["From"] == "Herald Fox <info@em.heraldfox.com>"
+    assert message["From"] == "HeraldFox <info@em.heraldfox.com>"
     assert message["To"] == "news@heraldfox.com"
     assert message["Reply-To"] == "lead@example.com"
     assert message["Subject"] == "subject"

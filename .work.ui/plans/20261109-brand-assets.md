@@ -1,6 +1,6 @@
 # Brand assets — logo on the root site, favicons everywhere
 
-**Status:** Draft (2026-11-09), decision 1 answered · **Needs:** §5 decision 2 (tile colour) still owner-open — assumed `#0b1220`; the wordmark treatment is settled: emblem + live text (`.work/plans/20261109-next-improvement.md` § Decisions, 2026-11-09); asset slate below assumes emblem + live text.
+**Status:** Implemented (2026-11-09 → verified 2026-11-10, shipped as M15) · **Needs:** nothing — decision 1 settled (emblem + live text) and decision 2 settled (owner, 2026-11-10: keep `#0b1220`, recommendation applied, no re-derivation).
 **Source art:** `.work.ui/references/heraldfox-final.png` — 1536 × 1024 RGBA, transparent background (797,734 fully transparent pixels, alpha max 254), art bbox `x 140–1401, y 4–922`. Baked palette: fur `#f87000`, banner gold `#f8a800`, banner `#000000`.
 **Scope:** root site (apex lobby) gets the logo; every host gets a favicon derived from it. Channel headers keep their per-skin emblem.
 
@@ -71,7 +71,7 @@ convert -size 180x180 xc:'#0b1220' \( brand/icon-tile.png -resize 164x164 \) \
 ```
 
 - Emblem `width=32 height=32`, `alt=""`, `aria-hidden="true"` inside the existing brand link (its `aria-label` already carries the name).
-- Wordmark: `--lb-font-display` (Georgia), 21 px, weight 700, letter-spacing -0.01em. Spelling follows D-018: the logo reads "HeraldFox", the lobby copy "Herald Fox" (*pick one). The baked wordmark is a high-contrast serif; Georgia bold is the closest system face and the lobby already uses it.
+- Wordmark: `--lb-font-display` (Georgia), 21 px, weight 700, letter-spacing -0.01em. Spelling **decided (owner, 2026-11-09): "HeraldFox" is one word, never "Herald Fox"** — the logo and the lobby copy both read `HeraldFox`. The baked wordmark is a high-contrast serif; Georgia bold is the closest system face and the lobby already uses it.
 - Replace `.lb-brand-mark` (the 10 px square) in both masthead and footer; delete the rule once unused.
 - Mobile ≤ 480 px: emblem 28 px, wordmark 19 px, tagline hidden (it already wraps).
 
@@ -95,8 +95,8 @@ They keep `SkinEmblem`; the desk identity is the section emblem, not the corpora
 
 ## 5. Decisions
 
-1. **Wordmark treatment.** (a) emblem + live Georgia text — recommended, survives any size, theme-aware; (b) baked lockup, scaled up only on the lobby hero where it is legible, emblem elsewhere. Pick one; (a) is assumed below.
-2. **Tile colour.** `#0b1220` (cybersecurity skin's ink) or neutral `#111111`. Assumed `#0b1220`.
+1. **Wordmark treatment.** (a) emblem + live Georgia text — recommended, survives any size, theme-aware; (b) baked lockup, scaled up only on the lobby hero where it is legible, emblem elsewhere. **Answered 2026-11-09: (a).** Implemented in the masthead and footer.
+2. **Tile colour.** `#0b1220` (cybersecurity skin's ink) or neutral `#111111`. **Answered 2026-11-10: keep `#0b1220`** — it shipped, the derived icons are opaque on it, and the measured corner matches (`srgb(11,18,32)`); no re-derivation.
 3. **Per-desk favicons.** Phase 2 or never.
 
 ## 6. Acceptance
@@ -105,7 +105,7 @@ They keep `SkinEmblem`; the desk identity is the section emblem, not the corpora
 |---|-------|------|
 | 1 | Masthead renders emblem + wordmark at 360 px and 1440 px | no overflow, no layout shift (CLS 0 on `/`) |
 | 2 | Logo link has one accessible name | axe 0 critical/serious on `/`, `/es`, `/services` |
-| 3 | `<link rel="icon">` present once per document | `curl -s http://localhost:3000/ | grep -c 'rel="icon"'` = 1 |
+| 3 | One `favicon.ico` link per document (the App Router also emits `icon.png`) | `curl -s http://localhost:3000/ | grep -c 'rel="icon"'` = 2, exactly one `href="/favicon.ico"` |
 | 4 | `/favicon.ico` returns 200 `image/x-icon` | curl |
 | 5 | Apple icon is opaque | `identify -format "%[opaque]"` = true |
 | 6 | Favicon survives the 16 px test | visual check at 16 px in light and dark tab strip; adjust the crop box ±40 px if the eyes smear |
@@ -119,6 +119,15 @@ They keep `SkinEmblem`; the desk identity is the section emblem, not the corpora
 - **Cached favicons.** Verification on a subdomain may show the old (absent) icon until a hard refresh; check with a cache-busting query before declaring a failure.
 - **`middleware.ts` matcher.** `/icon.png` is not in the exception list at `middleware.ts:188`; confirm the metadata route is served before the middleware rewrite, or add the paths.
 
-## 8. Next action
+## 8. Outcome (2026-11-10)
 
-Pick decision 1, then run the derivation block above and wire `Masthead` (`shell.tsx:47-68`).
+Shipped as **M15** (full plan §19, v1.7) and verified on dev: emblem 700×700 transparent, lockup 1265×921, tile 512, favicon 48/32/16, icon 512, apple 180 opaque; masthead + footer marks wired with `aria-hidden`, one accessible name; `favicon.ico` 200 `image/x-icon` on four hosts with byte-identical icons; axe 0 critical/serious; CLS 0.0000 at 360/1440 px on `/`, `/es`, `/services`.
+
+Two corrections against this plan's assumptions:
+
+- **`middleware.ts` did need a change.** The matcher at `src/middleware.ts:188` did not exclude `brand/`, `icon.png` or `apple-icon.png`; each was rewritten to `/en/<path>` and 404'd. The negative-lookahead now excludes all three (declared in `.work/touch-scope`).
+- **Acceptance #3 was wrong as written.** The document carries two `rel="icon"` elements, not one — `favicon.ico` and `icon.png` are both auto-emitted, each exactly once. Recorded literally instead of rounding the count to a pass.
+
+## 9. Next action
+
+Nothing is open in this plan: decision 2 keeps `#0b1220`, per-desk favicons stay phase 2 (§5 decision 3), and the channel brand string is D6/U1 (owner, 2026-12-15).

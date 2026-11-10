@@ -2,13 +2,13 @@
 
 > **Path:** `<repo-root>/.work.ui/context/HANDOFF_UI.md` · Maintained by **`ui-*` skills**. Session bookends: **`@session-control`** when `.ai/` is present (full repo); `.work.ui`-scoped session verbs (start / status / context / add / commit / close / push) via **`@ui-session`**.
 
-**Status:** UI v2 implemented and verified; direction **Approved**; **11 channel SPECs Approved**; **visual verify: pass with gaps**; **a11y milestone: pass**; **S0 primitives shipped**; **S1 screens shipped** (contact, about, admin-console; 78 Playwright green) · **Needs:** P1 primitives, S4 SPECs.
+**Status:** UI v2 implemented and verified; direction **Approved**; **11 channel SPECs Approved**; **visual verify: pass with gaps**; **a11y milestone: pass**; **S0 primitives shipped**; **S1 screens shipped** (contact, about, admin-console) · **brand surfaces shipped (M15)** · **Needs:** P1 primitives, S4 SPECs, tile-colour call.
 
 ## Session status
 
 **Closed:** 2026-11-06 - S1 screens shipped: contact, about and admin-console implemented from approved SPECs; production build + 80 Playwright tests green; axe 0 critical/serious on 21 URLs.
 
-**Updated:** 2026-11-06
+**Updated:** 2026-11-10
 
 **UI layer state:** Foundation certified. Eleven skins live (photo bands on every channel); the conversion spine is open/editorial (full-bleed proof, photo, conversion bands; balanced 2-column coverage; filled fields). Eleven channel-home SPECs are `Approved`; the three S1 screens are `Implemented` (2026-11-06). S0 primitives shipped; P1 (`Skeleton`, `Toc`) remain planned.
 
@@ -435,3 +435,13 @@ Keep **### UI layer** in `.work/context/HANDOFF.md` in sync when milestones clos
 **Verified:** all six commands smoke-tested in `tmp/` (removed after use): emblem 700 × 700 transparent, lockup 1265 × 921, tile 512 × 512, favicon 48/32/16, icon 512, apple 180 opaque; emblem and tile inspected visually. `touch-scope-verify` pass; MOD-06 → merge_ok.
 **Still open:** decision 2 (tile colour); M15-T1..T7 not started.
 **Next:** `@code-implementation start` (M15-T1).
+
+---
+
+## Brand surfaces shipped (M15) - 2026-11-10 (@x-director)
+
+**Scope:** `.work.ui/plans/20261109-brand-assets.md` — now `Implemented` (M15-T1..T8 in the full plan v1.8).
+**Shipped:** emblem 700×700 transparent, lockup 1265×921, icon tile 512; `apps/web/public/brand/`; file-based `favicon.ico` (48/32/16), `icon.png` (512), `apple-icon.png` (180, opaque); masthead 32 px (28 under 480 px) + footer 24 px with `aria-hidden` marks; `.lb-brand-mark` retired; `middleware.ts` matcher excludes `brand/`, `icon.png`, `apple-icon.png`; "HeraldFox" one word in the lobby catalogs.
+**Verified:** axe 0 critical/serious on `/`, `/es`, `/services`; CLS 0.0000 at 360/1440 px; `favicon.ico` 200 `image/x-icon` on 4 hosts, byte-identical; Playwright **124 passed / 0 failed / 5 skipped** on a fresh production build; `pnpm check` 579 keys, 11/11 contrast.
+**Settled 2026-11-10:** §5 decision 2 — keep `#0b1220` (owner applied the recommendation; no re-derivation). Still open: §5 decision 3 (per-desk favicons, phase 2) and the channel strings (D6/U1).
+**Next:** owner tile-colour call; no UI plan work is open.

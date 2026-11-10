@@ -42,6 +42,25 @@ class Settings(BaseSettings):
     ai_picks_timeout_seconds: float = 60.0
     refresh_interval_minutes: int = 720
 
+    # --- crawler identity and pacing (fetch-safety SPEC, R1-R5) ------------
+    # One identity, used by both fetchers (articles and offers). The contact
+    # URL must be a page a publisher can actually reach.
+    bot_name: str = "HeraldFoxBot"
+    bot_version: str = "1.0"
+    bot_url: str = "https://heraldfox.com/bot"
+    # enforce = delay for real; shadow = compute and log the delay without
+    # applying it; off = no floor, cap or breaker (429 cooldowns still apply -
+    # the server asked for them explicitly).
+    fetch_pacing: Literal["off", "shadow", "enforce"] = "enforce"
+    fetch_host_floor_s: float = 5.0
+    fetch_host_hourly_cap: int = 20
+    fetch_robots_ttl_s: int = 24 * 60 * 60
+    fetch_breaker_failures: int = 5
+    fetch_breaker_seconds: int = 30 * 60
+    fetch_retry_base_s: float = 60.0
+    fetch_cooldown_cap_s: int = 6 * 60 * 60
+    fetch_challenge_cooldown_s: int = 60 * 60
+
     rate_limit_keyless: int = 120
     rate_limit_keyed: int = 600
     contact_rate_limit_per_hour: int = 3

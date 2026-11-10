@@ -191,3 +191,79 @@ test("the digital-technology channel renders with its own skin and no asset card
   await page.waitForSelector('html[data-hydrated="true"]');
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
 });
+
+test("crawler page states who we are and how to block us", async ({ page }) => {
+  await page.goto("/bot");
+  await expect(page.locator("h1")).toContainText(/crawler/i);
+  await expect(page.getByText("HeraldFoxBot/1.0 (+https://heraldfox.com/bot)").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^identity$/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /how often/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /how to block us/i })).toBeVisible();
+  // Machine-facing page: it must not be pushed into the reader's navigation.
+  await expect(page.getByRole("navigation").getByRole("link", { name: /crawler/i })).toHaveCount(0);
+});
+
+test("crawler page is available in Spanish", async ({ page }) => {
+  await page.goto("/es/bot");
+  await expect(page.locator("h1")).toContainText(/Rastreador/i);
+  await expect(page.getByRole("heading", { name: /Cómo bloquearnos/i })).toBeVisible();
+});
+
+test("a missing story explains the archive it left", async ({ page }) => {
+  const response = await page.goto("/legal/article/00000000-0000-0000-0000-000000000000");
+  // Pre-existing behaviour, unchanged by D10: a rewritten route serves the
+  // not-found boundary with 200 (see NEXT.md observation O-404-status).
+  expect(response).not.toBeNull();
+  await expect(page.getByRole("heading", { name: /story not found/i })).toBeVisible();
+  await expect(page.getByText(/30-day archive/i)).toBeVisible();
+  // The retention the product really enforces - the old seven-day claim is gone.
+  await expect(page.getByText(/seven-day/i)).toHaveCount(0);
+  // Home must leave the dead URL: an empty href kept the reader on the 404.
+  await expect(page.getByTestId("article-404-home")).toHaveAttribute("href", "/");
+});
+
+test("a story without a summary never claims an AI wrote one", async ({ page }) => {
+  const channels = [
+    "legal",
+    "financial",
+    "behavioral-health",
+    "education",
+    "logistics",
+    "cybersecurity",
+    "stem-cell",
+    "manufacturing",
+    "energy",
+    "retail",
+    "digital-technology",
+  ];
+  let target: string | null = null;
+  let hasExcerpt = false;
+  for (const slug of channels) {
+    const response = await page.request.get(
+      `/api/proxy/v1/news/bundle?industry=${slug}&locale=en`,
+    );
+    if (!response.ok()) continue;
+    const body = (await response.json()) as {
+      data?: { items?: { id: string; summary?: string | null; excerpt?: string | null }[] };
+    };
+    const hit = (body.data?.items ?? []).find((item) => !item.summary);
+    if (hit) {
+      target = `/${slug}/article/${hit.id}`;
+      hasExcerpt = Boolean(hit.excerpt);
+      break;
+    }
+  }
+  test.skip(
+    target === null,
+    "no article without a summary in this dataset; the D9 render proof cannot run",
+  );
+
+  await page.goto(target as string);
+  await expect(page.locator("h1")).toBeVisible();
+  await expect(page.getByText(/AI summary/i)).toHaveCount(0);
+  if (hasExcerpt) {
+    await expect(page.getByText(/From the publisher/i)).toBeVisible();
+  } else {
+    await expect(page.getByText(/No summary is available for this story/i)).toBeVisible();
+  }
+});

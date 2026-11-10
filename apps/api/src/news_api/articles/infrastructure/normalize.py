@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import html.entities
 import re
 import unicodedata
 import uuid
@@ -8,6 +9,7 @@ from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from xml.etree.ElementTree import ParseError
 
 from defusedxml import ElementTree as DefusedET  # type: ignore[import-untyped]
 
@@ -22,6 +24,63 @@ TAG_RE = re.compile(r"<[^>]+>")
 LITERAL_CDATA_RE = re.compile(r"<!\[CDATA\[(.*?)\]\]>", re.DOTALL)
 WHITESPACE_RE = re.compile(r"\s+")
 MOJIBAKE_MARKERS = ("Ã", "Â", "â€", "Ã©", "Ã³", "Ã±")
+
+# Publishers paste HTML into XML: "&nbsp;" inside a description is not a
+# defined XML entity, Expat raises "undefined entity", and one stray character
+# would otherwise cost the whole feed (C7: Inside Higher Ed, 4 failures).
+HTML_ENTITY_RE = re.compile(
+    rb"&(?!#\d+;|#x[0-9a-fA-F]+;|amp;|lt;|gt;|quot;|apos;)[a-zA-Z][a-zA-Z0-9]{1,31};"
+)
+# A bare "&" is not legal XML either: one publisher puts "Óptica & Audiología"
+# straight into a title, and Expat rejects the document (C7: Distribución
+# Actualidad, 1 failure). Only the ampersands that do not already open a legal
+# reference are escaped.
+BARE_AMP_RE = re.compile(rb"&(?!#\d+;|#x[0-9a-fA-F]+;|(?:amp|lt|gt|quot|apos);)")
+# CDATA is literal text; escaping an "&" there would print "&amp;" to readers.
+CDATA_SPLIT_RE = re.compile(rb"(<!\[CDATA\[.*?\]\]>)", re.DOTALL)
+# The five entities XML defines itself: rewriting those would corrupt the text.
+XML_PREDEFINED = {"amp;", "lt;", "gt;", "quot;", "apos;"}
+# Typography that should survive as readable ASCII rather than disappear.
+ASCII_FALLBACK = {
+    "\xa0": " ",
+    "\u2026": "...",
+    "\u2013": "-",
+    "\u2014": "-",
+    "\u2018": "'",
+    "\u2019": "'",
+    "\u201c": '"',
+    "\u201d": '"',
+    "\u2022": "-",
+    "\u00d7": "x",
+}
+
+
+def repair_html_entities(content: bytes) -> bytes:
+    """Replace HTML-only entity references with what a reader would see.
+
+    Output stays ASCII-compatible, so a repaired document keeps whatever
+    encoding it declared. An entity we cannot resolve simply disappears — a
+    missing ornament beats a dropped feed. A bare ampersand becomes ``&amp;``
+    so the document parses and the reader still sees the character.
+    """
+
+    def swap(match: re.Match[bytes]) -> bytes:
+        name = match.group(0)[1:].decode("ascii", "ignore")
+        if name in XML_PREDEFINED:
+            return match.group(0)
+        char = html.entities.html5.get(name, "")
+        if not char:
+            return b""
+        char = "".join(ASCII_FALLBACK.get(piece, piece) for piece in char)
+        return unicodedata.normalize("NFKD", char).encode("ascii", "ignore")
+
+    def repair(chunk: bytes) -> bytes:
+        return BARE_AMP_RE.sub(b"&amp;", HTML_ENTITY_RE.sub(swap, chunk))
+
+    return b"".join(
+        part if part.startswith(b"<![CDATA[") else repair(part)
+        for part in CDATA_SPLIT_RE.split(content)
+    )
 
 
 class _TextExtractor(HTMLParser):
@@ -180,7 +239,11 @@ def parse_feed(content: bytes, *, source_name: str, language: str) -> list[FeedI
     head = content[:4096].lower()
     if b"<!doctype" in head or b"<!entity" in head:
         raise ValueError("DTD/entity declarations are not allowed")
-    root = DefusedET.fromstring(content)
+    try:
+        root = DefusedET.fromstring(content)
+    except ParseError:
+        # One HTML entity should not cost the whole feed: repair and retry.
+        root = DefusedET.fromstring(repair_html_entities(content))
     root_name = _local(root.tag)
     publisher_default = clean_text(_child_text(root, "title")) if root_name != "feed" else ""
     if root_name == "feed":

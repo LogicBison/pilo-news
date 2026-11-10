@@ -7,6 +7,7 @@ from news_api.articles.infrastructure.normalize import (
     canonicalize_url,
     clean_text,
     parse_feed,
+    repair_html_entities,
     repair_mojibake,
 )
 
@@ -87,3 +88,66 @@ def test_parse_feed_rejects_entities() -> None:
 def test_parse_feed_skips_unusable_entries() -> None:
     payload = b"<rss><channel><item><description>no title</description></item></channel></rss>"
     assert parse_feed(payload, source_name="x", language="en") == []
+
+
+# --- C7: one HTML entity in a publisher's XML must not cost the whole feed ---
+
+HTML_ENTITY_RSS = b"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Inside Higher Ed</title>
+<item><title>Heard at a conference</title>
+<link>https://www.example.com/story</link>
+<description>&lt;p&gt;A new book,&nbsp;&lt;/span&gt; and what follows.&lt;/p&gt;</description>
+<pubDate>Mon, 09 Nov 2026 03:00:00 -0500</pubDate></item>
+</channel></rss>"""
+
+
+def test_parse_feed_repairs_html_entities_instead_of_dropping_the_feed() -> None:
+    items = parse_feed(HTML_ENTITY_RSS, source_name="Inside Higher Ed", language="en")
+    assert len(items) == 1
+    assert "book," in items[0].excerpt
+    # The non-breaking space becomes the separator it always was.
+    assert "\xa0" not in items[0].excerpt
+
+
+def test_repair_leaves_xml_entities_alone() -> None:
+    payload = b"a &amp; b &lt;c&gt; &quot;d&quot; &apos;e&apos; &hellip;&nbsp;end"
+    assert (
+        repair_html_entities(payload) == b"a &amp; b &lt;c&gt; &quot;d&quot; &apos;e&apos; ... end"
+    )
+
+
+def test_repair_drops_entities_it_cannot_resolve() -> None:
+    assert repair_html_entities(b"noise &notathing; end") == b"noise  end"
+    # Numeric references are already legal XML: untouched.
+    assert repair_html_entities(b"&#169; &#x2014;") == b"&#169; &#x2014;"
+
+
+def test_repair_keeps_accents_readable() -> None:
+    assert repair_html_entities(b"Regulaci&oacute;n") == b"Regulacion"
+    assert repair_html_entities(b"caf&eacute; &ndash; open") == b"cafe - open"
+
+
+# --- C7: a bare ampersand in publisher XML must not cost the feed either ---
+
+BARE_AMP_RSS = b"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Distribucion Actualidad</title>
+<item><title>\xc3\x93ptica & Audiolog\xc3\xada Universitaria avanza</title>
+<link>https://www.example.com/optica</link>
+<description>Un repaso &amp; una nota.</description>
+<pubDate>Mon, 09 Nov 2026 03:00:00 -0500</pubDate></item>
+</channel></rss>"""
+
+
+def test_parse_feed_repairs_a_bare_ampersand_in_a_title() -> None:
+    items = parse_feed(BARE_AMP_RSS, source_name="Distribucion Actualidad", language="es")
+    assert len(items) == 1
+    assert items[0].title == "Óptica & Audiología Universitaria avanza"
+    assert "&amp;" not in items[0].title
+
+
+def test_repair_escapes_bare_ampersands_only_outside_cdata() -> None:
+    assert repair_html_entities(b"AT&T") == b"AT&amp;T"
+    assert repair_html_entities(b"a &amp; b &#38; &#x26;") == b"a &amp; b &#38; &#x26;"
+    # Inside CDATA the ampersand is already literal text: escaping it would
+    # print "&amp;" to the reader.
+    assert repair_html_entities(b"<![CDATA[AT&T]]>") == b"<![CDATA[AT&T]]>"

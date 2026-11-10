@@ -185,5 +185,10 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|skins/|photos/|api/).*)"],
+  // Static assets are excluded so the locale rewrite never turns them into a
+  // /en/<path> 404: `brand/` carries the apex logo, `icon.png` and
+  // `apple-icon.png` are App Router metadata routes.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon\\.png|apple-icon\\.png|robots.txt|sitemap.xml|skins/|photos/|brand/|api/).*)",
+  ],
 };

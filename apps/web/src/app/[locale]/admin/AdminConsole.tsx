@@ -122,6 +122,10 @@ interface Source {
   status: string;
   last_success_at: string | null;
   consecutive_failures: number;
+  fail_streak?: number;
+  last_error: string | null;
+  cooldown_until?: string | null;
+  cooldown_reason?: string;
 }
 interface Topic {
   id: string;
@@ -1638,6 +1642,19 @@ export function AdminConsole({
                         <td className="p-2">
                           {source.status}
                           {source.consecutive_failures ? ` (${source.consecutive_failures})` : ""}
+                          {source.cooldown_until ? (
+                            <span className="mt-1 block text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.cooldown", {
+                                when: source.cooldown_until.slice(0, 16).replace("T", " "),
+                                reason: source.cooldown_reason || t(locale, "admin.reason"),
+                              })}
+                            </span>
+                          ) : null}
+                          {source.last_error ? (
+                            <span className="mt-1 block break-all text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.lastError", { error: source.last_error })}
+                            </span>
+                          ) : null}
                         </td>
                         <td className="whitespace-nowrap p-2 text-right">
                           <button

@@ -18,6 +18,9 @@ class OfferDefinition:
     agency_slugs: tuple[str, ...] = ()
     banned_claims: tuple[str, ...] = ()
     enabled: bool = True
+    # D8: the noun the standfirst counts ("12 federal rule changes"), so the
+    # issue line reads like a sentence instead of a database row.
+    standfirst_noun: str = "changes"
 
     @property
     def cadence_label(self) -> str:

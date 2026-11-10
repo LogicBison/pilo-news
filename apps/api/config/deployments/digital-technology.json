@@ -256,7 +256,7 @@
           "feed_url": "https://www.theregister.com/headlines.atom",
           "language": "en",
           "trust": 0.8,
-          "enabled": true,
+          "enabled": false,
           "allow_http": false,
           "poll_interval_min": 720,
           "terms_url": null

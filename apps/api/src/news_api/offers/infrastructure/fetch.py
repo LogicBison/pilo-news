@@ -7,11 +7,11 @@ from urllib.parse import urljoin
 import httpx
 
 from news_api.articles.infrastructure.fetcher import validate_fetch_url
+from news_api.articles.infrastructure.politeness import USER_AGENT
 
 MAX_BYTES = 5 * 1024 * 1024
 MAX_REDIRECTS = 3
 TIMEOUT = httpx.Timeout(30.0, connect=10.0)
-USER_AGENT = "SystemNewsBot/1.0 (+https://system-news.example/bot)"
 
 
 async def fetch_json(url: str, *, params: Any = None) -> dict[str, Any]:

@@ -1,6 +1,6 @@
 # Next improvement session — brand, fetching, content
 
-**Status:** Draft (2026-11-09) · **Needs:** owner decision on the fetcher's contact URL (decision 1) and the wordmark treatment (A0); the rest is executable without input.
+**Status:** Implemented (2026-11-10) — A+B shipped as M15; C+D shipped and verified (api 209 tests after the C7 fix; web gates and the production build green). **Needs:** D6/D-018 only (brand string, due 2026-12-15); the tile colour is settled (owner, 2026-11-10: keep `#0b1220`) and O16 is done.
 **Scope:** four tracks from the 2026-11-09 request: (A) root-site logo, (B) favicons everywhere, (C) fetcher access + safe fetching, (D) ten content improvements.
 **Evidence base:** the 2026-11-07 dev bundle (`backups/news-dev-bundle-20261107-205243.tar.gz`, 676 published articles, 52 sources, 78 refresh runs) plus the code as it stands at `cb2f1c9`.
 
@@ -96,7 +96,7 @@ What is worth porting, by source:
 | C4 | Retry budget: one retry for a dead socket only; no retry loops | test asserts one attempt on 429 |
 | C5 | Response hygiene: `Content-Type` must be xml/rss/atom, reject `text/html` challenge bodies | test: 200 + HTML → `blocked` |
 | C6 | Pin the validated IP: connect to the address `_resolve_is_public` approved (closes the rebinding window at `fetcher.py:51-55`) | test: host resolving twice to different IPs uses the first |
-| C7 | Retire the two broken sources or fix them | `verify-sources` exit 0, 0 stale > 45 days |
+| C7 | Retire the two broken sources or fix them | `verify-sources` exit 0, 0 stale > 45 days (see the outcome below: this accepted a broken source, because the CLI exits 0 on failure) |
 
 Detail and test matrix: `.work/features/fetch-safety/20261109-SPEC.md`.
 
@@ -113,7 +113,7 @@ Each row: what the reader sees now (measured), what changes, how it is proven. A
 | D3 | **Openers bury the actor.** 20 % start "A/An/The", 0 % start with a number, median first sentence 160 chars, 272 sentences ≥30 words. | First sentence: actor + action + the number/date when the source has one; ≤25 words. Cap the summary at 3 sentences / 520 chars. | median first-sentence ≤25 words; 0 "A/An/The" openers in the sample |
 | D4 | **Vague verbs carry the meaning.** "signals" 16 %, "highlights" 9 %, "matters" 20 %, "readers" 11 %. | Ban `signals/highlights/underscores/matters to` as the meaning verb; require a concrete consequence (who does what, by when). | 0 banned verbs in the sample; reviewer reads 10 and cannot ask "so what" |
 | D5 | **Numbers get dropped.** Only 41 % of summaries contain a digit; a 9.6 % tonnage move is the most quotable fact in its story. | If the title or excerpt carries a number, the summary must carry one. Validator: digit present when source digits exist. | 100 % compliance on items whose excerpt has a number |
-| D6 | **Three brand strings in one product.** The wordmark reads "HeraldFox", the apex copy "Herald Fox" (`lobby.brand.name`), channel headers and `meta.siteName` "System News"; taglines differ too. | One brand value, driven by the asset, used by `brand.name` and `meta.siteName`. | one string in both catalogs; grep finds no "System News" in `src/` |
+| D6 | **Three brand strings in one product.** The wordmark reads "HeraldFox", the apex copy now also reads "HeraldFox" (`lobby.brand.name`, owner 2026-11-09), but channel headers and `meta.siteName` still say "System News"; taglines differ too. | One brand value, driven by the asset, used by `brand.name` and `meta.siteName`. | one string in both catalogs; grep finds no "System News" in `src/` |
 | D7 | **Phantom references.** The KEV digest item says "see URL in Notes"; the public page strips URLs, so the pointer goes nowhere. | Forbid "see link/URL/notes" in generation; render the source link explicitly instead. | grep the two issues: no such phrase; the source link is on the page |
 | D8 | **Machine metadata as a standfirst.** `_standfirst()` emits "12 dated changes. Scope: global. Source checked 2026-11-04." | Human line ("12 federal rule changes this month, checked 4 November"); scope becomes a chip. | read the built issue: no "Scope:", no ISO date |
 | D9 | **The empty-summary state says "AI" twice.** 27/676 have no summary; the page shows "From the publisher" + excerpt + "No AI summary is available" under an "AI summary" eyebrow. | One block, label "Summary" / "Resumen"; one quiet fallback line, only when used. | screenshot of a no-summary article, EN + ES |
@@ -155,7 +155,7 @@ docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "c
 ## Decisions (answered 2026-11-09)
 
 1. **Bot contact URL** (C0): `https://heraldfox.com/bot`, with a short crawler page. Ship the page in the same PR as C0.
-2. **Wordmark treatment** (A0): emblem + live text, as recommended. The masthead reads the existing `lobby.brand.name` ("Herald Fox"); the spelling itself stays with D-018.
+2. **Wordmark treatment** (A0): emblem + live text, as recommended. The masthead reads `lobby.brand.name`, which now renders **"HeraldFox"** — one word (owner decision 2026-11-09; supersedes the D-018 spelling split).
 3. **Re-summarise policy** (D-trial): wait for the next natural refresh. No forced `--full-reset`; read the first natural batch after D1–D5 land.
 4. **Brand string** (D6): still open, D-018 due 2026-12-15. This session does not rename anything.
 
@@ -166,6 +166,23 @@ docker compose --env-file .env.dev -f docker-compose.dev.yml exec web bash -c "c
 - **robots.txt on a news site can disallow the feed path.** That has to be a hard skip, not a warning — report it as a source error so the operator sees the reason.
 - **Favicon on 11 subdomains** depends on the browser caching per origin; expect to hard-refresh during verification.
 
+## Outcome (2026-11-10)
+
+| Track | Shipped as | Evidence |
+|-------|-----------|----------|
+| A logo | M15 (apex masthead + footer, emblem + live wordmark) | `.work.ui/plans/20261109-brand-assets.md` §8; axe 0, CLS 0.0000 |
+| B favicons | M15 (favicon/icon/apple-icon, per-host check) | 4 hosts, byte-identical icons, `image/x-icon` 200 |
+| C fetch safety | `politeness.py`, fetcher rewiring, `settings.py` bot/pacing keys | SPEC `.work/features/fetch-safety/20261109-SPEC.md` §9; 18 politeness tests + fetcher tests |
+| D content | prompt + `validate_summary`, offer standfirst, article summary block, 404 copy | `test_summary_validation.py`, `test_standfirst.py`, e2e public spec |
+
+**C7 deviated from the plan.** Only one of the "two broken sources" was a parser bug worth repairing, and two *different* sources turned out to be refused by their own robots policy:
+
+- Finextra (`financial`) — `User-agent: *` → `Disallow: /rss/`; disabled.
+- The Register (`digital-technology`) — default-deny policy, licence required; disabled.
+- Inside Higher Ed + Distribución Actualidad — parser corners (HTML entities, bare `&`), repaired in `normalize.py` so the feeds keep working.
+
+Finextra's retirement left financial at 3 enabled sources against the policy minimum of 4; a Federal Reserve press-release feed was added to restore 4. `verify-sources` still exits 0 when a source fails — the acceptance in the C7 row was too weak, and that is now a follow-up rather than a passed gate.
+
 ## Next action
 
-Answer decisions 1–2, then start Track A+B: add an asset script under `apps/web/scripts/` that derives the emblem, lockup and icon tile from `.work.ui/references/heraldfox-final.png`, then wire the masthead.
+None for the tracks. Open items live in `.work/plans/NEXT.md`: O9 (production TLS), O15 (`SMTP_FROM` spelling), O16 (`BOT_*`/`FETCH_*` in `.env.example`), the D-trial read of the next natural refresh, and the `verify-sources` exit-code gate.

@@ -44,6 +44,12 @@ CACHE_HITS = _counter("cache_hits_total", "Cache hits", ("cache",))
 CACHE_MISSES = _counter("cache_misses_total", "Cache misses", ("cache",))
 
 INGEST_FETCH = _counter("ingest_fetch_total", "Feed fetches", ("source", "status"))
+INGEST_FETCH_BLOCKED = _counter(
+    "ingest_fetch_blocked_total", "Feed fetches refused before or without parsing", ("reason",)
+)
+INGEST_HOST_COOLDOWN = _gauge(
+    "ingest_host_cooldown_seconds", "Seconds until a host may be polled again", ("host",)
+)
 INGEST_FETCH_DURATION = _histogram(
     "ingest_fetch_duration_seconds", "Feed fetch duration", ("source",)
 )

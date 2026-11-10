@@ -68,6 +68,29 @@ The command prints JSON: per source `score`, `grade`, `passed`, `metrics`
 - **Low trust**: raise trust only with an editorial reason recorded in the
   channel's deployment profile.
 - **Duplicate-heavy**: usually a broken publisher feed; replace it.
+- **`robots_disallowed`**: the publisher's `robots.txt` refuses our crawler.
+  There is nothing to fix from our side — a feed path under a `Disallow` is not
+  ours to read. Disable the source in its deployment profile (never by hand in
+  the database, so the profile stays the source of truth) and add a replacement.
+  Re-enable it only if the publisher changes the file or grants a licence; the
+  crawler page at `/bot` is what our user agent points at.
+
+### Retired 2026-11-10 (robots, not breakage)
+
+| Source | Channel | Why |
+|--------|---------|-----|
+| Finextra | financial | `User-agent: *` carries `Disallow: /rss/` (specific bots get `Allow: /rss/`) |
+| The Register | digital-technology | default-deny policy: `User-agent: *` → `Disallow: /`, licence sold separately |
+
+Both were disabled through their profiles (`apply-profile`) and are excluded
+from `verify-sources`. Financial dropped to 3 enabled sources against the policy
+minimum of 4, so `Federal Reserve Board` press releases
+(`https://www.federalreserve.gov/feeds/press_all.xml`, EN, trust 0.95) were
+added and the profile re-applied. `verify-sources --industry all` is 50/50 with
+no coverage warnings.
+
+Note: `verify-sources` exits 0 even when a source fails — read
+`summary.failed`, not the exit code, until that gate is tightened.
 
 ## 6. Editorial judgment that stays human
 

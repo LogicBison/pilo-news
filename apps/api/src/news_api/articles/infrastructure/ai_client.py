@@ -25,6 +25,54 @@ HTML_RE = re.compile(r"<[^>]+>")
 SENTENCE_RE = re.compile(r"[^.!?]+[.!?]+")
 BULLET_RE = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+", re.MULTILINE)
 
+# D2 - stock tails that read as machine copy. Exact phrases, both languages;
+# a hit means the model produced the habit rather than the fact.
+BANNED_PHRASES: tuple[str, ...] = (
+    "for professional readers",
+    "the takeaway is",
+    "the move signals",
+    "it is worth noting",
+    "it's worth noting",
+    "a significant development",
+    "in today's fast-paced",
+    "plays a crucial role",
+    "shed light on",
+    "resulta relevante para los profesionales",
+    "el movimiento señala",
+    "es importante destacar",
+    "en el panorama actual",
+    "juega un papel crucial",
+    "vale la pena señalar",
+)
+
+# D4 - vague verbs that carry the meaning instead of stating it. Only the
+# verb forms the plan names: the singular nouns ("a signal from the Fed")
+# survive, because banning them would reject facts rather than filler.
+BANNED_VERBS_RE = re.compile(
+    r"\bsignals\b|\bhighlights\b|\bunderscores\b|\bmatters to\b"
+    r"|\bseñala\b|\bsubraya\b|\bes relevante para\b",
+    re.IGNORECASE,
+)
+
+# D7 - a pointer the public page cannot follow ("see URL in Notes").
+REFERENCE_RE = re.compile(
+    r"\bsee\b[^.!?]{0,60}\b(?:link|url|notes?|below|above)\b"
+    r"|\b(?:link|url|notes?)\s+(?:above|below)\b"
+    r"|\bin\s+(?:the\s+)?notes\b",
+    re.IGNORECASE,
+)
+
+# D3 - an article opener buries the actor. "The European Commission" keeps its
+# actor (proper noun follows); "The change shortens..." does not. English
+# articles only: a Spanish "Los reguladores publicó..." leads with its actor
+# too, so applying El/La/Los here would reject correct Spanish openers.
+OPENER_RE = re.compile(r"^(?:A|An|The)\s+[a-z]")
+
+MAX_SUMMARY_CHARS = 520
+MAX_SUMMARY_SENTENCES = 3
+MAX_OPENER_WORDS = 25
+DIGIT_RE = re.compile(r"\d")
+
 
 class AIError(Exception):
     pass
@@ -46,21 +94,46 @@ def _plain(value: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def validate_summary(text: str, title: str) -> tuple[bool, str]:
+def validate_summary(text: str, title: str, *, excerpt: str = "") -> tuple[bool, str]:
+    """Gate one candidate summary (SPEC-adjacent: improvement plan D1-D5, D7).
+
+    ``excerpt`` is the source the model was given; when it carries a digit the
+    summary has to carry one too (D5). Every failure is a distinct reason so
+    the retry log tells us *which* rule the model broke.
+    """
     candidate = _plain(text)
     if not candidate:
         return False, "empty"
-    if len(candidate) < 80 or len(candidate) > 900:
+    if len(candidate) < 80 or len(candidate) > MAX_SUMMARY_CHARS:
         return False, "length"
     if URL_RE.search(candidate) or DOMAIN_RE.search(candidate):
         return False, "url"
     if HTML_RE.search(candidate):
         return False, "html"
     sentences = [item.strip() for item in SENTENCE_RE.findall(candidate) if item.strip()]
-    if not 2 <= len(sentences) <= 4:
+    if not 2 <= len(sentences) <= MAX_SUMMARY_SENTENCES:
         return False, "sentences"
+    # Checked before ``opener``: a stock tail reads as machine copy whether or
+    # not it also buries the actor, and the reason is what the retry log keeps.
+    lowered = candidate.casefold()
+    hit = next((phrase for phrase in BANNED_PHRASES if phrase in lowered), None)
+    if hit:
+        return False, f"banned-phrase:{hit}"
     if title and title.casefold().strip() and title.casefold().strip() in candidate.casefold():
         return False, "copied-title"
+    # D3: actor first, and short enough to read as one breath.
+    if OPENER_RE.match(sentences[0]):
+        return False, "opener"
+    if len(sentences[0].split()) > MAX_OPENER_WORDS:
+        return False, "opener-length"
+    # D4 / D7: the habits the reader can spot without being told.
+    if BANNED_VERBS_RE.search(candidate):
+        return False, "banned-verb"
+    if REFERENCE_RE.search(candidate):
+        return False, "reference"
+    # D5: the source had a number, so the summary has to keep one.
+    if DIGIT_RE.search(f"{title} {excerpt}") and not DIGIT_RE.search(candidate):
+        return False, "missing-number"
     return True, "ok"
 
 
@@ -238,7 +311,7 @@ class AIClient:
                 if isinstance(exc, BudgetExceeded):
                     return None
                 continue
-            valid, reason = validate_summary(result.text, title)
+            valid, reason = validate_summary(result.text, title, excerpt=excerpt)
             if valid:
                 SUMMARIES.labels(language=language, status="ok").inc()
                 return _plain(result.text)

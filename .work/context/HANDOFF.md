@@ -2,6 +2,19 @@
 
 ## Session status
 
+**Open (2026-11-10, C+D verified):** the interrupted 2026-11-09 C+D session was resumed, verified and finished. Fetch safety (full plan **M16**) and the content fixes pass every gate: api **209 tests**, web lint/tsc/check **579 keys**, build **RC=0**, Playwright **124 passed / 0 failed / 5 skipped** on the production build, `hosts` all 14 invariants, `verify-sources` **50/50, 0 warnings**. Six defects were found while verifying and fixed: retail parser (bare `&`), financial below the 4-source minimum (Federal Reserve feed added), cooldown gauge not reset, admin Sources not rendering the new cooldown/last-error fields, the article-404 home link empty on channel hosts, and plan drift (NEXT said `pending`; the full plan had no M16). Commit approved by the owner in the same message and verified with `@code-verify uncommitted` (2026-11-10); the SHA is recorded in the cross-framework record below.
+
+**Open:** 2026-11-09 - goal: proceed to implement all plans until all is full and complete (`@x-director`)
+
+**Open (2026-11-09, M15 shipped):** brand surfaces implemented and verified end to end —
+`@code-verify milestone - M15` verdict **pass with gaps**, `@code-implementation complete - M15`
+run. Emblem/lockup/tile/favicon/icon/apple derived, masthead + footer marks wired, per-host icon
+check green on dev (4 hosts), gates green (lint/tsc/check/build RC=0, **Playwright 120 passed /
+0 failed / 5 skipped** on the production build, axe 0 critical/serious, CLS 0.0000 at 360/1440 px).
+Full plan → **v1.7**. Next in this session: `.work/plans/20261109-next-improvement.md` Tracks **C**
+(fetch safety, decision 1 answered) and **D** (content fixes D1–D5, D7–D10).
+Changes are **uncommitted** — `@code-verify uncommitted` before any commit.
+
 **Closed:** 2026-11-09 — `@x-director` plan-drift pass: M15 plans verified and corrected (full plan v1.6 gains the M15-T8 row and G1 `M15-T1..T8`; brand-assets plan header, tracked-art claim and derivation block fixed), derivation smoke-tested, MOD-06 → merge_ok. M15 implementation itself is still pending.
 
 **Closed:** 2026-11-09 — four-request analysis, M15 planned and approved, apex responsive fix, READY TO IMPLEMENT.
@@ -24,7 +37,7 @@ and a browser save/restore check against the dev API. SPEC:
 
 **Closed:** 2026-11-06 - S1 screens shipped: contact, about and admin-console implemented from approved SPECs. 80 Playwright tests pass on a production build (admin sign-in included); axe 0 critical/serious on 21 URLs; 329 catalog keys; 11/11 contrast. Every channel now publishes an RSS 2.0 feed in both locales. Along the way: the funnel proxy no longer returns a false 503 on 204, and the about page stopped claiming a seven-day window while every channel runs 30 days.
 
-**Updated:** 2026-11-09
+**Updated:** 2026-11-10
 
 **Prior session (closed 2026-11-06):** eleven channels. M9 shipped config-driven asset cards and one secondary rung; M10 added the digital-technology demand test (three topics, `placement="topic"`, migration 012); M11 built the eleventh channel (`digital-technology`): its own `datacenter` skin with a CC BY-SA photo, six grade-A feeds, 26 EN + 1 ES items, and the channel inventory regenerated. 113 api tests; web checks; 64 Playwright passed / 1 skipped; 11/11 contrast.
 
@@ -36,10 +49,10 @@ and a browser save/restore check against the dev API. SPEC:
 
 1. Run **`@session-control start`**.
 2. Read `.cursorrules`, this file, `.work/plans/NEXT.md`.
-3. **Implement M15** (`.work/plans/NEXT.md` `## Current iteration`): assets, masthead, footer,
-   icons, per-host check. Approved, scoped (`.work/touch-scope`), and ready — start with
-   `@code-implementation start`. The prd half of M15-T6 waits on O9 (production TLS:
-   `./bin/start.sh --env prd domains --write`, `nginx -t`, reload, `certs --check`).
+3. ~~**Implement M15**~~ done 2026-11-09. ~~**Track C+D**~~ **done and verified 2026-11-10**
+   (full plan **M16**): no plan work is open. Next is the owner lane — **O9** production TLS
+   (`./bin/start.sh --env prd domains --write`, `nginx -t`, reload, `certs --check`, `hosts`),
+   then the D-trial read of the next natural refresh and the `verify-sources` exit-code gate.
 4. **Apex:** the lobby lives in `apps/web/src/components/lobby/`; its copy is
    `.work.biz/strategy/20261107-lobby-copy.md` (140 keys, EN/ES). Change copy there
    first, then in `apps/web/src/messages/`.
@@ -98,6 +111,7 @@ and a browser save/restore check against the dev API. SPEC:
 | apex site | done | ADR 016, lobby + services + legal pages, `GET /v1/desks`, `e2e/lobby.spec.ts` |
 | channel inventory | gated | environment-free block, live/profile fallback, CI check |
 | request logging | outcome-based | probes silent, 0 lines per 30 s idle |
+| fetch safety (M16) | done | politeness 18 tests, fetcher outcome tests, `verify-sources` 50/50, `hosts` 14/14, bots page live in EN/ES |
 
 **Integrity:** no known waivers. Dev stack running (`system-news-dev`).
 
@@ -107,6 +121,15 @@ and a browser save/restore check against the dev API. SPEC:
 
 | Gate | Command | Result |
 |---|---|---|
+| M15 code gates (2026-11-09) | `pnpm lint` · `tsc --noEmit` · `pnpm check` · `pnpm build` | ✔ · ✔ · ✔ (567 keys, 11/11 contrast) · **BUILD_RC=0** |
+| Playwright (2026-11-09, production build) | `pnpm build` + `next start` in a throwaway container (`.next` on `system-news-dev_web_next_prod_v2`) | **120 passed / 0 failed / 5 skipped, exit 0** |
+| axe (2026-11-09) | `e2e/accessibility.spec.ts` incl. new brand assertions | 0 critical/serious |
+| Layout/CLS (2026-11-09) | measured `/`, `/es`, `/services` × 360 & 1440 px | overflow **0**, **CLS 0.0000** (6/6), emblem 28 px @360 / 32 px @1440 |
+| Icons per host (2026-11-09) | curl matrix: apex EN/ES + `stem-cell.`, `financial.`, `legal.localhost` | `favicon.ico` 200 `image/x-icon` everywhere; exactly **1** `rel="icon" href="/favicon.ico"` per doc; apex vs subdomain bytes identical |
+| Assets (2026-11-09) | `identify` on `src/app/*` | favicon 48/32/16 (16 px non-blank), icon 512, apple 180 **100 % opaque** (corner `srgb(11,18,32)`) |
+| Routing (2026-11-09) | `./bin/start.sh hosts` | **14/14** incl. *the lobby carries the brand* (asserts HeraldFox) |
+| MOD-06 + scope (2026-11-09) | `mod06-output-check.sh` · `touch-scope-verify.sh` · `traceability-verify.sh` · `blast-radius-check.sh` | pass · pass · **17/17 FR** · warn (files=21, lines≈189, areas `apps bin .work .work.ui`, all declared) |
+| api notify fixture (2026-11-09) | `pytest tests/unit/test_notify.py` | 12 passed |
 | Plan drift (2026-11-09) | `touch-scope-verify.sh` / `traceability-verify.sh` / `mod06-output-check.sh` / `blast-radius-check.sh` | pass · 17/17 FR · pass · medium = docs only, MOD-06 merge_ok |
 | Derivation smoke test (2026-11-09) | six `convert` commands in `tmp/` (removed after) | emblem 700×700 transparent, lockup 1265×921, tile 512×512, favicon 48/32/16, icon 512, apple 180 opaque |
 | Lobby e2e (2026-11-09) | `pnpm exec playwright test e2e/lobby.spec.ts` | 13 passed |
@@ -131,8 +154,14 @@ and a browser save/restore check against the dev API. SPEC:
 | Links | every internal href on six apex pages | 26/26 return 200 |
 | Logs | 30 s idle after the change | api 0, web 0, worker 0 lines |
 | Migration | 016 applied on dev and on the restored prd copy | `applied: 0, total: 16` |
+| C+D gates (2026-11-10) | api `ruff`/`format`/`mypy`/`pytest`; web `lint`/`tsc`/`check`; `pnpm build` | **209 passed** · **579 keys**, 11/11 contrast · **RC=0** |
+| Playwright (2026-11-10) | full suite on the rebuilt production bundle | **124 passed / 0 failed / 5 skipped** |
+| Sources (2026-11-10) | `verify-sources --industry all` | **50 sources, 50 passed, 0 warnings** |
+| Hosts (2026-11-10) | `./bin/start.sh --env dev hosts` | **all checks passed** (14 invariants) |
+| Parser repairs (2026-11-10) | `test_normalize.py` (bare `&`, CDATA untouched) | 2 new tests pass |
+| Politeness (2026-11-10) | `test_politeness.py` (fake clock, no network) | 18 passed |
 
-Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, reload, `certs --check`), and the footer credit on the live hosts. Both are the next session's first steps.
+Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, reload, `certs --check`); the footer credit on the live hosts; R10's seeded-cooldown render (no cooldown seeded in dev — lint/tsc/build only); D1–D5 on live output (waits for the next natural refresh, decision 3); the prd shadow week for pacing.
 
 ## Open owner actions
 
@@ -152,6 +181,8 @@ Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, re
 | O12 | Decide the brand string across surfaces (D-018 covers the apex; channel footers still say System News) | consistency | owner | `.work.biz/decisions/` |
 | O13 | Deploy the footer credit: `git pull` + `./bin/start.sh --env prd up` on the host | live attribution | owner | `apps/web/src/components/DevelopedBy.tsx` |
 | O14 | Reconcile the host's local TLS template edit before pulling; the repo now carries the fix | clean pull | owner | `ops/nginx/site.conf.template` |
+| O15 | Approve the `SMTP_FROM` spelling change to **HeraldFox** in `.env.example` / `.env.dev` / `.env.prd` (protected surfaces — needs same-message approval) | brand consistency in outgoing mail | owner | `.env.example` (`SMTP_FROM` block) |
+| O16 | ~~Approve the `BOT_*`/`FETCH_*` keys in `.env.example`~~ approved 2026-11-10, keys added under "crawler identity and pacing" | - | owner | `.env.example` |
 
 ---
 
@@ -159,6 +190,7 @@ Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, re
 
 | Date | Session | Artifacts |
 |------|---------|-----------|
+| 2026-11-09 | **M15 brand surfaces (complete)** | `apps/web/public/brand/{heraldfox-emblem,heraldfox-lockup,icon-tile}.png`; `apps/web/src/app/{favicon.ico,icon.png,apple-icon.png}` (file-based metadata); `components/lobby/shell.tsx` + `lobby.css` masthead/footer marks (32/28/24 px, `.lb-brand-mark` retired); `e2e/accessibility.spec.ts` brand assertions; `middleware.ts` matcher excludes `brand/`, `icon.png`, `apple-icon.png`; "HeraldFox" one word in `messages/{en,es}.json`, `bin/start.sh`, `apps/api/tests/unit/test_notify.py`; full plan **v1.7** (M15 T1..T7 done), NEXT iteration closed with MOD-06 code output |
 | 2026-11-09 | plan-drift fixes (@x-director) | full plan **v1.6** (missing `M15-T8` row added, G1 → `M15-T1..T8`); brand-assets plan corrected (decision-1 header, tracked-art claim, `convert` + `-fuzz 2%` derivation, lockup 1265×921); NEXT gained the plan-verification block and the MOD-06 output; HANDOFF + HANDOFF_UI x-director records |
 | 2026-11-09 | responsive fix (M15-T8) | lobby desk board kept three columns (languages column dropped by the owner) and stopped clipping its last column at 1024-1440 px; masthead wraps under 720 px so a 390 px document no longer scrolls sideways; regression test in `e2e/lobby.spec.ts` |
 | 2026-11-09 | improvement planning | `.work/plans/20261109-next-improvement.md` (4 tracks), `.work/features/fetch-safety/20261109-SPEC.md`, `.work.ui/plans/20261109-brand-assets.md`; content audit of 676 articles from the 2026-11-07 bundle; M15 planned in the full plan + `## Current iteration` in NEXT |
@@ -211,7 +243,7 @@ Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, re
 
 | # | Unknown | Blocks | Owner |
 |---|---|---|---|
-| U1 | Brand name across surfaces (apex ratified as Herald Fox by D-018; channels unchanged) | consistency | owner |
+| U1 | Brand name across surfaces (apex ratified as **HeraldFox**, one word, per owner 2026-11-09; channels unchanged) | consistency | owner |
 | U8 / U20 | Email delivery — integrated and tested through the gateway; the weekly-brief campaign is still unbuilt | brief campaign, G1 | owner |
 | D-005 / U19 | Named reviewers — holds the reviewer signature line in the services copy | content-generation claim, G2 | owner |
 | U9 | Analytics/consent vendor | lobby funnel depth beyond first-party | owner |
@@ -275,8 +307,13 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 | TLS reload not re-verified | the host rejected the first 443 config on duplicate session directives; the template is fixed, but `nginx -t`, reload and `certs --check` still need to pass | O9 is the first step next session |
 | nginx config validated syntactically only | `nginx -t` passes but no request has gone through the real edge | `start.sh hosts` runs the same contract over HTTP once the host proxy is live |
 | CI inventory gate unapproved | the step would run on the next PR before the owner signs off | listed as O10 |
-| Brand string split | apex says Herald Fox, channel footers still say System News | D-018 with a 2026-12-15 outcome date |
+| Brand string split | apex says **HeraldFox** (one word, owner 2026-11-09), channel footers still say System News | D-018 with a 2026-12-15 outcome date |
 | Scheduler can park a channel | a run stuck in `queued`/`running` blocks that channel until a worker restart; orphan recovery runs only at start (`queue.py:42-63`, `repo.py:285-293`) | cadence verified 2026-11-09 (720 min, all 11 channels); sweep proposed in the M15 block |
+| Emblem source PNG is 599 KB | `public/brand/heraldfox-emblem.png` is served raw wherever `next/image` is not used (footer/OG-less paths) | masthead + footer both use `next/image`; measured `naturalWidth=32` at render, so a resized variant is what ships |
+| Favicon caching per origin | browsers cache `favicon.ico` per origin, so a re-derived icon needs a hard refresh on each of 11 subdomains | accept; re-check with a cache-busting query during verification |
+| Tile colour `#0b1220` assumed | the derived `icon.png`/`apple-icon.png` are flattened on it; UI plan §5 decision 2 is still owner-open | measured corner is `srgb(11,18,32)`; re-derive if the owner picks another colour |
+| Playwright output recompiles dev | `apps/web/test-results/` sits inside the bind-mounted `/app`; one write triggers a Next compile + "Fast Refresh had to perform a full reload", which can knock out a running test (pre-existing, gitignored) | clean `test-results/` before a suite run; run the gate suite against a **production** build in a throwaway container |
+| `pnpm build` clobbers the dev `.next` | `.next` is the named volume `system-news-dev_web_next_v2` and the dev container's entrypoint is `pnpm dev`; a build inside it overwrites the running build (this happened 2026-11-09 and 404'd every asset until wiped) | never run `pnpm build` in the dev container — use `docker compose run --rm --no-deps -v system-news-dev_web_next_prod_v2:/app/.next web` |
 
 - Single VPS SPOF (R4); volume restore drilled, prd deploy/rollback not drilled.
 - Feed licensing/terms (U11) and Spanish coverage (R17) remain owner inputs.
@@ -300,9 +337,12 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Implement M15 (`.work/plans/NEXT.md` `## Current iteration`): assets, masthead, footer, icons,
-per-host check, gates. Then the content track, then fetch safety. O9 (production TLS on
-`169.58.4.85`) still blocks the prd half of M15-T6.
+M15 and M16 are **complete**; the C+D tree is verified but **uncommitted**. Run
+`@code-verify uncommitted` before any commit. Then the owner lane: **O9** (production TLS on
+`169.58.4.85`, also the prd half of M15-T6), **O15** (`SMTP_FROM` spelling), **O16**
+(`BOT_*`/`FETCH_*` in `.env.example`). Agent follow-ups: read the next natural refresh for
+D1–D5 (no forced reset, decision 3), make `verify-sources` exit non-zero on a failed source,
+and run one week of `FETCH_PACING=shadow` on prd.
 
 ## Cross-framework action (@x-director)
 
@@ -337,3 +377,23 @@ per-host check, gates. Then the content track, then fetch safety. O9 (production
 **Coordination notes:** both directors' domains were executed natively in one model pass (single-model, as on 2026-11-06) after the operator acked the routing plan; no application code touched — three planning files only, all inside `.work/touch-scope`.
 **Blockers:** §5 decision 2 (tile colour, assumed `#0b1220`) still owner-open; O9 still blocks the prd half of M15-T6.
 **Next recommended:** `@code-implementation start` (M15-T1..T7)
+
+---
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-10
+**Request:** "previous session was interrupted, verify the uncomitted changes, resolve any issues and blockers and gaps, starting with the plans: `.work/plans/20261109-next-improvement.md`, `.work/plans/full/20261105-full-plan.md`, `.work.ui/plans/20261109-brand-assets.md`"
+**Frameworks involved:** .ai, .ai.ui
+**Classified bucket(s):** cross-framework (engineering + ui)
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc yes (source only, no `.work.soc/`) | .ai.cto no | .ai.flutter no | .ai.mlt no
+**Executed:**
+1. Plan audit before code: the C+D work existed in the tree while NEXT listed C0–C8/D1–D10 as `pending`, the full plan had no milestone for it, the fetch-safety SPEC still said `Draft` and asked for a decision answered on 2026-11-09, and the brand-assets plan still described M15 as not started. All four corrected; full plan v1.8 gains **M16** plus a traceability row.
+2. Verification of the uncommitted tree: api **209 tests** (ruff, format, mypy clean), web **lint/tsc/check** (579 keys, 11/11 contrast), production **build RC=0**, Playwright **124 passed / 0 failed / 5 skipped** on that build, `hosts` **14/14**, `verify-sources` **50/50, 0 warnings**.
+3. Six defects found and fixed: retail feed parse error (bare `&` in a title — `normalize.py` now escapes bare ampersands outside CDATA, 3 new tests); financial left at 3 sources after Finextra's robots retirement (Federal Reserve press releases added, profile applied, 4/4); `ingest_host_cooldown_seconds` never reset (R9); admin Sources table did not render the new `last_error`/cooldown fields (R10, +2 catalog keys); article-404 home link was `href=""` on channel hosts; and the plan drift above.
+4. MOD-06 rerun for the C+D code: boundaries 4, human review required, **merge_with_conditions** — conditions recorded in `.work/plans/NEXT.md`.
+**User correction:** none
+**Coordination notes:** UI portion (brand surfaces, admin Sources row, reader copy) was executed natively under the same single-model pass; `.work.ui/plans/20261109-brand-assets.md` and `HANDOFF_UI` were updated to match what shipped. No protected file was edited; `.env*` changes stay with the owner (O15, O16).
+**Blockers:** O9 (production TLS), O15 (`SMTP_FROM`), O16 (`BOT_*`/`FETCH_*` in `.env.example`); agent follow-ups are the D-trial read, a real `verify-sources` exit code, and a prd shadow week for pacing.
+**Next recommended:** `@code-verify uncommitted`, then commit the C+D + M15 tree.

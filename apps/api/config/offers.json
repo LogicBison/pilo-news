@@ -32,7 +32,8 @@
       "government-ethics-office",
       "patent-and-trademark-office",
       "federal-labor-relations-authority"
-    ]
+    ],
+    "standfirst_noun": "federal rule change"
   },
   "cybersecurity": {
     "offer_slug": "cybersecurity-kev-digest",
@@ -51,6 +52,7 @@
       "patch is sufficient",
       "no risk",
       "guaranteed protection"
-    ]
+    ],
+    "standfirst_noun": "newly added vulnerability"
   }
 }

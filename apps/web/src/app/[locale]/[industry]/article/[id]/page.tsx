@@ -109,13 +109,17 @@ export default async function ArticlePage({ params }: Params) {
         </header>
 
         <div className="sn-card sn-card-surface mt-6 p-6">
-          <p className="sn-eyebrow">
-            {article.summary ? t(resolved, "article.aiSummary") : t(resolved, "article.excerptLabel")}
-          </p>
+          <p className="sn-eyebrow">{t(resolved, "article.summaryLabel")}</p>
           <p className="mt-2 text-base leading-relaxed text-[var(--sn-text)]">
-            {article.summary ?? article.excerpt ?? t(resolved, "article.summaryUnavailable")}
+            {article.summary ?? article.excerpt ?? ""}
           </p>
-          {!article.summary ? (
+          {/* D9: one quiet line, only when it has something to say. */}
+          {!article.summary && article.excerpt ? (
+            <p className="mt-2 text-xs text-[var(--sn-muted)]">
+              {t(resolved, "article.excerptLabel")}
+            </p>
+          ) : null}
+          {!article.summary && !article.excerpt ? (
             <p className="mt-2 text-xs text-[var(--sn-muted)]">
               {t(resolved, "article.summaryUnavailable")}
             </p>

@@ -732,7 +732,7 @@ cmd_hosts() {
 	apex_body="$(curl -s -H "Host: ${domain}:${web_port}" "${base}/" || true)"
 	expect "the lobby lists every desk" "$(channel_slugs | wc -l | tr -d ' ') desk plates" \
 		"$(printf '%s' "$apex_body" | grep -o 'class="lb-plate"' | wc -l | tr -d ' ') desk plates"
-	expect "the lobby carries the brand" "Herald Fox" "$apex_body"
+	expect "the lobby carries the brand" "HeraldFox" "$apex_body"
 
 	apex_services="$(curl -s -o /dev/null -w '%{http_code}' -H "Host: ${domain}:${web_port}" "${base}/services")"
 	expect "apex /services renders" "200" "$apex_services"

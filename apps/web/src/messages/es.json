@@ -52,16 +52,16 @@
     "published": "Publicado",
     "by": "Por",
     "topics": "Temas",
-    "aiSummary": "Resumen con IA",
     "excerptLabel": "Del medio original",
     "readAtPublisher": "Leer la historia completa en el medio original",
     "related": "Cobertura relacionada",
     "backToChannel": "Volver a {industry}",
     "notFound": "Historia no encontrada",
-    "notFoundBody": "Esta historia pudo haber salido de la ventana de siete días o haber sido retirada.",
-    "summaryUnavailable": "No hay resumen con IA disponible para esta historia.",
+    "notFoundBody": "Esta historia pudo haber salido del archivo de 30 días o haber sido retirada.",
+    "summaryUnavailable": "No hay resumen disponible para esta historia.",
     "attribution": "El titular y el extracto se muestran con atribución. El texto completo permanece en el medio original.",
-    "sources": "fuentes"
+    "sources": "fuentes",
+    "summaryLabel": "Resumen"
   },
   "about": {
     "title": "Acerca de {industry} en System News",
@@ -231,6 +231,8 @@
     "unpin": "Quitar",
     "run": "Ejecutar ahora",
     "reason": "Motivo",
+    "cooldown": "En pausa hasta {when} · {reason}",
+    "lastError": "Último error: {error}",
     "status": "Estado",
     "action": "Acción",
     "label": "Etiqueta",
@@ -477,7 +479,7 @@
   },
   "lobby": {
     "brand": {
-      "name": "Herald Fox",
+      "name": "HeraldFox",
       "tagline": "Mesas sectoriales",
       "deskCount": "{desks} mesas"
     },
@@ -622,7 +624,7 @@
       "companyTitle": "Compañía",
       "followTitle": "Seguir",
       "legal": "Noticias, no asesoría profesional. Los titulares enlazan al medio original.",
-      "blurbFallback": "Herald Fox opera mesas sectoriales desde fuentes primarias, en inglés y en español."
+      "blurbFallback": "HeraldFox opera mesas sectoriales desde fuentes primarias, en inglés y en español."
     },
     "form": {
       "title": "Solicitar una llamada de alcance",
@@ -655,7 +657,7 @@
       "boardCaption": "Las {desks} mesas con su frecuencia de actualización, idiomas y la fecha de la historia más reciente."
     },
     "meta": {
-      "title": "Herald Fox — once mesas sectoriales para profesionales",
+      "title": "HeraldFox — once mesas sectoriales para profesionales",
       "description": "Once mesas sectoriales leen la fuente primaria y publican lo que un profesional tiene que atender. Inglés y español, gratis."
     },
     "servicesMeta": {
@@ -665,15 +667,27 @@
     "legal": {
       "updated": "Última actualización: 7 de noviembre de 2026",
       "privacyTitle": "Privacidad",
-      "privacyBody": "Herald Fox guarda solo lo necesario para operar las mesas y responder una solicitud de servicio: metadatos de fuentes, titulares y enlaces, conteos de uso agregados y los mensajes que usted decide enviar. No vendemos datos personales. Guardamos un identificador de red con hash, un identificador de dispositivo con hash, parámetros de campaña y un código de país aproximado cuando el borde de la red lo proporciona, para evitar abusos y medir interés agregado; no guardamos direcciones IP sin procesar. Una solicitud la leemos nosotros; no se vende ni se comparte con un socio salvo que usted pida una presentación.",
+      "privacyBody": "HeraldFox guarda solo lo necesario para operar las mesas y responder una solicitud de servicio: metadatos de fuentes, titulares y enlaces, conteos de uso agregados y los mensajes que usted decide enviar. No vendemos datos personales. Guardamos un identificador de red con hash, un identificador de dispositivo con hash, parámetros de campaña y un código de país aproximado cuando el borde de la red lo proporciona, para evitar abusos y medir interés agregado; no guardamos direcciones IP sin procesar. Una solicitud la leemos nosotros; no se vende ni se comparte con un socio salvo que usted pida una presentación.",
       "termsTitle": "Términos",
-      "termsBody": "Herald Fox publica titulares, extractos y resúmenes originales con atribución y enlaces al medio. El contenido sigue siendo propiedad de su editor. Nada de este sitio es asesoría legal, financiera, médica ni profesional. Un encargo de servicio se rige por el alcance que usted firma, no por esta página. El acceso automatizado debe respetar los límites de uso publicados."
+      "termsBody": "HeraldFox publica titulares, extractos y resúmenes originales con atribución y enlaces al medio. El contenido sigue siendo propiedad de su editor. Nada de este sitio es asesoría legal, financiera, médica ni profesional. Un encargo de servicio se rige por el alcance que usted firma, no por esta página. El acceso automatizado debe respetar los límites de uso publicados."
     },
     "contact": {
       "eyebrow": "07 — Contacto",
       "title": "Escríbanos.",
       "intro": "Un mensaje, leído por una persona. Diga qué mesa, un servicio o cualquier otra cosa. Para una solicitud de servicio, el formulario de la página de servicios hace las preguntas más útiles.",
       "submit": "Enviar mensaje"
+    },
+    "bot": {
+      "title": "Rastreador de HeraldFox",
+      "intro": "Esta página está dirigida a quienes operan las fuentes que leemos: quiénes somos, qué consultamos, con qué frecuencia y cómo detenernos.",
+      "identityTitle": "Identidad",
+      "identityBody": "Cada petición lleva el agente de usuario HeraldFoxBot/1.0 (+https://heraldfox.com/bot), y la dirección que incluye abre esta página.",
+      "readingTitle": "Qué leemos",
+      "readingBody": "Fuentes RSS y Atom públicas que figuran en nuestras listas: el titular, el enlace, la fecha de publicación y el extracto que el medio ya publica. No copiamos artículos completos, no iniciamos sesión en ningún sitio y no imitamos a un navegador.",
+      "pacingTitle": "Con qué frecuencia",
+      "pacingBody": "Seguimos robots.txt y su Crawl-delay, dejamos unos segundos entre dos peticiones al mismo host, hacemos como máximo veinte peticiones a un host por hora y esperamos lo que el servidor pida mediante Retry-After.",
+      "blockTitle": "Cómo bloquearnos",
+      "blockBody": "Añade una regla para HeraldFoxBot en tu robots.txt - Disallow: / basta - o escribe a {email} y dejaremos de leer la fuente."
     }
   }
 }

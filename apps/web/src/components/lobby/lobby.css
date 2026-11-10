@@ -99,12 +99,19 @@
   letter-spacing: -0.01em;
 }
 
-.lb-brand-mark {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  background: var(--lb-signal);
-  margin-right: 2px;
+/* The mark is decorative: the brand link's aria-label carries the name, and
+   the footer paragraph reads its own text. Sized in CSS so the intrinsic
+   width/height attributes only reserve the box. */
+.lb-brand-emblem {
+  align-self: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+.lb-foot .lb-brand-emblem {
+  width: 24px;
+  height: 24px;
 }
 
 .lb-brand-small {
@@ -143,6 +150,23 @@
 
   .lb-lang {
     margin-left: auto;
+  }
+}
+
+/* Narrow phones: the emblem and wordmark step down and the tagline drops out
+   so the masthead stays one line above the wrapping nav. */
+@media (max-width: 480px) {
+  .lb-mast .lb-brand {
+    font-size: 19px;
+  }
+
+  .lb-mast .lb-brand-emblem {
+    width: 28px;
+    height: 28px;
+  }
+
+  .lb-mast .lb-brand-small {
+    display: none;
   }
 }
 

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel, Field
 
 from news_api.articles.application.queue import enqueue
 from news_api.articles.infrastructure.fetcher import fetch_source
+from news_api.articles.infrastructure.politeness import HostLedger
 from news_api.articles.infrastructure.repo import create_run
 from news_api.channels.infrastructure import repo as channels_repo
 from news_api.dependencies import admin_auth, admin_mutation
@@ -76,7 +78,21 @@ async def list_sources(industry: str | None = None) -> Any:
     if industry:
         industry_id = (await channel_for_slug(industry)).id
     sources = await sources_repo.list_sources(industry_id, include_disabled=True)
-    return {"data": [source_dto(source, admin=True) for source in sources]}
+    data = [source_dto(source, admin=True) for source in sources]
+    # R10: why a source is not moving — the streak lives in Postgres, the
+    # cooldown lives in the Redis host ledger, and the operator needs both.
+    ledger = HostLedger()
+    cooldowns = await ledger.cooldowns(
+        (urlsplit(source.feed_url).hostname or "") for source in sources
+    )
+    for source, payload in zip(sources, data, strict=True):
+        state = cooldowns.get(urlsplit(source.feed_url).hostname or "", {})
+        until = float(state.get("cooldown_until") or 0)
+        payload["cooldown_until"] = (
+            datetime.fromtimestamp(until, UTC).isoformat() if until > 0 else None
+        )
+        payload["cooldown_reason"] = state.get("cooldown_reason") or ""
+    return {"data": data}
 
 
 @router.post("", status_code=201, dependencies=[Depends(admin_mutation)])

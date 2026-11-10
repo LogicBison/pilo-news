@@ -52,16 +52,16 @@
     "published": "Published",
     "by": "By",
     "topics": "Topics",
-    "aiSummary": "AI summary",
     "excerptLabel": "From the publisher",
     "readAtPublisher": "Read the full story at the publisher",
     "related": "Related coverage",
     "backToChannel": "Back to {industry}",
     "notFound": "Story not found",
-    "notFoundBody": "This story may have expired from the seven-day window or been removed.",
-    "summaryUnavailable": "No AI summary is available for this story.",
+    "notFoundBody": "This story may have left the 30-day archive or been removed.",
+    "summaryUnavailable": "No summary is available for this story.",
     "attribution": "Headline and excerpt are shown for attribution. Full text remains with the publisher.",
-    "sources": "sources"
+    "sources": "sources",
+    "summaryLabel": "Summary"
   },
   "about": {
     "title": "About {industry} on System News",
@@ -231,6 +231,8 @@
     "unpin": "Unpin",
     "run": "Run now",
     "reason": "Reason",
+    "cooldown": "Paused until {when} · {reason}",
+    "lastError": "Last error: {error}",
     "status": "Status",
     "action": "Action",
     "label": "Label",
@@ -477,7 +479,7 @@
   },
   "lobby": {
     "brand": {
-      "name": "Herald Fox",
+      "name": "HeraldFox",
       "tagline": "Industry desks",
       "deskCount": "{desks} desks"
     },
@@ -622,7 +624,7 @@
       "companyTitle": "Company",
       "followTitle": "Follow",
       "legal": "News, not professional advice. Headlines link to the original publisher.",
-      "blurbFallback": "Herald Fox runs industry desks from primary sources, in English and Spanish."
+      "blurbFallback": "HeraldFox runs industry desks from primary sources, in English and Spanish."
     },
     "form": {
       "title": "Request a scope call",
@@ -655,7 +657,7 @@
       "boardCaption": "All {desks} desks with update cadence, languages, and the date of the newest story."
     },
     "meta": {
-      "title": "Herald Fox — eleven industry desks for professionals",
+      "title": "HeraldFox — eleven industry desks for professionals",
       "description": "Eleven industry desks read the primary record and publish what professionals actually have to act on. English and Spanish, free to read."
     },
     "servicesMeta": {
@@ -665,15 +667,27 @@
     "legal": {
       "updated": "Last updated 7 November 2026",
       "privacyTitle": "Privacy",
-      "privacyBody": "Herald Fox stores only what it needs to run the desks and answer a service inquiry: feed metadata, headlines and links, aggregated usage counts, and the messages you choose to send. We do not sell personal data. We store a hashed network identifier, a hashed device identifier, campaign parameters, and a coarse country code when the network edge provides one, to prevent abuse and measure aggregate interest; we do not store raw IP addresses. An inquiry is read by us, and is not sold or shared with a partner unless you ask for an introduction.",
+      "privacyBody": "HeraldFox stores only what it needs to run the desks and answer a service inquiry: feed metadata, headlines and links, aggregated usage counts, and the messages you choose to send. We do not sell personal data. We store a hashed network identifier, a hashed device identifier, campaign parameters, and a coarse country code when the network edge provides one, to prevent abuse and measure aggregate interest; we do not store raw IP addresses. An inquiry is read by us, and is not sold or shared with a partner unless you ask for an introduction.",
       "termsTitle": "Terms",
-      "termsBody": "Herald Fox publishes headlines, excerpts, and original summaries with attribution and links to the publisher. Content remains the property of its publisher. Nothing on this site is legal, financial, medical, or professional advice. A service engagement is governed by the scope you sign, not by this page. Automated access must respect the published rate limits."
+      "termsBody": "HeraldFox publishes headlines, excerpts, and original summaries with attribution and links to the publisher. Content remains the property of its publisher. Nothing on this site is legal, financial, medical, or professional advice. A service engagement is governed by the scope you sign, not by this page. Automated access must respect the published rate limits."
     },
     "contact": {
       "eyebrow": "07 — Contact",
       "title": "Write to us.",
       "intro": "One message, read by a person. Say which desk, a service, or something else entirely. For a service inquiry the form on the services page asks the better questions.",
       "submit": "Send message"
+    },
+    "bot": {
+      "title": "HeraldFox crawler",
+      "intro": "This page is for the operators of feeds we read: who we are, what we fetch, how often, and how to stop us.",
+      "identityTitle": "Identity",
+      "identityBody": "Every request carries the user agent HeraldFoxBot/1.0 (+https://heraldfox.com/bot), and the address in it opens this page.",
+      "readingTitle": "What we read",
+      "readingBody": "Public RSS and Atom feeds that we list as sources: the headline, the link, the publication date and the excerpt the publisher already publishes. We do not copy full articles, do not log in anywhere, and do not imitate a browser.",
+      "pacingTitle": "How often",
+      "pacingBody": "We follow robots.txt and its Crawl-delay, leave a few seconds between two requests to the same host, make no more than twenty requests to one host in an hour, and wait as long as a server asks us to through Retry-After.",
+      "blockTitle": "How to block us",
+      "blockBody": "Add a rule for HeraldFoxBot to your robots.txt - Disallow: / is enough - or write to {email} and we will stop reading the feed."
     }
   }
 }

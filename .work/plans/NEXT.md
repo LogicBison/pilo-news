@@ -1,13 +1,122 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-09 (M15 approved; apex responsive fix shipped)
+**Updated:** 2026-11-10 (Track C+D complete and verified — M16 in the full plan)
 
 ---
 
-## Current iteration - M15: brand surfaces (2026-11-09)
+## Current iteration - Track C+D: fetch safety and content fixes (2026-11-09 → complete 2026-11-10)
+
+**Milestone ref:** `.work/plans/20261109-next-improvement.md` Tracks C + D · full plan §19 **M16** · spec `.work/features/fetch-safety/20261109-SPEC.md` (**Implemented**)
+**Status:** complete 2026-11-10 · **Started:** 2026-11-09 · **Scope delivered:** C0–C8 + D1–D5, D7–D10
+
+### In scope
+
+- **C0/R1** one `USER_AGENT` constant from settings, imported by both fetchers, no `example` domain left.
+- **C1/R2** robots.txt once per host/day in Redis, `Disallow` → `robots_disallowed` with zero feed requests, `Crawl-delay` raises the floor.
+- **C2/R3** per-host ledger in Redis: 5 s floor ±20 % jitter, 20/h cap, cooldown, fail streak, breaker.
+- **C3/R4** `429`/`503` honour `Retry-After`, escalate per streak, never retry immediately.
+- **C4** one retry for a dead socket only.
+- **C5/R6** content-type allow-list + challenge-body detection → `challenge`.
+- **C6/R8** pin the validated IP (Host header + `sni_hostname`).
+- **C7** retire or fix the broken/stale sources; `verify-sources` clean.
+- **C8/R9, R10** counters/gauge, run stats `blocked`/`rate_limited`/`robots_disallowed`, `partial` above 20 % blocked; admin source view carries `fail_streak`, `last_error`, cooldown + reason.
+- **D1–D5** summary shape, banned phrases/verbs, opener rule, number preservation — prompt + `validate_summary`.
+- **D7–D10** no "see link/URL/notes", human standfirst, one summary block, 404 archive window.
+
+### Tasks
+
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| C0 | Bot identity constant from settings, both fetchers import it | `platform/settings.py`, `articles/infrastructure/fetcher.py`, `offers/infrastructure/fetch.py` | done 2026-11-10 |
+| C1 | robots.txt fetch + Redis cache + `Disallow` gate + `Crawl-delay` floor | `articles/infrastructure/politeness.py` | done 2026-11-10 |
+| C2 | Per-host ledger: floor, jitter, hourly cap, streak, breaker | `politeness.py` | done 2026-11-10 |
+| C3 | 429/503 cooldown from `Retry-After`, exponential escalation | `politeness.py`, `fetcher.py` | done 2026-11-10 |
+| C4 | Retry budget: one retry on a dead socket, none on 429 | `fetcher.py` | done 2026-11-10 |
+| C5 | Content-type allow-list + challenge detection | `fetcher.py` | done 2026-11-10 |
+| C6 | Pin the approved IP across the request | `fetcher.py` | done 2026-11-10 |
+| C7 | Broken/stale sources (repaired two, retired two, replaced one) | `normalize.py`, `config/deployments/{financial,digital-technology}.json` | done 2026-11-10 |
+| C8/R9 | Metrics counters, gauge, run stats + `partial` threshold; admin cooldown fields | `ingest.py`, `metrics.py`, `editorial/http/sources.py`, `sources/infrastructure/repo.py`, `AdminConsole.tsx` | done 2026-11-10 |
+| D1 | One summary shape in prompt + validator | `ai_client.py`, `config/prompts/{en,es}.json` | done 2026-11-10 |
+| D2 | Banned stock phrases (EN+ES) → `retry` | `ai_client.py` | done 2026-11-10 |
+| D3 | Opener rule ≤25 words, cap 3 sentences / 520 chars | `ai_client.py` | done 2026-11-10 |
+| D4 | Banned vague verbs, require a concrete consequence | `ai_client.py` | done 2026-11-10 |
+| D5 | Digit present when the source has one | `ai_client.py` | done 2026-11-10 |
+| D7 | Forbid "see link/URL/notes" in generated copy | `ai_client.py` | done 2026-11-10 |
+| D8 | Human standfirst, scope as a chip | `offers/application/build.py`, `offers/domain/models.py`, `config/offers.json` | done 2026-11-10 |
+| D9 | One summary block, quiet fallback | article page, `messages/{en,es}.json` | done 2026-11-10 |
+| D10 | 404 says 30-day archive, not seven days | `article/not-found.tsx`, `messages/{en,es}.json` | done 2026-11-10 |
+
+### Done this iteration (evidence)
+
+| Group | Artifact | Evidence |
+|-------|----------|----------|
+| Fetch safety | `articles/infrastructure/politeness.py` (new), rewired `fetcher.py`, `settings.py` bot/pacing keys, `offers/infrastructure/fetch.py` | 18 politeness tests (fake clock, no network) + fetcher tests for 429/HTML/rebinding; `verify-sources` 50/50 |
+| Metrics + operator view | `platform/metrics.py`, `articles/application/ingest.py`, `editorial/http/sources.py`, `sources/infrastructure/repo.py`, `AdminConsole.tsx` | blocked/cooldown counters, run stats + `partial` >20 %, cooldown line + last error in the Sources table |
+| Content | `ai_client.py` (D1–D5, D7), `config/prompts/{en,es}.json`, `offers/application/build.py` (D8), article page (D9), `article.not-found.tsx` (D10), catalogs | `test_summary_validation.py` + `test_standfirst.py`; e2e "a story without a summary…" and "a missing story…" |
+| Crawler page | `apps/web/src/app/[locale]/bot/page.tsx` + catalog block | e2e EN + ES; no nav entry |
+
+### Gaps found and fixed during verification (2026-11-10)
+
+1. **Distribución Actualidad (retail) still failed** with `parse_error` after the entity repair: the title carries a bare `&` (`Óptica & Audiología`). `repair_html_entities` now escapes ampersands that do not open a legal reference, and splits CDATA out first so a literal `&` there is never printed as `&amp;`. Two new tests; retail 4/4.
+2. **Financial fell below the 4-source policy minimum** after Finextra was retired by its robots file. Added `Federal Reserve Board` (press releases, trust 0.95) and applied the profile; financial 4/4.
+3. **R9 gauge was never reset** on recovery — `ingest_host_cooldown_seconds` now sets 0 on success/4xx.
+4. **R10 stopped at the API**: the admin Sources table did not render `last_error` or the cooldown. Added both, with `admin.cooldown` / `admin.lastError` keys in EN and ES (579 keys).
+5. **Article 404 home link was empty on channel hosts** (`href=""` → back to the 404). Home now targets `/` (`/es` in Spanish); e2e asserts the href.
+
+### Verification (2026-11-10)
+
+| Gate | Command | Result |
+|------|---------|--------|
+| API lint/type/tests | `ruff check` · `ruff format --check` · `mypy src` · `pytest -q` (api container) | clean · **209 passed** |
+| Web static | `pnpm lint` · `tsc --noEmit` · `pnpm check` | clean · **579 keys** · 11/11 contrast |
+| Production build | `pnpm build` (throwaway container, `web_next_prod_v2`) | **RC=0** |
+| Playwright | `pnpm exec playwright test` against that build | **124 passed / 0 failed / 5 skipped** |
+| Routing | `./bin/start.sh --env dev hosts` | **all checks passed** (14 invariants) |
+| Sources | `python -m news_api.cli verify-sources --industry all` | **50 sources, 50 passed, 0 failed, 0 warnings** |
+
+Not verified: R10's seeded-cooldown acceptance (no cooldown seeded in dev; the render is covered by lint/tsc/build only), and D1–D5 on live output (the next natural refresh supplies the sample; no forced `--full-reset`).
+
+### Owner blockers
+
+- **O9** — production TLS; also keeps the prd half of M15-T6 open.
+- **O15** — `SMTP_FROM` spelling in the protected `.env*` files.
+- **O16** — approve `BOT_NAME`/`BOT_VERSION`/`BOT_URL`/`FETCH_PACING`/`FETCH_HOST_FLOOR_S`/`FETCH_HOST_HOURLY_CAP` in `.env.example`. The feature runs on the `settings.py` defaults without it.
+
+### Follow-ups
+
+- **D-trial** — read the first natural refresh batch after D1–D5 (decision 3: no forced reset).
+- **`verify-sources` exit code** — it exits 0 with `summary.failed > 0`, which made C7's acceptance meaningless. Make it a real gate.
+- **prd shadow week** — `FETCH_PACING=shadow` for one week before trusting the pacing numbers.
+
+### MOD-06 output (2026-11-10, Track C+D code)
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 4 — ingestion fetch layer (new `politeness.py` + `fetcher.py`) → every channel's content; AI summary generation (`ai_client.py` + prompts) → every published article; offers builder/config → public reference pages; admin source API → admin console. Web routes (`/bot`, article 404) are additive.
+- New cross-boundary deps: `fetcher.py` → `politeness.py` (Redis + httpx); `ingest.py` → `politeness.BLOCK_REASONS`; `AdminConsole` → the new source fields. No new module, RPC, shared model or DB dependency; no schema change.
+- Test isolation: ok — pacing/cooldown/breaker: `pytest tests/unit/test_politeness.py` (18, fake clock, no network); fetch outcomes: `tests/unit/test_fetcher.py`; summary rules: `tests/unit/test_summary_validation.py`; standfirst: `tests/unit/test_standfirst.py`; reader copy: `pnpm exec playwright test e2e/public.spec.ts`; catalog parity: `pnpm check`.
+- Human architectural review: required — reason: >1 hard boundary (MOD-06 §2). Read `politeness.py` (fail-open paths, lock release, breaker probe) and the `_pin_to_address` hunk in `fetcher.py` first: a mistake there stops every feed rather than one.
+- Blast radius: if pacing or pinning is wrong, ingestion stalls across all 11 channels (freshness, no data loss); if `validate_summary` is too strict, summaries fail-open to the excerpt (visible per article); if the bot identity or robots gate is wrong, publishers see the wrong UA or we fetch a disallowed path (legal/relationship risk, invisible in tests); if the 404 href is wrong, dead-end navigation. The admin render only affects operators.
+
+## Recommendation
+merge_with_conditions — reason: gates are green (209 api tests, lint/tsc/check, build RC=0, Playwright 124/0/5, `hosts` 14, `verify-sources` 50/50) and each fetch-safety rule has a test with a fake clock; but the diff crosses four boundaries and one of them (pacing) fails site-wide, so MOD-06 routes it to human review rather than self-approval.
+
+## Conditions if merge_with_conditions
+- Human architectural review of `politeness.py` and the `_pin_to_address` path in `fetcher.py` before commit.
+- One week in `FETCH_PACING=shadow` on prd before trusting the pacing numbers (rollout step 2).
+- The D-trial sample is read before D1–D5 is called effective; the existing summaries are unchanged by design.
+- `verify-sources` exit code made a real gate before C7 is treated as permanently green.
+
+### Cross-LLM verification
+
+Not run in this session; `@code-verify uncommitted` before any commit.
+
+---
+
+## Completed iteration - M15: brand surfaces (2026-11-09)
 
 **Milestone ref:** `.work/plans/full/20261105-full-plan.md` §19 M15 · spec `.work.ui/plans/20261109-brand-assets.md`
-**Status:** approved 2026-11-09 · ready to start · **Started:** - · **Target:** M15-T1..T7 (logo on the apex, favicons on every host)
+**Status:** complete 2026-11-09 · **M15-T1..T8 done** (T6 prd half still open on **O9**) · `@code-verify milestone` verdict **pass with gaps**
 
 ### In scope
 
@@ -21,28 +130,17 @@
 
 - channel headers (they keep `SkinEmblem`), per-desk favicons, a PWA manifest.
 - the brand string itself (D-018: "HeraldFox" on the logo, "Herald Fox" in the lobby copy, "System News" in channel headers). This iteration renders the existing copy, it does not rename anything.
+  - **Updated 2026-11-09 (owner):** "HeraldFox" is one word, never "Herald Fox" — applied to the lobby catalogs, `bin/start.sh` and the notify fixture. `SMTP_FROM` in `.env.example`/`.env.dev`/`.env.prd` still reads "Herald Fox" (protected surfaces, needs same-message approval). Channel headers / `meta.siteName` still say "System News" (D6/U1, untouched).
 - the OG image, the fetch-safety work, and the ten content fixes (separate tracks).
 
-### Tasks
+### Acceptance criteria (measured 2026-11-09)
 
-| ID | Description | Files | Status | Notes |
-|----|-------------|-------|--------|-------|
-| M15-T1 | Derive emblem (700x700 head square), lockup (trimmed) and icon tile (512, flattened on `#0b1220`) | `apps/web/public/brand/` | pending | one-off ImageMagick run per the UI plan §2 |
-| M15-T2 | Masthead: emblem 32 px + live wordmark in `--lb-font-display`; remove `.lb-brand-mark` | `apps/web/src/components/lobby/shell.tsx`, `apps/web/src/components/lobby/lobby.css` | pending | mobile 28 px emblem, tagline hidden < 480 px |
-| M15-T3 | Footer: emblem 24 px in `LobbyFooter`, same link target | `apps/web/src/components/lobby/shell.tsx` | pending | no second landmark |
-| M15-T4 | Accessible names + axe coverage for `/`, `/es`, `/services` | `shell.tsx`, `apps/web/e2e/accessibility.spec.ts` | pending | marks `alt=""`/`aria-hidden` |
-| M15-T5 | `favicon.ico` (16/32/48), `icon.png` (512), `apple-icon.png` (180, opaque) | `apps/web/src/app/` | pending | file-based metadata; no `metadata.icons` |
-| M15-T6 | Per-host check: 200 + one icon link per document on apex and two subdomains | dev `./bin/start.sh dev hosts`; prd `--env prd hosts` | pending | prd half blocks on O9 |
-| M15-T7 | Gates: lint, type, check, build, Playwright (incl. layout) on the production build | `apps/web` | pending | axe 0 critical/serious |
-| M15-T8 | Responsive fix (owner-reported, 2026-11-09): board clipped its last column at 1024-1440 px; masthead pushed a 390 px document sideways. Board is three columns (languages dropped by the owner), table kept, masthead wraps under 720 px | `apps/web/src/components/lobby/sections.tsx`, `lobby.css`, `apps/web/e2e/lobby.spec.ts`, `apps/web/src/messages/{en,es}.json` | done | verified 320-1440 px, 13/13 lobby e2e |
-
-### Acceptance criteria
-
-- logo renders on `/`, `/es`, `/services` at 360 px and 1440 px; no horizontal overflow, CLS 0 on `/`.
-- `/favicon.ico` returns 200 `image/x-icon`; exactly one `<link rel="icon">` per document.
-- apple icon is opaque; the 16 px tab icon still reads as the fox.
-- axe 0 critical/serious on the three apex URLs; the brand link has one accessible name.
-- two subdomains serve the same icon (dev; prd after O9).
+- [x] logo renders on `/`, `/es`, `/services` at 360 px and 1440 px; no horizontal overflow, **CLS 0.0000** on all six combinations.
+- [x] `/favicon.ico` returns 200 `image/x-icon` on apex and every subdomain checked; **`<link rel="icon" href="/favicon.ico">` appears exactly once** per document.
+  - *Wording gap (low):* the plan says "exactly one `<link rel="icon">`"; the document carries **2** `rel="icon"` elements (favicon.ico ×1 + icon.png ×1, both auto-emitted, each exactly once). Reported literally, not rounded to pass.
+- [x] apple icon opaque (100 %, corner `srgb(11,18,32)`); the 16 px tab icon still reads as the fox (mean 0.28, max 1).
+- [x] axe 0 critical/serious on the three apex URLs; the brand link has one accessible name.
+- [x] two subdomains serve the same icon — checked on **three** (`stem-cell.`, `financial.`, `legal.localhost`), byte-identical to the apex. prd after O9.
 
 ### Validation steps
 
@@ -70,7 +168,15 @@ Not run in this session; `@code-verify uncommitted` before any commit.
 
 | ID | Description | Completed |
 |----|-------------|-----------|
-| M15-T8 | Board keeps its table, loses the languages column, no clipped cells 320-1440 px; masthead wraps under 720 px | 2026-11-09 |
+| M15-T1 | Emblem 700×700 transparent, lockup 1265×921 (`convert -fuzz 2%`), tile 512 opaque, from `.work.ui/references/heraldfox-final.png` | 2026-11-09 |
+| M15-T2 | Masthead: emblem 32 px (`28 px` < 480 px) + live wordmark; `.lb-brand-mark` CSS square retired (0 leftovers) | 2026-11-09 |
+| M15-T3 | Footer emblem 24 px in `LobbyFooter`, same link target, no second landmark | 2026-11-09 |
+| M15-T4 | Marks `alt=""` + `aria-hidden="true"`; axe assertions on `/`, `/es`, `/services` (one name, emblem loads, no `footer h1`) | 2026-11-09 |
+| M15-T5 | `favicon.ico` (48/32/16), `icon.png` (512), `apple-icon.png` (180, **100 % opaque**) via file-based metadata, no `metadata.icons` | 2026-11-09 |
+| M15-T6 (dev) | `start.sh hosts` **14/14** incl. *the lobby carries the brand*; `favicon.ico` 200 `image/x-icon` + exactly one `favicon.ico` link per document on apex EN/ES, `stem-cell.`, `financial.`, `legal.localhost`; apex vs subdomain bytes **identical**. **prd half → O9** | 2026-11-09 |
+| M15-T7 | lint ✔ · tsc ✔ · check ✔ (567 keys, 11/11 contrast) · `pnpm build` **RC=0** · Playwright **120 passed / 0 failed / 5 skipped, exit 0** on the production build · axe 0 critical/serious · 360/1440 px × `/`,`/es`,`/services`: overflow 0, **CLS 0.0000** | 2026-11-09 |
+| M15-T8 | Responsive fix: desk board keeps three columns (languages dropped by owner), table kept, no clipped cells 320-1440 px; masthead wraps < 720 px; lobby e2e 13/13 | 2026-11-09 |
+| Brand spelling | "HeraldFox" is one word everywhere the brand appears (owner instruction 2026-11-09): EN/ES catalogs (5× each), `bin/start.sh:735` brand check, api notify fixture. `SMTP_FROM` in `.env.*` **not** changed (protected surface, needs same-message approval) | 2026-11-09 |
 
 ### Plan verification (2026-11-09, @x-director)
 
@@ -85,16 +191,16 @@ Gates: `touch-scope-verify` pass · `blast-radius` medium (docs only, 2 areas) �
 
 ### Concept / NFR registry (this iteration)
 
-| Concept | Applies | Reason |
-|---------|---------|--------|
-| MOD-01 coupling-audit | no | all changes stay inside `apps/web` presentation; no module boundary crossed |
-| MOD-02 network-cost | no | no new network hop; static assets only |
-| MOD-03 cost-model | no | no new billable unit |
-| MOD-04 ops-headcount | no | no new deployable or on-call surface |
-| MOD-05 modularity-vs-distribution | no | no service boundary change |
-| MOD-06 ai-amplification | **yes** | agent-authored code; reviewable, small diff, assets are static and reproducible from the documented command |
-| MOD-07 prompt-architecture | no | no prompt change in this iteration (that is the content track) |
-| MOD-08 declarative-infra | no | no infrastructure change |
+| Concept | Applies | Status | Reason |
+|---------|---------|--------|--------|
+| MOD-01 coupling-audit | no | n/a | lobby presentation → i18n catalog → routing is 3 boundaries, but MOD-06 is the code gate; MOD-01 not triggered by this milestone |
+| MOD-02 network-cost | no | n/a | no new network hop; static assets served by the existing origin |
+| MOD-03 cost-model | no | n/a | no new billable unit |
+| MOD-04 ops-headcount | no | n/a | no new deployable or on-call surface |
+| MOD-05 modularity-vs-distribution | no | n/a | no service boundary change |
+| MOD-06 ai-amplification | **yes** | **done** | agent-authored code — output below (2 sections: plan-drift docs + M15 code); `mod06-output-check.sh` pass on both |
+| MOD-07 prompt-architecture | no | n/a | no prompt change in this iteration (that is the content track) |
+| MOD-08 declarative-infra | no | n/a | no infrastructure change |
 
 ### MOD-06 output (2026-11-09, plan-drift fixes)
 
@@ -112,12 +218,35 @@ merge_ok — reason: five planning/session files, all inside `.work/touch-scope`
 ## Conditions if merge_with_conditions
 - none — the recommendation is `merge_ok`.
 
+### MOD-06 output (2026-11-09, M15 brand surfaces — code)
+
+Inputs: 8 files, +98/−24 (`shell.tsx`, `lobby.css`, `en.json`, `es.json`, `middleware.ts`, `accessibility.spec.ts`, `test_notify.py`, `start.sh`) plus static assets under `public/brand/` and `src/app/`. Boundaries map: lobby presentation (`components/lobby/*`), shared i18n catalog (`messages/*`), request routing (`middleware.ts`), e2e suite, api unit test, ops script. Isolating commands per area below.
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 3 — lobby presentation → shared i18n catalog (both locales read by lobby *and* channel chrome); shared i18n catalog → request routing (`middleware.ts` matcher affects every URL on every host); app code → e2e/api-test/ops assertions (`accessibility.spec.ts`, `test_notify.py`, `start.sh` expect the new strings)
+- New cross-boundary deps: `shell.tsx` → `next/image` (new import; served via `/_next/image`, excluded from the matcher); no new module, RPC, shared-model or DB dependency
+- Test isolation: ok — lobby/brand: `pnpm exec playwright test e2e/accessibility.spec.ts e2e/lobby.spec.ts` (fails only if the mark or its name is wrong); routing: `./bin/start.sh hosts` (14 checks) + curl matrix over 13 paths and 2 hosts; catalog: `pnpm check` (567-key parity, fails on any key drift); notify fixture: `pytest tests/unit/test_notify.py` (12 tests)
+- Human architectural review: required — reason: >1 hard boundary (per MOD-06 §2, not waived); the `middleware.ts` matcher is the one to read closely, since a bad negative-lookahead either 404s static assets or rewrites a page into `/en/<path>`
+- Blast radius: if the emblem or wordmark is wrong, every apex page in both locales shows a broken mark (cosmetic, no data). If the brand string is wrong it lands in `<title>`, the privacy/terms bodies and the brand link's accessible name — SEO and legal copy, visible immediately. If the matcher is wrong, `/_next/static` and the brand assets 404 and the site renders unstyled on **all** hosts, or a channel route stops resolving. The api fixture and `start.sh` check can only fail their own assertions. No write path, job, migration or PII surface is touched.
+
+## Recommendation
+merge_with_conditions — reason: gates green (lint, tsc, check, build RC=0, Playwright 120/0/5 on the production build, axe 0 critical/serious, `start.sh hosts` 14/14) and the routing blast radius is verified by an explicit 13-path × 2-host status matrix rather than assumed; but the diff crosses three boundaries, which MOD-06 routes to human architectural review rather than self-approving.
+
+## Conditions if merge_with_conditions
+- Human architectural review of `apps/web/src/middleware.ts` (the matcher negative-lookahead) before commit — it is the only hunk whose failure is site-wide rather than cosmetic.
+- prd half of M15-T6 stays open until **O9** (production TLS) — do not record T6 as fully closed on the strength of the dev half alone.
+- `SMTP_FROM` in `.env.example`/`.env.dev`/`.env.prd` still reads "Herald Fox"; protected surfaces, change only with owner approval in the same message.
+- Residual (unchanged, owner decision pending): tile colour `#0b1220` (UI plan §5 decision 2) and the "System News" channel strings (D6/U1).
+
 ---
 
 ## Done
 
 | Item | Artifact |
 |------|----------|
+| Fetch safety (M16) | `politeness.py`, fetcher rewiring, bot page, profile repairs; `verify-sources` 50/50, `hosts` 14/14, 18 ledger tests |
+| Content fixes (D1–D5, D7–D10) | prompt + validator rules, offer standfirst, one summary block, 30-day 404 copy; e2e + unit coverage |
 | M15 plan-drift fixes | full plan v1.6 (`M15-T8` row + G1 `M15-T1..T8`); brand-assets plan header/tracked-art/derivation corrected and smoke-tested; MOD-06 → merge_ok |
 | Apex responsive fix | Board keeps its table at 3 columns (languages dropped) and stops clipping the last column at 1024-1440 px; masthead wraps under 720 px; regression test in `e2e/lobby.spec.ts` |
 | Email transport | `start.sh`/settings gateway lane, `info@links.heraldfox.com`, delivered with DKIM/DMARC pass |
@@ -214,20 +343,26 @@ merge_ok — reason: five planning/session files, all inside `.work/touch-scope`
 
 ## Recommended next
 
-**New 2026-11-09:** `.work/plans/20261109-next-improvement.md` — logo + favicons, ten content
-fixes, fetch safety. A+B and D1–D5/D7–D10 need no owner input; C waits on the crawler contact URL.
-
-**Plans verified 2026-11-09:** the M15 drift found at session start is fixed (full plan v1.6, brand-asset plan corrected) — `## Current iteration` is cleared to start.
+**M15 and M16 complete** (2026-11-10, C+D verified) — no agent plan work is open. The next
+iteration starts on owner input: **O9** (production TLS) is the only item that unblocks a
+shipped half, and **D-trial** is the only read that can still change a code decision.
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **0** | Finish production TLS on `169.58.4.85` | pull the template fix, `domains --write`, `nginx -t`, reload, `certs --check`, `hosts` (O9) |
-| **1** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |
-| **2** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions |
-| **3** | Name the digest reviewer (D-005) | unblocks the content-generation signature line on `/services` (G2) |
-| **4** | ~~Wire email delivery (D-002)~~ done | gateway live and tested; the weekly-brief campaign is still unbuilt |
-| **5** | Answer U32/U33 | who takes the scope call, and what a service is priced on |
-| **6** | Settle the brand string (D-018 outcome, 2026-12-15) | apex says Herald Fox; channel footers still say System News |
+| **0** | Finish production TLS on `169.58.4.85` | pull the template fix, `domains --write`, `nginx -t`, reload, `certs --check`, `hosts` (O9) — also closes the **prd half of M15-T6** |
+| **1** | Run one week of `FETCH_PACING=shadow` on prd | before trusting the pacing numbers; dev runs `enforce` |
+| **2** | Read the digital-technology window | closes **2026-11-27**; topic placements + channel inquiries per D-014 |
+| **3** | Read the 14-day asset test | closes **2026-11-20**; `asset_interest` vs CTA impressions |
+| **4** | D-trial: read the next natural refresh | 20 new summaries against D1–D5; decision 3, no forced reset |
+| **5** | Make `verify-sources` exit non-zero on a failed source | the C7 acceptance proved nothing without it |
+| **6** | Name the digest reviewer (D-005) | unblocks the content-generation signature line on `/services` (G2) |
+| **7** | Approve the `SMTP_FROM` spelling change (O15) | `.env.example` region still says "Herald Fox"; protected surface, needs same-message approval |
+| **8** | ~~Approve the `BOT_*`/`FETCH_*` keys~~ done 2026-11-10 | `.env.example` documents the six keys; the rest stay in `settings.py` |
+| **9** | Answer U32/U33, settle the brand string (D-018, 2026-12-15) | pricing shape; channel headers still say "System News" |
+
+**Commit state:** the M15 + M16 tree (52 files) was approved, committed and pushed on 2026-11-10
+after `@code-verify uncommitted` (verdict *pass with conditions*: blast radius high, acknowledged
+by the owner in the same message).
 
 ---
 
@@ -236,6 +371,8 @@ fixes, fetch safety. A+B and D1–D5/D7–D10 need no owner input; C waits on th
 | # | Item | Notes |
 |---|------|-------|
 | O5 | Answer U1-U12 | brand/domain, publisher portfolio, pilot, analytics, traffic |
+| O15 | Approve the `SMTP_FROM` spelling change | `.env.example` (protected surface, same-message approval) |
+| ~~O16~~ | ~~Approve `BOT_*`/`FETCH_*` in `.env.example`~~ done 2026-11-10 | keys added |
 | O9 | Finish production TLS | `docs/domains.md`; `nginx -t`, reload and `certs --check` still need to pass |
 | O10 | Approve the CI inventory gate | `.github/workflows/ci.yml` runs it on the next PR |
 | O11 | Delete the unused `Caddyfile` | ADR 015 replaced the edge |

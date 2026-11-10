@@ -236,6 +236,8 @@ def source_dto(source: Source, *, admin: bool = False) -> dict[str, Any]:
                 "terms_url": source.terms_url,
                 "status": source.status,
                 "consecutive_failures": source.consecutive_failures,
+                # R10: the admin view names the streak the way the fetcher does.
+                "fail_streak": source.consecutive_failures,
                 "last_error": source.last_error,
                 "last_fetched_at": source.last_fetched_at,
                 "last_success_at": source.last_success_at,

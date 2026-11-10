@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import time
 from typing import Any
+from urllib.parse import urlsplit
 
 import structlog
 
@@ -12,6 +13,7 @@ from news_api.articles.domain.scoring import score_pool
 from news_api.articles.infrastructure.ai_client import AIClient, AIError
 from news_api.articles.infrastructure.fetcher import fetch_source
 from news_api.articles.infrastructure.normalize import article_uuid, canonicalize_url
+from news_api.articles.infrastructure.politeness import BLOCK_REASONS
 from news_api.articles.infrastructure.repo import (
     clear_summaries,
     create_run,
@@ -32,6 +34,7 @@ from news_api.platform.errors import Conflict, NotFound
 from news_api.platform.metrics import (
     ARTICLES_SCORED,
     INGEST_FETCH,
+    INGEST_FETCH_BLOCKED,
     INGEST_FETCH_DURATION,
     INGEST_ITEMS,
     INGEST_LAG,
@@ -143,6 +146,10 @@ async def run_ingest(
         "summarized": 0,
         "summaries_reused": 0,
         "errors": 0,
+        "blocked": 0,
+        "rate_limited": 0,
+        "robots_disallowed": 0,
+        "blocked_hosts": [],
         "per_language": {},
     }
 
@@ -164,6 +171,9 @@ async def run_ingest(
                     fetch_started = time.perf_counter()
                     outcome = await fetch_source(source)
                     INGEST_FETCH.labels(source=source.name, status=outcome.status).inc()
+                    reason = BLOCK_REASONS.get(outcome.status)
+                    if reason:
+                        INGEST_FETCH_BLOCKED.labels(reason=reason).inc()
                     INGEST_FETCH_DURATION.labels(source=source.name).observe(
                         time.perf_counter() - fetch_started
                     )
@@ -187,6 +197,14 @@ async def run_ingest(
                 if outcome.status == "http_304":
                     stats["http_304"] += 1
                     continue
+                if outcome.status in BLOCK_REASONS:
+                    if outcome.status == "rate_limited":
+                        stats["rate_limited"] += 1
+                    elif outcome.status == "robots_disallowed":
+                        stats["robots_disallowed"] += 1
+                    else:
+                        stats["blocked"] += 1
+                    stats["blocked_hosts"].append(urlsplit(source.feed_url).hostname or "")
                 if outcome.status != "ok":
                     stats["errors"] += 1
                     continue
@@ -298,7 +316,24 @@ async def run_ingest(
             duration = time.perf_counter() - started
             stats["duration_ms"] = round(duration * 1000, 2)
             REFRESH_DURATION.labels(industry=industry_slug).observe(duration)
+            polled = int(stats["feeds_polled"])
+            not_polled = (
+                int(stats["blocked"]) + int(stats["rate_limited"]) + int(stats["robots_disallowed"])
+            )
+            stats["blocked_share"] = round(not_polled / polled, 3) if polled else 0.0
             status = "ok" if stats["errors"] == 0 else "partial"
+            # R9: a run that mostly bounced is not a success even when the rest
+            # went through — say which hosts did it.
+            if polled and not_polled * 5 > polled:
+                status = "partial"
+                log.warning(
+                    "ingest.heavily_blocked",
+                    industry=industry_slug,
+                    run_id=run_id,
+                    blocked=not_polled,
+                    polled=polled,
+                    hosts=sorted({h for h in stats["blocked_hosts"] if h}),
+                )
             await update_run(run_id, status=status, stats=stats, finished=True)
             REFRESH_RUNS.labels(trigger=trigger, status=status).inc()
             INGEST_LAG.labels(industry=industry_slug).observe(duration)

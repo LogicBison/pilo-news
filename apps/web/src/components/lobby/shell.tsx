@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -8,8 +9,9 @@ import "./lobby.css";
 
 export const DESK_EMAIL = process.env.CONTACT_TO ?? "news@heraldfox.com";
 
-/** `""` for the lobby root, `"/services"` for the services page. */
-export type LobbyPath = "" | "/services";
+/** `""` for the lobby root, `"/services"` for the services page, `"/bot"` for
+ *  the crawler page the user agent advertises. */
+export type LobbyPath = "" | "/services" | "/bot";
 
 function localized(locale: Locale, path: LobbyPath): string {
   const suffix = locale === "es" ? "/es" : "";
@@ -51,7 +53,15 @@ export function Masthead({ locale, path }: { locale: Locale; path: LobbyPath }) 
     <header className="lb-mast">
       <div className="lb-mast-inner">
         <Link href={root} className="lb-brand" aria-label={t(locale, "lobby.brand.name")}>
-          <span className="lb-brand-mark" aria-hidden="true" />
+          <Image
+            src="/brand/heraldfox-emblem.png"
+            alt=""
+            aria-hidden="true"
+            width={32}
+            height={32}
+            loading="eager"
+            className="lb-brand-emblem"
+          />
           {t(locale, "lobby.brand.name")}
           <span className="lb-brand-small">{t(locale, "lobby.brand.tagline")}</span>
         </Link>
@@ -136,7 +146,15 @@ export function LobbyFooter({
       <div className="lb-foot-grid">
         <div>
           <p className="lb-brand">
-            <span className="lb-brand-mark" aria-hidden="true" />
+            <Image
+              src="/brand/heraldfox-emblem.png"
+              alt=""
+              aria-hidden="true"
+              width={24}
+              height={24}
+              loading="eager"
+              className="lb-brand-emblem"
+            />
             {t(locale, "lobby.brand.name")}
           </p>
           <p className="lb-body" style={{ maxWidth: "34ch" }}>

@@ -52,10 +52,28 @@ def _sources(records: list[RawRecord]) -> list[dict[str, str]]:
 
 
 def _standfirst(definition: OfferDefinition, issue_date: date, count: int) -> str:
-    return (
-        f"{count} dated changes. Scope: {definition.scope}. "
-        f"Source checked {issue_date.isoformat()}."
-    )
+    """One human line for the issue header (D8).
+
+    The scope already renders as its own chip on the reference page and the
+    issue date is a chip too, so this line carries the count and nothing the
+    reader has to decode: no "Scope:", no ISO date. ``standfirst_noun`` is
+    stored singular in the config and pluralised here.
+    """
+    noun = definition.standfirst_noun
+    checked = f"{issue_date.day} {issue_date.strftime('%B')}"
+    if count == 0:
+        return f"No {_pluralise(noun)} in this issue, checked {checked}"
+    label = noun if count == 1 else _pluralise(noun)
+    return f"{count} {label}, checked {checked}"
+
+
+def _pluralise(noun: str) -> str:
+    """Naive English plural - only ever applied to the config's noun phrases."""
+    if noun.endswith(("s", "x", "z", "ch", "sh")):
+        return noun + "es"
+    if noun.endswith("y") and noun[-2:-1] not in "aeiou":
+        return noun[:-1] + "ies"
+    return noun + "s"
 
 
 async def build_offer_issue(

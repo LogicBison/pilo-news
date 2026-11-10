@@ -227,7 +227,7 @@
           "feed_url": "https://www.finextra.com/rss/headlines.aspx",
           "language": "en",
           "trust": 0.9,
-          "enabled": true,
+          "enabled": false,
           "allow_http": false,
           "poll_interval_min": 720,
           "terms_url": null
@@ -237,6 +237,16 @@
           "feed_url": "https://www.paymentsdive.com/feeds/news/",
           "language": "en",
           "trust": 0.85,
+          "enabled": true,
+          "allow_http": false,
+          "poll_interval_min": 720,
+          "terms_url": null
+        },
+        {
+          "name": "Federal Reserve Board",
+          "feed_url": "https://www.federalreserve.gov/feeds/press_all.xml",
+          "language": "en",
+          "trust": 0.95,
           "enabled": true,
           "allow_http": false,
           "poll_interval_min": 720,

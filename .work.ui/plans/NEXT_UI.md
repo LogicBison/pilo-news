@@ -43,7 +43,7 @@
 
 ## Recommended next
 
-**New 2026-11-09:** `.work.ui/plans/20261109-brand-assets.md` — the Herald Fox logo on the apex
+**New 2026-11-09:** `.work.ui/plans/20261109-brand-assets.md` — the HeraldFox logo on the apex
 masthead/footer plus favicons on every host. Needs decision 1 (emblem + live text vs baked lockup).
 
 | Priority | Item | Notes |

@@ -36,6 +36,7 @@ def _definition(industry: str, raw: dict[str, Any]) -> OfferDefinition:
             if str(item).strip()
         ),
         enabled=bool(raw.get("enabled", True)),
+        standfirst_noun=str(raw.get("standfirst_noun") or "changes").strip() or "changes",
     )
 
 

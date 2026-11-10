@@ -47,3 +47,31 @@ for (const path of pages) {
     expect(critical, JSON.stringify(critical, null, 2)).toHaveLength(0);
   });
 }
+
+// M15-T4: the brand mark is decoration, so the brand link's accessible name
+// comes from its aria-label alone — no second name from the emblem's alt text.
+const apexBrandPages = ["/", "/es", "/services"];
+
+for (const path of apexBrandPages) {
+  test(`apex brand link has one name and a decorative mark on ${path}`, async ({ page }) => {
+    await page.goto(path);
+    await page.waitForSelector('html[data-hydrated="true"]');
+
+    const brand = page.locator("a.lb-brand");
+    await expect(brand).toHaveCount(1);
+    const label = await brand.getAttribute("aria-label");
+    expect(label?.trim(), "brand link must carry an aria-label").toBeTruthy();
+
+    const emblem = brand.locator("img.lb-brand-emblem");
+    await expect(emblem).toHaveCount(1);
+    await expect(emblem).toHaveAttribute("alt", "");
+    await expect(emblem).toHaveAttribute("aria-hidden", "true");
+    expect(
+      await emblem.evaluate((img: HTMLImageElement) => img.naturalWidth),
+      "brand emblem must load",
+    ).toBeGreaterThan(0);
+
+    // No second heading landmark in the footer beside the brand.
+    await expect(page.locator("footer h1")).toHaveCount(0);
+  });
+}
