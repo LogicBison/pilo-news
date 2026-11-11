@@ -108,12 +108,12 @@ async def draft_rows(
         return [], "none"
 
     client = AIClient()
-    if not client.available():
+    if not await client.available():
         return base, "fallback"
 
     system, user = _prompt(definition, records)
     try:
-        text = await client.complete_json(system=system, user=user, timeout=180.0, max_tokens=8000)
+        text = await client.complete_json(system=system, user=user, timeout=180.0, max_tokens=3000)
     except AIError as exc:
         log.warning("offer.draft.ai_failed", reason=type(exc).__name__, offer=definition.offer_slug)
         return base, "fallback"

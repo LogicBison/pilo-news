@@ -123,6 +123,7 @@ class Channel:
     sort_order: int = 0
     fetch_interval_minutes: int | None = None
     auto_fetch_enabled: bool = True
+    ai_summaries_enabled: bool = True
     offers: dict[str, Any] = field(default_factory=dict)
 
     @property
@@ -170,6 +171,7 @@ def channel_from_row(row: dict[str, Any]) -> Channel:
             else None
         ),
         auto_fetch_enabled=bool(row.get("auto_fetch_enabled", True)),
+        ai_summaries_enabled=bool(row.get("ai_summaries_enabled", True)),
         offers=as_dict(row.get("offers")),
     )
 

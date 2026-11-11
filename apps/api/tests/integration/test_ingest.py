@@ -13,6 +13,10 @@ from news_api.platform.db import fetch_all, fetch_one
 from news_api.platform.errors import Conflict
 
 
+async def _fake_available(self) -> bool:
+    return True
+
+
 async def _fake_fetch(source, **_kwargs):
     language = source.language
     return FetchOutcome(
@@ -122,3 +126,74 @@ async def test_single_flight_lock_rejects_second_run(monkeypatch) -> None:
         await ingest_module.run_ingest("legal", trigger="manual", run_id=run_id)
     release.set()
     await first
+
+
+@pytest.mark.asyncio
+async def test_channel_ai_switch_stops_every_model_call(monkeypatch, clean_db) -> None:
+    """A desk with AI summaries off never reaches the provider, even when configured."""
+    from news_api.channels.infrastructure import repo as channels_repo
+
+    calls: list[str] = []
+
+    async def fake_allowance(self, **_kwargs):
+        return 7
+
+    async def fake_summarize(self, **_kwargs):
+        calls.append("summary")
+        return "A regulator published rules. The change takes effect next quarter."
+
+    async def fake_brief(self, **_kwargs):
+        calls.append("brief")
+        return "- one\n- two\n- three"
+
+    async def fake_picks(self, **_kwargs):
+        calls.append("picks")
+        return None, []
+
+    monkeypatch.setattr(ingest_module, "fetch_source", _fake_fetch)
+    monkeypatch.setattr(ingest_module.AIClient, "available", _fake_available)
+    monkeypatch.setattr(ingest_module.AIClient, "allowance", fake_allowance)
+    monkeypatch.setattr(ingest_module.AIClient, "summarize", fake_summarize)
+    monkeypatch.setattr(ingest_module.AIClient, "desk_brief", fake_brief)
+    monkeypatch.setattr(ingest_module.AIClient, "pick_featured", fake_picks)
+    await channels_repo.update_channel("legal", ai_summaries_enabled=False)
+
+    run_id = await create_run(None, trigger="manual", status="queued")
+    result = await ingest_module.run_ingest("legal", trigger="manual", run_id=run_id)
+
+    assert result["stats"]["summary_budget"] == 0
+    assert calls == []
+
+
+@pytest.mark.asyncio
+async def test_channel_ai_switch_on_uses_the_budget_allowance(monkeypatch, clean_db) -> None:
+    from news_api.channels.infrastructure import repo as channels_repo
+
+    calls: list[str] = []
+
+    async def fake_allowance(self, **_kwargs):
+        return 2
+
+    async def fake_summarize(self, **_kwargs):
+        calls.append("summary")
+        return "A regulator published rules. The change takes effect next quarter."
+
+    async def fake_brief(self, **_kwargs):
+        return None
+
+    async def fake_picks(self, **_kwargs):
+        return None, []
+
+    monkeypatch.setattr(ingest_module, "fetch_source", _fake_fetch)
+    monkeypatch.setattr(ingest_module.AIClient, "available", _fake_available)
+    monkeypatch.setattr(ingest_module.AIClient, "allowance", fake_allowance)
+    monkeypatch.setattr(ingest_module.AIClient, "summarize", fake_summarize)
+    monkeypatch.setattr(ingest_module.AIClient, "desk_brief", fake_brief)
+    monkeypatch.setattr(ingest_module.AIClient, "pick_featured", fake_picks)
+    await channels_repo.update_channel("legal", ai_summaries_enabled=True)
+
+    run_id = await create_run(None, trigger="manual", status="queued")
+    result = await ingest_module.run_ingest("legal", trigger="manual", run_id=run_id)
+
+    assert result["stats"]["summary_budget"] == 2
+    assert 1 <= len(calls) <= 2

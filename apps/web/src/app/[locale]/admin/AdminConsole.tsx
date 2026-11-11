@@ -11,6 +11,7 @@ import { t, type Locale } from "@/lib/i18n";
 type Tab =
   | "overview"
   | "channels"
+  | "ai"
   | "offers"
   | "sources"
   | "topics"
@@ -27,6 +28,7 @@ type Tab =
 const TABS: readonly Tab[] = [
   "overview",
   "channels",
+  "ai",
   "offers",
   "sources",
   "topics",
@@ -71,6 +73,7 @@ interface AdminIndustry {
   fetch_interval_minutes: number | null;
   effective_fetch_interval_minutes: number;
   auto_fetch_enabled: boolean;
+  ai_summaries_enabled: boolean;
   offers: OfferConfig;
   asset?: string | null;
 }
@@ -103,9 +106,53 @@ interface OfferIssue {
   published_at: string | null;
 }
 
+interface AISettings {
+  values: {
+    ai_enabled: boolean;
+    ai_monthly_budget_usd: number;
+    ai_max_items_per_run: number;
+    ai_offpeak_only: boolean;
+    ai_peak_windows: string;
+    ai_peak_days: string;
+    ai_peak_holidays: string;
+  };
+  defaults: AISettings["values"];
+  overridden: string[];
+  updated_at: string | null;
+  updated_by: string | null;
+  spent_usd: number;
+  held_usd: number;
+  remaining_usd: number;
+  bucket: string;
+  ledger_available: boolean;
+}
+
+interface AIDraft {
+  enabled: boolean;
+  budget: string;
+  maxItems: string;
+  offpeakOnly: boolean;
+  windows: string;
+  days: string;
+  holidays: string;
+}
+
+function draftFromAI(values: AISettings["values"]): AIDraft {
+  return {
+    enabled: values.ai_enabled,
+    budget: String(values.ai_monthly_budget_usd),
+    maxItems: String(values.ai_max_items_per_run),
+    offpeakOnly: values.ai_offpeak_only,
+    windows: values.ai_peak_windows,
+    days: values.ai_peak_days,
+    holidays: values.ai_peak_holidays,
+  };
+}
+
 interface ChannelDraft {
   slug: string;
   autoFetch: boolean;
+  aiSummaries: boolean;
   useDefault: boolean;
   hours: string;
   consultation: boolean;
@@ -373,6 +420,8 @@ export function AdminConsole({
   const [newKey, setNewKey] = useState("");
   const [defaultFetchInterval, setDefaultFetchInterval] = useState(720);
   const [channelDraft, setChannelDraft] = useState<ChannelDraft | null>(null);
+  const [ai, setAi] = useState<AISettings | null>(null);
+  const [aiDraft, setAiDraft] = useState<AIDraft | null>(null);
 
   const [articleForm, setArticleForm] = useState<{ id: string; kind: "hide" | "pin" } | null>(null);
   const [hideReason, setHideReason] = useState("");
@@ -498,6 +547,12 @@ export function AdminConsole({
         if (data) {
           setIndustries(data.data ?? []);
           if (data.defaults) setDefaultFetchInterval(data.defaults.fetch_interval_minutes);
+        }
+      } else if (activeTab === "ai") {
+        const data = await read<{ data: AISettings }>("/api/proxy/v1/admin/ai");
+        if (data) {
+          setAi(data.data);
+          setAiDraft(draftFromAI(data.data.values));
         }
       } else if (activeTab === "offers") {
         const data = await read<{ data: OfferIssue[] }>("/api/proxy/v1/admin/offers?limit=50");
@@ -665,6 +720,35 @@ export function AdminConsole({
     return true;
   }
 
+  async function saveAiSettings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!aiDraft) return;
+    const budget = Number(aiDraft.budget);
+    const maxItems = Number(aiDraft.maxItems);
+    if (!Number.isFinite(budget) || budget <= 0) {
+      setStatus({ kind: "error", text: t(locale, "admin.aiInvalid") });
+      return;
+    }
+    if (!Number.isInteger(maxItems) || maxItems < 1) {
+      setStatus({ kind: "error", text: t(locale, "admin.aiInvalid") });
+      return;
+    }
+    await mutate("ai:save", "/api/proxy/v1/admin/ai", "PATCH", {
+      ai_enabled: aiDraft.enabled,
+      ai_monthly_budget_usd: budget,
+      ai_max_items_per_run: maxItems,
+      ai_offpeak_only: aiDraft.offpeakOnly,
+      ai_peak_windows: aiDraft.windows.trim(),
+      ai_peak_days: aiDraft.days.trim(),
+      ai_peak_holidays: aiDraft.holidays.trim(),
+    });
+  }
+
+  async function resetAiSettings() {
+    const ok = await mutate("ai:reset", "/api/proxy/v1/admin/ai", "PATCH", { reset: true });
+    if (ok) cancelConfirm("ai:reset");
+  }
+
   async function handleCreateIndustry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -695,6 +779,7 @@ export function AdminConsole({
     setChannelDraft({
       slug: item.slug,
       autoFetch: item.auto_fetch_enabled,
+      aiSummaries: item.ai_summaries_enabled,
       useDefault: item.fetch_interval_minutes === null,
       hours: String(Number((interval / 60).toFixed(2))),
       consultation: item.offers.consultation,
@@ -726,6 +811,7 @@ export function AdminConsole({
       "PATCH",
       {
         auto_fetch_enabled: channelDraft.autoFetch,
+        ai_summaries_enabled: channelDraft.aiSummaries,
         fetch_interval_minutes: channelDraft.useDefault ? null : minutes,
         offers: {
           consultation: channelDraft.consultation,
@@ -1015,6 +1101,7 @@ export function AdminConsole({
           fetch_interval_minutes: null,
           effective_fetch_interval_minutes: defaultFetchInterval,
           auto_fetch_enabled: true,
+          ai_summaries_enabled: true,
           offers: { consultation: true, brief: true, question: true, asset: false },
           asset: null,
         },
@@ -1175,6 +1262,11 @@ export function AdminConsole({
                             )}
                           </p>
                           <p className="mt-1 text-xs text-[var(--sn-muted)]">{schedule}</p>
+                          {item.ai_summaries_enabled ? null : (
+                            <p className="text-xs text-[var(--sn-muted)]">
+                              {t(locale, "admin.aiSummariesOff")}
+                            </p>
+                          )}
                           <p className="text-xs text-[var(--sn-muted)]">
                             {activeOffers || t(locale, "admin.offersInactive")}
                           </p>
@@ -1224,6 +1316,22 @@ export function AdminConsole({
                                 {t(locale, "admin.autoFetch")}
                                 <span className="mt-0.5 block text-xs text-[var(--sn-muted)]">
                                   {t(locale, "admin.autoFetchHint")}
+                                </span>
+                              </span>
+                            </label>
+                            <label className="mt-3 flex items-start gap-2">
+                              <input
+                                type="checkbox"
+                                checked={channelDraft.aiSummaries}
+                                onChange={(event) =>
+                                  patchChannelDraft({ aiSummaries: event.target.checked })
+                                }
+                                className="mt-0.5 h-4 w-4"
+                              />
+                              <span>
+                                {t(locale, "admin.aiSummaries")}
+                                <span className="mt-0.5 block text-xs text-[var(--sn-muted)]">
+                                  {t(locale, "admin.aiSummariesHint")}
                                 </span>
                               </span>
                             </label>
@@ -2074,6 +2182,162 @@ export function AdminConsole({
             <div className="mt-6">
               <RunTable runs={runs} locale={locale} />
             </div>
+          </section>
+        ) : null}
+
+        {tab === "ai" ? (
+          <section>
+            <Caption>{t(locale, "admin.tabs.ai")}</Caption>
+            <p className="mt-2 text-sm text-[var(--sn-muted)]">{t(locale, "admin.aiHint")}</p>
+            {ai ? (
+              <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+                <div>
+                  <dt className="text-xs text-[var(--sn-muted)]">{t(locale, "admin.aiSpent")}</dt>
+                  <dd className="tabular-nums">${ai.spent_usd.toFixed(4)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-[var(--sn-muted)]">{t(locale, "admin.aiRemaining")}</dt>
+                  <dd className="tabular-nums">${ai.remaining_usd.toFixed(4)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-[var(--sn-muted)]">{t(locale, "admin.aiPeriod")}</dt>
+                  <dd>{ai.bucket}</dd>
+                </div>
+              </dl>
+            ) : null}
+            {ai && !ai.ledger_available ? (
+              <p role="alert" className="mt-2 text-sm font-medium text-[var(--sn-accent)]">
+                {t(locale, "admin.aiLedgerDown")}
+              </p>
+            ) : null}
+            {aiDraft && ai ? (
+              <form className="mt-4 grid gap-4" onSubmit={(event) => void saveAiSettings(event)}>
+                <label className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={aiDraft.enabled}
+                    onChange={(event) => setAiDraft({ ...aiDraft, enabled: event.target.checked })}
+                    className="mt-0.5 h-4 w-4"
+                  />
+                  <span>
+                    {t(locale, "admin.aiEnabled")}
+                    <span className="mt-0.5 block text-xs text-[var(--sn-muted)]">
+                      {t(locale, "admin.aiEnabledHint")}
+                    </span>
+                  </span>
+                </label>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <TextField
+                    name="ai-budget"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max="1000"
+                    label={t(locale, "admin.aiBudget")}
+                    hint={t(locale, "admin.aiEnvDefault", {
+                      value: String(ai.defaults.ai_monthly_budget_usd),
+                    })}
+                    value={aiDraft.budget}
+                    onChange={(event) => setAiDraft({ ...aiDraft, budget: event.target.value })}
+                  />
+                  <TextField
+                    name="ai-max-items"
+                    type="number"
+                    step="1"
+                    min="1"
+                    max="500"
+                    label={t(locale, "admin.aiMaxItems")}
+                    hint={t(locale, "admin.aiEnvDefault", {
+                      value: String(ai.defaults.ai_max_items_per_run),
+                    })}
+                    value={aiDraft.maxItems}
+                    onChange={(event) => setAiDraft({ ...aiDraft, maxItems: event.target.value })}
+                  />
+                </div>
+
+                <label className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={aiDraft.offpeakOnly}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, offpeakOnly: event.target.checked })
+                    }
+                    className="mt-0.5 h-4 w-4"
+                  />
+                  <span>
+                    {t(locale, "admin.aiOffpeak")}
+                    <span className="mt-0.5 block text-xs text-[var(--sn-muted)]">
+                      {t(locale, "admin.aiOffpeakHint")}
+                    </span>
+                  </span>
+                </label>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <TextField
+                    name="ai-windows"
+                    label={t(locale, "admin.aiWindows")}
+                    hint={t(locale, "admin.aiWindowsHint")}
+                    value={aiDraft.windows}
+                    onChange={(event) => setAiDraft({ ...aiDraft, windows: event.target.value })}
+                  />
+                  <TextField
+                    name="ai-days"
+                    label={t(locale, "admin.aiDays")}
+                    hint={t(locale, "admin.aiDaysHint")}
+                    value={aiDraft.days}
+                    onChange={(event) => setAiDraft({ ...aiDraft, days: event.target.value })}
+                  />
+                  <TextField
+                    name="ai-holidays"
+                    label={t(locale, "admin.aiHolidays")}
+                    hint={t(locale, "admin.aiHolidaysHint")}
+                    value={aiDraft.holidays}
+                    onChange={(event) => setAiDraft({ ...aiDraft, holidays: event.target.value })}
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button type="submit" disabled={busy === "ai:save"}>
+                    {busy === "ai:save" ? t(locale, "admin.saving") : t(locale, "admin.aiSave")}
+                  </Button>
+                  {confirming === "ai:reset" ? (
+                    <span className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        className={DESTRUCTIVE_BUTTON}
+                        onClick={() => void resetAiSettings()}
+                        disabled={busy === "ai:reset"}
+                      >
+                        {busy === "ai:reset"
+                          ? t(locale, "admin.saving")
+                          : t(locale, "admin.confirmDelete")}
+                      </button>
+                      <button
+                        type="button"
+                        className={QUIET_BUTTON}
+                        onClick={() => cancelConfirm("ai:reset")}
+                      >
+                        {t(locale, "admin.cancel")}
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className={QUIET_BUTTON}
+                      onClick={() => setConfirming("ai:reset")}
+                    >
+                      {t(locale, "admin.aiReset")}
+                    </button>
+                  )}
+                  {ai.overridden.length ? (
+                    <span className="text-xs text-[var(--sn-muted)]">
+                      {t(locale, "admin.aiOverridden", { keys: ai.overridden.join(", ") })}
+                    </span>
+                  ) : null}
+                </div>
+              </form>
+            ) : null}
           </section>
         ) : null}
 

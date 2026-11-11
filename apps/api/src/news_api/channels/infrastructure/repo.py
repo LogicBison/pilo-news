@@ -43,6 +43,12 @@ async def get_channel_by_id(industry_id: str, locale: str = "en") -> Channel | N
     return channel_from_row(row) if row else None
 
 
+async def count_enabled_channels() -> int:
+    """How many desks share the global AI ceiling."""
+    row = await fetch_one("SELECT count(*) AS total FROM industries WHERE enabled = TRUE")
+    return int(row["total"]) if row else 1
+
+
 async def channel_id_map() -> dict[str, str]:
     rows = await fetch_all("SELECT id, slug FROM industries")
     return {str(row["slug"]): str(row["id"]) for row in rows}
@@ -62,6 +68,7 @@ async def update_channel(
     fetch_interval_minutes: int | None = None,
     clear_fetch_interval: bool = False,
     auto_fetch_enabled: bool | None = None,
+    ai_summaries_enabled: bool | None = None,
     offers: dict[str, bool] | None = None,
 ) -> bool:
     import json
@@ -100,6 +107,9 @@ async def update_channel(
     if auto_fetch_enabled is not None:
         fields.append("auto_fetch_enabled = :auto_fetch_enabled")
         params["auto_fetch_enabled"] = auto_fetch_enabled
+    if ai_summaries_enabled is not None:
+        fields.append("ai_summaries_enabled = :ai_summaries_enabled")
+        params["ai_summaries_enabled"] = ai_summaries_enabled
     if offers is not None:
         fields.append("offers = CAST(:offers AS jsonb)")
         params["offers"] = json.dumps(offers)
@@ -226,6 +236,7 @@ async def create_channel(
     topics: list[dict[str, Any]],
     fetch_interval_minutes: int | None = None,
     auto_fetch_enabled: bool = True,
+    ai_summaries_enabled: bool = True,
     offers: dict[str, bool] | None = None,
 ) -> Channel | None:
     import json
@@ -237,12 +248,12 @@ async def create_channel(
                 INSERT INTO industries (
                     slug, code, name, theme, locales, disclaimers, cta, timezone,
                     retention_days, sort_order, enabled, fetch_interval_minutes,
-                    auto_fetch_enabled, offers
+                    auto_fetch_enabled, ai_summaries_enabled, offers
                 ) VALUES (
                     :slug, :code, :name, CAST(:theme AS jsonb), :locales,
                     CAST(:disclaimers AS jsonb), CAST(:cta AS jsonb), :timezone,
                     :retention_days, :sort_order, :enabled, :fetch_interval_minutes,
-                    :auto_fetch_enabled, CAST(:offers AS jsonb)
+                    :auto_fetch_enabled, :ai_summaries_enabled, CAST(:offers AS jsonb)
                 )
                 ON CONFLICT (slug) DO NOTHING
                 RETURNING id
@@ -262,6 +273,7 @@ async def create_channel(
                 "enabled": enabled,
                 "fetch_interval_minutes": fetch_interval_minutes,
                 "auto_fetch_enabled": auto_fetch_enabled,
+                "ai_summaries_enabled": ai_summaries_enabled,
                 "offers": json.dumps(offers or {}),
             },
         )

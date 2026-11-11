@@ -29,8 +29,12 @@
   "column_count": 3,
   "per_column": 4,
   "ai": {
-    "input_price_per_million": 0.27,
-    "output_price_per_million": 1.1,
-    "pricing_note": "assumption - reconcile with provider billing"
+    "input_price_per_million": 0.3,
+    "input_offpeak_price_per_million": 0.15,
+    "cache_hit_price_per_million": 0.006,
+    "cache_hit_offpeak_price_per_million": 0.003,
+    "output_price_per_million": 1.2,
+    "output_offpeak_price_per_million": 0.6,
+    "pricing_note": "deepseek-flash list price, USD per 1M tokens; peak Mon-Fri 01:00-04:00 and 06:00-10:00 UTC, off-peak is half. Checked 2026-11-11 against api-docs.deepseek.com/quick_start/pricing"
   }
 }

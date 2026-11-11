@@ -35,14 +35,25 @@ class Settings(BaseSettings):
     ai_model: str = "deepseek-flash"
     ai_api_key: str = ""
     ai_enabled: bool = True
-    ai_monthly_budget_usd: float = 20.0
+    # The global ceiling, in USD, for every provider call this stack makes
+    # (item summaries, desk briefs, picks, offer drafts). Default 1: the demo
+    # is a demo. Raise it deliberately.
+    ai_monthly_budget_usd: float = 1.0
     ai_max_items_per_run: int = 60
-    # DeepSeek is cheapest outside 08:30-16:30 UTC. With this on, no provider
-    # call happens in the peak window; a run there publishes without summaries
-    # and the next off-peak run backfills them.
+    # DeepSeek peak is Mon-Fri, 01:00-04:00 and 06:00-10:00 UTC; every other
+    # hour is half price. With this on, no provider call is made inside a peak
+    # window: the run publishes without summaries and the next cheap run
+    # backfills them.
     ai_offpeak_only: bool = False
-    ai_offpeak_start: str = "16:30"
-    ai_offpeak_end: str = "08:30"
+    ai_peak_windows: str = "01:00-04:00,06:00-10:00"
+    # ISO weekday numbers, Monday = 1.
+    ai_peak_days: str = "1,2,3,4,5"
+    # Provider holidays (YYYY-MM-DD, comma separated) are off-peak all day.
+    ai_peak_holidays: str = ""
+    # Log once when this share of the ceiling has been spent.
+    ai_budget_alert_ratio: float = 0.8
+    # Planning number used only to size a run's item allowance, not accounting.
+    ai_item_cost_estimate_usd: float = 0.00016
     ai_item_timeout_seconds: float = 120.0
     ai_desk_timeout_seconds: float = 45.0
     ai_picks_timeout_seconds: float = 60.0
@@ -70,12 +81,20 @@ class Settings(BaseSettings):
     # pester, short enough that a licence or a robots change is picked up.
     fetch_denied_cooldown_s: int = 7 * 24 * 60 * 60
 
-    @field_validator("ai_offpeak_start", "ai_offpeak_end")
+    @field_validator("ai_peak_windows")
     @classmethod
-    def _offpeak_is_hhmm(cls, value: str) -> str:
-        from news_api.platform.offpeak import parse_hhmm
+    def _peak_windows_are_hhmm(cls, value: str) -> str:
+        from news_api.platform.offpeak import parse_peak_windows
 
-        parse_hhmm(value)
+        parse_peak_windows(value)
+        return value
+
+    @field_validator("ai_peak_days")
+    @classmethod
+    def _peak_days_are_weekdays(cls, value: str) -> str:
+        from news_api.platform.offpeak import parse_peak_days
+
+        parse_peak_days(value)
         return value
 
     @field_validator("*", mode="before")
@@ -109,6 +128,9 @@ class Settings(BaseSettings):
         "fetch_cooldown_cap_s",
         "fetch_challenge_cooldown_s",
         "fetch_denied_cooldown_s",
+        "ai_peak_windows",
+        "ai_peak_days",
+        "ai_peak_holidays",
         mode="before",
     )
     @classmethod

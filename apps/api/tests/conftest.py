@@ -64,14 +64,16 @@ async def _truncate() -> None:
         await conn.execute(
             text(
                 "TRUNCATE TABLE articles, pins, refresh_runs, audit_events, leads, "
-                "lead_events, contact_messages, cta_events, api_keys, offer_issues CASCADE"
+                "lead_events, contact_messages, cta_events, api_keys, offer_issues, "
+                "platform_settings CASCADE"
             )
         )
         await conn.execute(text("UPDATE industries SET enabled = TRUE"))
         await conn.execute(
             text(
                 "UPDATE industries SET fetch_interval_minutes = NULL, "
-                "auto_fetch_enabled = TRUE, offers = '{}'::jsonb"
+                "auto_fetch_enabled = TRUE, ai_summaries_enabled = TRUE, "
+                "offers = '{}'::jsonb"
             )
         )
         await conn.execute(text("UPDATE partners SET status = 'active'"))
@@ -83,6 +85,9 @@ async def _truncate() -> None:
         await redis.flushdb()
     except Exception:
         pass
+    from news_api.platform import overrides
+
+    overrides.invalidate()
 
 
 @pytest.fixture

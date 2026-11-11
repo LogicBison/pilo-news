@@ -258,6 +258,7 @@ async def test_channel_cadence_and_offer_switches(client, admin_client) -> None:
         json={
             "fetch_interval_minutes": 60,
             "auto_fetch_enabled": False,
+            "ai_summaries_enabled": False,
             "offers": {"question": False, "brief": True, "asset": False},
         },
     )
@@ -266,6 +267,7 @@ async def test_channel_cadence_and_offer_switches(client, admin_client) -> None:
     assert data["fetch_interval_minutes"] == 60
     assert data["effective_fetch_interval_minutes"] == 60
     assert data["auto_fetch_enabled"] is False
+    assert data["ai_summaries_enabled"] is False
     assert data["offers"] == {
         "consultation": True,
         "brief": True,
@@ -283,10 +285,15 @@ async def test_channel_cadence_and_offer_switches(client, admin_client) -> None:
 
     cleared = await admin_client.patch(
         "/v1/admin/industries/legal",
-        json={"fetch_interval_minutes": None, "auto_fetch_enabled": True},
+        json={
+            "fetch_interval_minutes": None,
+            "auto_fetch_enabled": True,
+            "ai_summaries_enabled": True,
+        },
     )
     assert cleared.status_code == 200, cleared.text
     assert cleared.json()["data"]["fetch_interval_minutes"] is None
+    assert cleared.json()["data"]["ai_summaries_enabled"] is True
     assert cleared.json()["data"]["effective_fetch_interval_minutes"] == 720
 
     too_fast = await admin_client.patch(
@@ -379,3 +386,53 @@ async def test_admin_offer_list_and_dry_run(admin_client, monkeypatch) -> None:
 async def test_admin_offer_invalid_id_is_not_found(admin_client) -> None:
     response = await admin_client.get("/v1/admin/offers/not-a-uuid")
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_ai_settings_default_from_env_and_save_overrides(admin_client) -> None:
+    read = await admin_client.get("/v1/admin/ai")
+    assert read.status_code == 200, read.text
+    body = read.json()["data"]
+    assert body["defaults"]["ai_monthly_budget_usd"] == 1.0
+    assert body["values"]["ai_monthly_budget_usd"] == 1.0
+    assert body["overridden"] == []
+    assert "spent_usd" in body and "remaining_usd" in body
+
+    saved = await admin_client.patch(
+        "/v1/admin/ai",
+        json={
+            "ai_monthly_budget_usd": 0.5,
+            "ai_max_items_per_run": 9,
+            "ai_offpeak_only": True,
+        },
+    )
+    assert saved.status_code == 200, saved.text
+    data = saved.json()["data"]
+    assert data["values"]["ai_monthly_budget_usd"] == 0.5
+    assert data["values"]["ai_max_items_per_run"] == 9
+    assert data["values"]["ai_offpeak_only"] is True
+    assert set(data["overridden"]) == {
+        "ai_monthly_budget_usd",
+        "ai_max_items_per_run",
+        "ai_offpeak_only",
+    }
+    # The default is still the environment's, and it is still reported.
+    assert data["defaults"]["ai_monthly_budget_usd"] == 1.0
+
+    again = await admin_client.get("/v1/admin/ai")
+    assert again.json()["data"]["values"]["ai_monthly_budget_usd"] == 0.5
+
+    reset = await admin_client.patch("/v1/admin/ai", json={"reset": True})
+    assert reset.status_code == 200, reset.text
+    assert reset.json()["data"]["overridden"] == []
+    assert reset.json()["data"]["values"]["ai_monthly_budget_usd"] == 1.0
+
+
+@pytest.mark.asyncio
+async def test_ai_settings_reject_bad_values(admin_client) -> None:
+    bad_window = await admin_client.patch("/v1/admin/ai", json={"ai_peak_windows": "1-4"})
+    assert bad_window.status_code == 422
+    bad_budget = await admin_client.patch("/v1/admin/ai", json={"ai_monthly_budget_usd": 0})
+    assert bad_budget.status_code == 422
+    empty = await admin_client.patch("/v1/admin/ai", json={})
+    assert empty.status_code == 422

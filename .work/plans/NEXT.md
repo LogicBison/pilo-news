@@ -1,10 +1,122 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-10 (production deployed at e322788 — M15–M20 live)
+**Updated:** 2026-11-11 (M21 implemented, gates green, pushed)
 
 ---
 
-## Current iteration - Track C+D: fetch safety and content fixes (2026-11-09 → complete 2026-11-10)
+## Recommended next
+
+Run `@code-verify milestone` on **M21** (AI spend cap + per-channel switches + admin overrides), then deploy
+prd — it still runs the old `$20` env and build. After the deploy, set the ceiling from **admin → AI spend**.
+
+---
+
+## Current iteration - M21: AI spend cap and per-channel switches (2026-11-11 →)
+
+**Milestone ref:** `.work/plans/full/20261105-full-plan.md` §19 **M21** · owner instruction 2026-11-11
+**Status:** implemented 2026-11-11, gates green, formal `@code-verify` still to run · **Started:** 2026-11-11 · **Target:** one session
+
+### In scope
+
+- a hard, configurable global AI ceiling (`AI_MONTHLY_BUDGET_USD`, default **1**): reserve the worst case **before** the provider call, settle the provider-reported usage after it, keep the hold when the outcome is unknown, refuse to call when the ledger is unreadable;
+- the provider's real cheap window: peak is Mon–Fri 01:00–04:00 and 06:00–10:00 UTC, everything else is half price;
+- cache-hit aware pricing (`prompt_cache_hit_tokens` at the hit rate) and the output cap trimmed;
+- a budget-aware per-run item allowance so one desk cannot spend the month on day one;
+- per-channel `ai_summaries_enabled` (migration 021) and clearer `auto_fetch_enabled` copy in the admin console: stop new fetches, stop AI summaries, or both, without disabling the channel.
+
+### Out of scope (explicit)
+
+- provider balance polling / 402 auto-top-up;
+- a per-request cost ledger table (Redis counters + metrics stay);
+- per-channel AI budgets (the cap stays global);
+- changing what a story looks like when it has no summary (excerpt fallback already ships).
+
+### Tasks
+
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| M21-T1 | Migration 021: `industries.ai_summaries_enabled BOOLEAN NOT NULL DEFAULT TRUE` | `apps/api/migrations/021_channel_ai_switch.sql` | done 2026-11-11 |
+| M21-T2 | Channel domain/repo + admin API field, audit, conftest reset | `channels/domain/theme.py`, `channels/infrastructure/repo.py`, `editorial/http/industries.py`, `tests/conftest.py` | done 2026-11-11 |
+| M21-T3 | Budget ledger: reserve → call → settle, fail-closed, exhausted flag, cache-hit pricing | `articles/infrastructure/ai_budget.py`, `ai_client.py`, `config/scoring.json` | done 2026-11-11 |
+| M21-T4 | Peak calendar + budget-aware allowance + per-channel AI gate in ingest | `platform/offpeak.py`, `platform/settings.py`, `articles/application/ingest.py` | done 2026-11-11 |
+| M21-T5 | Admin console: fetch + AI switches, row state, EN/ES copy | `AdminConsole.tsx`, `messages/{en,es}.json` | done 2026-11-11 |
+| M21-T6 | Tests, env defaults, cost doc, gates | `tests/**`, `.env.*`, `docs/ai-cost.md` | done 2026-11-11 |
+| M21-T7 | Runtime override store + `/v1/admin/ai` (validated, audited, 5 s process cache) | `migrations/022_platform_settings.sql`, `platform/overrides.py`, `editorial/http/ai_settings.py`, `main.py`, `tests/integration/test_ai_overrides.py` | done 2026-11-11 |
+| M21-T8 | Admin "AI spend" tab: ceiling, items/run, off-peak, calendar, spend readout, reset | `AdminConsole.tsx`, `messages/{en,es}.json`, `e2e/admin.spec.ts` | done 2026-11-11 |
+
+### Acceptance criteria
+
+- [x] a call that would cross the ceiling is refused before it is sent; with Redis unreadable no provider call happens at all (`test_ai_budget.py`, 6 ledger tests);
+- [x] with `AI_OFFPEAK_ONLY=true`, calls are refused in 01:00–04:00 and 06:00–10:00 UTC Mon–Fri and allowed at 12:00 UTC (`test_offpeak.py`);
+- [x] cache-hit tokens are priced at the hit rate (a hit-heavy call costs less than the same call priced as a miss);
+- [x] the per-run item allowance never overcommits the remaining budget and never exceeds `AI_MAX_ITEMS_PER_RUN`;
+- [x] an admin can stop fetches and stop AI summaries independently per channel; both are audited; the channel keeps serving (`test_ingest.py`, `test_admin.py`);
+- [x] an admin change to the ceiling wins over `.env` within the cache TTL and without a restart; `reset` returns to `.env`; the API key and model remain env-only (`test_ai_overrides.py`, `test_admin.py`).
+
+### Validation steps
+
+- [x] api `ruff`/`format --check`/`mypy` clean · **277 passed** (was 233)
+- [x] web `lint`/`tsc`/`check` clean · 610 keys EN=ES · `pnpm build` RC=0
+- [x] migrations 021 + 022 applied (`applied: 1` each, total 22), re-run `applied: 0`
+- [x] `pnpm exec playwright test e2e/admin.spec.ts` → **8 passed** (1 flaky on retry: the contacts tab, unrelated)
+- [x] `touch-scope-verify` pass · `blast-radius` warn (high, all in scope, `.env.example` owner-approved 2026-11-11)
+
+### Owner blockers
+
+- none — the owner authorised the cap value (1) and the per-channel switches on 2026-11-11.
+
+### Concept / NFR registry (this iteration)
+
+| Concept | Applies | Status | Reason |
+|---------|---------|--------|--------|
+| MOD-01 coupling | no | n/a | no module boundary moves; one new infrastructure module in the AI context |
+| MOD-02 network cost | **yes** | done | budget-aware allowance + peak calendar cut provider calls and their price |
+| MOD-03 cost-model | **yes** | done | the billable unit is now reserved, settled and capped |
+| MOD-04 ops headcount | no | n/a | no new deployable or on-call surface |
+| MOD-05 modularity | no | n/a | no service boundary change |
+| MOD-06 ai-amplification | **yes** | done | agent-authored code — output below |
+| MOD-07 prompt architecture | no | n/a | prompts unchanged; only `max_tokens` and pricing |
+| MOD-08 declarative infra | no | n/a | no IaC change |
+
+### Cross-LLM verification
+
+Not run in this session; `@code-verify uncommitted` before commit.
+
+### Done this iteration
+
+| Task | Completed | Evidence |
+|------|-----------|----------|
+| M21-T1 | 2026-11-11 | migration 021 applied on start (`applied: 1`, total 21), second run `applied: 0` |
+| M21-T2 | 2026-11-11 | `channels` domain/repo carry the column; admin payload and audit list it; contract test asserts both directions |
+| M21-T3 | 2026-11-11 | `ai_budget.py`: Lua reserve/settle, 402 exhaustion, fail-closed; `ai_client` reserves worst case and settles reported usage with cache-hit split; 6 ledger tests + 2 pricing tests |
+| M21-T4 | 2026-11-11 | peak calendar rewritten to the published two-block weekday schedule; `allowance()` sizes the run from remaining budget, runs left and desk count; ingest gates on `ai_summaries_enabled` |
+| M21-T5 | 2026-11-11 | admin console: second checkbox under Automation, row state line, EN/ES copy; 587 keys both locales |
+| M21-T6 | 2026-11-11 | api 277 passed, ruff/format/mypy clean; web lint/tsc/check/build green; admin e2e 8/8; `docs/ai-cost.md`; env defaults to 1 |
+| M21-T7 | 2026-11-11 | `platform_settings` row read with a 5 s cache; `PATCH` validates calendar and ceiling, audits `ai.settings.update`; tests cover precedence, reset, a bad stored value and a hand-edited calendar that falls back to env |
+| M21-T8 | 2026-11-11 | "AI spend" tab shows spent/left/bucket and edits the seven values with `.env` defaults beside them; reset is a two-step confirm; e2e reads the panel |
+
+### MOD-06 output (2026-11-11, M21)
+
+## AI change risk summary
+- AI-assisted: yes
+- Boundaries crossed: 5 — articles infrastructure (provider + ledger) → articles application (ingest policy); channels domain/repo → editorial admin HTTP; platform settings/calendar → three consumers; editorial admin HTTP → articles ledger (read-only spend readout); apps/web admin UI → the admin API contract.
+- New cross-boundary deps: `ingest.py` → `channels/infrastructure/repo.count_enabled_channels` (same repo it already imported `get_channel` from); `ai_client` → `ai_budget` → `platform.cache`/`config`; `ai_client` → `platform.overrides` → `platform.db`; `ai_settings.py` (editorial) → `ai_budget` read-only; `AdminConsole` → two admin payloads. One new table (`platform_settings`), no new service or secret store.
+- Test isolation: ok — ledger: `tests/integration/test_ai_budget.py` (fails only if reserve/settle/exhaustion breaks); calendar: `tests/unit/test_offpeak.py`; channel gate: `tests/integration/test_ingest.py::test_channel_ai_switch_*` (fails only if the desk switch is ignored); contract: `tests/contract/test_admin.py::test_channel_cadence_and_offer_switches`.
+- Human architectural review: required — reason: >1 hard boundary, and the money path is the one to read closely (`_chat` reserve/settle ordering, the 402 branch, and the fail-closed branch in `_reserve`).
+- Blast radius: if the reservation is wrong the desks stop summarising (visible, reversible by env); if the settle path leaks a hold, the month's headroom silently shrinks until the key expires; if the peak calendar is inverted, spend doubles but the cap still holds; if an override is wrong every desk inherits it within 5 s (the panel shows the env default next to it, and reset is one confirm); if a migration is wrong the API cannot start. No reader-facing route, data shape or PII surface changed; the site keeps serving with excerpts either way.
+
+## Recommendation
+merge_with_conditions — reason: gates green (api 270, web build RC=0, admin e2e 7/7, migration re-run clean) and every risky path has a test, but the diff crosses four boundaries and touches the money path, which MOD-06 routes to human review rather than self-approval.
+
+## Conditions if merge_with_conditions
+- Human read of `ai_client._chat` (reserve → call → settle, the 402 and unknown-outcome branches) and `ai_budget.RESERVE_SCRIPT` before deploy.
+- Operator confirms `.env.example` (protected surface) may carry the new peak keys and the 1 default — done in this session on the owner's 2026-11-11 "proceed with everything" instruction; flag it if that reading is wrong.
+- prd host: update `.env.prd` and recreate `api` + `worker` before the next scheduled run, or the old $20 ceiling stays live.
+- Residual: `AI_ITEM_COST_ESTIMATE_USD` is a planning number (`estimated`, not measured); the allowance self-corrects as real spend lands, but the first run after a ceiling change may trim harder than needed.
+
+---
+
+## Completed iteration - Track C+D: fetch safety and content fixes (2026-11-09 → complete 2026-11-10)
 
 **Milestone ref:** `.work/plans/20261109-next-improvement.md` Tracks C + D · full plan §19 **M16** · spec `.work/features/fetch-safety/20261109-SPEC.md` (**Implemented**)
 **Status:** complete 2026-11-10 · **Started:** 2026-11-09 · **Scope delivered:** C0–C8 + D1–D5, D7–D10

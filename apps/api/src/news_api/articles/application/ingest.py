@@ -26,7 +26,7 @@ from news_api.articles.infrastructure.repo import (
     update_run,
     upsert_article,
 )
-from news_api.channels.infrastructure.repo import get_channel
+from news_api.channels.infrastructure.repo import count_enabled_channels, get_channel
 from news_api.platform.cache import get_json, set_json, single_flight
 from news_api.platform.clock import hours_ago, now_iso
 from news_api.platform.config import prompt_table, scoring_config, seed_config
@@ -157,6 +157,7 @@ async def run_ingest(
         "rate_limited": 0,
         "robots_disallowed": 0,
         "denied": 0,
+        "summary_budget": 0,
         "blocked_hosts": [],
         "per_language": {},
     }
@@ -241,8 +242,23 @@ async def run_ingest(
                 pools.setdefault(candidate.language, []).append(candidate)
 
             ai = AIClient()
-            ai_available = ai.available()
-            summary_budget = settings.ai_max_items_per_run if ai_available else 0
+            # Two independent switches: the deployment (AI_ENABLED, key, peak
+            # window) and the desk (ai_summaries_enabled). Either can say no.
+            configured = await ai.available()
+            ai_available = configured and channel.ai_summaries_enabled
+            if configured and not channel.ai_summaries_enabled:
+                log.info("ingest.ai_summaries_disabled", industry=industry_slug)
+            summary_budget = (
+                await ai.allowance(
+                    interval_minutes=channel.effective_fetch_interval(
+                        settings.refresh_interval_minutes
+                    ),
+                    desks=await count_enabled_channels(),
+                )
+                if ai_available
+                else 0
+            )
+            stats["summary_budget"] = summary_budget
             summarized = 0
             language_stats: dict[str, dict[str, int]] = {}
 

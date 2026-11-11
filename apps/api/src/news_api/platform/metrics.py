@@ -64,6 +64,8 @@ SUMMARIES = _counter("summaries_generated_total", "AI summaries", ("language", "
 SUMMARY_LATENCY = _histogram("summary_latency_seconds", "Summary latency", ("locale",))
 AI_TOKENS = _counter("ai_tokens_total", "AI tokens", ("model", "direction"))
 AI_COST = _counter("ai_estimated_cost_usd_total", "Estimated AI cost", ("model",))
+AI_BUDGET_SPENT = _gauge("ai_budget_spent_usd", "AI spend booked this budget period")
+AI_BUDGET_REMAINING = _gauge("ai_budget_remaining_usd", "AI budget left this period")
 
 NEWS_READS = _counter("news_reads_total", "News reads", ("industry", "endpoint", "language"))
 REFRESH_MANUAL = _counter("refresh_manual_total", "Manual refreshes", ("industry",))

@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
 from news_api.channels.http.routes import router as industries_router
+from news_api.editorial.http.ai_settings import router as ai_settings_router
 from news_api.editorial.http.api_keys import router as api_keys_router
 from news_api.editorial.http.audit import router as audit_router
 from news_api.editorial.http.auth import router as auth_router
@@ -154,6 +155,7 @@ app.include_router(refresh_router)
 app.include_router(api_keys_router)
 app.include_router(audit_router)
 app.include_router(admin_industries_router)
+app.include_router(ai_settings_router)
 app.include_router(admin_leads_router)
 app.include_router(admin_contacts_router)
 app.include_router(funnel_router)

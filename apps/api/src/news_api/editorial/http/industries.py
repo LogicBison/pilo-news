@@ -48,6 +48,7 @@ class IndustryCreate(BaseModel):
     enabled: bool = True
     fetch_interval_minutes: int | None = Field(default=None, ge=5, le=1440)
     auto_fetch_enabled: bool = True
+    ai_summaries_enabled: bool = True
     offers: dict[str, bool] | None = None
     topics: list[TopicSeed] = Field(default_factory=list)
 
@@ -59,6 +60,7 @@ class IndustryUpdate(BaseModel):
     retention_days: int | None = Field(default=None, ge=1, le=90)
     fetch_interval_minutes: int | None = Field(default=None, ge=5, le=1440)
     auto_fetch_enabled: bool | None = None
+    ai_summaries_enabled: bool | None = None
     offers: dict[str, bool] | None = None
 
 
@@ -82,6 +84,7 @@ def admin_channel(channel: Any) -> dict[str, Any]:
         "sort_order": channel.sort_order,
         "fetch_interval_minutes": channel.fetch_interval_minutes,
         "auto_fetch_enabled": channel.auto_fetch_enabled,
+        "ai_summaries_enabled": channel.ai_summaries_enabled,
         "effective_fetch_interval_minutes": channel.effective_fetch_interval(default_interval),
     }
 
@@ -149,6 +152,7 @@ async def create_industry(payload: IndustryCreate, request: Request) -> Any:
         topics=[topic.model_dump() for topic in payload.topics],
         fetch_interval_minutes=payload.fetch_interval_minutes,
         auto_fetch_enabled=payload.auto_fetch_enabled,
+        ai_summaries_enabled=payload.ai_summaries_enabled,
         offers=offers,
     )
     if not channel:
@@ -201,6 +205,7 @@ async def update_industry(slug: str, payload: IndustryUpdate, request: Request) 
         fetch_interval_minutes=fetch_interval_minutes,
         clear_fetch_interval=clear_fetch_interval,
         auto_fetch_enabled=payload.auto_fetch_enabled,
+        ai_summaries_enabled=payload.ai_summaries_enabled,
         offers=offers,
     )
     updated = await channels_repo.get_channel(slug, enabled_only=False)
@@ -219,6 +224,7 @@ async def update_industry(slug: str, payload: IndustryUpdate, request: Request) 
                     "retention_days",
                     "fetch_interval_minutes",
                     "auto_fetch_enabled",
+                    "ai_summaries_enabled",
                     "offers",
                 )
                 if key in payload_fields
