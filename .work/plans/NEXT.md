@@ -1,20 +1,21 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-11 (M21 implemented, gates green, pushed)
+**Updated:** 2026-11-11 (M21 complete, deployed to prd as `b7d3506`)
 
 ---
 
 ## Recommended next
 
-Run `@code-verify milestone` on **M21** (AI spend cap + per-channel switches + admin overrides), then deploy
-prd — it still runs the old `$20` env and build. After the deploy, set the ceiling from **admin → AI spend**.
+No further milestone is defined in §19 — M21 was the last. Operator lane: confirm the live ceiling (admin → AI spend;
+prd runs `1`), and the dev-only `@env-sync apply` cleanup (`.env.dev` still `layout 38`). To open new work, `@plan-master revise - M22`.
 
 ---
 
-## Current iteration - M21: AI spend cap and per-channel switches (2026-11-11 →)
+## Completed iteration - M21: AI spend cap and per-channel switches (2026-11-11 → complete 2026-11-11)
 
 **Milestone ref:** `.work/plans/full/20261105-full-plan.md` §19 **M21** · owner instruction 2026-11-11
-**Status:** implemented 2026-11-11, gates green, formal `@code-verify` still to run · **Started:** 2026-11-11 · **Target:** one session
+**Status:** **complete 2026-11-11** · `@code-verify milestone` **pass with gaps** (M3 review gap waived by the owner) · deployed to prd as `b7d3506` · **Started:** 2026-11-11 · 8/8 tasks
+**Doc gap:** no bounded-context SPEC for M21 — the contract is full plan §19 + `docs/ai-cost.md`; write one if AI-cost work continues.
 
 ### In scope
 
@@ -80,7 +81,7 @@ prd — it still runs the old `$20` env and build. After the deploy, set the cei
 
 ### Cross-LLM verification
 
-Not run in this session; `@code-verify uncommitted` before commit.
+Not run — single-model session. `@code-verify milestone` (2026-11-11) recorded the missing money-path review as the M3 gap; the owner waived it in the `@code-implementation complete - M21` invocation. No named architect review is on record.
 
 ### Done this iteration
 
@@ -601,6 +602,7 @@ merge_with_conditions — reason: gates green (lint, tsc, check, build RC=0, Pla
 
 | Item | Artifact |
 |------|----------|
+| AI spend cap + per-channel switches (M21) | reserve/settle ledger (`ai_budget.py`), real peak calendar, cache-hit pricing, budget-aware allowance, per-channel `ai_summaries_enabled` (021), admin "AI spend" tab + `/v1/admin/ai` runtime overrides (022), `docs/ai-cost.md`; verified 277 api tests, deployed to prd `b7d3506` |
 | Source availability (M17) | permission ledger, `denied`/`challenge` outcomes, licensed-feed auth, availability gate, `/bot` allowlist block |
 | Source acquisition (M18) | `sources discover` + overlap, licence/outreach register, `/go` click counting, portfolio health |
 | Acquisition pipeline (M19) | candidate queue, per-source fetch history, robots-change warning, OPML round-trip, language gaps |

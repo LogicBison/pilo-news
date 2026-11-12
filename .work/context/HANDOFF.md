@@ -2,7 +2,9 @@
 
 ## Session status
 
-**Closed:** 2026-11-11 — M21: the AI ceiling is a ledger, not a check, and every cost knob is an admin override. `AI_MONTHLY_BUDGET_USD` defaults to **1**; each provider call reserves its worst case at peak rates before it is sent, then settles the reported usage (cache hits priced as hits). A timeout or an unparsable 200 keeps the hold, an unreadable Redis denies the call, a provider 402 stops the month. The peak calendar was wrong in both directions — the code bought 01:00–04:00 and 06:00–08:30 UTC at double rate while blocking the cheap 10:00–16:30 — and now follows the published Mon–Fri 01:00–04:00 / 06:00–10:00 schedule, configurable. Each run may summarise `remaining × 0.8 ÷ (runs left × desks)` items, capped by `AI_MAX_ITEMS_PER_RUN`; output caps trimmed. Per-channel `ai_summaries_enabled` (migration **021**) joins `auto_fetch_enabled`, so an operator can stop fetches, stop AI, or both without disabling the desk; the console's **AI spend** tab edits the seven cost values (migration **022** `platform_settings`), which override `.env` within 5 s without a restart, validate on write, audit as `ai.settings.update`, and reset to `.env`. The API key, base URL and model stay env-only. Gates: api **277 passed**, ruff/format/mypy clean; web lint/tsc/check **610 keys** EN=ES, build RC=0; admin e2e **8/8** (1 flaky retry, contacts tab); migrations 021+022 applied then re-run 0; touch-scope pass, blast-radius warn (high, all declared); readiness honest; traceability 17/17. Pushed 2026-11-11. **Not done:** prd still runs the old env and build — deploy, then set the ceiling from `/admin`; `@env-sync apply` is still pending (layout 38 per target, and the Caddy comment block must move into `.env.example` first); monthly-reset vs lifetime ceiling unanswered.
+**Closed:** 2026-11-11 (later session) — M21 verified, completed and deployed. `@code-verify milestone` returned **pass with gaps** (277 api tests, ruff/mypy clean, web 610 keys EN=ES, MOD-06 output validated, 33/33 files in declared scope, migrations 021+022 idempotent); the money-path review (**M3**) was **waived by the owner, not performed** — no named architect review exists. prd runs **`b7d3506`** with `AI_MONTHLY_BUDGET_USD=1`, the corrected peak calendar, per-channel AI switches and the admin "AI spend" overrides. `@env-sync` state: prd key-aligned, `.env.dev` still `layout 38`.
+
+**Closed:** 2026-11-11 — M21: the AI ceiling is a ledger, not a check, and every cost knob is an admin override. `AI_MONTHLY_BUDGET_USD` defaults to **1**; each provider call reserves its worst case at peak rates before it is sent, then settles the reported usage (cache hits priced as hits). A timeout or an unparsable 200 keeps the hold, an unreadable Redis denies the call, a provider 402 stops the month. The peak calendar was wrong in both directions — the code bought 01:00–04:00 and 06:00–08:30 UTC at double rate while blocking the cheap 10:00–16:30 — and now follows the published Mon–Fri 01:00–04:00 / 06:00–10:00 schedule, configurable. Each run may summarise `remaining × 0.8 ÷ (runs left × desks)` items, capped by `AI_MAX_ITEMS_PER_RUN`; output caps trimmed. Per-channel `ai_summaries_enabled` (migration **021**) joins `auto_fetch_enabled`, so an operator can stop fetches, stop AI, or both without disabling the desk; the console's **AI spend** tab edits the seven cost values (migration **022** `platform_settings`), which override `.env` within 5 s without a restart, validate on write, audit as `ai.settings.update`, and reset to `.env`. The API key, base URL and model stay env-only. Gates: api **277 passed**, ruff/format/mypy clean; web lint/tsc/check **610 keys** EN=ES, build RC=0; admin e2e **8/8** (1 flaky retry, contacts tab); migrations 021+022 applied then re-run 0; touch-scope pass, blast-radius warn (high, all declared); readiness honest; traceability 17/17. Pushed 2026-11-11. **Done 2026-11-11:** prd now runs `b7d3506` with `AI_MONTHLY_BUDGET_USD=1` (deploy record below); the ceiling can be raised from `/admin`; `@env-sync apply` is now dev-only (`.env.dev` `layout 38`; prd `layout 10`, comments only); monthly-reset vs lifetime ceiling unanswered.
 
 **Post-close — production deployed (2026-11-10):** prd runs **`e322788`** and is live on https. The first `up` failed because `LOG_SLOW_REQUEST_MS=` (empty, materialised by env-sync) is not a valid int: the API could not import and the stack never started. The host was patched, and the durable guard (blank non-string setting = default) is now deployed — proved in the running container with `LOG_SLOW_REQUEST_MS=` and `METRICS_ENABLED=` empty: `slow_ms 1000 metrics True`. The worker's inherited `:8080` healthcheck is disabled. Migrations **017–020** applied (20 total), `certs --check` covers every host, `hosts` all pass, apex/channel/bot/favicon 200, `/v1/outbound` 302. DeepSeek is now off-peak only on prd (`AI_OFFPEAK_ONLY=true`, window 16:30–08:30 UTC) — verified in the running container: allowed at 18:05 UTC, blocked at a simulated 12:00 UTC. A peak-window refresh still fetches and publishes, but buys no summaries; items still in the feed are summarised by the next off-peak run. Known limit: an item that leaves the feed before an off-peak run stays summary-less until a reset or backfill pass. One nginx hiccup: the docs' old hint linked `/etc/nginx/sites-enabled/system-news` at the sites *directory*, and `include sites-enabled/*` fails on a directory (`pread ... Is a directory`). The bad symlink was removed (the correct `system-news.conf` include was already there), nginx reloaded, and the hint in `bin/start.sh` + `docs/domains.md` now writes that one-line include file instead.
 
@@ -58,6 +60,27 @@ and a browser save/restore check against the dev API. SPEC:
 **Prior session (closed 2026-11-05):** lead-generation offer rungs built after the UI close: ask-one-question and gated-asset leads (migration 010), funnel read-out + admin tab, UTM capture, briefs archive, topic hubs, disposable-domain rejection; plus the biz offer brief and the product-feasibility verification. 108 API tests; 57 e2e / 1 skipped on a production build; axe 0 violations on 11 URLs; build + lint + typecheck + check green.
 
 **Prior session (closed 2026-11-05, earlier):** SPEC approvals, a11y milestone audit (+F1/F2), S0 catalog primitives, photographic bands on all ten channels. Then the earlier close: editorial-conversion v2 + ten channels + inventory/QA gates. 108 API tests; 57 e2e / 1 skipped; 40/40 layout; axe 11/11; 80 pages; 10/10 contrast. Ten SPECs in `Review`; visual verify **pass with gaps**.
+
+## Cross-framework action (@x-director)
+
+**Date:** 2026-11-11
+**Request:** "I have updated .env.prd, can you update the .env.prd in production and refresh production's deployment?"
+**Frameworks involved:** .ai
+**Classified bucket(s):** engineering
+**Routing confidence:** high
+**Preflight (frameworks installed):** .ai yes | .ai.ui yes | .ai.biz yes | .ai.soc yes | .ai.cto yes | .ai.flutter yes | .ai.mlt yes
+**Executed:**
+1. Host `.env.prd` backed up as `.env.prd.bak-20261111-1805` (old sha `e4d76d…`, 118 lines), replaced with the reviewed local file (sha `fca88b…`, 124 lines, mode 600).
+2. `/srv/system-news` pulled `4dd0c1a` → `b7d3506` (fast-forward, clean tree).
+3. `./bin/start.sh --env prd up` rebuilt and recreated api/worker/web; **RC 0**.
+4. Migrations **021 + 022** applied on start (`applied: 2, total: 22`); a second `migrate` run reports `applied: 0, total: 22`.
+5. Verified: api healthy (`db/redis/migrations` all true), settings resolve `budget 1.0 · items 60 · offpeak_only True · windows 01:00-04:00,06:00-10:00 · days 1-5 · pacing shadow · bot HeraldFoxBot`; https 200 on `/`, `/es`, `/admin`, `legal.`, `financial.`; `hosts` contract all pass; `/v1/admin/ai` returns 401 (present and gated).
+**User correction:** none
+**Coordination notes:** the deployed env drops `AI_OFFPEAK_START`/`AI_OFFPEAK_END` (dead keys at both commits) and gains `AI_PEAK_WINDOWS`/`AI_PEAK_DAYS`/`AI_PEAK_HOLIDAYS`; the M21 empty-env guard shipped in the same commit, so blank non-string keys are safe at startup.
+**Blockers:** none
+**Next recommended:** `@code-verify milestone - M21`; raise the ceiling from admin → AI spend if `1` is not the live intent.
+
+---
 
 ## Fresh start - what the next session should do first
 
@@ -227,6 +250,7 @@ Not verified: production HTTPS after the duplicate-directive fix (`nginx -t`, re
 
 | Date | Session | Artifacts |
 |------|---------|-----------|
+| 2026-11-11 | **M21 complete (verified + deployed)** | `ai_budget.py` (atomic reserve/settle, fail-closed, cache-hit pricing), `offpeak.py` (two published peak blocks), budget-aware allowance in `ai_client.py`/`ingest.py`, per-channel `ai_summaries_enabled` (migration **021**), `/v1/admin/ai` + `platform/overrides.py` (migration **022**, 5 s cache, audited), admin "AI spend" tab, `docs/ai-cost.md`; `@code-verify milestone` **pass with gaps** (277 api tests, web 610 keys, MOD-06 output validated; M3 review gap waived by owner); deployed to prd as **`b7d3506`** |
 | 2026-11-09 | **M15 brand surfaces (complete)** | `apps/web/public/brand/{heraldfox-emblem,heraldfox-lockup,icon-tile}.png`; `apps/web/src/app/{favicon.ico,icon.png,apple-icon.png}` (file-based metadata); `components/lobby/shell.tsx` + `lobby.css` masthead/footer marks (32/28/24 px, `.lb-brand-mark` retired); `e2e/accessibility.spec.ts` brand assertions; `middleware.ts` matcher excludes `brand/`, `icon.png`, `apple-icon.png`; "HeraldFox" one word in `messages/{en,es}.json`, `bin/start.sh`, `apps/api/tests/unit/test_notify.py`; full plan **v1.7** (M15 T1..T7 done), NEXT iteration closed with MOD-06 code output |
 | 2026-11-09 | plan-drift fixes (@x-director) | full plan **v1.6** (missing `M15-T8` row added, G1 → `M15-T1..T8`); brand-assets plan corrected (decision-1 header, tracked-art claim, `convert` + `-fuzz 2%` derivation, lockup 1265×921); NEXT gained the plan-verification block and the MOD-06 output; HANDOFF + HANDOFF_UI x-director records |
 | 2026-11-09 | responsive fix (M15-T8) | lobby desk board kept three columns (languages column dropped by the owner) and stopped clipping its last column at 1024-1440 px; masthead wraps under 720 px so a 390 px document no longer scrolls sideways; regression test in `e2e/lobby.spec.ts` |
@@ -376,10 +400,12 @@ lead dashboards/alerts. UI foundation and biz strategy docs remain in
 
 ## Next action
 
-Production is deployed at **`e322788`**: https, TLS covering every host, migrations 017–020,
-the blank-env guard proved live, worker check disabled, `hosts` all pass. No agent work is
-open. Operator lane: `FETCH_PACING=shadow` for one week (already set on prd), **O15**
-`SMTP_FROM`, and the D-trial read of the next natural refresh.
+**M21 is complete and live.** prd runs **`b7d3506`**: https on every host, migrations 017–022,
+`AI_MONTHLY_BUDGET_USD=1`, the corrected peak calendar, per-channel AI switches and the admin
+"AI spend" overrides. No milestone beyond M21 exists in §19; the agent lane is empty.
+Operator lane: confirm the live ceiling from admin → AI spend, **O15** `SMTP_FROM`, and the
+dev-only `@env-sync apply` (`.env.dev` still `layout 38`). Verifier gap on record: the
+money-path review (M3) was waived, not performed — no named architect review exists.
 
 ## Cross-framework action (@x-director)
 
