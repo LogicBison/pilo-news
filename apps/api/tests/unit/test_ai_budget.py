@@ -66,32 +66,25 @@ def test_the_peak_calendar_agrees_with_the_helper() -> None:
 
 
 def test_no_money_means_no_items() -> None:
-    assert (
-        ai_budget.allowance(remaining_usd=0.0, runs_left=10, item_cost_usd=0.00016, maximum=60) == 0
-    )
+    assert ai_budget.allowance(remaining=0.0, runs_left=10, item_cost=0.00016, maximum=60) == 0
 
 
 def test_the_allowance_never_exceeds_the_configured_maximum() -> None:
-    assert (
-        ai_budget.allowance(remaining_usd=100.0, runs_left=1, item_cost_usd=0.0001, maximum=60)
-        == 60
-    )
+    assert ai_budget.allowance(remaining=100.0, runs_left=1, item_cost=0.0001, maximum=60) == 60
 
 
 def test_a_runs_allowance_never_overcommits_the_remaining_budget() -> None:
     cost = 0.00016
-    first_day = ai_budget.allowance(
-        remaining_usd=1.0, runs_left=660, item_cost_usd=cost, maximum=60
-    )
-    late = ai_budget.allowance(remaining_usd=0.05, runs_left=22, item_cost_usd=cost, maximum=60)
+    first_day = ai_budget.allowance(remaining=1.0, runs_left=660, item_cost=cost, maximum=60)
+    late = ai_budget.allowance(remaining=0.05, runs_left=22, item_cost=cost, maximum=60)
     assert 0 < first_day <= 60
     assert first_day * 660 * cost <= 1.0
     assert late * 22 * cost <= 0.05
 
 
 def test_a_cheap_item_buys_more_than_an_expensive_one() -> None:
-    cheap = ai_budget.allowance(remaining_usd=1.0, runs_left=100, item_cost_usd=0.0001, maximum=60)
-    dear = ai_budget.allowance(remaining_usd=1.0, runs_left=100, item_cost_usd=0.001, maximum=60)
+    cheap = ai_budget.allowance(remaining=1.0, runs_left=100, item_cost=0.0001, maximum=60)
+    dear = ai_budget.allowance(remaining=1.0, runs_left=100, item_cost=0.001, maximum=60)
     assert cheap >= dear
 
 

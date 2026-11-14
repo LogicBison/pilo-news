@@ -29,8 +29,15 @@ CACHE_SECONDS = 5.0
 
 OVERRIDABLE: tuple[str, ...] = (
     "ai_enabled",
+    "ai_daily_token_limit",
+    "ai_monthly_token_limit",
+    "ai_daily_request_limit",
+    "ai_monthly_request_limit",
+    "ai_daily_budget_usd",
     "ai_monthly_budget_usd",
     "ai_max_items_per_run",
+    "ai_desks_per_tick",
+    "ai_rotation_minutes",
     "ai_offpeak_only",
     "ai_peak_windows",
     "ai_peak_days",
@@ -45,6 +52,22 @@ def invalidate() -> None:
     """Forget the cached row (the writer calls this; others wait for the TTL)."""
     global _cached_at
     _cached_at = 0.0
+
+
+async def effective_int(key: str, default: int) -> int:
+    """One overridable integer, falling back to ``default`` when unusable.
+
+    For callers outside the AI client - the scheduler paces itself by these
+    values - that should not have to build an ``AIConfig`` to read one knob.
+    """
+    value = (await load()).get(key)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        log.warning("settings.override_ignored", key=key, value=str(value)[:40])
+        return default
 
 
 async def load() -> dict[str, Any]:

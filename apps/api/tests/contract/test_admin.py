@@ -390,34 +390,55 @@ async def test_admin_offer_invalid_id_is_not_found(admin_client) -> None:
 
 @pytest.mark.asyncio
 async def test_ai_settings_default_from_env_and_save_overrides(admin_client) -> None:
+    from news_api.platform.settings import get_settings
+
+    env = get_settings()
     read = await admin_client.get("/v1/admin/ai")
     assert read.status_code == 200, read.text
     body = read.json()["data"]
-    assert body["defaults"]["ai_monthly_budget_usd"] == 1.0
-    assert body["values"]["ai_monthly_budget_usd"] == 1.0
+    assert body["defaults"]["ai_monthly_budget_usd"] == env.ai_monthly_budget_usd
+    assert body["values"]["ai_monthly_budget_usd"] == env.ai_monthly_budget_usd
     assert body["overridden"] == []
     assert "spent_usd" in body and "remaining_usd" in body
+    # Every cap is reported for both buckets, so the panel can show what binds.
+    for period in ("day", "month"):
+        limits = body["ledger"][period]["limits"]
+        assert set(limits) == {"requests", "tokens", "usd"}
+        assert set(body["ledger"][period]["remaining"]) == {"requests", "tokens", "usd"}
+    assert body["ledger"]["day"]["limits"]["tokens"] == env.ai_daily_token_limit
+    assert body["ledger"]["month"]["limits"]["tokens"] == env.ai_monthly_token_limit
+    assert body["halted_reason"] is None
 
     saved = await admin_client.patch(
         "/v1/admin/ai",
         json={
             "ai_monthly_budget_usd": 0.5,
+            "ai_daily_budget_usd": 0.25,
+            "ai_daily_token_limit": 5_000,
             "ai_max_items_per_run": 9,
+            "ai_desks_per_tick": 3,
             "ai_offpeak_only": True,
         },
     )
     assert saved.status_code == 200, saved.text
     data = saved.json()["data"]
     assert data["values"]["ai_monthly_budget_usd"] == 0.5
+    assert data["values"]["ai_daily_budget_usd"] == 0.25
+    assert data["values"]["ai_daily_token_limit"] == 5_000
     assert data["values"]["ai_max_items_per_run"] == 9
+    assert data["values"]["ai_desks_per_tick"] == 3
     assert data["values"]["ai_offpeak_only"] is True
     assert set(data["overridden"]) == {
         "ai_monthly_budget_usd",
+        "ai_daily_budget_usd",
+        "ai_daily_token_limit",
         "ai_max_items_per_run",
+        "ai_desks_per_tick",
         "ai_offpeak_only",
     }
     # The default is still the environment's, and it is still reported.
-    assert data["defaults"]["ai_monthly_budget_usd"] == 1.0
+    assert data["defaults"]["ai_monthly_budget_usd"] == env.ai_monthly_budget_usd
+    assert data["ledger"]["day"]["limits"]["tokens"] == 5_000
 
     again = await admin_client.get("/v1/admin/ai")
     assert again.json()["data"]["values"]["ai_monthly_budget_usd"] == 0.5
@@ -425,7 +446,7 @@ async def test_ai_settings_default_from_env_and_save_overrides(admin_client) -> 
     reset = await admin_client.patch("/v1/admin/ai", json={"reset": True})
     assert reset.status_code == 200, reset.text
     assert reset.json()["data"]["overridden"] == []
-    assert reset.json()["data"]["values"]["ai_monthly_budget_usd"] == 1.0
+    assert reset.json()["data"]["values"]["ai_monthly_budget_usd"] == env.ai_monthly_budget_usd
 
 
 @pytest.mark.asyncio
@@ -436,3 +457,25 @@ async def test_ai_settings_reject_bad_values(admin_client) -> None:
     assert bad_budget.status_code == 422
     empty = await admin_client.patch("/v1/admin/ai", json={})
     assert empty.status_code == 422
+    # A day cap above the month cap would make the daily knob decorative.
+    inverted = await admin_client.patch("/v1/admin/ai", json={"ai_daily_token_limit": 10_000_000})
+    assert inverted.status_code == 422
+    assert "ai_monthly_token_limit" in inverted.text
+
+
+@pytest.mark.asyncio
+async def test_a_halt_is_reported_and_only_an_operator_clears_it(admin_client) -> None:
+    from news_api.articles.infrastructure import ai_budget
+
+    await ai_budget.halt("auth_401")
+    read = await admin_client.get("/v1/admin/ai")
+    assert read.json()["data"]["halted_reason"] == "auth_401"
+
+    resumed = await admin_client.post("/v1/admin/ai/resume")
+    assert resumed.status_code == 200, resumed.text
+    assert resumed.json()["data"]["halted_reason"] is None
+
+    audit = await admin_client.get("/v1/admin/audit?action=ai.halt.resume")
+    assert audit.status_code == 200
+    entries = audit.json()["data"]
+    assert entries and entries[0]["payload"]["cleared"] == "auth_401"

@@ -66,6 +66,10 @@ AI_TOKENS = _counter("ai_tokens_total", "AI tokens", ("model", "direction"))
 AI_COST = _counter("ai_estimated_cost_usd_total", "Estimated AI cost", ("model",))
 AI_BUDGET_SPENT = _gauge("ai_budget_spent_usd", "AI spend booked this budget period")
 AI_BUDGET_REMAINING = _gauge("ai_budget_remaining_usd", "AI budget left this period")
+AI_LIMIT_REMAINING = _gauge(
+    "ai_limit_remaining", "AI headroom left in a bucket", ("dimension", "period")
+)
+AI_DENIED = _counter("ai_denied_total", "Provider calls refused by a limit", ("reason",))
 
 NEWS_READS = _counter("news_reads_total", "News reads", ("industry", "endpoint", "language"))
 REFRESH_MANUAL = _counter("refresh_manual_total", "Manual refreshes", ("industry",))

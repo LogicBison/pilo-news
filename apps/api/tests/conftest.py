@@ -65,7 +65,7 @@ async def _truncate() -> None:
             text(
                 "TRUNCATE TABLE articles, pins, refresh_runs, audit_events, leads, "
                 "lead_events, contact_messages, cta_events, api_keys, offer_issues, "
-                "platform_settings CASCADE"
+                "platform_settings, ai_usage CASCADE"
             )
         )
         await conn.execute(text("UPDATE industries SET enabled = TRUE"))

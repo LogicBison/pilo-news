@@ -1,6 +1,193 @@
 {
   "components": {
     "schemas": {
+      "AISettingsUpdate": {
+        "description": "Every field is optional: absent keeps, explicit null clears to `.env`.",
+        "properties": {
+          "ai_daily_budget_usd": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 1000.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Daily Budget Usd"
+          },
+          "ai_daily_request_limit": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Daily Request Limit"
+          },
+          "ai_daily_token_limit": {
+            "anyOf": [
+              {
+                "maximum": 1000000000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Daily Token Limit"
+          },
+          "ai_desks_per_tick": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Desks Per Tick"
+          },
+          "ai_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Enabled"
+          },
+          "ai_max_items_per_run": {
+            "anyOf": [
+              {
+                "maximum": 500.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Max Items Per Run"
+          },
+          "ai_monthly_budget_usd": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 1000.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Monthly Budget Usd"
+          },
+          "ai_monthly_request_limit": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Monthly Request Limit"
+          },
+          "ai_monthly_token_limit": {
+            "anyOf": [
+              {
+                "maximum": 1000000000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Monthly Token Limit"
+          },
+          "ai_offpeak_only": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Offpeak Only"
+          },
+          "ai_peak_days": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Peak Days"
+          },
+          "ai_peak_holidays": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Peak Holidays"
+          },
+          "ai_peak_windows": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Peak Windows"
+          },
+          "ai_rotation_minutes": {
+            "anyOf": [
+              {
+                "maximum": 1440.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Rotation Minutes"
+          },
+          "reset": {
+            "default": false,
+            "title": "Reset",
+            "type": "boolean"
+          }
+        },
+        "title": "AISettingsUpdate",
+        "type": "object"
+      },
       "ApiKeyCreate": {
         "properties": {
           "label": {
@@ -269,6 +456,11 @@
       },
       "IndustryCreate": {
         "properties": {
+          "ai_summaries_enabled": {
+            "default": true,
+            "title": "Ai Summaries Enabled",
+            "type": "boolean"
+          },
           "auto_fetch_enabled": {
             "default": true,
             "title": "Auto Fetch Enabled",
@@ -404,6 +596,17 @@
       },
       "IndustryUpdate": {
         "properties": {
+          "ai_summaries_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Summaries Enabled"
+          },
           "auto_fetch_enabled": {
             "anyOf": [
               {
@@ -1405,6 +1608,88 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/v1/admin/ai": {
+      "get": {
+        "operationId": "read_ai_settings_v1_admin_ai_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Read Ai Settings V1 Admin Ai Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Read Ai Settings",
+        "tags": [
+          "admin"
+        ]
+      },
+      "patch": {
+        "operationId": "update_ai_settings_v1_admin_ai_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AISettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Update Ai Settings V1 Admin Ai Patch"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Ai Settings",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/ai/resume": {
+      "post": {
+        "description": "Clear a halt so the stack may call the provider again.\n\nDeliberately explicit. A halt means the key was rejected or the provider\nfailed repeatedly; clearing it is an operator decision, not a retry policy,\nand the audit row records which reason was cleared.",
+        "operationId": "resume_ai_v1_admin_ai_resume_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Resume Ai V1 Admin Ai Resume Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Resume Ai",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/v1/admin/api-keys": {
       "get": {
         "operationId": "get_keys_v1_admin_api_keys_get",

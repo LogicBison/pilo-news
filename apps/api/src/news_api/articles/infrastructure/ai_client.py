@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 import httpx
@@ -17,11 +17,18 @@ from news_api.platform.metrics import (
     AI_BUDGET_REMAINING,
     AI_BUDGET_SPENT,
     AI_COST,
+    AI_DENIED,
+    AI_LIMIT_REMAINING,
     AI_TOKENS,
     SUMMARIES,
     SUMMARY_LATENCY,
 )
-from news_api.platform.offpeak import is_peak
+from news_api.platform.offpeak import (
+    is_peak,
+    parse_peak_days,
+    parse_peak_holidays,
+    parse_peak_windows,
+)
 from news_api.platform.settings import get_settings
 
 log = structlog.get_logger(__name__)
@@ -90,6 +97,24 @@ class AIError(Exception):
 
 class BudgetExceeded(AIError):
     pass
+
+
+# Consecutive provider failures in this process. A provider that is down, rate
+# limiting or rejecting the key gets one halt, not one retry per candidate: at
+# two attempts per item a single run can otherwise send hundreds of requests
+# that book nothing and buy nothing.
+_consecutive_failures = 0
+
+
+def _breaker_hit() -> int:
+    global _consecutive_failures
+    _consecutive_failures += 1
+    return _consecutive_failures
+
+
+def _breaker_reset() -> None:
+    global _consecutive_failures
+    _consecutive_failures = 0
 
 
 @dataclass
@@ -205,12 +230,15 @@ class AIConfig:
     """Effective cost controls: `.env` defaults with the admin row on top."""
 
     enabled: bool
-    budget_usd: float
+    limits: ai_budget.Limits
     max_items_per_run: int
+    desks_per_tick: int
     offpeak_only: bool
     peak_windows: str
     peak_days: str
     peak_holidays: str
+    breaker_failures: int = 5
+    breaker_seconds: int = 1800
 
 
 class AIClient:
@@ -219,6 +247,9 @@ class AIClient:
         self._client = client
         self.model = self.settings.ai_model
         self._offpeak_logged = False
+        # Set when a limit or a halt stops a call, so the caller can abandon the
+        # rest of the run instead of walking every remaining candidate.
+        self.stop_reason: str | None = None
         if self.model in LEGACY_MODEL_IDS:
             raise AIError(f"legacy model id rejected: {self.model}")
 
@@ -239,28 +270,41 @@ class AIClient:
 
         config = AIConfig(
             enabled=typed("ai_enabled", env.ai_enabled, _as_bool),
-            budget_usd=typed("ai_monthly_budget_usd", float(env.ai_monthly_budget_usd), float),
+            limits=ai_budget.Limits(
+                daily_tokens=typed("ai_daily_token_limit", int(env.ai_daily_token_limit), int),
+                monthly_tokens=typed(
+                    "ai_monthly_token_limit", int(env.ai_monthly_token_limit), int
+                ),
+                daily_requests=typed(
+                    "ai_daily_request_limit", int(env.ai_daily_request_limit), int
+                ),
+                monthly_requests=typed(
+                    "ai_monthly_request_limit", int(env.ai_monthly_request_limit), int
+                ),
+                daily_usd=typed("ai_daily_budget_usd", float(env.ai_daily_budget_usd), float),
+                monthly_usd=typed("ai_monthly_budget_usd", float(env.ai_monthly_budget_usd), float),
+            ),
             max_items_per_run=typed("ai_max_items_per_run", int(env.ai_max_items_per_run), int),
+            desks_per_tick=typed("ai_desks_per_tick", int(env.ai_desks_per_tick), int),
             offpeak_only=typed("ai_offpeak_only", env.ai_offpeak_only, _as_bool),
             peak_windows=typed("ai_peak_windows", env.ai_peak_windows, str),
             peak_days=typed("ai_peak_days", env.ai_peak_days, str),
             peak_holidays=typed("ai_peak_holidays", env.ai_peak_holidays, str),
+            breaker_failures=int(env.ai_breaker_failures),
+            breaker_seconds=int(env.ai_breaker_seconds),
         )
         try:
-            is_peak(
-                utcnow(),
-                windows=config.peak_windows,
-                days=config.peak_days,
-                holidays=config.peak_holidays,
-            )
+            # Parse the calendar instead of asking whether *now* is peak:
+            # `is_peak` returns early on a non-peak weekday, so a hand-edited bad
+            # row would slip through at the weekend and only be caught on Monday.
+            parse_peak_windows(config.peak_windows)
+            parse_peak_days(config.peak_days)
+            parse_peak_holidays(config.peak_holidays)
         except ValueError:
             # A hand-edited row must not take the desks down: use the env calendar.
             log.warning("ai.override_calendar_invalid", windows=config.peak_windows)
-            return AIConfig(
-                enabled=config.enabled,
-                budget_usd=config.budget_usd,
-                max_items_per_run=config.max_items_per_run,
-                offpeak_only=config.offpeak_only,
+            return replace(
+                config,
                 peak_windows=env.ai_peak_windows,
                 peak_days=env.ai_peak_days,
                 peak_holidays=env.ai_peak_holidays,
@@ -298,16 +342,50 @@ class AIClient:
         )
 
     async def allowance(self, *, interval_minutes: int, desks: int = 1) -> int:
-        """Items this run may summarise under the remaining ceiling."""
+        """Items this run may attempt under the tightest bucket.
+
+        Sized twice - by tokens, which is what the provider bills, and by
+        dollars, which is what an operator reads - across the runs still due
+        today and this month. The smallest of the four is the allowance, so a
+        run can never spend a day's or a month's headroom at once.
+        """
         config = await self.config()
-        remaining = await ai_budget.remaining(config.budget_usd)
-        runs = ai_budget.runs_left_in_period(interval_minutes) * max(1, desks)
-        return ai_budget.allowance(
-            remaining_usd=remaining,
-            runs_left=runs,
-            item_cost_usd=float(self.settings.ai_item_cost_estimate_usd),
-            maximum=config.max_items_per_run,
+        try:
+            state = await ai_budget.snapshot(config.limits)
+        except ai_budget.BudgetUnavailable:
+            return 0
+        if state.get("halted_reason"):
+            # Halted means no call will be sent, so the run gets no items: it
+            # publishes from the source excerpts instead of walking the pool.
+            return 0
+        desk_count = max(1, desks)
+        spans = (
+            ("day", ai_budget.runs_left_today(interval_minutes)),
+            ("month", ai_budget.runs_left_in_period(interval_minutes)),
         )
+        candidates: list[int] = []
+        for period, runs_left in spans:
+            bucket = state.get(period)
+            if not bucket:
+                continue
+            remaining = bucket["remaining"]
+            candidates.append(
+                ai_budget.allowance(
+                    remaining=float(remaining["tokens"]),
+                    runs_left=runs_left * desk_count,
+                    item_cost=float(ai_budget.plan_tokens()),
+                    maximum=config.max_items_per_run,
+                )
+            )
+            candidates.append(
+                ai_budget.allowance(
+                    remaining=float(remaining["usd"]),
+                    runs_left=runs_left * desk_count,
+                    item_cost=float(self.settings.ai_item_cost_estimate_usd),
+                    maximum=config.max_items_per_run,
+                )
+            )
+        return min(candidates) if candidates else 0
 
     async def _chat(
         self,
@@ -342,65 +420,98 @@ class AIClient:
                 json=payload,
                 timeout=timeout,
             )
+            if response.status_code in (401, 403):
+                # The key is wrong, revoked, or the account is stopped. Retrying
+                # cannot help, and every retry is another request against the
+                # provider's rate limit - so this stops the period, not the call.
+                await ai_budget.release(reservation)
+                await ai_budget.halt(f"auth_{response.status_code}")
+                self.stop_reason = "halted:auth"
+                raise BudgetExceeded(
+                    f"provider rejected the key ({response.status_code}); ai halted"
+                )
             if response.status_code == 402:
                 # The provider is out of money: stop trying, not just this call.
                 await ai_budget.release(reservation)
                 await ai_budget.mark_exhausted()
+                self.stop_reason = "halted:provider_402"
                 raise BudgetExceeded("provider balance exhausted")
             if response.status_code >= 400:
                 await ai_budget.release(reservation)
+                await self._failure(config, f"status_{response.status_code}")
                 raise AIError(f"provider status {response.status_code}")
             try:
                 body = response.json()
                 choices = body.get("choices") or []
                 if not choices:
-                    # Sent and billed, just unusable: keep the hold.
-                    await ai_budget.settle(reservation, reservation.amount_usd)
+                    # Sent and possibly billed, just unusable: book the worst case.
+                    await ai_budget.settle_worst_case(reservation)
+                    await self._failure(config, "no_choices")
                     raise AIError("provider returned no choices")
                 text = str(choices[0].get("message", {}).get("content") or "").strip()
-                usage = body.get("usage") or {}
-                prompt_tokens = int(usage.get("prompt_tokens") or 0)
-                completion_tokens = int(usage.get("completion_tokens") or 0)
-                cost = ai_budget.usage_cost(usage, period=period)
+                booked = ai_budget.usage_from_response(body.get("usage") or {}, period=period)
             except (KeyError, ValueError, TypeError) as exc:
                 # The request was sent, so it may have been billed; keep the hold.
-                await ai_budget.settle(reservation, reservation.amount_usd)
+                await ai_budget.settle_worst_case(reservation)
+                await self._failure(config, "unparsable")
                 raise AIError("invalid provider response") from exc
-            spent = await ai_budget.settle(reservation, cost)
-            self._record_usage(usage, cost, spent, config)
+            await ai_budget.settle(reservation, booked)
+            _breaker_reset()
+            await self._record_usage(booked, config)
             SUMMARY_LATENCY.labels(locale="mixed").observe(time.perf_counter() - started)
-            return AIResult(text, prompt_tokens, completion_tokens)
+            return AIResult(text, booked.prompt_tokens, booked.completion_tokens)
         except httpx.HTTPError as exc:
             # Unknown outcome after the request left: assume it was billed.
-            await ai_budget.settle(reservation, reservation.amount_usd)
+            await ai_budget.settle_worst_case(reservation)
+            await self._failure(config, type(exc).__name__)
             raise AIError(type(exc).__name__) from exc
         finally:
             if owns:
                 await client.aclose()
 
+    async def _failure(self, config: AIConfig, reason: str) -> None:
+        """Count a provider failure; open the breaker when they pile up."""
+        count = _breaker_hit()
+        if config.breaker_failures > 0 and count >= config.breaker_failures:
+            await ai_budget.halt("circuit_breaker", for_seconds=config.breaker_seconds)
+            self.stop_reason = "halted:circuit_breaker"
+        log.warning("ai.provider_failure", reason=reason, consecutive=count)
+
     async def _reserve(
         self, config: AIConfig, messages: list[dict[str, str]], max_tokens: int
     ) -> ai_budget.Reservation:
-        worst_case = ai_budget.estimate_cost(messages, max_tokens=max_tokens)
+        worst_case = ai_budget.estimate(messages, max_tokens=max_tokens)
         try:
-            return await ai_budget.reserve(worst_case, config.budget_usd)
+            return await ai_budget.reserve(worst_case, config.limits)
         except ai_budget.BudgetUnavailable as exc:
             # Fail closed: an unreadable ledger must not become a free pass.
             log.warning("ai.budget_unavailable", error=str(exc))
+            self.stop_reason = "ledger_unavailable"
+            AI_DENIED.labels(reason="ledger_unavailable").inc()
             raise BudgetExceeded("ai budget ledger unavailable") from exc
         except ai_budget.BudgetExceeded as exc:
+            self.stop_reason = exc.reason
+            AI_DENIED.labels(reason=exc.reason).inc()
+            log.info("ai.denied", reason=exc.reason, detail=str(exc))
             raise BudgetExceeded(str(exc)) from exc
 
-    def _record_usage(
-        self, usage: dict[str, Any], cost: float, spent: float, config: AIConfig
-    ) -> None:
-        prompt_tokens = int(usage.get("prompt_tokens") or 0)
-        completion_tokens = int(usage.get("completion_tokens") or 0)
-        AI_TOKENS.labels(model=self.model, direction="prompt").inc(prompt_tokens)
-        AI_TOKENS.labels(model=self.model, direction="completion").inc(completion_tokens)
-        AI_COST.labels(model=self.model).inc(cost)
-        AI_BUDGET_SPENT.set(spent)
-        AI_BUDGET_REMAINING.set(max(0.0, config.budget_usd - spent))
+    async def _record_usage(self, booked: ai_budget.Usage, config: AIConfig) -> None:
+        AI_TOKENS.labels(model=self.model, direction="prompt").inc(booked.prompt_tokens)
+        AI_TOKENS.labels(model=self.model, direction="completion").inc(booked.completion_tokens)
+        AI_COST.labels(model=self.model).inc(booked.cost_usd)
+        try:
+            state = await ai_budget.snapshot(config.limits)
+        except ai_budget.BudgetUnavailable:  # pragma: no cover - metrics only
+            return
+        month = state.get("month") or {}
+        AI_BUDGET_SPENT.set(float(month.get("cost_usd") or 0.0))
+        AI_BUDGET_REMAINING.set(float((month.get("remaining") or {}).get("usd") or 0.0))
+        for period in ("day", "month"):
+            remaining = (state.get(period) or {}).get("remaining") or {}
+            for dimension in ("requests", "tokens", "usd"):
+                AI_LIMIT_REMAINING.labels(dimension=dimension, period=period).set(
+                    float(remaining.get(dimension) or 0.0)
+                )
 
     async def complete_json(
         self,

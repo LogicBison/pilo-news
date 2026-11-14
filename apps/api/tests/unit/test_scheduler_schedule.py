@@ -30,6 +30,13 @@ def make_channel(slug: str, *, interval: int | None = None, auto: bool = True) -
     )
 
 
+class _NoOverrides:
+    """The rotation knobs come from `.env` in these tests, not the admin row."""
+
+    async def effective_int(self, _key: str, default: int) -> int:
+        return default
+
+
 def test_channel_interval_wins_over_the_default() -> None:
     assert make_channel("a", interval=60).effective_fetch_interval(720) == 60
     assert make_channel("b").effective_fetch_interval(720) == 720
@@ -80,10 +87,13 @@ async def test_scheduler_uses_the_channel_override_and_skips_paused_channels(
     monkeypatch.setattr(queue, "active_run", fake_active_run)
     monkeypatch.setattr(queue, "create_run", fake_create_run)
     monkeypatch.setattr(queue, "enqueue", fake_enqueue)
+    monkeypatch.setattr(queue, "overrides", _NoOverrides())
     monkeypatch.setattr(
         queue,
         "get_settings",
-        lambda: SimpleNamespace(refresh_interval_minutes=720),
+        lambda: SimpleNamespace(
+            refresh_interval_minutes=720, ai_desks_per_tick=2, ai_rotation_minutes=60
+        ),
     )
 
     count = await queue.scheduler_tick()
@@ -122,10 +132,13 @@ async def test_scheduler_respects_the_override_window(
     monkeypatch.setattr(queue, "active_run", fake_active_run)
     monkeypatch.setattr(queue, "create_run", fake_create_run)
     monkeypatch.setattr(queue, "enqueue", fake_enqueue)
+    monkeypatch.setattr(queue, "overrides", _NoOverrides())
     monkeypatch.setattr(
         queue,
         "get_settings",
-        lambda: SimpleNamespace(refresh_interval_minutes=720),
+        lambda: SimpleNamespace(
+            refresh_interval_minutes=720, ai_desks_per_tick=2, ai_rotation_minutes=60
+        ),
     )
 
     count = await queue.scheduler_tick()

@@ -35,11 +35,26 @@ class Settings(BaseSettings):
     ai_model: str = "deepseek-flash"
     ai_api_key: str = ""
     ai_enabled: bool = True
-    # The global ceiling, in USD, for every provider call this stack makes
-    # (item summaries, desk briefs, picks, offer drafts). Default 1: the demo
-    # is a demo. Raise it deliberately.
-    ai_monthly_budget_usd: float = 1.0
+    # The ceilings for every provider call this stack makes (item summaries,
+    # desk briefs, picks, offer drafts). Three dimensions, because USD is
+    # derived from a price table this stack does not control: tokens and
+    # requests are what the provider bills and what its console shows. A call
+    # must fit the day and the month on all three, so the first cap to bind
+    # stops the spend.
+    ai_daily_token_limit: int = 300_000
+    ai_monthly_token_limit: int = 6_000_000
+    ai_daily_request_limit: int = 400
+    ai_monthly_request_limit: int = 12_000
+    ai_daily_budget_usd: float = 0.25
+    ai_monthly_budget_usd: float = 3.0
     ai_max_items_per_run: int = 60
+    # Desk rotation and the failure breaker: how many channels one rotation may
+    # start, how far apart rotations are, and how many consecutive provider
+    # failures stop the stack until the cooldown expires.
+    ai_desks_per_tick: int = 2
+    ai_rotation_minutes: int = 60
+    ai_breaker_failures: int = 5
+    ai_breaker_seconds: int = 1800
     # DeepSeek peak is Mon-Fri, 01:00-04:00 and 06:00-10:00 UTC; every other
     # hour is half price. With this on, no provider call is made inside a peak
     # window: the run publishes without summaries and the next cheap run

@@ -1,13 +1,169 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-11 (M21 complete, deployed to prd as `b7d3506`)
+**Updated:** 2026-11-13 (M22 implemented in the working tree, uncommitted; M21 deployed to prd as `b7d3506`)
 
 ---
 
 ## Recommended next
 
-No further milestone is defined in §19 — M21 was the last. Operator lane: confirm the live ceiling (admin → AI spend;
-prd runs `1`), and the dev-only `@env-sync apply` cleanup (`.env.dev` still `layout 38`). To open new work, `@plan-master revise - M22`.
+M22 is code-complete and green but **not committed and not deployed**: owner review of the three judgement calls
+(default caps, rotation shape, indefinite auth halt), then `@code-verify milestone`, then the protected `.env.*`
+edits (six new keys + an explicit `AI_ENABLED`) and a deploy. Before any new API key goes in: one key per
+environment, and a balance no bigger than the loss you accept. Still open from the spend investigation: the prd
+counters for 2026-11-11→12 (host access requested, not granted) and whether to seed November's Redis-recorded
+spend into `ai_usage`.
+
+---
+
+## Current iteration - M22: reliable AI limits, durable ledger and desk rotation (2026-11-13 → implemented, uncommitted)
+
+**Milestone ref:** `.work/plans/full/20261105-full-plan.md` §19 **M22** · owner instruction 2026-11-13 ("a fully reliable
+way to limit, either daily, or monthly, or both … defaults enforced … overrideable through /admin", plus randomised
+channel fetching)
+**Status:** implemented, all gates green, **working tree dirty, nothing committed** · 10/12 tasks done, 1 blocked on a
+protected surface, 1 open on an owner decision · **Started:** 2026-11-13
+**Trigger:** `.work/reports/20261113-ai-spend-verification.md` — $21.40 / 6,974 requests / 601,649,337 tokens on
+2026-11-11→12, and the defects that let a run send 498 requests in 5 minutes against a revoked key.
+
+### In scope
+
+- caps on **tokens, requests and USD**, for the **day** and the **month**, all six checked before every call and all six
+  overridable from `/admin`;
+- the ledger in **Postgres** (`ai_usage`, migration 023): it survives a Redis flush, a `destroy`, a lost volume and a
+  dev→prd restore, and it keeps one row per day as an audit trail;
+- a **halt** that stops calls *before* they are sent: 401/403 and 402 halt indefinitely, `AI_BREAKER_FAILURES` (5)
+  consecutive provider failures halt for `AI_BREAKER_SECONDS` (1800), and only `POST /v1/admin/ai/resume` (audited
+  `ai.halt.resume`) or the cooldown clears it;
+- a refused 4xx books the **request** but no tokens and no dollars;
+- the per-run allowance counts **attempts**, and a run abandons its candidate pool as soon as a cap or a halt binds;
+- **weighted-random desk rotation**: at most `AI_DESKS_PER_TICK` (2) due desks per `AI_ROTATION_MINUTES` (60), weighted
+  by staleness so no channel starves;
+- the admin panel shows caps, per-bucket usage against every cap, the halt state and a resume button.
+
+### Out of scope (explicit)
+
+- provider balance polling and per-key attribution (the invoice cannot be split by consumer from here);
+- per-channel budgets — the caps stay stack-wide, the per-channel switches from M21 stay as they are;
+- changing `AI_API_KEY` / `AI_BASE_URL` / `AI_MODEL` handling (still env-only, still not overridable);
+- the `.env.*` edits themselves: protected surfaces, so the six keys and `AI_ENABLED` are pending same-message approval
+  (until then the code defaults apply);
+- backfilling November's Redis-recorded spend into `ai_usage` (owner decision, M22-T12).
+
+### Tasks
+
+| ID | Description | Files | Status |
+|----|-------------|-------|--------|
+| M22-T1 | Migration 023: `ai_usage` (day + month rows, requests/tokens/USD, held columns, halt columns) | `apps/api/migrations/023_ai_usage_ledger.sql` | done 2026-11-13 |
+| M22-T2 | Ledger on Postgres: atomic two-bucket reserve with row locks, settle / release / worst-case, halt + resume, snapshot | `articles/infrastructure/ai_budget.py` | done 2026-11-13 |
+| M22-T3 | Client: token+request+USD reservation, 401/403 and 402 halts, consecutive-failure breaker, `ai_denied_total`, `ai_limit_remaining` | `articles/infrastructure/ai_client.py`, `platform/metrics.py` | done 2026-11-13 |
+| M22-T4 | Ingest: attempts spend the allowance, the pool is abandoned on a stop, `summary_attempts` + `ai_stopped` in the run stats | `articles/application/ingest.py` | done 2026-11-13 |
+| M22-T5 | Scheduler: staleness-weighted random rotation behind a rotation window (Redis marker, fail-open) | `articles/application/queue.py` | done 2026-11-13 |
+| M22-T6 | Six settings + defaults, six new overridable keys, `overrides.effective_int` for the scheduler | `platform/settings.py`, `platform/overrides.py` | done 2026-11-13 |
+| M22-T7 | Admin API: ledger and halt in the payload, daily ≤ monthly validation, `POST /v1/admin/ai/resume`, OpenAPI snapshot | `editorial/http/ai_settings.py`, `docs/api/openapi.v1.json` | done 2026-11-13 |
+| M22-T8 | Admin panel: caps form, usage table, halt banner + resume, 26 new EN/ES keys (610 → 636) | `AdminConsole.tsx`, `messages/{en,es}.json`, `e2e/admin.spec.ts` | done 2026-11-13 |
+| M22-T9 | Tests: ledger integration (14), rotation unit (8), override round-trips, contract, e2e + axe | `apps/api/tests/**`, `apps/web/e2e/admin.spec.ts` | done 2026-11-13 |
+| M22-T10 | Cost doc rewritten around caps, halt, rotation and the incident record | `docs/ai-cost.md` | done 2026-11-13 |
+| M22-T11 | Env keys for the six caps + explicit `AI_ENABLED` | `.env.example`, `.env.dev`, `.env.prd` | **blocked** - protected surface, owner approval pending |
+| M22-T12 | Seed November's prior spend into `ai_usage`, or accept the clean start | `ai_usage` rows | open - owner decision |
+| M22-T13 | Migration start-up race: serialise `run_migrations()` behind a transaction-scoped advisory lock | `platform/migrations.py` | done 2026-11-13 |
+| M22-T14 | Calendar override validation made day-independent (parse the calendar, do not ask "is now peak?") | `articles/infrastructure/ai_client.py` | done 2026-11-13 |
+
+### Acceptance criteria
+
+- [x] a call is sent only if it fits the day **and** the month on tokens, requests and dollars (`test_ai_budget.py`: usd, token and request caps each refuse independently; the day bucket binds before the month);
+- [x] a wrong price table can no longer raise the real ceiling — the token cap holds at 1/1000 of the dollar cap (`test_the_token_cap_holds_even_when_the_price_table_is_wrong`);
+- [x] flushing Redis does not reset the caps (`test_the_ledger_survives_a_redis_flush`);
+- [x] a 401 sends **one** request, halts the period, and every later call is refused before it is sent — live on dev, and `test_a_rejected_key_halts_the_stack_instead_of_retrying`;
+- [x] a halt sizes the run's allowance to zero, so the pool is not walked (`test_a_halted_ledger_gives_a_run_no_items`);
+- [x] a breaker halt expires by itself; an auth halt does not (`test_a_breaker_halt_expires_by_itself`);
+- [x] an unreadable ledger denies the call and reports `ledger_available: false` (`test_an_unreadable_ledger_denies_the_call`);
+- [x] attempts, not successes, spend the per-run allowance — live run: `summary_budget 28, summary_attempts 1`;
+- [x] rotation starts at most `AI_DESKS_PER_TICK` due desks, holds the rest for the window, weights by staleness, and fails open when Redis is down (`test_scheduler_rotation.py`, 8 tests);
+- [x] every cap is readable and writable from `/admin` with the `.env` default beside it; a daily cap above its monthly one is refused by the browser **and** the API; resume is audited (contract + e2e);
+- [x] migrations apply seamlessly and idempotently when the api and the worker boot together: 4 concurrent `run_migrations()` against a throwaway database all succeed and every script is applied exactly once (`test_migrations_concurrent.py`) — with the advisory lock removed the same test fails, verified by mutation;
+- [x] a restart keeps the ledger and the halt: dev `restart api worker` → both logged `migrations.done applied: 0 total: 23`, `ai_usage` still `requests 2, halted auth_401`, `/v1/health` `{"db":true,"redis":true,"migrations":true}`;
+- [x] the bad-calendar fallback no longer depends on the day of the week (parametrised over a weekday off-peak hour, a Saturday and a weekday peak hour).
+
+### Validation steps
+
+- [x] api: `ruff check` clean · `ruff format --check` 182 files · `mypy src` clean (130 files) · `pytest -q` **300 passed** (was 277 at M21)
+- [x] web: `pnpm lint` clean · `tsc --noEmit` clean · `pnpm check` **636 keys EN=ES**, 5 channels contrast · `pnpm build` RC=0
+- [x] e2e: `playwright test e2e/admin.spec.ts` **8 passed**, including an axe WCAG 2.1 AA scan of the AI tab
+- [x] migration idempotency: `python -m news_api.platform.migrations` twice → `applied: 0, total: 23` both times
+- [x] migration concurrency (owner question, 2026-11-13): two processes migrating a **fresh** database at the same time. Before the lock: `[worker] RESULT fail IntegrityError | UniqueViolationError: duplicate key value violates unique constraint "pg_type_typname_nsp_index"` while the api applied all 23 — i.e. the loser crashed on the first boot after any new migration, hidden by `restart: unless-stopped`. After the lock: `[api] applied=23`, `[worker] applied=0`, no failures. Reproduced on a throwaway `mig_race` database, dropped afterwards; covered permanently by `tests/integration/test_migrations_concurrent.py` (4-way, mutation-checked).
+- [x] live dev probe (revoked key): 2 provider requests total across a direct call pair and a full ingest run, ledger `requests 2, tokens 0, cost 0, halted auth_401`, no stranded holds — the same code path sent 498 requests in 5 minutes before this change
+- [x] `touch-scope-verify --strict` pass · `blast-radius-check` warn: high (apps/docs/.work), all in declared scope · `mod06-output-check` pass
+- [ ] `@code-verify milestone` — not run
+- [ ] prd deploy — not run
+
+### Gaps found and fixed while verifying (2026-11-13)
+
+1. **Migration start-up race** (pre-existing, all 23 migrations, not specific to 023): `run_migrations()` had no lock, and `compose up` starts api + worker together. Fixed with `pg_advisory_xact_lock(741000023)` taken before the ledger DDL, so the second process waits and then applies nothing. `restart: unless-stopped` used to mask it as a one-cycle crash; on prd the loser would have been whichever container lost the coin flip, and `cmd_up`'s `wait_health 45` could have reported "api health not ready yet".
+2. **Day-dependent calendar validation** (pre-existing, latent): `config()` validated an admin-supplied peak calendar by calling `is_peak(utcnow())`, which returns early on a non-peak *day* — so a hand-edited bad row was silently kept at the weekend and only fell back to `.env` on a weekday. Now the calendar is parsed directly. This surfaced as a test failure on Saturday 2026-11-14 that had passed on Friday; the test is now parametrised over three clock positions.
+3. **Orphaned Redis keys:** `ai:spend:202611` and `ai:held:202611` are still in dev Redis. Nothing reads them any more. They are the only record of November's pre-M22 accounted spend (dev: `$0.956`) and therefore the source for M22-T12 — do not delete them before deciding.
+
+### Owner blockers
+
+1. **Approval to edit the protected env files** (`.env.example`, `.env.dev`, `.env.prd`): six new keys
+   (`AI_DAILY_TOKEN_LIMIT`, `AI_MONTHLY_TOKEN_LIMIT`, `AI_DAILY_REQUEST_LIMIT`, `AI_MONTHLY_REQUEST_LIMIT`,
+   `AI_DAILY_BUDGET_USD`, `AI_DESKS_PER_TICK`, `AI_ROTATION_MINUTES`, `AI_BREAKER_*`) plus an explicit `AI_ENABLED=false`
+   until new keys exist. Note `.env.dev`/`.env.prd` still pin `AI_MONTHLY_BUDGET_USD=1`, which beats the new `3` default.
+2. **One API key per environment.** dev and prd sharing a key is why the 11-11→12 invoice could not be attributed; two
+   stacks also means two independent ledgers against one balance.
+3. **Seed November or not** (M22-T12): the pre-M22 Redis keys `ai:spend:202611` / `ai:held:202611` are still in dev
+   (dev value `$0.956`) and will still be in prd after the deploy; nothing reads them now. `ai_usage` starts at zero, so
+   this month's caps have that much extra headroom. They are the only record of November's accounted spend — decide
+   before anyone deletes them.
+4. **prd host access** for the 11-11→12 counters, to finish the spend report.
+5. **Judgement calls to confirm:** default caps (300k tok/day, 6M/mo, 400 req/day, $0.25/day, $3/mo), rotation
+   (2 desks / 60 min), indefinite auth halt.
+6. **`023_ai_usage_ledger.sql` is now frozen.** The runner stores a checksum and refuses to boot if an applied file
+   changes (`migration ... changed after being applied`). It is applied in dev, in `news_test` and in the throwaway
+   race database; any further schema change goes in `024_*.sql`.
+
+### Done this iteration
+
+`apps/api/migrations/023_ai_usage_ledger.sql` (new) · `articles/infrastructure/ai_budget.py` (rewritten: Redis → Postgres,
+three dimensions, two buckets, halt/resume) · `articles/infrastructure/ai_client.py` (limits in `AIConfig`, 401/403 and
+402 halts, breaker, `stop_reason`, snapshot-driven metrics, day-independent calendar validation) ·
+`articles/application/ingest.py` (attempts, stop, two new stats) · `articles/application/queue.py` (`select_desks`,
+rotation window, staleness weights) · `platform/{settings,overrides,metrics}.py` · `platform/migrations.py` (advisory
+lock) · `editorial/http/ai_settings.py` (ledger payload, nested-cap validation, `POST /resume`) · `AdminConsole.tsx`
+(+`AIUsageTable`, halt banner, 7 new fields) · `messages/{en,es}.json` (+26 keys, `aiLedgerDown` no longer says Redis) ·
+`e2e/admin.spec.ts` · `tests/**` (+25 tests, 5 updated) ·
+`docs/api/openapi.v1.json` (regenerated; it also picks up M21's `/v1/admin/ai`, which was never exported) ·
+`docs/ai-cost.md` (rewritten) · `.work/reports/{20261113-ai-spend-verification,20261113-mod06-m22-ai-limits}.md` ·
+`QWEN.md` (session-start adapter, separate owner request; committed by the owner as `805df3d`) · `.work/touch-scope`
+
+### MOD-06 output (2026-11-13, M22)
+
+Full text: `.work/reports/20261113-mod06-m22-ai-limits.md` (`mod06-output-check` pass).
+
+## AI change risk summary
+- AI-assisted: yes (agent session, no `human-only` declaration).
+- Boundaries crossed: 4 — schema (one new table), API (admin AI payload + one new POST route), worker (scheduler
+  rotation), web presentation (admin AI tab). No public read path, auth, bundle or theme changed.
+- New cross-boundary deps: the spend ledger moved from Redis to Postgres, so a provider call now needs a writable
+  database (ingest already did). `queue.py` imports the existing `platform.overrides`. No new external dependency.
+- Test isolation: ok — 297 api tests, 8 e2e including axe, plus a live probe against a revoked key. `evidence: measured`.
+- Human architectural review: **recommended** — money path, and the default caps, the rotation shape and the indefinite
+  auth halt are product judgement, not correctness.
+- Blast radius: permissive bug → overspend (the failure this milestone ends, and why tokens and requests are capped
+  alongside dollars); restrictive bug → summaries stop and stories publish from source excerpts, site stays up;
+  migration failure → api and worker do not start; a false auth halt stops all AI silently until someone resumes it
+  (visible in `/admin` and in `ingest.ai_stopped`, but nothing pages). Known gap: November's Redis-recorded spend is not
+  carried into `ai_usage`.
+
+## Recommendation
+merge_with_conditions
+
+## Conditions if merge_with_conditions
+1. Owner confirms the three judgement calls before this reaches prd.
+2. One API key per environment, and a prepaid balance sized to the acceptable loss.
+3. Decide on seeding November's prior spend.
+4. Approve the `.env.*` edits (protected) — until then the code defaults apply and `AI_ENABLED` stays unset (true).
+5. Read the prd counters for 2026-11-11→12; the report's attribution conclusion currently rests on prompt-size and
+   volume arithmetic, not on prd's own numbers.
 
 ---
 

@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import os
+import random
 import time
 from typing import Any
 
@@ -20,6 +21,7 @@ from news_api.articles.infrastructure.repo import (
     update_run,
 )
 from news_api.channels.infrastructure.repo import list_channels
+from news_api.platform import overrides
 from news_api.platform.cache import get_redis
 from news_api.platform.clock import utcnow
 from news_api.platform.db import session_scope
@@ -32,7 +34,12 @@ GROUP = "worker"
 DEAD = "news:jobs:dead"
 RETRY_ZSET = "news:jobs:retry"
 RETRY_KEY = "news:job:retry"
+# When the last rotation started. Pacing only: the spend ceiling lives in the
+# Postgres ledger, so losing this key costs one extra rotation, not money.
+ROTATION_KEY = "scheduler:rotation_at"
 BACKOFF_SECONDS = (60, 300, 1500)
+# Process-local draw for the rotation. Tests pass their own seeded Random.
+_rng = random.Random()
 
 
 def consumer_name() -> str:
@@ -147,11 +154,30 @@ def _stagger(industry: str) -> int:
     return int(digest[:8], 16) % 600
 
 
-async def scheduler_tick() -> int:
+async def scheduler_tick(*, rng: random.Random | None = None) -> int:
+    """Start the due desks - a weighted-random subset of them, not all at once.
+
+    Two gates stack. The per-channel interval decides whether a desk is *due*;
+    the rotation window decides how many due desks may *start* now. With twelve
+    channels and a tight budget, running every due desk on the same tick gives
+    each of them one summary; rotating gives a few of them a full run and comes
+    back for the others later, which is more useful per dollar. The draw is
+    weighted by staleness, so a desk that keeps losing gets heavier until it
+    wins - no channel is starved, and the order is not guessable.
+
+    The rotation window lives in Redis. Losing it costs one extra rotation, not
+    a cent: the spend ceiling is enforced by the Postgres ledger, not here.
+    """
     settings = get_settings()
     default_interval = settings.refresh_interval_minutes
+    per_tick = max(
+        0, await overrides.effective_int("ai_desks_per_tick", int(settings.ai_desks_per_tick))
+    )
+    window_minutes = max(
+        0, await overrides.effective_int("ai_rotation_minutes", int(settings.ai_rotation_minutes))
+    )
     now = utcnow()
-    enqueued = 0
+    due: list[tuple[Any, float]] = []
     for channel in await list_channels(enabled_only=True):
         if not channel.auto_fetch_enabled:
             continue
@@ -166,8 +192,20 @@ async def scheduler_tick() -> int:
                 elapsed = interval_seconds
             if elapsed < interval_seconds + _stagger(channel.slug):
                 continue
+            weight = elapsed / max(1, interval_seconds)
+        else:
+            # Never run: the keenest candidate, but still one draw among many.
+            weight = 2.0
         if await active_run(channel.id):
             continue
+        due.append((channel, weight))
+    if not due:
+        return 0
+    if len(due) > per_tick and not await _rotation_open(window_minutes):
+        return 0
+    picked = select_desks(due, per_tick=per_tick, rng=rng)
+    enqueued = 0
+    for channel in picked:
         run_id = await create_run(channel.id, trigger="schedule", requested_by="scheduler")
         await enqueue(run_id=run_id, industry=channel.slug, trigger="schedule")
         enqueued += 1
@@ -175,10 +213,65 @@ async def scheduler_tick() -> int:
             "scheduler.enqueued",
             industry=channel.slug,
             run_id=run_id,
-            interval_minutes=interval_minutes,
+            interval_minutes=channel.effective_fetch_interval(default_interval),
             schedule_source="channel" if channel.fetch_interval_minutes else "default",
         )
+    if enqueued:
+        await _mark_rotation()
+    if len(due) > enqueued:
+        log.info(
+            "scheduler.rotated",
+            due=len(due),
+            started=enqueued,
+            deferred=[channel.slug for channel, _ in due if channel not in picked],
+        )
     return enqueued
+
+
+def select_desks(
+    due: list[tuple[Any, float]], *, per_tick: int, rng: random.Random | None = None
+) -> list[Any]:
+    """Weighted sampling without replacement over the due desks."""
+    if per_tick <= 0 or not due:
+        return []
+    if len(due) <= per_tick:
+        return [channel for channel, _ in due]
+    draw = _rng if rng is None else rng
+    pool = list(due)
+    picked: list[Any] = []
+    for _ in range(per_tick):
+        # A floor on the weight: a desk that just missed the draw stays in it.
+        weights = [max(0.05, weight) for _, weight in pool]
+        choice = draw.choices(pool, weights=weights, k=1)[0]
+        picked.append(choice[0])
+        pool.remove(choice)
+    return picked
+
+
+async def _rotation_open(window_minutes: int) -> bool:
+    """Whether a rotation may start now. An unreadable marker means yes."""
+    if window_minutes <= 0:
+        return True
+    try:
+        client = await get_redis()
+        raw = await client.get(ROTATION_KEY)
+    except Exception as exc:  # pacing is not a safety control
+        log.warning("scheduler.rotation_marker_unreadable", error=type(exc).__name__)
+        return True
+    if not raw:
+        return True
+    try:
+        return time.time() - float(raw) >= window_minutes * 60
+    except (TypeError, ValueError):
+        return True
+
+
+async def _mark_rotation() -> None:
+    try:
+        client = await get_redis()
+        await client.set(ROTATION_KEY, str(time.time()), ex=86400)
+    except Exception as exc:  # pragma: no cover - pacing only
+        log.warning("scheduler.rotation_marker_unwritable", error=type(exc).__name__)
 
 
 async def _process_offer_job(fields: dict[str, str]) -> None:

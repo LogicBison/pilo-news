@@ -158,6 +158,7 @@ async def run_ingest(
         "robots_disallowed": 0,
         "denied": 0,
         "summary_budget": 0,
+        "summary_attempts": 0,
         "blocked_hosts": [],
         "per_language": {},
     }
@@ -260,6 +261,7 @@ async def run_ingest(
             )
             stats["summary_budget"] = summary_budget
             summarized = 0
+            attempted = 0
             language_stats: dict[str, dict[str, int]] = {}
 
             for language, pool in sorted(pools.items()):
@@ -292,7 +294,11 @@ async def run_ingest(
                         stats["summaries_reused"] += 1
                         kept += 1
                         continue
-                    if ai_available and summarized < summary_budget:
+                    # Attempts spend the allowance, not successes: a provider
+                    # that refuses everything must not turn one run into a walk
+                    # of the whole candidate pool at two requests per item.
+                    if ai_available and attempted < summary_budget and not ai.stop_reason:
+                        attempted += 1
                         summary = await ai.summarize(
                             title=candidate.title,
                             excerpt=candidate.excerpt,
@@ -317,7 +323,7 @@ async def run_ingest(
                     "deduped": len(deduped),
                 }
 
-                if ai_available:
+                if ai_available and not ai.stop_reason:
                     # Generate the desk brief when it is missing, even if this run
                     # added nothing: a failed first attempt would otherwise leave
                     # the channel without a brief until the TTL expires.
@@ -349,6 +355,18 @@ async def run_ingest(
                             ttl_seconds=86400,
                         )
 
+            stats["summary_attempts"] = attempted
+            if ai.stop_reason:
+                # A cap, a halt or an unreadable ledger ended the AI work early.
+                # The run still publishes: items fall back to the source excerpt.
+                stats["ai_stopped"] = ai.stop_reason
+                log.info(
+                    "ingest.ai_stopped",
+                    industry=industry_slug,
+                    reason=ai.stop_reason,
+                    attempted=attempted,
+                    summarized=summarized,
+                )
             stats["per_language"] = language_stats
             purged = await purge_old_content(
                 article_days=int(rules.get("purge_after_days", 30)),

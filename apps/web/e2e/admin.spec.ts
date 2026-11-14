@@ -46,7 +46,7 @@ test("admin can manage a channel's cadence and free offers", async ({ page }) =>
   await expect(row.getByRole("button", { name: /save channel settings/i })).toBeVisible();
 });
 
-test("admin can read the AI ceiling and its current spend", async ({ page }) => {
+test("admin can read every AI cap and the usage against it", async ({ page }) => {
   test.skip(!password, "E2E_ADMIN_PASSWORD is not set");
   await page.goto("/en/admin");
   await page.getByLabel("Email").fill(email);
@@ -57,7 +57,41 @@ test("admin can read the AI ceiling and its current spend", async ({ page }) => 
   await expect(page.getByLabel(/monthly ceiling/i)).toHaveValue("1");
   await expect(page.getByText(/spent this period/i)).toBeVisible();
   await expect(page.getByLabel(/max summaries per run/i)).toBeVisible();
+  // Every cap an operator may move, in both buckets and all three dimensions.
+  await expect(page.getByLabel(/daily ceiling/i)).toBeVisible();
+  await expect(page.getByLabel(/daily token cap/i)).toBeVisible();
+  await expect(page.getByLabel(/monthly token cap/i)).toBeVisible();
+  await expect(page.getByLabel(/daily request cap/i)).toBeVisible();
+  await expect(page.getByLabel(/monthly request cap/i)).toBeVisible();
+  await expect(page.getByLabel(/desks per rotation/i)).toBeVisible();
+  await expect(page.getByLabel(/minutes between rotations/i)).toBeVisible();
+  const usage = page.getByRole("table", { name: /ai usage against every cap/i });
+  await expect(usage).toBeVisible();
+  await expect(usage.getByRole("row", { name: /^tokens/i })).toBeVisible();
+  await expect(usage.getByRole("row", { name: /^requests/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /save ai settings/i })).toBeVisible();
+
+  // A day cap above its month cap is refused in the browser, before the API.
+  await page.getByLabel(/daily token cap/i).fill("999999999");
+  await page.getByRole("button", { name: /save ai settings/i }).click();
+  await expect(page.getByText(/daily cap cannot sit above/i)).toBeVisible();
+
+  // A valid save round-trips through the API, then the panel returns to .env.
+  await page.getByLabel(/daily token cap/i).fill("250000");
+  await page.getByRole("button", { name: /save ai settings/i }).click();
+  await expect(page.getByText(/overrides:/i)).toContainText("ai_daily_token_limit");
+  await page.getByRole("button", { name: /reset to \.env/i }).click();
+  await page.getByRole("button", { name: /confirm deletion/i }).click();
+  await expect(page.getByLabel(/daily token cap/i)).toHaveValue("300000");
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(
+    results.violations.filter((violation) =>
+      ["critical", "serious"].includes(violation.impact ?? ""),
+    ),
+  ).toHaveLength(0);
 });
 
 test("admin can inspect generated offer drafts", async ({ page }) => {

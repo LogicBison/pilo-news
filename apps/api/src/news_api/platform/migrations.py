@@ -23,6 +23,13 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 )
 """
 
+# The api and the worker both migrate at boot and `compose up` starts them
+# together, so two backends can run the same `CREATE TABLE` at once. Postgres
+# resolves that with a unique violation on pg_type, not with IF NOT EXISTS, and
+# the loser crashes. One transaction-scoped advisory lock serialises them: the
+# second process waits, then finds everything already applied and does nothing.
+MIGRATION_LOCK_KEY = 741_000_023
+
 
 def _checksum(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -38,6 +45,7 @@ async def run_migrations(migrations_dir: Path | None = None) -> list[str]:
 
     applied_now: list[str] = []
     async with engine.begin() as conn:
+        await conn.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": MIGRATION_LOCK_KEY})
         await conn.execute(text(LEDGER_DDL))
         result = await conn.execute(text("SELECT filename, checksum FROM schema_migrations"))
         applied = {str(row[0]): str(row[1]) for row in result.all()}

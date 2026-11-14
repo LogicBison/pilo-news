@@ -106,11 +106,30 @@ interface OfferIssue {
   published_at: string | null;
 }
 
+interface AIBucket {
+  bucket: string;
+  requests: number;
+  tokens: number;
+  cost_usd: number;
+  held_requests: number;
+  held_tokens: number;
+  held_usd: number;
+  limits: { requests: number; tokens: number; usd: number };
+  remaining: { requests: number; tokens: number; usd: number };
+}
+
 interface AISettings {
   values: {
     ai_enabled: boolean;
+    ai_daily_token_limit: number;
+    ai_monthly_token_limit: number;
+    ai_daily_request_limit: number;
+    ai_monthly_request_limit: number;
+    ai_daily_budget_usd: number;
     ai_monthly_budget_usd: number;
     ai_max_items_per_run: number;
+    ai_desks_per_tick: number;
+    ai_rotation_minutes: number;
     ai_offpeak_only: boolean;
     ai_peak_windows: string;
     ai_peak_days: string;
@@ -120,6 +139,9 @@ interface AISettings {
   overridden: string[];
   updated_at: string | null;
   updated_by: string | null;
+  ledger: { day: AIBucket | null; month: AIBucket | null };
+  halted_reason: string | null;
+  halted_until: string | null;
   spent_usd: number;
   held_usd: number;
   remaining_usd: number;
@@ -130,7 +152,14 @@ interface AISettings {
 interface AIDraft {
   enabled: boolean;
   budget: string;
+  dailyBudget: string;
+  dailyTokens: string;
+  monthlyTokens: string;
+  dailyRequests: string;
+  monthlyRequests: string;
   maxItems: string;
+  desksPerTick: string;
+  rotationMinutes: string;
   offpeakOnly: boolean;
   windows: string;
   days: string;
@@ -141,7 +170,14 @@ function draftFromAI(values: AISettings["values"]): AIDraft {
   return {
     enabled: values.ai_enabled,
     budget: String(values.ai_monthly_budget_usd),
+    dailyBudget: String(values.ai_daily_budget_usd),
+    dailyTokens: String(values.ai_daily_token_limit),
+    monthlyTokens: String(values.ai_monthly_token_limit),
+    dailyRequests: String(values.ai_daily_request_limit),
+    monthlyRequests: String(values.ai_monthly_request_limit),
     maxItems: String(values.ai_max_items_per_run),
+    desksPerTick: String(values.ai_desks_per_tick),
+    rotationMinutes: String(values.ai_rotation_minutes),
     offpeakOnly: values.ai_offpeak_only,
     windows: values.ai_peak_windows,
     days: values.ai_peak_days,
@@ -724,19 +760,47 @@ export function AdminConsole({
     event.preventDefault();
     if (!aiDraft) return;
     const budget = Number(aiDraft.budget);
+    const dailyBudget = Number(aiDraft.dailyBudget);
     const maxItems = Number(aiDraft.maxItems);
-    if (!Number.isFinite(budget) || budget <= 0) {
+    const desksPerTick = Number(aiDraft.desksPerTick);
+    const rotationMinutes = Number(aiDraft.rotationMinutes);
+    const dailyTokens = Number(aiDraft.dailyTokens);
+    const monthlyTokens = Number(aiDraft.monthlyTokens);
+    const dailyRequests = Number(aiDraft.dailyRequests);
+    const monthlyRequests = Number(aiDraft.monthlyRequests);
+    const positive = (value: number) => Number.isFinite(value) && value > 0;
+    const whole = (value: number, floor = 1) => Number.isInteger(value) && value >= floor;
+    if (
+      !positive(budget) ||
+      !positive(dailyBudget) ||
+      !whole(maxItems) ||
+      !whole(desksPerTick) ||
+      !whole(rotationMinutes, 0) ||
+      !whole(dailyTokens) ||
+      !whole(monthlyTokens) ||
+      !whole(dailyRequests) ||
+      !whole(monthlyRequests)
+    ) {
       setStatus({ kind: "error", text: t(locale, "admin.aiInvalid") });
       return;
     }
-    if (!Number.isInteger(maxItems) || maxItems < 1) {
-      setStatus({ kind: "error", text: t(locale, "admin.aiInvalid") });
+    // A day cap above its month cap would make the daily knob decorative. The
+    // API refuses it too; saying so here saves the round trip.
+    if (dailyBudget > budget || dailyTokens > monthlyTokens || dailyRequests > monthlyRequests) {
+      setStatus({ kind: "error", text: t(locale, "admin.aiDailyAboveMonthly") });
       return;
     }
     await mutate("ai:save", "/api/proxy/v1/admin/ai", "PATCH", {
       ai_enabled: aiDraft.enabled,
+      ai_daily_budget_usd: dailyBudget,
       ai_monthly_budget_usd: budget,
+      ai_daily_token_limit: dailyTokens,
+      ai_monthly_token_limit: monthlyTokens,
+      ai_daily_request_limit: dailyRequests,
+      ai_monthly_request_limit: monthlyRequests,
       ai_max_items_per_run: maxItems,
+      ai_desks_per_tick: desksPerTick,
+      ai_rotation_minutes: rotationMinutes,
       ai_offpeak_only: aiDraft.offpeakOnly,
       ai_peak_windows: aiDraft.windows.trim(),
       ai_peak_days: aiDraft.days.trim(),
@@ -747,6 +811,11 @@ export function AdminConsole({
   async function resetAiSettings() {
     const ok = await mutate("ai:reset", "/api/proxy/v1/admin/ai", "PATCH", { reset: true });
     if (ok) cancelConfirm("ai:reset");
+  }
+
+  async function resumeAi() {
+    const ok = await mutate("ai:resume", "/api/proxy/v1/admin/ai/resume", "POST");
+    if (ok) cancelConfirm("ai:resume");
   }
 
   async function handleCreateIndustry(event: FormEvent<HTMLFormElement>) {
@@ -2205,6 +2274,46 @@ export function AdminConsole({
                 </div>
               </dl>
             ) : null}
+            {ai?.halted_reason ? (
+              <div role="alert" className="mt-3 rounded border border-[var(--sn-accent)] p-3">
+                <p className="text-sm font-semibold text-[var(--sn-accent)]">
+                  {t(locale, "admin.aiHalted", { reason: ai.halted_reason })}
+                </p>
+                <p className="mt-1 text-xs text-[var(--sn-muted)]">
+                  {t(locale, "admin.aiHaltedHint")}
+                </p>
+                {confirming === "ai:resume" ? (
+                  <span className="mt-2 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      className={DESTRUCTIVE_BUTTON}
+                      onClick={() => void resumeAi()}
+                      disabled={busy === "ai:resume"}
+                    >
+                      {busy === "ai:resume"
+                        ? t(locale, "admin.saving")
+                        : t(locale, "admin.aiResumeConfirm")}
+                    </button>
+                    <button
+                      type="button"
+                      className={QUIET_BUTTON}
+                      onClick={() => cancelConfirm("ai:resume")}
+                    >
+                      {t(locale, "admin.cancel")}
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className={`${QUIET_BUTTON} mt-2`}
+                    onClick={() => setConfirming("ai:resume")}
+                  >
+                    {t(locale, "admin.aiResume")}
+                  </button>
+                )}
+              </div>
+            ) : null}
+            {ai ? <AIUsageTable ai={ai} locale={locale} /> : null}
             {ai && !ai.ledger_available ? (
               <p role="alert" className="mt-2 text-sm font-medium text-[var(--sn-accent)]">
                 {t(locale, "admin.aiLedgerDown")}
@@ -2253,6 +2362,119 @@ export function AdminConsole({
                     })}
                     value={aiDraft.maxItems}
                     onChange={(event) => setAiDraft({ ...aiDraft, maxItems: event.target.value })}
+                  />
+                </div>
+
+                <p className="text-xs font-semibold text-[var(--sn-muted)]">
+                  {t(locale, "admin.aiCapsHeading")}
+                </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <TextField
+                    name="ai-daily-budget"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max="1000"
+                    label={t(locale, "admin.aiDailyBudget")}
+                    hint={t(locale, "admin.aiEnvDefault", {
+                      value: String(ai.defaults.ai_daily_budget_usd),
+                    })}
+                    value={aiDraft.dailyBudget}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, dailyBudget: event.target.value })
+                    }
+                  />
+                  <TextField
+                    name="ai-daily-tokens"
+                    type="number"
+                    step="1"
+                    min="1"
+                    label={t(locale, "admin.aiDailyTokens")}
+                    hint={t(locale, "admin.aiTokensHint", {
+                      value: String(ai.defaults.ai_daily_token_limit),
+                    })}
+                    value={aiDraft.dailyTokens}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, dailyTokens: event.target.value })
+                    }
+                  />
+                  <TextField
+                    name="ai-monthly-tokens"
+                    type="number"
+                    step="1"
+                    min="1"
+                    label={t(locale, "admin.aiMonthlyTokens")}
+                    hint={t(locale, "admin.aiTokensHint", {
+                      value: String(ai.defaults.ai_monthly_token_limit),
+                    })}
+                    value={aiDraft.monthlyTokens}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, monthlyTokens: event.target.value })
+                    }
+                  />
+                  <TextField
+                    name="ai-daily-requests"
+                    type="number"
+                    step="1"
+                    min="1"
+                    label={t(locale, "admin.aiDailyRequests")}
+                    hint={t(locale, "admin.aiRequestsHint", {
+                      value: String(ai.defaults.ai_daily_request_limit),
+                    })}
+                    value={aiDraft.dailyRequests}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, dailyRequests: event.target.value })
+                    }
+                  />
+                  <TextField
+                    name="ai-monthly-requests"
+                    type="number"
+                    step="1"
+                    min="1"
+                    label={t(locale, "admin.aiMonthlyRequests")}
+                    hint={t(locale, "admin.aiRequestsHint", {
+                      value: String(ai.defaults.ai_monthly_request_limit),
+                    })}
+                    value={aiDraft.monthlyRequests}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, monthlyRequests: event.target.value })
+                    }
+                  />
+                </div>
+
+                <p className="text-xs font-semibold text-[var(--sn-muted)]">
+                  {t(locale, "admin.aiRotationHeading")}
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <TextField
+                    name="ai-desks-per-tick"
+                    type="number"
+                    step="1"
+                    min="1"
+                    max="100"
+                    label={t(locale, "admin.aiDesksPerTick")}
+                    hint={t(locale, "admin.aiDesksHint", {
+                      value: String(ai.defaults.ai_desks_per_tick),
+                    })}
+                    value={aiDraft.desksPerTick}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, desksPerTick: event.target.value })
+                    }
+                  />
+                  <TextField
+                    name="ai-rotation-minutes"
+                    type="number"
+                    step="5"
+                    min="0"
+                    max="1440"
+                    label={t(locale, "admin.aiRotationMinutes")}
+                    hint={t(locale, "admin.aiRotationHint", {
+                      value: String(ai.defaults.ai_rotation_minutes),
+                    })}
+                    value={aiDraft.rotationMinutes}
+                    onChange={(event) =>
+                      setAiDraft({ ...aiDraft, rotationMinutes: event.target.value })
+                    }
                   />
                 </div>
 
@@ -2851,6 +3073,56 @@ function IndustryPicker({
           </option>
         ))}
       </SelectField>
+    </div>
+  );
+}
+
+function usageCell(
+  bucket: AIBucket | null,
+  dimension: "requests" | "tokens" | "usd",
+  locale: Locale,
+) {
+  if (!bucket) return "-";
+  const used = dimension === "usd" ? bucket.cost_usd : bucket[dimension];
+  const format = (value: number) =>
+    dimension === "usd" ? `$${value.toFixed(4)}` : value.toLocaleString(locale);
+  return `${format(used)} / ${format(bucket.limits[dimension])}`;
+}
+
+function AIUsageTable({ ai, locale }: { ai: AISettings; locale: Locale }) {
+  const rows: Array<{ label: string; dimension: "requests" | "tokens" | "usd" }> = [
+    { label: t(locale, "admin.aiRequestsRow"), dimension: "requests" },
+    { label: t(locale, "admin.aiTokensRow"), dimension: "tokens" },
+    { label: t(locale, "admin.aiCostRow"), dimension: "usd" },
+  ];
+  return (
+    <div className="mt-4 overflow-x-auto">
+      <table className="w-full text-sm">
+        <Caption>{t(locale, "admin.aiUsageCaption")}</Caption>
+        <thead>
+          <tr className="border-b border-[var(--sn-border)]">
+            <Th>{t(locale, "admin.aiUsageDimension")}</Th>
+            <Th numeric>{t(locale, "admin.aiUsageToday")}</Th>
+            <Th numeric>{t(locale, "admin.aiUsageMonth")}</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.dimension} className="border-b border-[var(--sn-border)]">
+              <th scope="row" className="p-2 text-left font-normal">
+                {row.label}
+              </th>
+              <td className="p-2 text-right tabular-nums whitespace-nowrap">
+                {usageCell(ai.ledger.day, row.dimension, locale)}
+              </td>
+              <td className="p-2 text-right tabular-nums whitespace-nowrap">
+                {usageCell(ai.ledger.month, row.dimension, locale)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-1 text-xs text-[var(--sn-muted)]">{t(locale, "admin.aiUsageHint")}</p>
     </div>
   );
 }
