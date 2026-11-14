@@ -54,6 +54,12 @@
 | `summary_latency_seconds` | histogram | locale | Provider latency |
 | `ai_tokens_total` | counter | model, direction (`prompt`/`completion`) | Cost (R3) |
 | `ai_estimated_cost_usd_total` | counter | model | Budget alert |
+| `ai_budget_spent_usd` | gauge | none | Spend booked this month in the `ai_usage` ledger |
+| `ai_budget_remaining_usd` | gauge | none | Headroom against the monthly dollar cap |
+| `ai_limit_remaining` | gauge | dimension (`requests`/`tokens`/`usd`), period (`day`/`month`) | Headroom against each of the six caps (R19) |
+| `ai_denied_total` | counter | reason (`usd`/`tokens`/`requests`/`halted:<reason>`/`ledger_unavailable`) | Calls refused *before* being sent; the cap and halt alerts read this (R19) |
+
+Every `ai_*` series is emitted from `articles/infrastructure/ai_client.py`, which runs in the **worker** process. The worker exposes no `/metrics` endpoint, so a scraper on the api sees these only for calls the api itself made - see UNKNOWNS U36.
 
 ### publishing
 

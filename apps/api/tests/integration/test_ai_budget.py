@@ -148,6 +148,47 @@ async def test_a_breaker_halt_expires_by_itself(clean_db) -> None:
 
 
 @pytest.mark.asyncio
+async def test_an_indefinite_halt_survives_a_bucket_rollover(monkeypatch, clean_db) -> None:
+    """The kill switch must outlive the bucket row it was written into.
+
+    A halt lives in a day row and a month row, and both are created fresh at a
+    rollover. Without carry-over an auth halt lapsed on the first call of the
+    next period and sent one request to a key already known to be dead.
+    """
+    from datetime import timedelta
+
+    from news_api.platform.clock import utcnow
+
+    await ai_budget.halt("auth_401")
+    monkeypatch.setattr(ai_budget, "utcnow", lambda: utcnow() + timedelta(days=40))
+
+    with pytest.raises(ai_budget.BudgetExceeded) as exc:
+        await ai_budget.reserve(Estimate(tokens=1, usd=0.0), ROOMY)
+    assert exc.value.reason == "halted:auth_401"
+    assert (await ai_budget.snapshot(ROOMY))["halted_reason"] == "auth_401"
+
+    # An operator resume still clears it, in the rolled-over bucket.
+    await ai_budget.resume(by="operator")
+    assert await ai_budget.reserve(Estimate(tokens=1, usd=0.0), ROOMY)
+
+
+@pytest.mark.asyncio
+async def test_an_expired_breaker_halt_is_not_carried_into_a_new_bucket(
+    monkeypatch, clean_db
+) -> None:
+    """A cooldown that has run out stays run out, rollover or not."""
+    from datetime import timedelta
+
+    from news_api.platform.clock import utcnow
+
+    await ai_budget.halt("circuit_breaker", for_seconds=60)
+    monkeypatch.setattr(ai_budget, "utcnow", lambda: utcnow() + timedelta(days=40))
+
+    reservation = await ai_budget.reserve(Estimate(tokens=1, usd=0.0), ROOMY)
+    assert reservation.estimate.tokens == 1
+
+
+@pytest.mark.asyncio
 async def test_an_unreadable_ledger_denies_the_call(monkeypatch, clean_db) -> None:
     def broken(*_args, **_kwargs):
         raise RuntimeError("database down")

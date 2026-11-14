@@ -1,6 +1,6 @@
 # UNKNOWNS - planning registry
 
-**Updated:** 2026-11-06 · **Maintained by:** plan-foundation / plan-master
+**Updated:** 2026-11-14 · **Maintained by:** plan-foundation / plan-master
 
 | ID | Question / blocker | Blocks | Owner | Status |
 |----|-------------------|--------|-------|--------|
@@ -19,6 +19,7 @@
 | U32 | Which trusted edge header supplies country, and what is its value? | `GEO_COUNTRY_HEADER`; country attribution | owner | Open |
 | U33 | Does the contact form consent cover marketing use, or is a separate opt-in needed? | marketing use of contact data | owner + counsel | Open |
 | U34 | Which reviewer signs the first legal/cybersecurity reference issue? | publish gate; D-005 | owner | Open |
+| U36 | Should the worker expose a `/metrics` endpoint, and should compose deploy Prometheus? Every `ai_*` and `ingest_*` series is emitted in the worker process, which has no exporter, and no Prometheus runs in dev or prd - so `ops/prometheus/alerts.yml` (including the new `AiHalted` / `AiCapReached`) and the three Grafana dashboards read nothing today | AI cap + halt alerting (ingestion SPEC R19), observability spec §4, M8 "alerts" claim | owner | Open - raised 2026-11-14 by `@code-verify milestone - M22` gap 4 |
 
 ## Deferred (recorded decisions the owner may revisit)
 
@@ -38,6 +39,7 @@
 | 2026-11-05 | plan-foundation | Seeded from doc 01, doc 04 §13 (deferrals), probe ledger |
 | 2026-11-05 | plan-foundation | U4 narrowed to budget; U16/U17 added after ADR 007/010 amendments |
 | 2026-11-05 | operator + agent | U5 closed to technical scope (ADR 014); U6 = legal |
+| 2026-11-14 | code-repair (from `@code-verify milestone - M22`) | U36 opened: the AI and ingest series are emitted in the worker process and no Prometheus is deployed, so the alert rules are inert |
 
 ## Next action
 

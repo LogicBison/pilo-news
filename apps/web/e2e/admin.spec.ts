@@ -3,6 +3,12 @@ import { expect, test } from "@playwright/test";
 
 const password = process.env.E2E_ADMIN_PASSWORD;
 const email = process.env.ADMIN_EMAIL ?? "admin@example.com";
+// The panel shows the effective cap, which is the .env default until an
+// operator overrides it. A literal here broke the day the monthly default
+// moved from 1 to 3 - and every test in this file skips without a password,
+// so the suite stayed green while the assertion was wrong.
+const monthlyCeiling = String(Number(process.env.AI_MONTHLY_BUDGET_USD ?? 3));
+const dailyTokenCap = String(Number(process.env.AI_DAILY_TOKEN_LIMIT ?? 300000));
 
 test("admin console requires a session", async ({ page }) => {
   await page.goto("/en/admin");
@@ -54,7 +60,7 @@ test("admin can read every AI cap and the usage against it", async ({ page }) =>
   await page.getByRole("button", { name: /sign in/i }).click();
   await page.getByRole("tab", { name: /ai spend/i }).click();
 
-  await expect(page.getByLabel(/monthly ceiling/i)).toHaveValue("1");
+  await expect(page.getByLabel(/monthly ceiling/i)).toHaveValue(monthlyCeiling);
   await expect(page.getByText(/spent this period/i)).toBeVisible();
   await expect(page.getByLabel(/max summaries per run/i)).toBeVisible();
   // Every cap an operator may move, in both buckets and all three dimensions.
@@ -82,7 +88,7 @@ test("admin can read every AI cap and the usage against it", async ({ page }) =>
   await expect(page.getByText(/overrides:/i)).toContainText("ai_daily_token_limit");
   await page.getByRole("button", { name: /reset to \.env/i }).click();
   await page.getByRole("button", { name: /confirm deletion/i }).click();
-  await expect(page.getByLabel(/daily token cap/i)).toHaveValue("300000");
+  await expect(page.getByLabel(/daily token cap/i)).toHaveValue(dailyTokenCap);
 
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

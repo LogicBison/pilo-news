@@ -19,14 +19,40 @@ groups:
         expr: max by (industry) (time() - (ingest_lag_seconds_sum / ingest_lag_seconds_count)) > 43200
         for: 15m
         labels: { severity: p1 }
+      # The AI rules below read series emitted in the worker process
+      # (ai_client.py, ingest.py). The worker exposes no /metrics endpoint and
+      # compose deploys no Prometheus, so these are the intended rules rather
+      # than live ones - UNKNOWNS U36.
       - alert: AiFailureRate
         expr: sum(rate(summaries_generated_total{status="failed"}[30m])) / sum(rate(summaries_generated_total[30m])) > 0.1
         for: 30m
         labels: { severity: p2 }
       - alert: AiBudgetBurn
-        expr: increase(ai_estimated_cost_usd_total[24h]) > 0.5 * 20
+        # Half the DAILY dollar cap (AI_DAILY_BUDGET_USD, 0.25 at the M22
+        # defaults). It used to read 0.5 * 20 - the pre-M21 monthly default -
+        # which no cap can reach any more, so the rule could never fire.
+        expr: increase(ai_estimated_cost_usd_total[24h]) > 0.125
         for: 1h
         labels: { severity: p2 }
+        annotations:
+          summary: "AI spend passed half the daily cap in 24h"
+      - alert: AiCapReached
+        # Ingestion SPEC R19: reaching a cap must alert, not just stop the
+        # summaries. A cap refuses calls before they are sent, so the spend
+        # series above never moves when one binds.
+        expr: increase(ai_denied_total{reason=~"usd|tokens|requests"}[1h]) > 0
+        for: 0m
+        labels: { severity: p2 }
+        annotations:
+          summary: "An AI cap refused provider calls in the last hour"
+      - alert: AiHalted
+        # A 401/403/402 or the breaker halts the period until an operator
+        # resumes from /admin -> AI spend. Nothing else surfaces it.
+        expr: increase(ai_denied_total{reason=~"halted:.*"}[15m]) > 0
+        for: 0m
+        labels: { severity: p1 }
+        annotations:
+          summary: "AI is halted - summaries stopped until an operator resumes"
       - alert: BackupAge
         expr: time() - system_news_last_backup_timestamp_seconds > 93600
         for: 30m

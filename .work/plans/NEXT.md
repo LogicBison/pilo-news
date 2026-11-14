@@ -1,18 +1,25 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-14 (M22 committed `e38dde0`, pushed, **deployed to prd**; `@code-verify milestone` owed)
+**Updated:** 2026-11-14 (M22 verified and repaired; repair committed and pushed, **not yet on prd**)
 
 ---
 
 ## Recommended next
 
-**`@code-verify milestone - M22`** - the owner deferred verification to the next session, and it should also
-close the M3 money-path review gap carried since M21 (second change to that path with no named architect
-review). Then **O18**: fund the new per-environment keys and enable AI in prd from `/admin` -> AI spend;
-prd is deployed, capped and silent until then. After the first funded run, reconcile `ai_usage` against the
-provider invoice - that is the only way to prove the dollar leg of the cap, and it retires the D4/D9
-price-table assumption. Also open: **O19** find what else burned ~600 M tokens on the retired shared key,
-**O20** dev's `auth_401` halt, **O15** `SMTP_FROM`.
+**O21 - deploy the 2026-11-14 repair to prd** (`git pull` + `./bin/start.sh --env prd up`). prd runs `e38dde0`,
+where an indefinite `auth_401` halt lapses for one call at every day and month boundary; the fix is code, so prd
+needs a deploy. Then **O18**: fund the new per-environment keys and enable AI from `/admin` → AI spend. After the
+first funded run, reconcile `ai_usage` against the provider invoice - the only way to prove the dollar leg of the
+cap, and it retires the D4/D9 price-table assumption.
+
+Two redirects from the milestone verify, both doc-layer and neither started: **`@feature-spec amend`** for ingestion
+SPEC **R19** (it still describes one monthly USD cap and predates M21/M22), and **`@plan-repair master`** for §19
+(`M22-T11/T12` statuses stale, `M22-T13/T14` missing entirely, `NFR-cost` is not a defined id, the FR-2/FR-3 traces
+are wrong, "297 passed" is now 302, doc 04 NFR-10 still says the cap default is 20).
+
+Also open: **O22/U36** the AI alert rules are inert until the worker gets a `/metrics` exporter or Prometheus is
+deployed, **O23** the money-path review has now been waived twice with no named architect, **O19** what else burned
+~600 M tokens on the retired shared key, **O20** dev's `auth_401` halt, **O15** `SMTP_FROM`.
 
 ---
 
@@ -23,7 +30,8 @@ way to limit, either daily, or monthly, or both … defaults enforced … overri
 channel fetching)
 **Status:** **complete 2026-11-14** · committed `e38dde0` (31 files), pushed, **deployed to prd** (migration 023
 applied, `AI_ENABLED=false`, https 200 ×6, `hosts` all pass, zero provider calls) · all gates green · 12/12 tasks
-closed · `@code-verify milestone` **owed** (owner deferred it) · **Started:** 2026-11-13
+closed · `@code-verify milestone` ran 2026-11-14: **fail → repaired → pass with gaps** (M3 waived by the owner;
+the repair is committed but **not yet on prd**) · **Started:** 2026-11-13
 **Trigger:** `.work/reports/20261113-ai-spend-verification.md` — $21.40 / 6,974 requests / 601,649,337 tokens on
 2026-11-11→12, and the defects that let a run send 498 requests in 5 minutes against a revoked key.
 
@@ -102,7 +110,34 @@ closed · `@code-verify milestone` **owed** (owner deferred it) · **Started:** 
   other boots `applied: 0, total: 23`, no crash or restart loop. `ai_usage` present with 0 rows; settings resolve
   `enabled False · 300000/6000000 tokens · 400/12000 requests · $0.25/$3 · desks 2 · rotation 60 · offpeak_only True`;
   `/v1/health` all true; `/v1/admin/ai` 401; `hosts` all pass; worker log shows zero provider calls
-- [ ] `@code-verify milestone - M22` — deferred to the next session by the owner
+- [x] `@code-verify milestone - M22` — ran 2026-11-14 (later session): **fail** → `@code-repair repair - from milestone` → **pass with gaps**. See §Repair pass below
+
+### Repair pass (2026-11-14, later session)
+
+`@code-verify milestone - M22` returned **fail** on four counts, and verifying it surfaced a fifth defect in the
+milestone's own kill switch. All five are fixed or filed; the code lane re-verified **pass with gaps**.
+
+| # | Finding | Disposition | Evidence |
+|---|---------|-------------|----------|
+| 1 | `e2e/admin.spec.ts` asserted a monthly ceiling of `"1"`; `.env.dev:69` carries `3` → the AI-cap test failed and its axe scan never ran. It hid because every test in the file calls `test.skip(!password)` | **fixed** | both caps now read from env; admin e2e **8/8**, AI-cap test ✓ 3.9 s |
+| 2 | M3 money-path review missing (second milestone in a row) | **waived** by the owner in-message 2026-11-14 | no named architect review exists → **O23** |
+| 3 | `AiBudgetBurn` thresholded at `0.5 * 20` (the pre-M21 monthly default) against caps of $0.25/day and $3/month → could never fire; nothing alerted on a cap bind or a halt, which ingestion SPEC R19 requires | **fixed** | retuned to `0.125`; new `AiCapReached` (p2) and `AiHalted` (p1) on `ai_denied_total`; 11 rules parse |
+| 4 | `ai_denied_total` / `ai_limit_remaining` are emitted only in the worker, which exposes no `/metrics`; compose deploys no Prometheus | **owner** | **U36** / **O22**; proved by 4 × `ai.denied` in the worker log with neither series on the api's `/metrics` |
+| 5 | **New defect:** an indefinite `auth_401` halt did not survive a bucket rollover — `_ensure_rows` created the new day/month rows empty, so one call per period escaped to a key already known dead. A denied `reserve` also rolls its transaction back, so the rows never persisted and the panel showed "not halted" while refusing everything | **fixed** | `_ensure_rows` inherits a still-active halt from the *immediately preceding* bucket and commits in its own transaction; `snapshot` materialises the period. Test failed pre-fix (`DID NOT RAISE BudgetExceeded`), passes post-fix; live dev grew `day\|20261114\|0\|auth_401` inherited from `day\|20261113` |
+| 6-9 | ingestion SPEC R19 predates M21/M22; plan §19 statuses stale and `M22-T13/T14` absent; `NFR-cost` is not a defined id and the FR-2/FR-3 traces are wrong; doc 04 NFR-10 still says the default is 20 | **redirected** | `@feature-spec amend` (R19) · `@plan-repair master` (§19, ids, doc 04) — plan and SPEC docs are out of code-repair's lane |
+| 10 | four `ai_*` series unregistered | **fixed** | observability spec §4 gains `ai_budget_spent_usd`, `ai_budget_remaining_usd`, `ai_limit_remaining`, `ai_denied_total` |
+
+Re-gates: api **302 passed** (was 300), ruff/format/mypy clean · web lint/tsc/`636 keys EN=ES`/themes clean · admin
+e2e **8/8** with 2 flaky retries · `touch-scope-verify --strict` RC 0 · `blast-radius-check` RC 2 (9 files, ~197
+lines, 3 areas, all declared) · `mod06-output-check` RC 0 (addendum appended). `pnpm build` not re-run: no
+`apps/web/src/` change.
+
+**Method caveat:** `playwright.config.ts` has no `webServer` and `baseURL` defaults to `:3000`, so the e2e ran against
+`pnpm dev`, not the production build the M22 validation row above cites. Both flakes were 45 s cold-compile timeouts
+on a first interaction; each passed on retry, and the contacts test passes in isolation in 1.1 s.
+
+**Residual, not fixed:** money is compared as a Python `float` (stored `NUMERIC(16,8)`) against CONVENTIONS §4 "never
+float" — pre-existing since M21; a Decimal pass over the ledger is a separate decision.
 
 ### Gaps found and fixed while verifying (2026-11-13)
 
@@ -135,10 +170,16 @@ closed · `@code-verify milestone` **owed** (owner deferred it) · **Started:** 
 2. **O19** Identify the other consumer of the retired shared key: ~600 M tokens at ~86 k per request over 11-11→12 was
    not this system (its measured worst case is ~0.22 M tokens and $0.10–0.20).
 3. **O20** Dev stays halted on `auth_401` — the safe parking spot. Resume from `/admin` once the dev key has funds.
-4. `@code-verify milestone - M22`, and with it the M3 money-path review owed since M21.
+4. ~~`@code-verify milestone - M22`~~ **done 2026-11-14**: fail → repaired → pass with gaps (§Repair pass). The M3
+   money-path review was **waived again by the owner** in-message, so no named architect review exists for M21 or M22
+   → **O23** name one, or accept the risk in writing before the next AI-cost change.
 5. After the first funded run: reconcile `ai_usage` against the provider invoice to prove the dollar leg of the cap.
 6. The pre-M22 Redis keys (`ai:spend:202611` — dev `0.956`, prd `0.928180204`) are unread by any code and are the only
    record of November's accounted spend. Left in place deliberately; note the values before deleting them.
+7. **O21** Deploy the 2026-11-14 repair to prd — the halt-rollover fix is code and prd still runs `e38dde0`.
+8. **O22 / U36** Decide the metrics lane: a worker `/metrics` exporter and/or a deployed Prometheus. Without one, the
+   `AiHalted`, `AiCapReached`, `AiBudgetBurn`, `AiFailureRate` and `StaleChannel` rules and all three dashboards are
+   inert, and a silent AI stop pages nobody.
 
 
 ### Done this iteration

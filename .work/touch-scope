@@ -36,7 +36,10 @@
     "docs/api/openapi.v1.json",
     ".work/reports/20261113-mod06-m22-ai-limits.md",
     "apps/api/src/news_api/platform/migrations.py",
-    "apps/api/tests/integration/test_migrations_concurrent.py"
+    "apps/api/tests/integration/test_migrations_concurrent.py",
+    "ops/prometheus/alerts.yml",
+    ".work/standards/20261105-observability-spec.md",
+    ".work/plans/UNKNOWNS.md"
   ],
   "allowed_patterns": [],
   "notes": [

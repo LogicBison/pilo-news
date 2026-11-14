@@ -281,17 +281,41 @@ async def _read_rows(session: Any, day: str, month: str) -> list[dict[str, Any]]
     return [dict(row) for row in result.mappings().all()]
 
 
-async def _ensure_rows(session: Any, day: str, month: str) -> None:
-    await session.execute(
-        text(
-            """
-            INSERT INTO ai_usage (bucket_kind, bucket)
-            VALUES ('day', :day), ('month', :month)
-            ON CONFLICT ON CONSTRAINT ai_usage_pk DO NOTHING
-            """
-        ),
-        {"day": day, "month": month},
-    )
+async def _ensure_rows(day: str, month: str) -> None:
+    """Create this period's rows, carrying an unfinished halt into them.
+
+    A halt lives in bucket rows, and a rollover creates fresh ones - so without
+    this an indefinite auth halt lapsed on the first call of a new day or month
+    and let one request out to a key already known to be dead. Only the
+    *immediately preceding* bucket is consulted, and only while its halt is
+    still active: an operator resume clears today's rows, so tomorrow inherits
+    nothing, and a breaker cooldown that has run out stays run out.
+
+    This commits on its own. A denied ``reserve`` rolls its transaction back,
+    and the rows must not roll back with it: an operator reading the panel in
+    the new period has to see the halt that is refusing the calls.
+    """
+    async with session_scope() as session:
+        await session.execute(
+            text(
+                """
+                INSERT INTO ai_usage (bucket_kind, bucket, halted_reason, halted_until)
+                SELECT v.bucket_kind, v.bucket, p.halted_reason, p.halted_until
+                FROM (VALUES ('day', :day), ('month', :month)) AS v(bucket_kind, bucket)
+                LEFT JOIN LATERAL (
+                    SELECT prev.halted_reason, prev.halted_until
+                    FROM ai_usage prev
+                    WHERE prev.bucket_kind = v.bucket_kind
+                      AND prev.bucket < v.bucket
+                    ORDER BY prev.bucket DESC
+                    LIMIT 1
+                ) p ON p.halted_reason IS NOT NULL
+                   AND (p.halted_until IS NULL OR p.halted_until > now())
+                ON CONFLICT ON CONSTRAINT ai_usage_pk DO NOTHING
+                """
+            ),
+            {"day": day, "month": month},
+        )
 
 
 def _halted(row: dict[str, Any], now: datetime) -> str | None:
@@ -315,8 +339,8 @@ async def reserve(est: Estimate, limits: Limits) -> Reservation:
     day, month = daily_bucket(), monthly_bucket()
     now = utcnow()
     try:
+        await _ensure_rows(day, month)
         async with session_scope() as session:
-            await _ensure_rows(session, day, month)
             rows = await _read_rows(session, day, month)
             for row in rows:
                 reason = _halted(row, now)
@@ -357,8 +381,8 @@ async def reserve(est: Estimate, limits: Limits) -> Reservation:
 async def _book(reservation: Reservation, usage: Usage) -> None:
     """Release the hold and book ``usage`` into both buckets."""
     try:
+        await _ensure_rows(reservation.day, reservation.month)
         async with session_scope() as session:
-            await _ensure_rows(session, reservation.day, reservation.month)
             await session.execute(
                 text(
                     """
@@ -431,8 +455,8 @@ async def halt(reason: str, *, for_seconds: int | None = None) -> None:
     day, month = daily_bucket(), monthly_bucket()
     until = utcnow() + timedelta(seconds=for_seconds) if for_seconds else None
     try:
+        await _ensure_rows(day, month)
         async with session_scope() as session:
-            await _ensure_rows(session, day, month)
             await session.execute(
                 text(
                     """
@@ -457,8 +481,8 @@ async def mark_exhausted() -> None:
 async def resume(*, by: str | None = None) -> None:
     """Clear a halt. Only an operator action calls this."""
     day, month = daily_bucket(), monthly_bucket()
+    await _ensure_rows(day, month)
     async with session_scope() as session:
-        await _ensure_rows(session, day, month)
         await session.execute(
             text(
                 """
@@ -473,15 +497,20 @@ async def resume(*, by: str | None = None) -> None:
 
 
 async def snapshot(limits: Limits) -> dict[str, Any]:
-    """Read-only view for the admin panel, metrics and an operator's sanity check.
+    """Read the ledger for the admin panel, metrics and an operator's sanity check.
 
     A ledger this stack cannot read raises :class:`BudgetUnavailable`: the
     caller decides whether that is "unavailable" (admin read) or "deny"
     (reserve path).
+
+    Reading materialises the current period's rows, so a fresh day or month
+    shows the halt it inherited instead of an empty panel while every call is
+    being refused.
     """
     day, month = daily_bucket(), monthly_bucket()
     now = utcnow()
     try:
+        await _ensure_rows(day, month)
         async with session_scope() as session:
             rows = await _read_rows(session, day, month)
     except Exception as exc:
