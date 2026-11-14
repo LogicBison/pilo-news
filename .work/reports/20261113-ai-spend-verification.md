@@ -167,3 +167,63 @@ change.
    willing to lose — a prepaid balance is the only limit no application bug can exceed.
 3. until D1/D2 are fixed, keep `ai_summaries_enabled` off on the prd desks: the run will still fetch
    and publish with excerpt fallback, and it will not attempt the whole candidate pool.
+
+---
+
+# Addendum 2 — prd read (2026-11-14, read-only over ssh) and final attribution
+
+Host access confirmed (`vmi3435240`, root, `recode-prod.pem`). Every command was read-only.
+
+## prd state
+
+| check | result |
+|---|---|
+| repo | `/srv/system-news` at **`b7d3506`**, branch `main`, **clean tree** |
+| migrations on disk | up to `022_platform_settings.sql` — M22 not deployed |
+| `ai_usage` table | absent (`to_regclass` → null), as expected pre-M22 |
+| `platform_settings` | **0 rows** → no admin override was ever saved; `.env` was in force |
+| Redis ledger | `ai:spend:202611 = 0.928180204` · `ai:held:202611 = 0` · no `ai:exhausted:202611` · TTL 1895255 s |
+| containers | api / worker / web up 2 days (the 11-11 deploy), postgres 2 days, redis 6 days |
+| worker log, 96 h | **124 × `provider status 401`**, zero successful AI events |
+| host `.env.prd` | 124 lines, sha `fca88b2301ff` — differs from the local file (`526d025b0171` before this session's edit), so the new key was local only |
+
+## prd's own call volume, by day
+
+| day (UTC) | runs | summaries booked | articles | with summary |
+|---|---|---|---|---|
+| 11-08 | 22 sched | 38 | 8 | 8 |
+| 11-09 | 22 sched | 169 | 123 | 119 |
+| 11-10 | 23 sched + 22 manual | 250 + 40 | 302 | 274 |
+| **11-11** | 24 sched | **184** | 211 | 131 |
+| **11-12** | 24 sched | **0** (`summary_budget` 0) | 201 | **0** |
+| 11-13 | 24 sched | **0** (`summary_budget` 0) | 155 | **0** |
+
+24 runs/day is 12 desks × 2 runs at the 720-minute interval — exactly the configured schedule, no
+extra runs, no retry storm. From 11-12 onward the M21 allowance was **0**, because the ledger had
+reached `0.928` of its `$1` ceiling: prd made no AI call at all on the second day of the window.
+
+## Final attribution
+
+- **Requests.** System News made roughly 190 successful summary calls on 11-11 (prd 184 + dev 5) plus
+  desk briefs and featured picks (≤ ~50 per day per stack), and **zero** on 11-12. Call it ≤ 600
+  requests for the whole window, against the invoice's **6,974**. At least ~90% of the requests were
+  not this system's.
+- **Tokens.** ~190 summaries × ~840 tokens ≈ 160k tokens; briefs and picks add ~60k. Total ≈ **0.22 M
+  tokens** against the invoice's **601.6 M** — a factor of ~2,700. The invoice's own average of 86,270
+  tokens per request is impossible here: the largest prompt this codebase can build is ≈12k tokens.
+- **Dollars.** Both stacks' ledgers, which book the provider's *reported* usage, total
+  `$0.928` (prd) + `$0.956` (dev) = **`$1.88` for the whole of November**, and only part of that fell
+  inside the window (prd's 11-11 share prices at ≈$0.09 at peak list, ≈$0.006 at the invoice's blend).
+  Even if the price table undercounts by 10×, System News' share of the `$21.40` is **≈$1, i.e. <5%**.
+
+**Conclusion, now measured rather than inferred:** the `$21.40` / 601 M tokens was **not** mostly
+System News. This system's contribution to the window is best estimated at **$0.10–0.20**, and its
+contribution to the request count is under 10%. The remaining ~600 M tokens at ~86k per request is the
+signature of a long-context consumer — an agent, RAG or document workload running ~2.4 requests a
+minute for two days — sharing the same key. Since that key is now deleted, whatever it was has also
+stopped; identifying it means looking outside this repo, and separate per-environment keys (now in
+place locally) make the next bill attributable.
+
+The defects this system *did* have are real and are fixed in M22 (`e38dde0`): the retry storms measured
+on 2026-11-13 (dev 498 requests in 5 minutes, prd 124 × 401 over two days) post-date the key revocation
+and were **not billed** — they are a request-volume and rate-limit defect, not the cause of the $21.40.

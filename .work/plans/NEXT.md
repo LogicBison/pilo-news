@@ -1,27 +1,29 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-13 (M22 implemented in the working tree, uncommitted; M21 deployed to prd as `b7d3506`)
+**Updated:** 2026-11-14 (M22 committed `e38dde0`, pushed, **deployed to prd**; `@code-verify milestone` owed)
 
 ---
 
 ## Recommended next
 
-M22 is code-complete and green but **not committed and not deployed**: owner review of the three judgement calls
-(default caps, rotation shape, indefinite auth halt), then `@code-verify milestone`, then the protected `.env.*`
-edits (six new keys + an explicit `AI_ENABLED`) and a deploy. Before any new API key goes in: one key per
-environment, and a balance no bigger than the loss you accept. Still open from the spend investigation: the prd
-counters for 2026-11-11→12 (host access requested, not granted) and whether to seed November's Redis-recorded
-spend into `ai_usage`.
+**`@code-verify milestone - M22`** - the owner deferred verification to the next session, and it should also
+close the M3 money-path review gap carried since M21 (second change to that path with no named architect
+review). Then **O18**: fund the new per-environment keys and enable AI in prd from `/admin` -> AI spend;
+prd is deployed, capped and silent until then. After the first funded run, reconcile `ai_usage` against the
+provider invoice - that is the only way to prove the dollar leg of the cap, and it retires the D4/D9
+price-table assumption. Also open: **O19** find what else burned ~600 M tokens on the retired shared key,
+**O20** dev's `auth_401` halt, **O15** `SMTP_FROM`.
 
 ---
 
-## Current iteration - M22: reliable AI limits, durable ledger and desk rotation (2026-11-13 → implemented, uncommitted)
+## Completed iteration - M22: reliable AI limits, durable ledger and desk rotation (2026-11-13 → deployed 2026-11-14)
 
 **Milestone ref:** `.work/plans/full/20261105-full-plan.md` §19 **M22** · owner instruction 2026-11-13 ("a fully reliable
 way to limit, either daily, or monthly, or both … defaults enforced … overrideable through /admin", plus randomised
 channel fetching)
-**Status:** implemented, all gates green, **working tree dirty, nothing committed** · 10/12 tasks done, 1 blocked on a
-protected surface, 1 open on an owner decision · **Started:** 2026-11-13
+**Status:** **complete 2026-11-14** · committed `e38dde0` (31 files), pushed, **deployed to prd** (migration 023
+applied, `AI_ENABLED=false`, https 200 ×6, `hosts` all pass, zero provider calls) · all gates green · 12/12 tasks
+closed · `@code-verify milestone` **owed** (owner deferred it) · **Started:** 2026-11-13
 **Trigger:** `.work/reports/20261113-ai-spend-verification.md` — $21.40 / 6,974 requests / 601,649,337 tokens on
 2026-11-11→12, and the defects that let a run send 498 requests in 5 minutes against a revoked key.
 
@@ -63,8 +65,8 @@ protected surface, 1 open on an owner decision · **Started:** 2026-11-13
 | M22-T8 | Admin panel: caps form, usage table, halt banner + resume, 26 new EN/ES keys (610 → 636) | `AdminConsole.tsx`, `messages/{en,es}.json`, `e2e/admin.spec.ts` | done 2026-11-13 |
 | M22-T9 | Tests: ledger integration (14), rotation unit (8), override round-trips, contract, e2e + axe | `apps/api/tests/**`, `apps/web/e2e/admin.spec.ts` | done 2026-11-13 |
 | M22-T10 | Cost doc rewritten around caps, halt, rotation and the incident record | `docs/ai-cost.md` | done 2026-11-13 |
-| M22-T11 | Env keys for the six caps + explicit `AI_ENABLED` | `.env.example`, `.env.dev`, `.env.prd` | **blocked** - protected surface, owner approval pending |
-| M22-T12 | Seed November's prior spend into `ai_usage`, or accept the clean start | `ai_usage` rows | open - owner decision |
+| M22-T11 | Env keys for the caps, rotation and breaker + explicit `AI_ENABLED` | `.env.example`, `.env.dev`, `.env.prd` | done 2026-11-14 (owner-approved; `AI_ENABLED=false` in prd until M22 deploys) |
+| M22-T12 | Seed November's prior spend into `ai_usage`, or accept the clean start | `ai_usage` rows | closed 2026-11-14 - owner chose **start clean**; the orphan Redis keys stay as the only record |
 | M22-T13 | Migration start-up race: serialise `run_migrations()` behind a transaction-scoped advisory lock | `platform/migrations.py` | done 2026-11-13 |
 | M22-T14 | Calendar override validation made day-independent (parse the calendar, do not ask "is now peak?") | `articles/infrastructure/ai_client.py` | done 2026-11-13 |
 
@@ -93,8 +95,14 @@ protected surface, 1 open on an owner decision · **Started:** 2026-11-13
 - [x] migration concurrency (owner question, 2026-11-13): two processes migrating a **fresh** database at the same time. Before the lock: `[worker] RESULT fail IntegrityError | UniqueViolationError: duplicate key value violates unique constraint "pg_type_typname_nsp_index"` while the api applied all 23 — i.e. the loser crashed on the first boot after any new migration, hidden by `restart: unless-stopped`. After the lock: `[api] applied=23`, `[worker] applied=0`, no failures. Reproduced on a throwaway `mig_race` database, dropped afterwards; covered permanently by `tests/integration/test_migrations_concurrent.py` (4-way, mutation-checked).
 - [x] live dev probe (revoked key): 2 provider requests total across a direct call pair and a full ingest run, ledger `requests 2, tokens 0, cost 0, halted auth_401`, no stranded holds — the same code path sent 498 requests in 5 minutes before this change
 - [x] `touch-scope-verify --strict` pass · `blast-radius-check` warn: high (apps/docs/.work), all in declared scope · `mod06-output-check` pass
-- [ ] `@code-verify milestone` — not run
-- [ ] prd deploy — not run
+- [x] pushed: `805df3d..e38dde0 main -> main`
+- [x] prd deploy (2026-11-14): host `.env.prd` backed up as `.env.prd.bak-20261114-0204` (`fca88b…`, 124 lines) and
+  replaced (`7ba31e…`, 146 lines, mode 600); `/srv/system-news` pulled `b7d3506` → `e38dde0` (fast-forward, clean);
+  `./bin/start.sh --env prd up` RC 0. **The migration lock held in production**: worker `applied: 1, total: 23`,
+  other boots `applied: 0, total: 23`, no crash or restart loop. `ai_usage` present with 0 rows; settings resolve
+  `enabled False · 300000/6000000 tokens · 400/12000 requests · $0.25/$3 · desks 2 · rotation 60 · offpeak_only True`;
+  `/v1/health` all true; `/v1/admin/ai` 401; `hosts` all pass; worker log shows zero provider calls
+- [ ] `@code-verify milestone - M22` — deferred to the next session by the owner
 
 ### Gaps found and fixed while verifying (2026-11-13)
 
@@ -104,22 +112,34 @@ protected surface, 1 open on an owner decision · **Started:** 2026-11-13
 
 ### Owner blockers
 
-1. **Approval to edit the protected env files** (`.env.example`, `.env.dev`, `.env.prd`): six new keys
-   (`AI_DAILY_TOKEN_LIMIT`, `AI_MONTHLY_TOKEN_LIMIT`, `AI_DAILY_REQUEST_LIMIT`, `AI_MONTHLY_REQUEST_LIMIT`,
-   `AI_DAILY_BUDGET_USD`, `AI_DESKS_PER_TICK`, `AI_ROTATION_MINUTES`, `AI_BREAKER_*`) plus an explicit `AI_ENABLED=false`
-   until new keys exist. Note `.env.dev`/`.env.prd` still pin `AI_MONTHLY_BUDGET_USD=1`, which beats the new `3` default.
-2. **One API key per environment.** dev and prd sharing a key is why the 11-11→12 invoice could not be attributed; two
-   stacks also means two independent ledgers against one balance.
-3. **Seed November or not** (M22-T12): the pre-M22 Redis keys `ai:spend:202611` / `ai:held:202611` are still in dev
-   (dev value `$0.956`) and will still be in prd after the deploy; nothing reads them now. `ai_usage` starts at zero, so
-   this month's caps have that much extra headroom. They are the only record of November's accounted spend — decide
-   before anyone deletes them.
-4. **prd host access** for the 11-11→12 counters, to finish the spend report.
-5. **Judgement calls to confirm:** default caps (300k tok/day, 6M/mo, 400 req/day, $0.25/day, $3/mo), rotation
-   (2 desks / 60 min), indefinite auth halt.
-6. **`023_ai_usage_ledger.sql` is now frozen.** The runner stores a checksum and refuses to boot if an applied file
-   changes (`migration ... changed after being applied`). It is applied in dev, in `news_test` and in the throwaway
-   race database; any further schema change goes in `024_*.sql`.
+1. ~~Approval to edit the protected env files~~ **done 2026-11-14**: all three files carry the ten new `AI_*` keys in
+   one aligned layout (`env-sync verify: PASS`, 146 lines each), `AI_MONTHLY_BUDGET_USD` moved `1 -> 3` per the
+   confirmed defaults, `AI_ENABLED=true` in dev and `false` in prd until M22 deploys. Dev was recreated with
+   `./bin/start.sh --env dev up`: healthy, all twelve settings verified in-container, ledger and halt intact.
+2. ~~One API key per environment~~ **owner reports separate keys are already in `.env.dev` and `.env.prd`**. Not
+   verified by me: key fingerprinting is blocked by sandbox policy, and the *host* `.env.prd` still holds the old
+   shared key (host sha `fca88b2301ff` vs local `526d025b0171` before this session's edit) - deploying the env file is
+   what actually gives prd its own key.
+3. ~~Seed November or not~~ **decided: start clean.** The orphan keys stay untouched as the only record of pre-M22
+   accounted spend - dev `ai:spend:202611 = 0.956`, prd `0.928180204`. Do not delete them without noting the values.
+4. ~~prd host access~~ **done 2026-11-14**, read-only over ssh (`vmi3435240`, root, `~/.ssh/recode-prod.pem`;
+   `iterwire_ed25519` is refused): prd on `b7d3506` clean, migrations to 022, no `ai_usage`, `platform_settings`
+   empty, Redis `$0.928` of `$1` with no stranded holds, 124 x `provider status 401` in 96 h, 24 runs/day with
+   184 summaries on 11-11 and 0 on 11-12. Report Addendum 2.
+5. ~~Judgement calls~~ **confirmed by the owner 2026-11-14** (caps, rotation, indefinite auth halt).
+
+### Open (needs the owner)
+
+1. **O18** Fund the new per-environment DeepSeek keys, then enable AI in prd (`/admin` → AI spend → AI enabled, or
+   `AI_ENABLED=true` + recreate). Until then prd fetches and publishes but makes no provider call.
+2. **O19** Identify the other consumer of the retired shared key: ~600 M tokens at ~86 k per request over 11-11→12 was
+   not this system (its measured worst case is ~0.22 M tokens and $0.10–0.20).
+3. **O20** Dev stays halted on `auth_401` — the safe parking spot. Resume from `/admin` once the dev key has funds.
+4. `@code-verify milestone - M22`, and with it the M3 money-path review owed since M21.
+5. After the first funded run: reconcile `ai_usage` against the provider invoice to prove the dollar leg of the cap.
+6. The pre-M22 Redis keys (`ai:spend:202611` — dev `0.956`, prd `0.928180204`) are unread by any code and are the only
+   record of November's accounted spend. Left in place deliberately; note the values before deleting them.
+
 
 ### Done this iteration
 
