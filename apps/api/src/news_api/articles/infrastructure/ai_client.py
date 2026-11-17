@@ -124,6 +124,36 @@ class AIResult:
     completion_tokens: int = 0
 
 
+def _reported_usage(response: httpx.Response) -> tuple[int | None, int | None, int | None]:
+    """Token counts from a provider body. Missing fields stay unset.
+
+    A refused call often has no ``usage`` object. Logging zeros there would
+    look like a call that sent nothing and was free.
+    """
+    try:
+        body = response.json()
+    except (ValueError, UnicodeError):
+        return None, None, None
+    usage = body.get("usage") if isinstance(body, dict) else None
+    if not isinstance(usage, dict):
+        return None, None, None
+
+    def num(value: Any) -> int | None:
+        if value is None:
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+
+    hit = num(usage.get("prompt_cache_hit_tokens"))
+    if hit is None:
+        details = usage.get("prompt_tokens_details")
+        if isinstance(details, dict):
+            hit = num(details.get("cached_tokens"))
+    return num(usage.get("prompt_tokens")), num(usage.get("completion_tokens")), hit
+
+
 def _as_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
@@ -410,6 +440,11 @@ class AIClient:
         owns = self._client is None
         client = self._client or httpx.AsyncClient(timeout=timeout)
         started = time.perf_counter()
+        status: int | None = None
+        error: str | None = None
+        prompt_tokens: int | None = None
+        completion_tokens: int | None = None
+        cache_hit_tokens: int | None = None
         try:
             response = await client.post(
                 f"{self.settings.ai_base_url.rstrip('/')}/chat/completions",
@@ -420,6 +455,8 @@ class AIClient:
                 json=payload,
                 timeout=timeout,
             )
+            status = response.status_code
+            prompt_tokens, completion_tokens, cache_hit_tokens = _reported_usage(response)
             if response.status_code in (401, 403):
                 # The key is wrong, revoked, or the account is stopped. Retrying
                 # cannot help, and every retry is another request against the
@@ -462,10 +499,26 @@ class AIClient:
             return AIResult(text, booked.prompt_tokens, booked.completion_tokens)
         except httpx.HTTPError as exc:
             # Unknown outcome after the request left: assume it was billed.
+            error = type(exc).__name__
             await ai_budget.settle_worst_case(reservation)
-            await self._failure(config, type(exc).__name__)
-            raise AIError(type(exc).__name__) from exc
+            await self._failure(config, error)
+            raise AIError(error) from exc
         finally:
+            # Every request that left the process, including a 401 and a
+            # timeout. The key, the prompt, and the reply stay out of the log.
+            log.info(
+                "ai.call",
+                model=self.model,
+                status=status,
+                elapsed_ms=round((time.perf_counter() - started) * 1000, 1),
+                messages=len(messages),
+                prompt_chars=sum(len(str(item.get("content") or "")) for item in messages),
+                max_tokens=max_tokens,
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                cache_hit_tokens=cache_hit_tokens,
+                error=error,
+            )
             if owns:
                 await client.aclose()
 

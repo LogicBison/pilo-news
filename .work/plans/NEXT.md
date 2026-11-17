@@ -1,16 +1,14 @@
 # NEXT - planning backlog
 
-**Updated:** 2026-11-14 (M22 verified and repaired; repair committed and pushed, **not yet on prd**)
+**Updated:** 2026-11-16 (provider-call log committed; not on prd; the $18.70 spend is still unattributed)
 
 ---
 
 ## Recommended next
 
-**O21 - deploy the 2026-11-14 repair to prd** (`git pull` + `./bin/start.sh --env prd up`). prd runs `e38dde0`,
-where an indefinite `auth_401` halt lapses for one call at every day and month boundary; the fix is code, so prd
-needs a deploy. Then **O18**: fund the new per-environment keys and enable AI from `/admin` → AI spend. After the
-first funded run, reconcile `ai_usage` against the provider invoice - the only way to prove the dollar leg of the
-cap, and it retires the D4/D9 price-table assumption.
+**Deploy the provider-call log to prd** (`git pull` + `./bin/start.sh --env prd up`). Each request that leaves
+`AIClient._chat` then writes one `ai.call` line. With AI off, that log stays empty. Do not fund or re-enable AI
+until the sender of the 2026-11-16 bill is identified. The 2026-11-14 repair is already on prd (`3c3b51a`).
 
 Two redirects from the milestone verify, both doc-layer and neither started: **`@feature-spec amend`** for ingestion
 SPEC **R19** (it still describes one monthly USD cap and predates M21/M22), and **`@plan-repair master`** for §19

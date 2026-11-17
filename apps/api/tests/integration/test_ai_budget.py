@@ -10,6 +10,18 @@ import pytest
 from news_api.articles.infrastructure import ai_budget
 from news_api.articles.infrastructure.ai_budget import Estimate, Limits, Usage
 
+
+class _Calls:
+    def __init__(self) -> None:
+        self.events: list[tuple[str, dict]] = []
+
+    def info(self, event: str, **kwargs: object) -> None:
+        self.events.append((event, kwargs))
+
+    def warning(self, event: str, **kwargs: object) -> None:
+        self.events.append((event, kwargs))
+
+
 ROOMY = Limits(
     daily_tokens=1_000_000,
     monthly_tokens=10_000_000,
@@ -264,6 +276,8 @@ async def test_a_rejected_key_halts_the_stack_instead_of_retrying(monkeypatch, c
     monkeypatch.setenv("AI_OFFPEAK_ONLY", "false")
     get_settings.cache_clear()
     sent = {"count": 0}
+    calls = _Calls()
+    monkeypatch.setattr(module, "log", calls)
 
     def handler(_request):
         sent["count"] += 1
@@ -289,6 +303,45 @@ async def test_a_rejected_key_halts_the_stack_instead_of_retrying(monkeypatch, c
     assert state["month"]["requests"] == 1
     assert state["month"]["tokens"] == 0
     assert state["month"]["cost_usd"] == pytest.approx(0.0, abs=1e-9)
+    logged = [fields for name, fields in calls.events if name == "ai.call"]
+    assert len(logged) == 1
+    assert logged[0]["status"] == 401
+    assert logged[0]["model"] == "deepseek-flash"
+    assert logged[0]["prompt_tokens"] is None
+    assert "revoked-key" not in str(logged[0])
+
+
+@pytest.mark.asyncio
+async def test_a_disabled_client_logs_no_call(monkeypatch, clean_db) -> None:
+    """AI off means no request, so the call log stays empty."""
+    import httpx
+
+    from news_api.articles.infrastructure import ai_client as module
+    from news_api.platform import overrides
+    from news_api.platform.settings import get_settings
+
+    overrides.invalidate()
+    monkeypatch.setenv("AI_ENABLED", "false")
+    monkeypatch.setenv("AI_API_KEY", "test-key")
+    get_settings.cache_clear()
+    calls = _Calls()
+    monkeypatch.setattr(module, "log", calls)
+    sent = {"count": 0}
+
+    def handler(_request):
+        sent["count"] += 1
+        return httpx.Response(200, json={"choices": [{"message": {"content": "no"}}]})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    try:
+        ai = module.AIClient(client=client)
+        assert await ai.summarize(title="Title", excerpt="Excerpt", language="en") is None
+    finally:
+        await client.aclose()
+        get_settings.cache_clear()
+
+    assert sent["count"] == 0
+    assert [name for name, _fields in calls.events if name == "ai.call"] == []
 
 
 @pytest.mark.asyncio
